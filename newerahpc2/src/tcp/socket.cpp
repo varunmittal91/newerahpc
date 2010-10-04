@@ -50,6 +50,9 @@ namespace newera_network{
 	void start(){
 		pthread_t main_thread;
 		pthread_create(&main_thread,NULL,open_socket,NULL);
+		database = new conn_database;
+		hpc_data = new newera_hpc;
+		load_node_list();		
 	}
 	void *open_socket(void *){
 		signal(SIGINT,sig_handler);
@@ -71,13 +74,11 @@ namespace newera_network{
 			exit(1);
 		}
 		//////////boot patch wish to have a better protocol///////////////
-		database = new conn_database;
-		hpc_data = new newera_hpc;
-		load_node_list();
+		/*
 		if(server_port<=8090){
 			hpc_data->load((char *)"/Volumes/newerahpc/newerahpc/grid_plugin/bin/libplugin.so");
 			grid_execute((char *)"newera_task");
-		}
+		}*/
 		/////////////////////////////////////////////////////////////////
 		while(1){
 			conn_rec *client_rec = new conn_rec;

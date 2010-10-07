@@ -24,4 +24,5 @@ namespace newera_network{
 	char *itoa(int);
 	std::string return_file();
 	int get_file_size(char *);
+	void add_log(const char *);
 };

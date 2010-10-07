@@ -77,6 +77,36 @@ namespace newera_network{
 	void grid_task::wait(){
 		while(!check()){}
 	}
+	void grid_task::submit(){
+		lock();
+		for(int cntr=0;cntr<count;cntr++){
+			instruction_set *instruction = return_instruction();
+			instruction->func_name = func_name;
+			instruction->status = GRID_NDONE;
+			peer_details *details = hpc_data->return_peer();
+			while(details==NULL){
+				cout<<"no free client found waiting for some time"<<endl;
+				sleep(4);
+				details = hpc_data->return_peer();
+			}
+			instruction->host = (char *)details->host.c_str();
+			instruction->port = details->port;
+#ifdef debug
+			add_log("task being dispatched");
+			add_log((const char *)instruction->host);
+#endif
+			pthread_t thread;
+			pthread_create(&thread,NULL,newera_hpc::send_job,(void *)instruction);
+			details = NULL;
+		}
+		while(check()==false){
+			sleep(2);
+			cout<<"waiting for tasks to get over"<<endl;
+		}
+		hpc_data->functions[func_name]->ptr_processor(instructions);
+		cout<<"the task completed successfuly"<<endl;		
+		unlock();
+	}
 	task_manager::task_manager(){
 		count = 0;
 	}

@@ -48,11 +48,13 @@ namespace newera_network{
 		connection_close(in_rec);
 	}
 	void start(){
-		pthread_t main_thread;
-		pthread_create(&main_thread,NULL,open_socket,NULL);
 		database = new conn_database;
 		hpc_data = new newera_hpc;
 		load_node_list();		
+		cout<<"enter a port for server communication: ";
+		cin>>server_port;
+		pthread_t main_thread;
+		pthread_create(&main_thread,NULL,open_socket,NULL);
 	}
 	void *open_socket(void *){
 		signal(SIGINT,sig_handler);
@@ -60,8 +62,6 @@ namespace newera_network{
 		local_rec = new conn_rec;
 		local_rec->host = (char *)"localhost";
 		local_rec->addr.sin_family = AF_INET;
-		cout<<"enter a port for server communication: ";
-		cin>>server_port;
 		local_rec->addr.sin_port = htons(server_port);
 		local_rec->addr.sin_addr.s_addr = htonl(INADDR_ANY);
 		if((local_rec->sockfd = socket(PF_INET,SOCK_STREAM,0))<0)perror("");

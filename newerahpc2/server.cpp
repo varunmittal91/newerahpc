@@ -21,6 +21,7 @@ using namespace newera_network;
 using namespace std;
 
 int main(){
-	open_socket(NULL);
+	start();
+	while(1)sleep(1);
 	return 0;
 }

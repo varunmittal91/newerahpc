@@ -64,6 +64,7 @@ namespace newera_network{
 		void lock();
 		void unlock();
 	public:
+		char *func_name;
 		instruction_set **instructions;
 		int c_id;
 		grid_task();
@@ -76,6 +77,7 @@ namespace newera_network{
 		}
 		bool check();
 		void wait();
+		void submit();
 	};
 	class instruction_set{
 	public:
@@ -120,10 +122,10 @@ namespace newera_network{
 		void unlock_task();
 	};
 	class newera_hpc:public config,public task_manager{
-		functions_map functions;
 		grid_task *tasks;
 		pthread_mutex_t mutex;
 	public:
+		functions_map functions;
 		newera_hpc();
 		~newera_hpc();
 		void lock();

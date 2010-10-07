@@ -1,7 +1,6 @@
 INCLUDE_PATH := -I./include
 
-EXTRA_CFLAGS_SERVER := -Dnewerahpc -g $(INCLUDE_PATH)
-EXTRA_CFLAGS_CLIENT := -Dnewerahpc -Dnewerahpc_client -g
+EXTRA_CFLAGS_SERVER := -Dnewerahpc -g $(INCLUDE_PATH) -Ddebug
 
 server:clean
 	rm bin/libnewera_server.a
@@ -13,6 +12,7 @@ server:clean
 	g++ src/grid/grid_task.cpp -c -o bin/grid_task.o $(EXTRA_CFLAGS_SERVER)
 	g++ src/grid/grid_instruction.cpp -c -o bin/grid_instruction.o $(EXTRA_CFLAGS_SERVER)
 	g++ src/thread/thread.cpp -c -o bin/thread.o $(EXTRA_CFLAGS_SERVER)
+	g++ src/general/log.cpp -c -o bin/log.o $(EXTRA_CFLAGS_SERVER)
 	g++ src/general/string.cpp -c -o bin/string.o $(EXTRA_CFLAGS_SERVER)
 	g++ src/general/file.cpp -c -o bin/file.o $(EXTRA_CFLAGS_SERVER)
 	g++ src/http/http.cpp -c -o bin/http.o $(EXTRA_CFLAGS_SERVER)

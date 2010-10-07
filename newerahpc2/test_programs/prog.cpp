@@ -8,7 +8,7 @@ int main(){
 	start();
 	hpc_data->load((char *)"grid_plugin/bin/libplugin.so");
 	grid_task task1;
-	task1.func_name = "newera_task";
+	task1.func_name = (char *)"newera_task";
 	instruction_set *in1 = new instruction_set;
 	int *data = new int;
 	*data = 12;

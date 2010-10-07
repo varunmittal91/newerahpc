@@ -1,2 +1,2 @@
 all:
-	g++ prog.cpp -lnewera_server -g
+	g++ prog.cpp -lnewera_server -lpthread -ldl -g

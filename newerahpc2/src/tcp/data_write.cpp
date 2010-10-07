@@ -102,7 +102,7 @@ namespace newera_network{
 			bzero(buffer,sizeof(buffer));
 			bytes_file = fread(buffer,1,sizeof(buffer),fp);
 			if(bytes_file==0)break;
-			bytes_temp = write(sockfd,buffer,sizeof(buffer));
+			bytes_temp = write(sockfd,buffer,bytes_file);
 			if(bytes_temp<0){
 				break;
 			}

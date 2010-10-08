@@ -58,7 +58,7 @@ namespace newera_network{
 		func_ptr *function;
 		int count;
 		int used;
-		pthread_mutex_t mutex;
+		pthread_mutex_t *mutex;
 		bool status;
 		void **data;
 		void lock();
@@ -76,8 +76,8 @@ namespace newera_network{
 			return count;
 		}
 		bool check();
-		void wait();
 		void submit();
+		void collect();
 	};
 	class instruction_set{
 	public:

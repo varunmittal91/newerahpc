@@ -22,6 +22,6 @@ int main(){
 	task1 = in1;
 	task1 = in2;
 	task1.submit();
-	task1.wait();
+	task1.collect();
 	return 0;
 }

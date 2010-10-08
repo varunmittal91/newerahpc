@@ -22,6 +22,8 @@ namespace newera_network{
 		c_id = 0;
 		count = 0;
 		used = 0;
+		mutex = new pthread_mutex_t;
+		pthread_mutex_init(mutex, NULL);
 	}
 	grid_task::~grid_task(){
 		lock();
@@ -32,10 +34,10 @@ namespace newera_network{
 		unlock();
 	}
 	void grid_task::lock(){
-		pthread_mutex_lock(&mutex);
+		pthread_mutex_lock(mutex);
 	}
 	void grid_task::unlock(){
-		pthread_mutex_unlock(&mutex);
+		pthread_mutex_unlock(mutex);
 	}
 	void grid_task::operator=(instruction_set *instruction){
 		lock();
@@ -53,11 +55,9 @@ namespace newera_network{
 		unlock();
 	}
 	instruction_set *grid_task::return_instruction(){
-		lock();
 		int pos = count-used-1;
 		instruction_set *instruction = instructions[pos];
 		used++;
-		unlock();
 		return instruction;
 	}
 	void grid_task::remove(instruction_set *instruction){
@@ -73,9 +73,6 @@ namespace newera_network{
 		}
 		unlock();
 		return ret_status;
-	}
-	void grid_task::wait(){
-		while(!check()){}
 	}
 	void grid_task::submit(){
 		lock();
@@ -99,12 +96,15 @@ namespace newera_network{
 			pthread_create(&thread,NULL,newera_hpc::send_job,(void *)instruction);
 			details = NULL;
 		}
+		unlock();
+	}
+	void grid_task::collect(){
 		while(check()==false){
 			sleep(2);
 			cout<<"waiting for tasks to get over"<<endl;
 		}
 		hpc_data->functions[func_name]->ptr_processor(instructions);
-		cout<<"the task completed successfuly"<<endl;		
+		cout<<"the task completed successfuly"<<endl;
 		unlock();
 	}
 	task_manager::task_manager(){

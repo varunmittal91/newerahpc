@@ -28,7 +28,7 @@ namespace newera_network{
 		pthread_create(&thread,NULL,grid_execute_thread,(void *)func_name);
 	}
 	void *grid_thread(void *data){
-		
+
 	};
 	newera_hpc::newera_hpc(){
 		pthread_mutex_init(&mutex,NULL);
@@ -44,9 +44,11 @@ namespace newera_network{
 		pthread_mutex_unlock(&mutex);
 	}
 	void newera_hpc::load(char *file_name){
+		lock();
 		void *dll = dlopen(file_name,RTLD_NOW);
 		if(!dll){
 			cout<<dlerror()<<endl;
+			unlock();
 			return;
 		}
 		func_ptr func_ptr_t = (func_ptr)dlsym(dll,"plugin_init");
@@ -54,15 +56,21 @@ namespace newera_network{
 		func_ptr func_ptr_t_p = (func_ptr)dlsym(dll,"plugin_processor");
 		if(!func_ptr_t&&!func_ptr_t_c&&!func_ptr_t_p){
 			cout<<dlerror()<<endl;
+			unlock();
 			return;
 		}
 		else{
 			void *func_string_temp;
 			func_string_temp = func_ptr_t(NULL);
 			string *func_string = (string *)func_string_temp;
+			if(check_dll((char*)(*func_string).c_str())==true)cout<<"dll already found"<<endl;
+			if(check_dll((char*)(*func_string).c_str())==true){
+				unlock();
+				return;
+			}
 			func_ptr_t = (func_ptr)dlsym(dll,"plugin_exec");
 			if(!func_ptr_t){
-				cout<<dlerror()<<endl;
+				unlock();
 				return;
 			}
 			else{
@@ -71,12 +79,11 @@ namespace newera_network{
 				func_details_t->ptr_client = func_ptr_t_c;
 				func_details_t->ptr_processor = func_ptr_t_p;
 				func_details_t->path = file_name;
-				pthread_mutex_lock(&mutex);
 				functions[*func_string] = func_details_t;
-				pthread_mutex_unlock(&mutex);
 				cout<<"dll loaded exec function found"<<endl;
 			}
 		}
+		unlock();
 	}
 	bool newera_hpc::check_dll(char *func_name){
 		functions_map::iterator check = functions.find(func_name);

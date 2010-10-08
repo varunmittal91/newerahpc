@@ -82,7 +82,6 @@ namespace newera_network{
 			instruction->status = GRID_NDONE;
 			peer_details *details = hpc_data->return_peer();
 			while(details==NULL){
-				//cout<<"no free client found waiting for some time"<<endl;
 				sleep(1);
 				details = hpc_data->return_peer();
 			}

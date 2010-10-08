@@ -23,7 +23,7 @@ namespace newera_network{
 	conn_rec *local_rec;
 	conn_database *database;
 	int server_port;
-	
+
 	void connection_close(conn_rec *in_rec){
 		sleep(2);
 		shutdown(in_rec->sockfd,SHUT_RDWR);
@@ -50,7 +50,7 @@ namespace newera_network{
 	void start(){
 		database = new conn_database;
 		hpc_data = new newera_hpc;
-		load_node_list();		
+		load_node_list();
 		cout<<"enter a port for server communication: ";
 		cin>>server_port;
 		pthread_t main_thread;
@@ -73,13 +73,6 @@ namespace newera_network{
 			perror("");
 			exit(1);
 		}
-		//////////boot patch wish to have a better protocol///////////////
-		/*
-		if(server_port<=8090){
-			hpc_data->load((char *)"/Volumes/newerahpc/newerahpc/grid_plugin/bin/libplugin.so");
-			grid_execute((char *)"newera_task");
-		}*/
-		/////////////////////////////////////////////////////////////////
 		while(1){
 			conn_rec *client_rec = new conn_rec;
 			int size = sizeof(client_rec->addr);
@@ -93,7 +86,6 @@ namespace newera_network{
 			client_rec->host = inet_ntoa(client_rec->addr.sin_addr);
 			client_rec->port = ntohs(client_rec->addr.sin_port);
 			client_rec->cid = database->add(client_rec->host,client_connect);
-			database->display(client_rec->host);
 			client_rec->servr_port = server_port;
 			int thread_accept_status = pthread_create(&client_connect,NULL,handle_connection,(void *)client_rec);
 		}

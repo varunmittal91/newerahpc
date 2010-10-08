@@ -38,6 +38,8 @@ namespace newera_network{
 					write->add(itoa(server_port));
 					write->add("");
 					write->push();
+					shutdown(out_rec->sockfd,SHUT_RDWR);
+					close(out_rec->sockfd);
 				}
 			}
 			for(int cntr_1=0;cntr_1<5;cntr_1++){

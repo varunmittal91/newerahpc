@@ -27,7 +27,7 @@ namespace newera_network{
 		limit = CLIENT_REQ_MAX;
 		count = 0;
 		file_size = 0;
-		file_size_act = NULL;
+		file_size_act = 0;
 		get_file = NO_FILE;
 	}
 	client_request::~client_request(){
@@ -58,7 +58,7 @@ namespace newera_network{
 			bytes = recv(in_rec->sockfd,buffer,sizeof(buffer),0);
 			fp.write(buffer,bytes);
 			file_size += bytes;
-			if(file_size_act!=NULL){
+			if(file_size_act!=0){
 				if(file_size==file_size_act)break;
 				else if(bytes==0)break;
 			}

@@ -36,7 +36,7 @@ namespace newera_network{
 		int count;
 	};
 	class http_data{
-		char *req_details[REQ_DETAILS_MAX];
+		char **req_details;
 		int file_status;
 		int status_code;
 		int sockfd;
@@ -54,6 +54,7 @@ namespace newera_network{
 		void reply();
 		void push_header();
 		void directory_listing();
+		void error();
 	};
 	class http_data_client{
 		int port;
@@ -75,5 +76,5 @@ namespace newera_network{
 	};
 	extern tcp_http_response_codes http_response_codes[16];
 	void http_init(conn_rec *,client_request *);
-	int filedir_check(char *);
+	int filedir_check(const char *);
 };

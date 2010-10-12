@@ -25,13 +25,13 @@ namespace newera_network{
 	int server_port;
 
 	void connection_close(conn_rec *in_rec){
-		sleep(2);
 		shutdown(in_rec->sockfd,SHUT_RDWR);
 		close(in_rec->sockfd);
 		delete in_rec;
 	}
 	void *handle_connection(void *data){
 		signal(SIGPIPE,sig_handler);
+		signal(SIGSEGV,sig_handler);
 		conn_rec *in_rec = (conn_rec *)data;
 		client_request *req = new client_request;
 		req->read(in_rec);
@@ -48,6 +48,8 @@ namespace newera_network{
 		connection_close(in_rec);
 	}
 	void start(){
+		signal(SIGINT,sig_handler);
+		signal(SIGKILL,sig_handler);
 		database = new conn_database;
 		hpc_data = new newera_hpc;
 		load_node_list();
@@ -57,8 +59,6 @@ namespace newera_network{
 		pthread_create(&main_thread,NULL,open_socket,NULL);
 	}
 	void *open_socket(void *){
-		signal(SIGINT,sig_handler);
-		signal(SIGKILL,sig_handler);
 		local_rec = new conn_rec;
 		local_rec->host = (char *)"localhost";
 		local_rec->addr.sin_family = AF_INET;

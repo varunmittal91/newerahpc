@@ -96,7 +96,7 @@ namespace newera_network{
 	char *substr(char *str,size_t start_pos,size_t end_pos){
 		size_t length = end_pos - start_pos;
 		char *result = new char [length+1];
-		bzero(result,sizeof(result));
+		bzero(result,length+1);
 		char *temp = str;
 		for(int cntr_1=0;cntr_1<start_pos;cntr_1++){
 			temp++;

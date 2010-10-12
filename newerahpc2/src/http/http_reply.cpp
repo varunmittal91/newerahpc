@@ -95,6 +95,10 @@ namespace newera_network{
 		write->add("</table>");
 		closedir(dp);
 	}
+	void http_data::error(){
+		char *message = http_response_codes[status_code].message;
+		write->add(message);
+	}
 	void http_data::push_header(){
 		if(file_status==FILE_FOUND)return;
 		write->reset();
@@ -102,7 +106,8 @@ namespace newera_network{
 		write->add("<html><Head><Title>");
 		write->add(SITE_NAME);
 		write->add("</Title></Head><Body><h1><center>newera server</center></h1><hr>");
-		directory_listing();
+		if(file_status==DIR_FOUND)directory_listing();
+		else error();
 		write->add("</Body></Html>");
 		write->push_http();
 	}

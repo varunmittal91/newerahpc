@@ -20,7 +20,7 @@
 #define MAXPENDING 10
 #define MAXCONN 10
 #define BUFFSIZE 1024
-#define CLIENT_REQ_MAX 10
+#define CLIENT_REQ_MAX 1
 #define SERVER_PORT 8091
 #define NO_FILE 0
 #define GET_FILE 1

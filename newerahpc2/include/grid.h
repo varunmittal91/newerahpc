@@ -121,20 +121,31 @@ namespace newera_network{
 		void lock_task();
 		void unlock_task();
 	};
-	class newera_hpc:public config,public task_manager{
+	class plugin_manager{
+	private:
+		pthread_mutex_t *mutex;
+		void lock_plugin();
+		void unlock_plugin();
+	public:
+		functions_map functions;
+		plugin_manager();
+		~plugin_manager();
+		void add_request(conn_rec *,char *,char *);
+		void wait_plugin();
+		void load(char *);
+		bool check_dll(char *);
+	};
+	class newera_hpc:public config,public task_manager,public plugin_manager{
 		grid_task *tasks;
 		pthread_mutex_t mutex;
 	public:
-		functions_map functions;
 		newera_hpc();
 		~newera_hpc();
 		void lock();
 		void unlock();
 		void add();
-		void load(char *);
 		void *execute(char *);
 		void execute_client(instruction_set *);
-		bool check_dll(char *);
 		char *return_path(char *);
 		void grid_lng_init(network_write *,char *);
 		static void *send_job(void *);

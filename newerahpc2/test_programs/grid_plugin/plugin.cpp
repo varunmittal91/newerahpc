@@ -18,9 +18,28 @@
 #include <string>
 #include <iostream>
 #include "plugin.h"
+#include <init.h>
 
 using namespace std;
 using namespace newera_network;
+using namespace newera_mpi;
+
+void print_num(newera_hpc_bit *num,int count){
+        cout<<num[0]<<" "<<endl;
+        int b =0;
+        for(int a=1;a<count;a++){
+                cout<<num[a];
+                if(a%10==0){
+                        cout<<" ";
+                        b++;
+                        if(b==5){
+                                cout<<endl;
+                                b=0;
+                        }
+                }
+        }
+        cout<<endl;
+}
 
 extern "C"{
 	string *plugin_init(){
@@ -46,21 +65,26 @@ extern "C"{
 		return task;
 	}
 	instruction_set *plugin_exec_client(void *data){
-		cout<<"yup i m borm now"<<endl;
+		cout<<"executing client function"<<endl;
 		instruction_set *instruction = (instruction_set *)data;
-		int *a = (int *)instruction->data;
-		*a = (*a) * 2;
-		cout<<*a<<" in exec_client"<<endl;
-		instruction->data = (void *)a;
-		instruction->length = sizeof(int);
+		int *values = (int *)instruction->data;
+		newera_hpc_data *data_mpi = arctan(values[0],0,values[1]);
+		instruction->data = (void *)data_mpi->data;
+		instruction->length = sizeof(newera_hpc_bit)*4000;
 		return instruction;
 	}
 	void *plugin_processor(void *data){
 		instruction_set **instructions = (instruction_set **)data;
-		instruction_set *in1;
+		instruction_set *in1,*in2;
 		in1 = instructions[0];
-		int *a = (int *)in1->data;
-		cout<<"this my data "<<*a<<endl;
+		in2 = instructions[1];
+		newera_hpc_bit *a = (newera_hpc_bit *)in1->data;
+		newera_hpc_bit *b = (newera_hpc_bit *)in2->data;
+		multiply_old(a,16,4000);
+		multiply_old(b,4,4000);
+		subtract_old(a,b,4000);
+		print_num(a,4000);
+		print_num(b,4000);
 		cout<<"i have all the data from clients"<<endl;
 	}
 }

@@ -70,10 +70,7 @@ namespace newera_network{
 			hpc_data->free_peer(in_rec->host);
 		}
 		else if(find(req->lines[0],(char *)"_GETPLUGIN")!=STR_NPOS){
-			cout<<"receievd request for a new plugin"<<endl;
-			cout<<req->lines[1]<<endl;
 			if(hpc_data->check_dll(req->lines[1])){
-				cout<<"sending plugin"<<endl;
 				conn_rec *out_rec = new conn_rec;
 				out_rec->host = in_rec->host;
 				out_rec->port = atoi(req->lines[2]);

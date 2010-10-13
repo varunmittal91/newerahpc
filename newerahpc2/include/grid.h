@@ -123,9 +123,19 @@ namespace newera_network{
 	};
 	class plugin_manager{
 	private:
+		struct plugin_request{
+			char *host;
+			int port;
+			char *plg_name;
+			char *plg_code;
+			plugin_request *next;
+		};
+		plugin_request *requests;
+		int request_count;
 		pthread_mutex_t *mutex;
 		void lock_plugin();
 		void unlock_plugin();
+		bool check_request(char *,char *);
 	public:
 		functions_map functions;
 		plugin_manager();
@@ -134,6 +144,7 @@ namespace newera_network{
 		void wait_plugin();
 		void load(char *);
 		bool check_dll(char *);
+		void display_plugin_requests();
 	};
 	class newera_hpc:public config,public task_manager,public plugin_manager{
 		grid_task *tasks;

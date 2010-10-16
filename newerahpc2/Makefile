@@ -7,6 +7,7 @@ server:clean
 	g++ src/grid/grid.cpp -c -o bin/grid.o $(EXTRA_CFLAGS_SERVER)
 	g++ src/grid/grid_conf.cpp -c -o bin/grid_conf.o $(EXTRA_CFLAGS_SERVER)
 	g++ src/grid/grid_plugin.cpp -c -o bin/grid_plugin.o $(EXTRA_CFLAGS_SERVER)
+	g++ src/grid/grid_nxi.cpp -c -o bin/grid_nxi.o $(EXTRA_CFLAGS_SERVER)
 	g++ src/grid/grid_dynamic.cpp -c -o bin/grid_dynamic.o $(EXTRA_CFLAGS_SERVER)
 	g++ src/grid/grid_lng.cpp -c -o bin/grid_lng.o $(EXTRA_CFLAGS_SERVER) 
 	g++ src/grid/grid_data.cpp -c -o bin/grid_data.o $(EXTRA_CFLAGS_SERVER)

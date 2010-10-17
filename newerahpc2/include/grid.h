@@ -145,7 +145,7 @@ namespace newera_network{
 		void load(char *);
 		bool check_dll(char *);
 		void display_plugin_requests();
-		void load_nxi(char *);
+		char *load_nxi(char *);
 		char *read_nxi(const char *);
 		char *create_nxi(const char *);
 	};

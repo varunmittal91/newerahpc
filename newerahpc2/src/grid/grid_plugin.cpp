@@ -82,8 +82,7 @@ namespace newera_network{
 	}
 	void plugin_manager::load(char *file_name){
 		if(find(file_name,".nxi")!=STR_NPOS||find(file_name,".info")!=STR_NPOS){
-			load_nxi(file_name);
-			return;
+			file_name = load_nxi(file_name);
 		}
 		lock_plugin();
 		void *dll = dlopen(file_name,RTLD_NOW);

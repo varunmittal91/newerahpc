@@ -1,5 +1,5 @@
-MPIX_INCLUDE = ../mpix/include
-MPIX_LIB = ../mpix/bin
+MPIX_INCLUDE = mpix/include
+MPIX_LIB = mpix/bin
 
 all:
 	g++ plugin.cpp -o bin/plugin.o -c -I $(MPIX_INCLUDE)

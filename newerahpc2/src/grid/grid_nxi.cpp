@@ -29,12 +29,14 @@ namespace newera_network{
         system(tmp.c_str());
         plg_exec<<"#!/bin/sh"<<endl;
         plg_exec<<"cd "<<out_dir<<endl;
+		plg_exec<<"mkdir bin"<<endl;
         string line;
         fstream out_files;
         while(getline(plg_inp_file,line)){
 			if(line.find("build-command")!=string::npos){
 				size_t tmp_pos1 = line.find(":");
-				plg_exec<<line.substr(tmp_pos1+1,line.length()-tmp_pos1-1)<<" &> /dev/null"<<endl<<"echo rv: $?"<<endl;
+				plg_exec<<line.substr(tmp_pos1+1,line.length()-tmp_pos1-1)<<" &> /dev/null"<<endl;
+				plg_exec<<"if [ \"$?\" != \"0\" ]; then"<<endl<<"exit 1"<<endl<<"fi"<<endl;
 				continue;
 			}
 			else if(line.find("<<file:over>>")!=string::npos){
@@ -61,9 +63,15 @@ namespace newera_network{
 			}
 			out_files<<line<<endl;
         }
-		plg_exec<<"exit $?"<<endl;
+		plg_exec<<"exit 0"<<endl;
         tmp = out_dir + "/exec";
-		cout<<system(tmp.c_str())<<endl;
+		int status = system(tmp.c_str());
+		if(status>0)return NULL;
+		else{
+			string plugin_path = out_dir + "/" + "bin/libplugin.so";
+			if(filedir_check(plugin_path.c_str())!=FILE_FOUND)return NULL;
+			return (char *)plugin_path.c_str();
+		}
 	}
 	char *plugin_manager::create_nxi(const char *file){
 		string plg_info_path = file;
@@ -105,13 +113,15 @@ namespace newera_network{
         }
 		return (char *)out_file.c_str();
 	}
-	void plugin_manager::load_nxi(char *file_name){
+	char *plugin_manager::load_nxi(char *file_name){
 		if(find(file_name,".info")!=STR_NPOS){
 			char *nxi_loc = create_nxi(file_name);
 			file_name = nxi_loc;
 		}
-		if(file_name!=NULL)
-			char *dll_loc = read_nxi(file_name);
+		if(file_name==NULL)
+			return NULL;
+		char *dll_loc = read_nxi(file_name);
+		return dll_loc;
 	}
 };
 		

@@ -5,7 +5,7 @@ using namespace newera_network;
 int main(){
 	start();
         //hpc_data->load((char *)"grid_plugin/bin/libplugin.so");
-	hpc_data->load((char *)"grid_plugin/plugin.info");
+	hpc_data->load((char *)"grid_plugin/plugin.nxi");
 	//return 0;
 	int count = 1;
 	grid_task task;

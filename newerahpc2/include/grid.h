@@ -145,9 +145,9 @@ namespace newera_network{
 		void load(char *);
 		bool check_dll(char *);
 		void display_plugin_requests();
-		void add_nxi(const char *);
-		void read_nxi(const char *);
-		void create_nxi(const char *);
+		void load_nxi(char *);
+		char *read_nxi(const char *);
+		char *create_nxi(const char *);
 	};
 	class newera_hpc:public config,public task_manager,public plugin_manager{
 		grid_task *tasks;

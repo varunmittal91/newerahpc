@@ -4,7 +4,9 @@ using namespace newera_network;
 
 int main(){
 	start();
-        hpc_data->load((char *)"grid_plugin/bin/libplugin.so");
+        //hpc_data->load((char *)"grid_plugin/bin/libplugin.so");
+	hpc_data->load((char *)"grid_plugin/plugin.info");
+	//return 0;
 	int count = 1;
 	grid_task task;
 	task.func_name = (char *)"newera_task";
@@ -21,13 +23,10 @@ int main(){
 	in1->length = sizeof(int)*2;
 	in2->data = (void *)data2;
 	in2->length = sizeof(int)*2;
-	cout<<"sommethings working"<<endl;
 	task = in1;
 	task = in2;
-	cout<<"all done"<<endl;
 	task.submit();
 	task.check();
-	cout<<"task submitted"<<endl;
 	task.collect();
 	return 0;
 }

@@ -20,19 +20,19 @@
 namespace newera_network{
 	char *plugin_manager::read_nxi(const char *file){
 		ifstream plg_inp_file(file);
-        string out_dir = return_file();
-        string tmp = "mkdir " + out_dir;
-        system(tmp.c_str());
-        string out_exec = out_dir + "/exec";
-        ofstream plg_exec(out_exec.c_str());
-        tmp = "chmod a+x " + out_dir + "/exec";
-        system(tmp.c_str());
-        plg_exec<<"#!/bin/sh"<<endl;
-        plg_exec<<"cd "<<out_dir<<endl;
+		string out_dir = return_file();
+		string tmp = "mkdir " + out_dir;
+		system(tmp.c_str());
+		string out_exec = out_dir + "/exec";
+		ofstream plg_exec(out_exec.c_str());
+		tmp = "chmod a+x " + out_dir + "/exec";
+		system(tmp.c_str());
+		plg_exec<<"#!/bin/sh"<<endl;
+		plg_exec<<"cd "<<out_dir<<endl;
 		plg_exec<<"mkdir bin"<<endl;
-        string line;
-        fstream out_files;
-        while(getline(plg_inp_file,line)){
+		string line;
+		fstream out_files;
+		while(getline(plg_inp_file,line)){
 			if(line.find("build-command")!=string::npos){
 				size_t tmp_pos1 = line.find(":");
 				plg_exec<<line.substr(tmp_pos1+1,line.length()-tmp_pos1-1)<<" &> /dev/null"<<endl;
@@ -62,9 +62,9 @@ namespace newera_network{
 				continue;
 			}
 			out_files<<line<<endl;
-        }
+		}
 		plg_exec<<"exit 0"<<endl;
-        tmp = out_dir + "/exec";
+		tmp = out_dir + "/exec";
 		int status = system(tmp.c_str());
 		if(status>0)return NULL;
 		else{
@@ -75,20 +75,20 @@ namespace newera_network{
 	}
 	char *plugin_manager::create_nxi(const char *file){
 		string plg_info_path = file;
-        size_t pos_t1 = plg_info_path.find("/");
-        size_t pos_t2 = pos_t1;
-        while(pos_t1!=string::npos){
+		size_t pos_t1 = plg_info_path.find("/");
+		size_t pos_t2 = pos_t1;
+		while(pos_t1!=string::npos){
 			pos_t2 = pos_t1;
 			pos_t1 = plg_info_path.find("/",pos_t1+1);
-        }
-        if(pos_t2==string::npos)pos_t2 = 0;
-        string plg_info_root = plg_info_path.substr(0,pos_t2);
-        ifstream plg_info(file);
+		}
+		if(pos_t2==string::npos)pos_t2 = 0;
+		string plg_info_root = plg_info_path.substr(0,pos_t2);
+		ifstream plg_info(file);
 		string out_file = return_file();
-        ofstream plg_out(out_file.c_str());
-        string line;
-        bool file_mode = false;
-        while(getline(plg_info,line)){
+		ofstream plg_out(out_file.c_str());
+		string line;
+		bool file_mode = false;
+		while(getline(plg_info,line)){
 			if(file_mode!=true){
 				if(line.find("build-command")!=string::npos){
 					plg_out<<line<<endl;
@@ -110,7 +110,7 @@ namespace newera_network{
 				plg_out<<line_file<<endl;
 			}
 			plg_out<<"<<file:over>>"<<endl;
-        }
+		}
 		return (char *)out_file.c_str();
 	}
 	char *plugin_manager::load_nxi(char *file_name){
@@ -124,5 +124,5 @@ namespace newera_network{
 		return dll_loc;
 	}
 };
-		
-		
+
+

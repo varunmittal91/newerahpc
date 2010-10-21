@@ -157,7 +157,6 @@ namespace newera_network{
 		
 	}
 	void plugin_manager::load(char *file_name){
-<<<<<<< .mine
 		lock_plugin();
 		func_details *func_details_t = new func_details;
 		if(check_nxi(file_name)==true){
@@ -168,10 +167,6 @@ namespace newera_network{
 				unlock_plugin();
 				return;
 			}
-=======
-		if(find(file_name,(char *)".nxi")!=STR_NPOS||find(file_name,(char *)".info")!=STR_NPOS){
-			file_name = load_nxi(file_name);
->>>>>>> .r23
 		}
 		void *dll = dlopen(file_name,RTLD_NOW);
 		if(!dll){

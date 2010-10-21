@@ -114,7 +114,7 @@ namespace newera_network{
 		return (char *)out_file.c_str();
 	}
 	char *plugin_manager::load_nxi(char *file_name){
-		if(find(file_name,".info")!=STR_NPOS){
+		if(find(file_name,(char *)".info")!=STR_NPOS){
 			char *nxi_loc = create_nxi(file_name);
 			file_name = nxi_loc;
 		}

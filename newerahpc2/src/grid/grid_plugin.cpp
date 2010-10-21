@@ -81,7 +81,7 @@ namespace newera_network{
 		
 	}
 	void plugin_manager::load(char *file_name){
-		if(find(file_name,".nxi")!=STR_NPOS||find(file_name,".info")!=STR_NPOS){
+		if(find(file_name,(char *)".nxi")!=STR_NPOS||find(file_name,(char *)".info")!=STR_NPOS){
 			file_name = load_nxi(file_name);
 		}
 		lock_plugin();
@@ -126,7 +126,7 @@ namespace newera_network{
 		unlock_plugin();
 	}	
 	bool plugin_manager::check_dll(char *func_name){
-		functions_map::iterator check = functions.find(func_name);
+		functions_map::iterator check = functions.find((char *)func_name);
 		if(check==functions.end())return false;
 		else return true;
 	}	

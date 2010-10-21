@@ -49,7 +49,6 @@ namespace newera_network{
 				data_rqst = data_rqst_bs;
 				if(data_rqst->next!=NULL){
 					plugin_request *tmp_request = data_rqst->next;
-					cout<<tmp_request->host<<endl;
 					if(data_rqst->next->next!=NULL){
 						data_rqst->next = data_rqst->next->next;
 					}
@@ -84,7 +83,6 @@ namespace newera_network{
 		}
 	}
 	void plugin_manager::wait_plugin(char *plg_name,char *plg_code){
-		cout<<"executing ckeck_request sequence"<<endl;
 		while(check_request(plg_name,plg_code)==true){
 			sleep(1);
 		}
@@ -115,7 +113,6 @@ namespace newera_network{
 		else{
 			plugin_request *tmp_request = requests_bs->next;
 			while(tmp_request->next!=NULL){
-				cout<<"rolled"<<endl;
 				tmp_request = tmp_request->next;
 			}
 			tmp_request->next = new_request;

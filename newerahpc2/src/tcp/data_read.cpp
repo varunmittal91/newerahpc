@@ -63,6 +63,7 @@ namespace newera_network{
 				else if(bytes==0)break;
 			}
 		}while(bytes>=0);
+		fp.close();
 	}
 	void client_request::read(conn_rec *in_rec){
 		signal(SIGPIPE,sig_handler);

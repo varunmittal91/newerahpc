@@ -98,7 +98,6 @@ namespace newera_network{
 		unlock();
 	}
 	void grid_task::collect(){
-		cout<<"collecting"<<endl;
 		while(check()==false){
 			sleep(2);
 			cout<<"waiting for tasks to get over"<<endl;

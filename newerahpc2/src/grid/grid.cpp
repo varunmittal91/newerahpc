@@ -24,26 +24,7 @@ namespace newera_network{
 	void grid_init(conn_rec *in_rec,client_request *req){
 		if(find(req->lines[0],(char *)"_EXECUTE")!=STR_NPOS){
 			if(!hpc_data->check_dll(req->lines[1])){
-				hpc_data->add_request((char *)in_rec->host,atoi(req->lines[2]),(char *)req->lines[1],"",WAIT_PLUGIN);
-				/*
-				conn_rec *out_rec = new conn_rec;
-				out_rec->host = in_rec->host;
-				out_rec->port = atoi(req->lines[2]);
-				connect(out_rec);
-				if(!out_rec->conn_status)cout<<"connection failed"<<endl;
-				else{
-					network_write *write = new network_write(out_rec->sockfd);
-					client_request *req_plugin = new client_request;
-					req_plugin->get_file = GET_FILE;
-					write->add("GRID_GETPLUGIN");
-					write->add(req->lines[1]);
-					write->add(itoa(server_port));
-					write->add("");
-					write->push();
-					shutdown(out_rec->sockfd,SHUT_RDWR);
-					close(out_rec->sockfd);
-				}
-				 */
+				hpc_data->add_request((char *)in_rec->host,atoi(req->lines[2]),(char *)req->lines[1],(char *)"",WAIT_PLUGIN);
 			}
 			for(int cntr_1=0;cntr_1<5;cntr_1++){
 				sleep(4);

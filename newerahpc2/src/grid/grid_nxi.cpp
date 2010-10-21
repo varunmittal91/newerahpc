@@ -19,13 +19,14 @@
 
 namespace newera_network{
 	char *plugin_manager::read_nxi(const char *file){
-		ifstream plg_inp_file(file);
+		string file_inp_str = file;
+		ifstream plg_inp_file(file_inp_str.c_str(),ios::in);
 		string out_dir = return_file(DIR_T);
 		string out_exec = out_dir + "/exec";
 		ofstream plg_exec(out_exec.c_str());
 		string tmp = "chmod a+x " + out_dir + "/exec";
 		system(tmp.c_str());
-		plg_exec<<"#!/bin/sh"<<endl;
+		plg_exec<<"#!/bin/bash"<<endl;
 		plg_exec<<"cd "<<out_dir<<endl;
 		plg_exec<<"mkdir bin"<<endl;
 		string line;
@@ -62,6 +63,7 @@ namespace newera_network{
 			out_files<<line<<endl;
 		}
 		plg_exec<<"exit 0"<<endl;
+		plg_exec.close();
 		tmp = out_dir + "/exec";
 		int status = system(tmp.c_str());
 		if(status>0)return NULL;
@@ -124,14 +126,16 @@ namespace newera_network{
 		return dll_loc;
 	}
 	bool plugin_manager::check_nxi(char *file_name){
-		if(find(file_name,".nxi")!=STR_NPOS||find(file_name,".info")!=STR_NPOS){
+		if(find(file_name,(char *)".nxi")!=STR_NPOS||find(file_name,(char *)".info")!=STR_NPOS){
 			return true;
 		}
+		bool ret_status = true;
 		ifstream check_pxi(file_name);
 		string line;
 		getline(check_pxi,line);
-		if(line.find("nxi_file")==string::npos)return false;
-		return true;
+		if(line.find("nxi_file")==string::npos)ret_status = false;
+		check_pxi.close();
+		return ret_status;
 	}
 };
 

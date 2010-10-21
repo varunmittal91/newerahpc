@@ -23,8 +23,11 @@ int main(){
 	in2->length = sizeof(int)*2;
 	task = in1;
 	task = in2;
+	cout<<"submitting task"<<endl;
 	task.submit();
+	cout<<"task givven"<<endl;
 	task.check();
+	cout<<"task collecting"<<endl;
 	task.collect();
 	return 0;
 }

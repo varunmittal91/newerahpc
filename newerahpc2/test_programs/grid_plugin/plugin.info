@@ -1,0 +1,30 @@
+build-command:cd mpix && mkdir bin && make mpi
+build-command:cd ..
+build-command:make
+files:
+plugin.cpp
+plugin.h
+Makefile
+mpix/Makefile
+mpix/include/io.h
+mpix/include/adv_math.h
+mpix/include/basic.h
+mpix/include/basic_math.h
+mpix/include/compare.h
+mpix/include/data.h
+mpix/include/init.h
+mpix/include/io.h
+mpix/include/old_math.h
+mpix/include/string_mpi.h
+mpix/src/add.cpp
+mpix/src/arctan.cpp
+mpix/src/basic.cpp
+mpix/src/compare.cpp
+mpix/src/devide.cpp
+mpix/src/devide_back.cpp
+mpix/src/init.cpp
+mpix/src/io.cpp
+mpix/src/math_old.cpp
+mpix/src/multiply.cpp
+mpix/src/string.cpp
+mpix/src/subtract.cpp

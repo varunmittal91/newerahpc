@@ -33,6 +33,27 @@ namespace newera_network{
 		}
 		return file;
 	}
+	string return_file(int type){
+		int stat = 0;
+		int count=0;
+		string file;
+		while(stat!=1){
+			file = "/tmp/temp";
+			file += itoa(count);
+			ifstream temp(file.c_str());
+			if(!temp.is_open())stat=1;
+			count++;
+		}
+		string cmd;
+		if(type==FILE_T){
+			cmd = "touch "+file;
+		}
+		else{
+			cmd = "mkdir "+file;
+		}
+		system(cmd.c_str());
+		return file;
+	}
 	int get_file_size(char *file){
 		int file_size;
 		ifstream data(file);

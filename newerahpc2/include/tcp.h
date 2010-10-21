@@ -79,7 +79,7 @@ namespace newera_network{
 		int file_size;
 		int file_size_act;
 		std::ofstream fp;
-		char *file_location;
+		std::string file_location;
 		void *grid_data_v;
 		client_request();
 		~client_request();

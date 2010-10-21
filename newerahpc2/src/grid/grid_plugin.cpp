@@ -21,54 +21,133 @@
 namespace newera_network{
 	plugin_manager::plugin_manager(){
 		mutex = new pthread_mutex_t;
-		request_count = 0;
-		requests = NULL;
+		request_count = new int;
+		(*request_count) = 0;
+		requests_bs = new plugin_request;
+		requests_bs->next = NULL;
+		requests_bs->thread_mutex = mutex;
 	}
 	plugin_manager::~plugin_manager(){
 		delete mutex;
-		for(int cntr=0;cntr<request_count;cntr++){
+		for(int cntr=0;cntr<(*request_count);cntr++){
 			
 		}
 	}
-	void plugin_manager::add_request(conn_rec *in_rec,char *plg_name,char *plg_code){
+	void plugin_manager::init_manager(){
+		cout<<"initing plugin manager"<<endl;
+		requests_bs->request_count = (int *)request_count;
+		pthread_t thread;
+		pthread_create(&thread,NULL,plugin_manager::dispatcher,(void *)requests_bs);
+	}
+	void *plugin_manager::dispatcher(void *data){
+		plugin_request *data_rqst_bs = (plugin_request *)data;
+		plugin_request *data_rqst = data_rqst_bs; 
+		while(1){
+			sleep(2);
+			pthread_mutex_lock(data_rqst_bs->thread_mutex);			
+			while(1){
+				data_rqst = data_rqst_bs;
+				if(data_rqst->next!=NULL){
+					plugin_request *tmp_request = data_rqst->next;
+					cout<<tmp_request->host<<endl;
+					if(data_rqst->next->next!=NULL){
+						data_rqst->next = data_rqst->next->next;
+					}
+					else{
+						data_rqst->next = NULL;
+					}
+					////////////////////////////////////////////
+					conn_rec *out_rec = new conn_rec;
+					out_rec->host = tmp_request->host;
+					out_rec->port = tmp_request->port;
+					connect(out_rec);
+					if(!out_rec->conn_status)cout<<"connection failed"<<endl;
+					else{
+						network_write *write = new network_write(out_rec->sockfd);
+						client_request *req_plugin = new client_request;
+						req_plugin->get_file = GET_FILE;
+						write->add("GRID_GETPLUGIN");
+						write->add(tmp_request->plg_name);
+						write->add(itoa(server_port));
+						write->add("");
+						write->push();
+						shutdown(out_rec->sockfd,SHUT_RDWR);
+						close(out_rec->sockfd);
+					}					
+					////////////////////////////////////////////
+					delete tmp_request;
+					(*data_rqst->request_count)--;
+					if((*data_rqst->request_count)==0)break;
+				}
+			}
+			pthread_mutex_unlock(data_rqst_bs->thread_mutex);
+		}
+	}
+	void plugin_manager::wait_plugin(char *plg_name,char *plg_code){
+		cout<<"executing ckeck_request sequence"<<endl;
+		while(check_request(plg_name,plg_code)==true){
+			sleep(1);
+		}
+	}
+	std::string plugin_manager::return_path(char *plugin){
+		lock_plugin();
+		func_details *func_details = functions[plugin];
+		if(func_details->path_nxi.length()>0){
+			unlock_plugin();
+			return func_details->path_nxi;
+		}
+		unlock_plugin();
+		return func_details->path;
+	}	
+	void plugin_manager::add_request(char *host,int port,char *plg_name,char *plg_code,int status){
 		lock_plugin();
 		if(check_dll(plg_name)==true)return;
 		if(check_request(plg_name,plg_code)==true)return;
 		plugin_request *new_request = new plugin_request;
-		new_request->host = in_rec->host;
-		new_request->port = in_rec->port;
+		new_request->host = host;
+		new_request->port = port;
 		new_request->plg_name = plg_name;
 		new_request->plg_code = plg_code;
 		new_request->next = NULL;
-		if(request_count==0){
-			requests = new_request;	
+		if((*request_count)==0){
+			requests_bs->next = new_request;	
 		}
 		else{
-			plugin_request *tmp_request = requests;
+			plugin_request *tmp_request = requests_bs->next;
 			while(tmp_request->next!=NULL){
+				cout<<"rolled"<<endl;
 				tmp_request = tmp_request->next;
 			}
 			tmp_request->next = new_request;
 		}
-		request_count++;
+		(*request_count)++;
 		unlock_plugin();
+		if(status==WAIT_PLUGIN)wait_plugin(plg_name,plg_code);
 	}
 	void plugin_manager::display_plugin_requests(){
 		lock_plugin();
-		plugin_request *tmp_request = requests;
-		for(int cntr=0;cntr<request_count;cntr++){
+		plugin_request *tmp_request = requests_bs->next;
+		for(int cntr=0;cntr<(*request_count);cntr++){
 			cout<<tmp_request->plg_name<<endl;
 			tmp_request = tmp_request->next;
 		}
 		unlock_plugin();
 	}
 	bool plugin_manager::check_request(char *plg_name,char *plg_code){
-		if(request_count==0)return false;
-		plugin_request *tmp_request = requests;
-		while(tmp_request!=NULL){
-			if(find(tmp_request->plg_name,plg_name)!=STR_NPOS)return true;
-			tmp_request = tmp_request->next;
+		lock_plugin();
+		if(request_count==0){
+			unlock_plugin();
+			return false;
 		}
+		plugin_request *tmp_request = requests_bs;
+		while(tmp_request->next!=NULL){
+			tmp_request = tmp_request->next;
+			if(find(tmp_request->plg_name,plg_name)!=STR_NPOS){
+				unlock_plugin();
+				return true;
+			}
+		}
+		unlock_plugin();
 		return false;
 	}
 	void plugin_manager::lock_plugin(){
@@ -77,14 +156,23 @@ namespace newera_network{
 	void plugin_manager::unlock_plugin(){
 		
 	}
-	void plugin_manager::wait_plugin(){
-		
-	}
 	void plugin_manager::load(char *file_name){
+<<<<<<< .mine
+		lock_plugin();
+		func_details *func_details_t = new func_details;
+		if(check_nxi(file_name)==true){
+			func_details_t->path_nxi = file_name;
+			file_name = load_nxi(func_details_t);
+			if(file_name==NULL){
+				delete func_details_t;
+				unlock_plugin();
+				return;
+			}
+=======
 		if(find(file_name,(char *)".nxi")!=STR_NPOS||find(file_name,(char *)".info")!=STR_NPOS){
 			file_name = load_nxi(file_name);
+>>>>>>> .r23
 		}
-		lock_plugin();
 		void *dll = dlopen(file_name,RTLD_NOW);
 		if(!dll){
 			cout<<dlerror()<<endl;
@@ -114,7 +202,6 @@ namespace newera_network{
 				return;
 			}
 			else{
-				func_details *func_details_t = new func_details;
 				func_details_t->ptr = func_ptr_t;
 				func_details_t->ptr_client = func_ptr_t_c;
 				func_details_t->ptr_processor = func_ptr_t_p;

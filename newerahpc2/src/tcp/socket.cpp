@@ -52,6 +52,7 @@ namespace newera_network{
 		signal(SIGKILL,sig_handler);
 		database = new conn_database;
 		hpc_data = new newera_hpc;
+		hpc_data->init();
 		load_node_list();
 		cout<<"enter a port for server communication: ";
 		cin>>server_port;

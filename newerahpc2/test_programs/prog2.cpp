@@ -4,10 +4,8 @@ using namespace newera_network;
 
 int main(){
 	start();
-        //hpc_data->load((char *)"grid_plugin/bin/libplugin.so");
-	hpc_data->load((char *)"grid_plugin/plugin.nxi");
-	//return 0;
-	int count = 1;
+	//hpc_data->load((char *)"grid_plugin/bin/libplugin.so");
+	hpc_data->load((char *)"grid_plugin/plugin.info");
 	grid_task task;
 	task.func_name = (char *)"newera_task";
 	instruction_set *in1,*in2;

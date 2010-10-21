@@ -72,7 +72,7 @@ namespace newera_network{
 		string file = return_file();
 		if(get_file==GET_FILE){
 			file_location = (char *)file.c_str();
-			fp.open(file_location,ios::binary);
+			fp.open(file_location.c_str(),ios::binary);
 		}
 		do{
 			bzero(buffer,sizeof(buffer));
@@ -122,8 +122,8 @@ namespace newera_network{
 							char *xyz = substr(lines[count],pos_tmp+2,strlen(lines[count]));
 							file_size_act = atoi(xyz);
 							get_file = GET_FILE;
-							file_location = (char *)file.c_str();
-							fp.open(file_location,ios::binary);
+							file_location = file;
+							fp.open(file_location.c_str(),ios::binary);
 						}
 						else get_file = NO_FILE;
 					}

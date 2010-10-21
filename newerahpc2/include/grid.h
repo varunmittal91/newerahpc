@@ -22,7 +22,8 @@ struct func_details{
 	func_ptr ptr;
 	func_ptr ptr_client;
 	func_ptr ptr_processor;
-	char *path;
+	std::string path;
+	std::string path_nxi;
 };
 struct peer_details{
 	int port;
@@ -37,6 +38,9 @@ typedef std::map<std::string,peer_details *> peers;
 #define GET_GRID 2
 #define GRID_DONE 1
 #define GRID_NDONE 2
+////specific for plugin manager////
+#define WAIT_PLUGIN 1
+///////////////////////////////////
 
 using namespace std;
 
@@ -129,25 +133,31 @@ namespace newera_network{
 			char *plg_name;
 			char *plg_code;
 			plugin_request *next;
+			pthread_mutex_t *thread_mutex;
+			int *request_count;
 		};
-		plugin_request *requests;
-		int request_count;
+		plugin_request *requests_bs;
+		int *request_count;
 		pthread_mutex_t *mutex;
 		void lock_plugin();
 		void unlock_plugin();
 		bool check_request(char *,char *);
+		static void *dispatcher(void *);
 	public:
 		functions_map functions;
 		plugin_manager();
 		~plugin_manager();
-		void add_request(conn_rec *,char *,char *);
-		void wait_plugin();
+		void init_manager();
+		void add_request(char *host,int port,char *,char *,int);
+		void wait_plugin(char *,char *);
 		void load(char *);
 		bool check_dll(char *);
 		void display_plugin_requests();
-		char *load_nxi(char *);
+		std::string return_path(char *);
+		char *load_nxi(func_details *);
 		char *read_nxi(const char *);
 		char *create_nxi(const char *);
+		bool check_nxi(char *);
 	};
 	class newera_hpc:public config,public task_manager,public plugin_manager{
 		grid_task *tasks;
@@ -160,9 +170,9 @@ namespace newera_network{
 		void add();
 		void *execute(char *);
 		void execute_client(instruction_set *);
-		char *return_path(char *);
 		void grid_lng_init(network_write *,char *);
 		static void *send_job(void *);
+		void init();
 	};
 	extern newera_hpc *hpc_data;
 	void grid_init(conn_rec *,client_request *);

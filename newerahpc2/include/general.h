@@ -16,6 +16,8 @@
 //along with newerahpc.  If not, see <http://www.gnu.org/licenses/>.
 
 #define STR_NPOS -1
+#define FILE_T 1
+#define DIR_T 2
 
 namespace newera_network{
 	size_t find(char *,char *);
@@ -23,6 +25,7 @@ namespace newera_network{
 	char *substr(char *,size_t,size_t);
 	char *itoa(int);
 	std::string return_file();
+	std::string return_file(int);
 	int get_file_size(char *);
 	void add_log(const char *);
 };

@@ -24,6 +24,8 @@ namespace newera_network{
 	void grid_init(conn_rec *in_rec,client_request *req){
 		if(find(req->lines[0],(char *)"_EXECUTE")!=STR_NPOS){
 			if(!hpc_data->check_dll(req->lines[1])){
+				hpc_data->add_request((char *)in_rec->host,atoi(req->lines[2]),(char *)req->lines[1],"",WAIT_PLUGIN);
+				/*
 				conn_rec *out_rec = new conn_rec;
 				out_rec->host = in_rec->host;
 				out_rec->port = atoi(req->lines[2]);
@@ -41,9 +43,10 @@ namespace newera_network{
 					shutdown(out_rec->sockfd,SHUT_RDWR);
 					close(out_rec->sockfd);
 				}
+				 */
 			}
 			for(int cntr_1=0;cntr_1<5;cntr_1++){
-				sleep(2);
+				sleep(4);
 				if(hpc_data->check_dll(req->lines[1])){
 					instruction_set *instruction = new instruction_set;
 					instruction->host = in_rec->host;
@@ -59,7 +62,7 @@ namespace newera_network{
 			}			
 		}
 		else if(find(req->lines[0],(char *)"_LOADPLUGIN")!=STR_NPOS){
-			hpc_data->load(req->file_location);
+			hpc_data->load((char *)req->file_location.c_str());
 		}
 		else if(find(req->lines[0],(char *)"_REPLY")!=STR_NPOS){
 			int id = atoi(req->lines[1]);
@@ -76,9 +79,13 @@ namespace newera_network{
 				out_rec->port = atoi(req->lines[2]);
 				connect(out_rec);
 				string length = "Content-Length: ";
-				length += itoa(get_file_size(hpc_data->return_path(req->lines[1])));
+				char *path = (char *)hpc_data->return_path(req->lines[1]).c_str();
+				string str = hpc_data->return_path(req->lines[1]);
+				cout<<str<<endl;
+				length += itoa(get_file_size(path));
 				network_write *write = new network_write(out_rec->sockfd);
-				write->file_assign(hpc_data->return_path(req->lines[1]));
+				write->file_assign(path);
+				cout<<"sending hpc_data->plugin "<<path<<endl;
 				write->add("GRID_LOADPLUGIN");
 				write->add(length.c_str());
 				write->add("");

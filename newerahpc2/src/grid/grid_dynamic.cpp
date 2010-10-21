@@ -37,6 +37,9 @@ namespace newera_network{
 	newera_hpc::~newera_hpc(){
 		delete tasks;
 	}
+	void newera_hpc::init(){
+		init_manager();
+	}
 	void newera_hpc::lock(){
 		pthread_mutex_lock(&mutex);
 	}
@@ -95,9 +98,6 @@ namespace newera_network{
 		write->push_raw((char *)instruction->data,instruction->length);
 		shutdown(out_rec->sockfd,SHUT_RDWR);
 		close(out_rec->sockfd);
-	}
-	char *newera_hpc::return_path(char *plugin){
-		return functions[plugin]->path;
 	}
 	void newera_hpc::execute_client(instruction_set *instruction){
 		functions[instruction->plugin]->ptr_client(instruction);

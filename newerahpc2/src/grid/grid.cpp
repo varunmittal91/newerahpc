@@ -62,11 +62,9 @@ namespace newera_network{
 				string length = "Content-Length: ";
 				char *path = (char *)hpc_data->return_path(req->lines[1]).c_str();
 				string str = hpc_data->return_path(req->lines[1]);
-				cout<<str<<endl;
 				length += itoa(get_file_size(path));
 				network_write *write = new network_write(out_rec->sockfd);
 				write->file_assign(path);
-				cout<<"sending hpc_data->plugin "<<path<<endl;
 				write->add("GRID_LOADPLUGIN");
 				write->add(length.c_str());
 				write->add("");

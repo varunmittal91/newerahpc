@@ -47,6 +47,10 @@ namespace newera_network{
 			pthread_mutex_lock(data_rqst_bs->thread_mutex);			
 			while(1){
 				data_rqst = data_rqst_bs;
+				if(data_rqst->next==NULL){
+					pthread_mutex_unlock(data_rqst_bs->thread_mutex);
+					break;
+				}
 				if(data_rqst->next!=NULL){
 					plugin_request *tmp_request = data_rqst->next;
 					if(data_rqst->next->next!=NULL){

@@ -18,7 +18,7 @@
 #include <network.h>
 
 namespace newera_network{
-	char *plugin_manager::read_nxi(const char *file){
+	std::string *plugin_manager::read_nxi(const char *file){
 		string file_inp_str = file;
 		ifstream plg_inp_file(file_inp_str.c_str(),ios::in);
 		string out_dir = return_file(DIR_T);
@@ -68,9 +68,10 @@ namespace newera_network{
 		int status = system(tmp.c_str());
 		if(status>0)return NULL;
 		else{
-			string plugin_path = out_dir + "/" + "bin/libplugin.so";
-			if(filedir_check(plugin_path.c_str())!=FILE_FOUND)return NULL;
-			return (char *)plugin_path.c_str();
+			std::string *plugin_path = new std::string;
+			(*plugin_path) = out_dir + "/" + "bin/libplugin.so";
+			if(filedir_check((*plugin_path).c_str())!=FILE_FOUND)return NULL;
+			return plugin_path;
 		}
 	}
 	char *plugin_manager::create_nxi(const char *file){
@@ -114,7 +115,7 @@ namespace newera_network{
 		}
 		return (char *)out_file.c_str();
 	}
-	char *plugin_manager::load_nxi(func_details *details){
+	std::string *plugin_manager::load_nxi(func_details *details){
 		char *file_name = (char *)details->path_nxi.c_str();
 		if(find(file_name,(char *)".info")!=STR_NPOS){
 			file_name = create_nxi(file_name);
@@ -122,7 +123,7 @@ namespace newera_network{
 		}
 		if(file_name==NULL)
 			return NULL;
-		char *dll_loc = read_nxi(file_name);
+		std::string *dll_loc = read_nxi(file_name);
 		return dll_loc;
 	}
 	bool plugin_manager::check_nxi(char *file_name){

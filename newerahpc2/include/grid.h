@@ -154,8 +154,8 @@ namespace newera_network{
 		bool check_dll(char *);
 		void display_plugin_requests();
 		std::string return_path(char *);
-		char *load_nxi(func_details *);
-		char *read_nxi(const char *);
+		string *load_nxi(func_details *);
+		string *read_nxi(const char *);
 		char *create_nxi(const char *);
 		bool check_nxi(char *);
 	};

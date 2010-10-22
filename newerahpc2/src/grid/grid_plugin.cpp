@@ -158,12 +158,13 @@ namespace newera_network{
 		func_details *func_details_t = new func_details;
 		if(check_nxi(file_name)==true){
 			func_details_t->path_nxi = file_name;
-			file_name = load_nxi(func_details_t);
-			if(file_name==NULL){
+			std::string *file_name_nxi = load_nxi(func_details_t);
+			if(file_name_nxi==NULL){
 				delete func_details_t;
 				unlock_plugin();
 				return;
 			}
+			file_name = (char *)(*file_name_nxi).c_str();
 		}
 		void *dll = dlopen(file_name,RTLD_NOW);
 		if(!dll){

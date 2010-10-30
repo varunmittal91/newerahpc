@@ -68,19 +68,22 @@ extern "C"{
 		cout<<"executing client function"<<endl;
 		instruction_set *instruction = (instruction_set *)data;
 		int *values = (int *)instruction->data;
-		newera_hpc_data *data_mpi = arctan(values[0],0,values[1]);
+		newera_hpc_data *data_mpi = arctan(values[0],values[2],values[1]);
 		instruction->data = (void *)data_mpi->data;
 		instruction->length = sizeof(newera_hpc_bit)*4000;
 		return instruction;
 	}
 	void *plugin_processor(void *data){
 		instruction_set **instructions = (instruction_set **)data;
-		instruction_set *in1,*in2;
+		instruction_set *in1,*in2,*in3;
 		in1 = instructions[0];
 		in2 = instructions[1];
+		in3 = instructions[2];
 		newera_hpc_bit *a = (newera_hpc_bit *)in1->data;
 		newera_hpc_bit *b = (newera_hpc_bit *)in2->data;
+		newera_hpc_bit *c = (newera_hpc_bit *)in3->data;
 		multiply_old(a,16,4000);
+		add_old(b,c,4000);
 		multiply_old(b,4,4000);
 		subtract_old(a,b,4000);
 		print_num(a,4000);

@@ -87,7 +87,8 @@ namespace newera_network{
 		}
 	}
 	void plugin_manager::wait_plugin(char *plg_name,char *plg_code){
-		while(check_request(plg_name,plg_code)==true){
+		while(1){
+			if(hpc_data->check_dll(plg_name))break;
 			sleep(1);
 		}
 	}

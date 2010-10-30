@@ -26,9 +26,7 @@ namespace newera_network{
 			if(!hpc_data->check_dll(req->lines[1])){
 				hpc_data->add_request((char *)in_rec->host,atoi(req->lines[2]),(char *)req->lines[1],(char *)"",WAIT_PLUGIN);
 			}
-			for(int cntr_1=0;cntr_1<5;cntr_1++){
-				sleep(4);
-				if(hpc_data->check_dll(req->lines[1])){
+			if(hpc_data->check_dll(req->lines[1])){
 					instruction_set *instruction = new instruction_set;
 					instruction->host = in_rec->host;
 					instruction->port = atoi(req->lines[2]);
@@ -38,9 +36,7 @@ namespace newera_network{
 					hpc_data->execute_client(instruction);
 					free(req->grid_data_v);
 					delete instruction;
-					break;
-				}
-			}			
+			}
 		}
 		else if(find(req->lines[0],(char *)"_LOADPLUGIN")!=STR_NPOS){
 			hpc_data->load((char *)req->file_location.c_str());

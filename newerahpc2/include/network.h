@@ -32,6 +32,7 @@
 #include <fstream>
 #include <sstream>
 #include <dirent.h>
+#include "queue.h"
 #include "general.h"
 #include "tcp.h"
 #include "http.h"

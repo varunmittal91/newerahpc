@@ -66,11 +66,17 @@ namespace newera_network{
 		plg_exec.close();
 		tmp = out_dir + "/exec";
 		int status = system(tmp.c_str());
-		if(status>0)return NULL;
+		if(status>0){
+			cout<<"plugin load procedure failed"<<endl;
+			return NULL;
+		}
 		else{
 			std::string *plugin_path = new std::string;
 			(*plugin_path) = out_dir + "/" + "bin/libplugin.so";
-			if(filedir_check((*plugin_path).c_str())!=FILE_FOUND)return NULL;
+			if(filedir_check((*plugin_path).c_str())!=FILE_FOUND){
+				cout<<"plugin load procedure failed"<<endl;
+				return NULL;
+			}
 			return plugin_path;
 		}
 	}

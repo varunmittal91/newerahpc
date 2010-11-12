@@ -81,6 +81,8 @@ namespace newera_network{
 			instruction->func_name = func_name;
 			instruction->status = GRID_NDONE;
 			peer_details *details = hpc_data->return_peer();
+			if(details!=NULL)
+				cout<<details->host<<" "<<details->port<<endl;
 			while(details==NULL){
 				sleep(1);
 				details = hpc_data->return_peer();

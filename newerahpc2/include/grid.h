@@ -40,6 +40,7 @@ typedef std::map<std::string,peer_details *> peers;
 #define GRID_NDONE 2
 ////specific for plugin manager////
 #define WAIT_PLUGIN 1
+#define PLUGIN_QUEUE_RESERVED 1
 ///////////////////////////////////
 
 using namespace std;
@@ -132,12 +133,10 @@ namespace newera_network{
 			int port;
 			char *plg_name;
 			char *plg_code;
-			plugin_request *next;
 			pthread_mutex_t *thread_mutex;
 			int *request_count;
 		};
-		plugin_request *requests_bs;
-		int *request_count;
+		queue *requests_que;
 		pthread_mutex_t *mutex;
 		void lock_plugin();
 		void unlock_plugin();

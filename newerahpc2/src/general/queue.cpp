@@ -23,8 +23,7 @@ namespace newera_network{
         first = NULL;
 	}
 	queue::~queue(){
-        for(int cntr=0;cntr<count;cntr++){
-        }
+		empty();
 	}
 	void queue::operator+=(void *in_p){
         queue_elem *new_elem = new queue_elem;
@@ -82,5 +81,12 @@ namespace newera_network{
 			}
 			tmp_elem = tmp_elem->next;
         }
-	}	
+	}
+	void queue::empty(){
+		int cntr=0;
+		while(cntr<count){	
+			operator-=(cntr);
+			cntr++;
+		}
+	}
 };

@@ -26,6 +26,7 @@ namespace newera_network{
 	}
 	plugin_manager::~plugin_manager(){
 		delete mutex;
+		delete requests_que;
 	}
 	void plugin_manager::init_manager(){
 		cout<<"initing plugin manager"<<endl;

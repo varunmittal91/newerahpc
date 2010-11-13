@@ -11,7 +11,8 @@ server:clean_lib
 	cd src/general && make
 	cd src/tcp && make
 	cd src/thread && make
-	ar -cvq bin/libnewera_server.a src/grid/*.o src/http/*.o src/general/*.o src/tcp/*.o src/thread/*.o
+	cd src/memory && make
+	ar -cvq bin/libnewera_server.a src/grid/*.o src/http/*.o src/general/*.o src/tcp/*.o src/thread/*.o src/memory/*.o
 	g++ server.cpp -L./bin -L./mpix/bin -lnewera_server -lpthread -o bin/server -I./include -g -ldl
 	
 server_only:
@@ -26,6 +27,7 @@ clean:
 	cd src/general && make clean
 	cd src/tcp && make clean
 	cd src/thread && make clean
+	cd src/memory && make clean
 
 mpi:
 	cd mpix && make mpi

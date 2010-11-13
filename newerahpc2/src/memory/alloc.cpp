@@ -15,29 +15,25 @@
 //You should have received a copy of the GNU General Public License
 //along with newerahpc.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <fcntl.h>
-#include <iostream>
-#include <pthread.h>
-#include <signal.h>
-#include <unistd.h>
-#include <string.h>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <dirent.h>
-#include "queue.h"
-#include "general.h"
-#include "tcp.h"
-#include "http.h"
-#include "thread.h"
-#include "grid.h"
-#include "memory.h"
+#include <network.h>
 
-using namespace std;
+namespace newera_network{
+	void *alloc(size_t in_size){
+		void *data = malloc(in_size);
+		(*mem_obj).add_mem(data,in_size);
+		return data;
+	}
+	void dalloc(void *in_p){
+		mem_obj->rem_mem(in_p);
+	}
+	void mem::add_mem(void *in_p,size_t in_size){
+		mem_element *element = new mem_element;
+		element->data = in_p;
+		element->size = in_size;
+		(*elements) += (void *)element;
+	}
+	void mem::rem_mem(void *in_p){
+		(*elements) -= in_p;
+		free(in_p);
+	}
+};

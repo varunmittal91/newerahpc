@@ -17,19 +17,19 @@
 
 namespace newera_network{
 	class queue{
-	public:
 		struct queue_elem{
 			void *data;
 			queue_elem *next;
-			size_t size;
 		};
-		int count;
 		queue_elem *first;
+	public:
+		int count;
 		queue();
 		~queue();
 		void operator+=(void *);
 		void operator-=(int);
 		void operator-=(void *);
 		void *operator[](int);
+		void empty();
 	};
 };

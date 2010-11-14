@@ -25,9 +25,10 @@ namespace newera_network{
 		elements = new queue;
 	}
 	mem::~mem(){
-		for(int cntr=0;cntr<elements->count;cntr++){
+		int cntr=0;
+		while(cntr<elements->count){
 			rem_mem((*elements)[cntr]);
-			delete elements;
 		}
+		delete elements;
 	}
 };

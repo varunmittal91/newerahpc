@@ -50,6 +50,7 @@ namespace newera_network{
 	void start(){
 		signal(SIGINT,sig_handler);
 		signal(SIGKILL,sig_handler);
+		mem_obj_status = NOT_REGISTER;
 		mem_obj = new mem;
 		database = new conn_database;
 		hpc_data = new newera_hpc;

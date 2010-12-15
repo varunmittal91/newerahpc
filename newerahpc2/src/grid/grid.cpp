@@ -27,15 +27,15 @@ namespace newera_network{
 				hpc_data->add_request((char *)in_rec->host,atoi(req->lines[2]),(char *)req->lines[1],(char *)"",WAIT_PLUGIN);
 			}
 			if(hpc_data->check_dll(req->lines[1])){
-					instruction_set *instruction = new instruction_set;
-					instruction->host = in_rec->host;
-					instruction->port = atoi(req->lines[2]);
-					instruction->plugin = req->lines[1];
-					instruction->data = req->grid_data_v;
-					instruction->id = atoi(req->lines[3]);
-					hpc_data->execute_client(instruction);
-					free(req->grid_data_v);
-					delete instruction;
+				instruction_set *instruction = new instruction_set;
+				instruction->host = in_rec->host;
+				instruction->port = atoi(req->lines[2]);
+				instruction->plugin = req->lines[1];
+				instruction->data = req->grid_data_v;
+				instruction->id = atoi(req->lines[3]);
+				hpc_data->execute_client(instruction);
+				free(req->grid_data_v);
+				delete instruction;
 			}
 		}
 		else if(find(req->lines[0],(char *)"_LOADPLUGIN")!=STR_NPOS){

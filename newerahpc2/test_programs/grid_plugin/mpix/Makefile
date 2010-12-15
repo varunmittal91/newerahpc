@@ -17,7 +17,7 @@ mpi:clean
 
 clean:
 	touch bin/temp
-	rm bin/*
+	rm -rf bin/*
 
 test:
 	g++ test.cpp -L./bin -lmpix -o bin/test -g2 -pg

@@ -25,8 +25,8 @@ namespace newera_network{
 	}
 	grid_data::~grid_data(){
 		for(int cntr=0;cntr<count;cntr++)free(data[cntr]);
-		delete []data;
-		delete []lengths;
+		delete data;
+		delete lengths;
 	}
 	void grid_data::add(char *in_line,size_t in_length){
 		expand();
@@ -38,12 +38,12 @@ namespace newera_network{
 	void grid_data::expand(){
 		count++;
 		char **new_data = new char* [count];
-		size_t *new_lengths = new size_t [count];
+		size_t *new_lengths = new size_t[count];
 		if(count!=1){
 			memcpy(new_data,data,sizeof(char**)*(count-1));
 			memcpy(new_lengths,lengths,sizeof(size_t)*(count-1));
-			delete []data;
-			delete []lengths;
+			delete data;
+			delete lengths;
 		}
 		data = new_data;
 		lengths = new_lengths;

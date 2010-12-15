@@ -20,6 +20,7 @@
 #include <init.h>
 
 using namespace std;
+using namespace newera_network;
 
 namespace newera_mpi{
   void assign(newera_hpc_data *input,int num){

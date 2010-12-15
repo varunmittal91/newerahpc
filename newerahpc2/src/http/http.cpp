@@ -43,7 +43,7 @@ namespace newera_network{
 	};
 	http_data::http_data(conn_rec *in_rec,client_request *req){
 		header = new http_server_header;
-		header->lines = new string *[HTTP_SERVER_HEADER_MAX];
+		header->lines = new string* [HTTP_SERVER_HEADER_MAX];
 		header->count = 0;
 		req_details = new char* [REQ_DETAILS_MAX];
 		status_code = 0;
@@ -58,7 +58,7 @@ namespace newera_network{
 				pos_3 = find(req->lines[cntr_1],(char *)" ",pos_2+1);
 				req_details[0] = substr(req->lines[cntr_1],pos_2,pos_3);	//requested file
 				size_t length = strlen(req_details[0])+1;
-				req_details[FILE_REQUEST_ORIG] = (char *)malloc(length);
+				req_details[FILE_REQUEST_ORIG] = new char [length];
 				bzero(req_details[FILE_REQUEST_ORIG],length);
 				strcpy(req_details[FILE_REQUEST_ORIG],req_details[FILE_REQUEST]);
 				req_details[FILE_REQUEST_ORIG-1]='\0';

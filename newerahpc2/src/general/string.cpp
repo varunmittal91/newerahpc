@@ -28,7 +28,7 @@ namespace newera_network{
     			counter++;
     			temp_num = temp_num/10;
   		}
- 		char *buffer = new char [counter+1];
+		char *buffer = new char [counter+1];
   		buffer[counter] = '\0';
  	 	while(num>0){
     			temp_num = num%10;

@@ -25,6 +25,7 @@ namespace newera_network{
 	public:
 		int count;
 		queue();
+		void queue_manual();
 		~queue();
 		void operator+=(void *);
 		void operator-=(int);

@@ -21,14 +21,30 @@ using namespace std;
 
 namespace newera_network{
 	mem *mem_obj;
+	int mem_obj_status;
 	mem::mem(){
+		cout<<"constructor called"<<endl;
 		elements = new queue;
+		mutex = new pthread_mutex_t;
+		mem_obj_status = REGISTER;
 	}
 	mem::~mem(){
+		pthread_mutex_lock(mutex);
 		int cntr=0;
-		while(cntr<elements->count){
-			rem_mem((*elements)[cntr]);
+		for(int cntr=(elements->count-1);cntr>=0;cntr--){
+			mem_element *tmp_elem = (mem_element *)(*elements)[cntr];
+			free(tmp_elem->data);
+			(*elements) -= cntr;
+			delete tmp_elem;
 		}
+		pthread_mutex_unlock(mutex);
 		delete elements;
+		delete mutex;
+	}
+	void mem::lock(){
+		pthread_mutex_lock(mutex);
+	}
+	void mem::unlock(){
+		pthread_mutex_unlock(mutex);
 	}
 };

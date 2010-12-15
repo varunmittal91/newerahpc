@@ -25,6 +25,9 @@ namespace newera_network{
 			delete local_rec;
 			delete database;
 			delete hpc_data;
+			//dalloc(local_rec);
+			//dalloc(database);
+			//dalloc(hpc_data);
 			delete mem_obj;
 			exit(0);
 		}

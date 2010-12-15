@@ -22,11 +22,15 @@ namespace newera_network{
         count = 0;
         first = NULL;
 	}
+	void queue::queue_manual(){
+		count = 0;
+		first = NULL;
+	}
 	queue::~queue(){
 		empty();
 	}
 	void queue::operator+=(void *in_p){
-        queue_elem *new_elem = new queue_elem;
+        queue_elem *new_elem = (queue_elem *)malloc(sizeof(queue_elem));
         new_elem->next = NULL;
         new_elem->data = in_p;
         count++;                                                     
@@ -57,17 +61,20 @@ namespace newera_network{
         if(id==0){
 			if(count==1){
 				first=NULL;
-				delete first;
+				free(first);
+				//delete first;
 			}
 			else{
 				first=first->next;
-				delete tmp_elem;
+				free(tmp_elem);
+				//delete tmp_elem;
 			}
         }
         else{
 			queue_elem *tmp_elem_1 = tmp_elem->next;
 			tmp_elem->next = tmp_elem_1->next;
-			delete tmp_elem_1;
+			free(tmp_elem_1);
+			//delete tmp_elem_1;
         }
         count--;
 	}

@@ -30,9 +30,9 @@ namespace newera_network{
 	}
 	network_write::~network_write(){
 		if(buffer!=NULL)
-			delete []buffer;
+			delete buffer;
 		if(lengths!=NULL)
-			delete []lengths;
+			delete lengths;
 	}
 	void network_write::add(const char * str_in){
 		if(lines==0){
@@ -40,12 +40,12 @@ namespace newera_network{
 			lengths = new int [1];
 		}
 		else{
-			int *lengths_temp = new int [lines+1];
 			char **line_temp = new char* [lines+1];
+			int *lengths_temp = new int [lines+1];
 			memcpy(line_temp,buffer,sizeof(buffer)*lines);
 			memcpy(lengths_temp,lengths,sizeof(lengths)*lines);
-			delete []buffer;
-			delete []lengths;
+			delete buffer;
+			delete lengths;
 			buffer = line_temp;
 			lengths = lengths_temp;
 		}
@@ -114,7 +114,7 @@ namespace newera_network{
 	void network_write::reset(){
 		fp = 0;
 		lines = 0;
-		delete []lengths;
-		delete []buffer;
+		delete lengths;
+		delete buffer;
 	}
 }

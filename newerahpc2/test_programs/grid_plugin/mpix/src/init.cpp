@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include <string.h>
 
+using namespace newera_network;
+
 namespace newera_mpi{
 	newera_hpc_data* init_data(){
      		newera_hpc_data *data = new newera_hpc_data;

@@ -62,6 +62,7 @@ namespace newera_network{
 					write->push();
 					shutdown(out_rec->sockfd,SHUT_RDWR);
 					close(out_rec->sockfd);
+					delete write;
 				}
 				cntr++;
 				(*requests_que) -= tmp_request;

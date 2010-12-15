@@ -4,8 +4,8 @@ using namespace newera_network;
 
 int main(){
 	start();
-	//hpc_data->load((char *)"grid_plugin/bin/libplugin.so");
-	hpc_data->load((char *)"grid_plugin/plugin.info");
+	hpc_data->load((char *)"grid_plugin/bin/libplugin.so");
+	//hpc_data->load((char *)"grid_plugin/plugin.info");
 	grid_task task;
 	task.func_name = (char *)"newera_task";
 	instruction_set *in1,*in2,*in3;
@@ -16,14 +16,14 @@ int main(){
 	int *data2 = new int [3];
 	int *data3 = new int [3];
 	data1[0] = 5;    ///number
-	data1[1] = 300;   ///no. of loop
+	data1[1] = 10;   ///no. of loop
 	data1[2] = 0;    ///initial count
 	data2[0] = 239;  
-	data2[1] = 150;
+	data2[1] = 5;
 	data2[2] = 0;
 	data3[0] = 239;
-	data3[1] = 300;
-	data3[2] = 150;
+	data3[1] = 10;
+	data3[2] = 5;
 	in1->data = (void *)data1;
 	in1->length = sizeof(int)*3;
 	in2->data = (void *)data2;

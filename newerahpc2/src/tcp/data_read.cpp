@@ -32,19 +32,19 @@ namespace newera_network{
 	}
 	client_request::~client_request(){
 		for(int cntr=0;cntr<count;cntr++){
-			delete [](lines[cntr]);
+			delete lines[cntr];
 		}
-		delete []lines;
-		delete []length;
+		delete lines;
+		delete length;
 	}
 	void client_request::increase_limit(){
-		char **temp_lines = new char* [limit+CLIENT_REQ_MAX];
+		char **temp_lines = new char* [CLIENT_REQ_MAX+limit];
 		memcpy(temp_lines,lines,sizeof(lines)*limit);
-		delete []lines;
+		delete lines;
 		lines = temp_lines;
-		int *temp_length = new int [limit+CLIENT_REQ_MAX];
+		int *temp_length = new int [CLIENT_REQ_MAX+limit];
 		memcpy(temp_length,length,sizeof(length)*limit);
-		delete []length;
+		delete length;
 		length = temp_length;
 		limit = limit+CLIENT_REQ_MAX;
 	}
@@ -97,7 +97,7 @@ namespace newera_network{
 						}
 						else if(get_file==GET_GRID){
 							grid_data *grid_data_t = new grid_data;
-							left_over = (char *)malloc(bytes-cnt_1);
+							left_over = new char [bytes-cnt_1];
 							memcpy(left_over,temp_buffer,bytes-cnt_1);
 							grid_data_t->add(left_over,(size_t)(bytes-cnt_1));
 							while(1){
@@ -122,6 +122,7 @@ namespace newera_network{
 						if(pos_tmp!=STR_NPOS){
 							char *xyz = substr(lines[count],pos_tmp+2,strlen(lines[count]));
 							file_size_act = atoi(xyz);
+							delete xyz;
 							get_file = GET_FILE;
 							file_location = file;
 							fp.open(file_location.c_str(),ios::binary);

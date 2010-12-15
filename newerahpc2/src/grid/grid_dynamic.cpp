@@ -98,6 +98,7 @@ namespace newera_network{
 		write->push_raw((char *)instruction->data,instruction->length);
 		shutdown(out_rec->sockfd,SHUT_RDWR);
 		close(out_rec->sockfd);
+		delete write;
 	}
 	void newera_hpc::execute_client(instruction_set *instruction){
 		functions[instruction->plugin]->ptr_client(instruction);
@@ -117,5 +118,6 @@ namespace newera_network{
 		write->push_raw((char *)instruction->data,instruction->length);
 		shutdown(out_rec->sockfd,SHUT_RDWR);
 		close(out_rec->sockfd);
+		delete write;
 	}
 };

@@ -17,23 +17,71 @@
 
 #include <network.h>
 
+void *operator new(size_t in_s){
+	void *p = malloc(in_s);
+	while(p==0){
+		p = malloc(in_s);
+	}
+	if(newera_network::mem_obj_status==REGISTER)
+		(*newera_network::mem_obj).add_mem(p,in_s);
+	return p;
+};
+void *operator new[](size_t in_s){
+	return ::operator new(in_s);
+};	
+void operator delete(void *in_p){
+	cout<<"delete called with size in_size"<<endl;
+	newera_network::mem_obj->rem_mem(in_p);
+};   
+void operator delete[](void *in_p){
+	cout<<"delete called with multi size"<<endl;
+	::operator delete(in_p);
+};
+	
 namespace newera_network{
-	void *alloc(size_t in_size){
-		void *data = malloc(in_size);
-		(*mem_obj).add_mem(data,in_size);
-		return data;
+	void *expand_mem(void *in_p,size_t in_size){
+		
 	}
-	void dalloc(void *in_p){
-		mem_obj->rem_mem(in_p);
+	void *mem::expand_mem(void *in_p,size_t in_size){
+		
 	}
-	void mem::add_mem(void *in_p,size_t in_size){
-		mem_element *element = new mem_element;
-		element->data = in_p;
-		element->size = in_size;
-		(*elements) += (void *)element;
+	void mem::rem_mem_clean(void *in_p){
+		mem_element *tmp_elem = (mem_element *)locate(in_p);
+		if(tmp_elem==NULL)return;
+		lock();
+		(*elements) -= tmp_elem;
+		unlock();
+		free(tmp_elem->data);
+		delete tmp_elem;
 	}
 	void mem::rem_mem(void *in_p){
-		(*elements) -= in_p;
-		free(in_p);
+		mem_element *tmp_elem = (mem_element *)locate(in_p);
+		if(tmp_elem==NULL){
+			cout<<endl<<endl<<"element not found "<<endl<<endl;
+			return;
+		}
+		lock();
+		(*elements) -= tmp_elem;
+		unlock();
+		cout<<elements->count<<" after removal"<<endl;
+		delete tmp_elem;
+	}		
+	void *mem::locate(void *in_p){
+		lock();
+		for(int cntr=0;cntr<elements->count;cntr++){
+			mem_element *tmp_elem = (mem_element *)(*elements)[cntr]; 
+			if(in_p==tmp_elem->data)return tmp_elem;
+		}
+		return NULL;
+		unlock();
 	}
+	void mem::add_mem(void *in_p,size_t in_size){
+		mem_element *element = (mem_element *)malloc(sizeof(mem_element));
+		element->data = in_p;
+		element->size = in_size;
+		lock();
+		(*elements) += (void *)element;
+		unlock();
+		cout<<elements->count<<" no of allocated spaces"<<endl;
+	}	
 };

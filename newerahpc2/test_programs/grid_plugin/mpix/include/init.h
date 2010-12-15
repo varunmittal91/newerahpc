@@ -15,6 +15,7 @@
 //You should have received a copy of the GNU General Public License
 //along with newerahpc.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <newerahpc/network.h>
 #include "data.h"
 #include "basic_math.h"
 #include "io.h"

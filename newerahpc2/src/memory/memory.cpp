@@ -23,7 +23,6 @@ namespace newera_network{
 	mem *mem_obj;
 	int mem_obj_status;
 	mem::mem(){
-		cout<<"constructor called"<<endl;
 		elements = new queue;
 		mutex = new pthread_mutex_t;
 		mem_obj_status = REGISTER;

@@ -17,24 +17,37 @@
 
 #include <network.h>
 
-void *operator new(size_t in_s){
+void* operator new(std::size_t in_s) throw(std::bad_alloc){
 	void *p = malloc(in_s);
 	while(p==0){
 		p = malloc(in_s);
 	}
-	if(newera_network::mem_obj_status==REGISTER)
+	if(newera_network::mem_obj_status==REGISTER){
 		(*newera_network::mem_obj).add_mem(p,in_s);
-	return p;
-};
-void *operator new[](size_t in_s){
+	}
+	return p;	
+}
+void* operator new(std::size_t in_s, const std::nothrow_t&) throw(){
+	void *p = malloc(in_s);
+	while(p==0){
+		p = malloc(in_s);
+	}
+	if(newera_network::mem_obj_status==REGISTER){
+		(*newera_network::mem_obj).add_mem(p,in_s);
+	}
+	return p;	
+}
+void* operator new[](std::size_t in_s) throw(std::bad_alloc){
 	return ::operator new(in_s);
-};	
+}
+void* operator new[](std::size_t in_s, const std::nothrow_t&) throw(){
+	return ::operator new(in_s);
+}
+
 void operator delete(void *in_p){
-	cout<<"delete called with size in_size"<<endl;
 	newera_network::mem_obj->rem_mem(in_p);
 };   
 void operator delete[](void *in_p){
-	cout<<"delete called with multi size"<<endl;
 	::operator delete(in_p);
 };
 	
@@ -57,7 +70,6 @@ namespace newera_network{
 	void mem::rem_mem(void *in_p){
 		mem_element *tmp_elem = (mem_element *)locate(in_p);
 		if(tmp_elem==NULL){
-			cout<<endl<<endl<<"element not found "<<endl<<endl;
 			return;
 		}
 		lock();

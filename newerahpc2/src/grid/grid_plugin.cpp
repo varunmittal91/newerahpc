@@ -163,7 +163,7 @@ namespace newera_network{
 		}
 		else{
 			void *func_string_temp;
-			func_string_temp = func_ptr_t(NULL);
+			func_string_temp = func_ptr_t(mem_obj);
 			string *func_string = (string *)func_string_temp;
 			if(check_dll((char*)(*func_string).c_str())==true)cout<<"dll already found"<<endl;
 			if(check_dll((char*)(*func_string).c_str())==true){

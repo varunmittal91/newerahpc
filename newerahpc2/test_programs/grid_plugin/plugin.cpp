@@ -42,7 +42,8 @@ void print_num(newera_hpc_bit *num,int count){
 }
 
 extern "C"{
-	string *plugin_init(){
+	string *plugin_init(mem *mem_obj_hst){
+		mem_obj = mem_obj_hst;
 		cout<<"function loaded successfully"<<endl;
 		string *abcx = new string;
 		(*abcx) = "newera_task";

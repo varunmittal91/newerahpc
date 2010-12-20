@@ -39,11 +39,11 @@ namespace newera_network{
 	}
 	void client_request::increase_limit(){
 		char **temp_lines = new char* [CLIENT_REQ_MAX+limit];
-		memcpy(temp_lines,lines,sizeof(lines)*limit);
+		memcpy(temp_lines,lines,sizeof(char *)*limit);
 		delete lines;
 		lines = temp_lines;
 		int *temp_length = new int [CLIENT_REQ_MAX+limit];
-		memcpy(temp_length,length,sizeof(length)*limit);
+		memcpy(temp_length,length,sizeof(int)*limit);
 		delete length;
 		length = temp_length;
 		limit = limit+CLIENT_REQ_MAX;
@@ -56,6 +56,7 @@ namespace newera_network{
 		do{
 			bzero(buffer,sizeof(buffer));
 			bytes = recv(in_rec->sockfd,buffer,sizeof(buffer),MSG_WAITALL);
+			//bytes = recv(in_rec->sockfd,buffer,sizeof(buffer),0);
 			fp.write(buffer,bytes);
 			file_size += bytes;
 			if(file_size_act!=0){
@@ -102,6 +103,7 @@ namespace newera_network{
 							grid_data_t->add(left_over,(size_t)(bytes-cnt_1));
 							while(1){
 								bzero(buffer,sizeof(buffer));
+								//bytes = recv(in_rec->sockfd,buffer,sizeof(buffer),0);
 								bytes = recv(in_rec->sockfd,buffer,sizeof(buffer),MSG_WAITALL);
 								if(bytes==0)break;
 								grid_data_t->add(buffer,(size_t)bytes);

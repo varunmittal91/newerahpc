@@ -75,7 +75,6 @@ namespace newera_network{
 		lock();
 		(*elements) -= tmp_elem;
 		unlock();
-		cout<<elements->count<<" after removal"<<endl;
 		delete tmp_elem;
 	}		
 	void *mem::locate(void *in_p){
@@ -94,6 +93,5 @@ namespace newera_network{
 		lock();
 		(*elements) += (void *)element;
 		unlock();
-		cout<<elements->count<<" no of allocated spaces"<<endl;
 	}	
 };

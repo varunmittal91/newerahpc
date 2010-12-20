@@ -32,9 +32,14 @@ namespace newera_network{
 	void *handle_connection(void *data){
 		signal(SIGPIPE,sig_handler);
 		signal(SIGSEGV,sig_handler);
+		//cout<<" starting to read"<<endl;
 		conn_rec *in_rec = (conn_rec *)data;
 		client_request *req = new client_request;
 		req->read(in_rec);
+		//cout<<" reading completed"<<endl;
+		for(int a=0;a<req->count;a++){
+			//cout<<"  "<<req->lines[a]<<endl;
+		}
 		if(req->count>0){
 			if(find(req->lines[0],(char *)"HTTP/1.")!=STR_NPOS){
 				http_init(in_rec,req);

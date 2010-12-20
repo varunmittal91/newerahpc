@@ -42,8 +42,8 @@ namespace newera_network{
 		else{
 			char **line_temp = new char* [lines+1];
 			int *lengths_temp = new int [lines+1];
-			memcpy(line_temp,buffer,sizeof(buffer)*lines);
-			memcpy(lengths_temp,lengths,sizeof(lengths)*lines);
+			memcpy(line_temp,buffer,sizeof(char *)*lines);
+			memcpy(lengths_temp,lengths,sizeof(int)*lines);
 			delete buffer;
 			delete lengths;
 			buffer = line_temp;

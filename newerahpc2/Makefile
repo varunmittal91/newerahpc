@@ -13,10 +13,10 @@ server:clean_lib
 	cd src/thread && make
 	cd src/memory && make
 	ar -cvq bin/libnewera_server.a src/grid/*.o src/http/*.o src/general/*.o src/tcp/*.o src/thread/*.o src/memory/*.o
-	g++ server.cpp -L./bin -L./mpix/bin -lnewera_server -lpthread -o bin/server -I./include -g -ldl
+	g++ server.cpp -L./bin -lnewera_server -lpthread -o bin/server -I./include -g -ldl
 	
 server_only:
-	g++ test.cpp -L./bin -L./mpix/bin -lnewera_server -lpthread -o bin/server -I./include -g
+	g++ test.cpp -L./bin -lnewera_server -lpthread -o bin/server -I./include -g -ldl
 
 clean_lib:
 	touch bin/libnewera_server.a

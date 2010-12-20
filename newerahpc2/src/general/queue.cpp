@@ -62,19 +62,16 @@ namespace newera_network{
 			if(count==1){
 				first=NULL;
 				free(first);
-				//delete first;
 			}
 			else{
 				first=first->next;
 				free(tmp_elem);
-				//delete tmp_elem;
 			}
         }
         else{
 			queue_elem *tmp_elem_1 = tmp_elem->next;
 			tmp_elem->next = tmp_elem_1->next;
 			free(tmp_elem_1);
-			//delete tmp_elem_1;
         }
         count--;
 	}

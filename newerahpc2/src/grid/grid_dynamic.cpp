@@ -96,10 +96,8 @@ namespace newera_network{
 		write->add("");
 		write->push();
 		write->push_raw((char *)instruction->data,instruction->length);
-		cout<<"send"<<endl;
 		shutdown(out_rec->sockfd,SHUT_RDWR);
 		close(out_rec->sockfd);
-		cout<<"closed"<<endl;
 		delete write;
 	}
 	void newera_hpc::execute_client(instruction_set *instruction){

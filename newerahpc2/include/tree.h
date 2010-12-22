@@ -15,30 +15,19 @@
 //You should have received a copy of the GNU General Public License
 //along with newerahpc.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <fcntl.h>
-#include <iostream>
-#include <pthread.h>
-#include <signal.h>
-#include <unistd.h>
-#include <string.h>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <dirent.h>
-#include "queue.h"
-#include "tree.h"
-#include "general.h"
-#include "tcp.h"
-#include "http.h"
-#include "thread.h"
-#include "grid.h"
-#include "memory.h"
-
-using namespace std;
+namespace newera_network{
+	class tree{
+		struct tree_elem{
+			void *data;
+			tree_elem *left;
+			tree_elem *right;
+		};
+		tree_elem *node;		
+	public:
+		int count;
+		void operator+=(void *);
+		void printTree(tree_elem *);
+		tree();
+		~tree();
+	};
+};

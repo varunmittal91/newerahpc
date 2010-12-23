@@ -21,10 +21,12 @@ namespace newera_network{
 	queue::queue(){
         count = 0;
         first = NULL;
+		current = NULL;
 	}
 	void queue::queue_manual(){
 		count = 0;
 		first = NULL;
+		current = NULL;
 	}
 	queue::~queue(){
 		empty();
@@ -34,13 +36,13 @@ namespace newera_network{
         new_elem->next = NULL;
         new_elem->data = in_p;
         count++;                                                     
-        if(first==NULL)first=new_elem;
+        if(first==NULL){
+			first=new_elem;
+			current = new_elem;
+		}
         else{
-			queue_elem *tmp_queue = first;
-			while(tmp_queue->next!=NULL){
-				tmp_queue = tmp_queue->next;
-			}
-			tmp_queue->next = new_elem;
+			current->next = new_elem;
+			current = new_elem;
         }
 	}
 	void *queue::operator[](int id){
@@ -61,6 +63,7 @@ namespace newera_network{
         if(id==0){
 			if(count==1){
 				first=NULL;
+				current=NULL;
 				free(first);
 			}
 			else{
@@ -69,6 +72,9 @@ namespace newera_network{
 			}
         }
         else{
+			if(id==(count-1)){
+				current = tmp_elem;
+			}
 			queue_elem *tmp_elem_1 = tmp_elem->next;
 			tmp_elem->next = tmp_elem_1->next;
 			free(tmp_elem_1);

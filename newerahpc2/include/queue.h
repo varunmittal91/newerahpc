@@ -22,6 +22,7 @@ namespace newera_network{
 			queue_elem *next;
 		};
 		queue_elem *first;
+		queue_elem *current;
 	public:
 		int count;
 		queue();

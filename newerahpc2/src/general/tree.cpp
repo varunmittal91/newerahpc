@@ -27,8 +27,6 @@ namespace newera_network{
 	}
 	void tree::operator+=(void *in_p){
 		count++;
-		cout<<"printing new tree"<<endl;
-		printTree(node);
 		tree_elem *new_elem = (tree_elem *)malloc(sizeof(tree_elem));
 		new_elem->data = in_p;
 		new_elem->left = NULL;
@@ -48,8 +46,12 @@ namespace newera_network{
 				tmp_elem = tmp_elem->right;
 			}
 		}
-		if(in_p>=tmp_elem->data)tmp_elem->left = new_elem;
-		else tmp_elem->right = new_elem;
+		if(in_p>=tmp_elem->data){
+			tmp_elem->left = new_elem;
+		}
+		else{
+			tmp_elem->right = new_elem;
+		}
 	}
 	void tree::printTree(tree_elem* st_node=NULL){
 		if (st_node == NULL){
@@ -57,10 +59,14 @@ namespace newera_network{
 			printTree(node);
 			return;
 		}
-		if(st_node->left!=NULL)
+		if(st_node->left!=NULL){
 			printTree(st_node->left);
+			cout<<"first elem is left"<<endl;
+		}
 		cout<<st_node->data<<" ";
-		if(st_node->right!=NULL)
+		if(st_node->right!=NULL){
 			printTree(st_node->right);
+			cout<<"first elem is right"<<endl;
+		}
 	}
 };

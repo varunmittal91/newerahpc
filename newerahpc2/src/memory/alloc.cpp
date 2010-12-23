@@ -17,7 +17,6 @@
 
 #include <network.h>
 
-/*
 void* operator new(std::size_t in_s) throw(std::bad_alloc){
 	void *p = malloc(in_s);
 	while(p==0){
@@ -51,8 +50,7 @@ void operator delete(void *in_p){
 void operator delete[](void *in_p){
 	::operator delete(in_p);
 };
-*/
-
+ 
 namespace newera_network{
 	void *expand_mem(void *in_p,size_t in_size){
 		

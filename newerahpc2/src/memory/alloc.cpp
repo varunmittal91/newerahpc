@@ -46,6 +46,8 @@ void* operator new[](std::size_t in_s, const std::nothrow_t&) throw(){
 
 void operator delete(void *in_p){
 	newera_network::mem_obj->rem_mem(in_p);
+	if(in_p)
+		free(in_p);
 };   
 void operator delete[](void *in_p){
 	::operator delete(in_p);
@@ -58,16 +60,8 @@ namespace newera_network{
 	void *mem::expand_mem(void *in_p,size_t in_size){
 		
 	}
-	void mem::rem_mem_clean(void *in_p){
-		mem_element *tmp_elem = (mem_element *)locate(in_p);
-		if(tmp_elem==NULL)return;
-		lock();
-		(*elements) -= tmp_elem;
-		unlock();
-		free(tmp_elem->data);
-		delete tmp_elem;
-	}
 	void mem::rem_mem(void *in_p){
+		if(elements==NULL)return;
 		mem_element *tmp_elem = (mem_element *)locate(in_p);
 		if(tmp_elem==NULL){
 			return;

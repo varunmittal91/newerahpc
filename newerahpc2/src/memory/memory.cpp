@@ -34,11 +34,12 @@ namespace newera_network{
 			mem_element *tmp_elem = (mem_element *)(*elements)[cntr];
 			free(tmp_elem->data);
 			(*elements) -= cntr;
-			delete tmp_elem;
+			free(tmp_elem);
 		}
 		pthread_mutex_unlock(mutex);
-		delete elements;
 		delete mutex;
+		delete elements;
+		elements = NULL;
 	}
 	void mem::lock(){
 		pthread_mutex_lock(mutex);

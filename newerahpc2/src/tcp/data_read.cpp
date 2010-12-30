@@ -17,6 +17,7 @@
 
 #include <network.h>
 #include <unistd.h>
+#include <errno.h>
 
 using namespace std;
 
@@ -78,7 +79,7 @@ namespace newera_network{
 		}
 		do{
 			bzero(buffer,sizeof(buffer));
-			bytes = recv(in_rec->sockfd,buffer,sizeof(buffer),MSG_WAITALL);
+			bytes = recv(in_rec->sockfd,buffer,sizeof(buffer),0);
 			char *temp_buffer = buffer;
 			int postn = 0;
 			for(int cnt_1=0;cnt_1<bytes;cnt_1++){
@@ -104,7 +105,7 @@ namespace newera_network{
 							while(1){
 								bzero(buffer,sizeof(buffer));
 								//bytes = recv(in_rec->sockfd,buffer,sizeof(buffer),0);
-								bytes = recv(in_rec->sockfd,buffer,sizeof(buffer),MSG_WAITALL);
+								bytes = recv(in_rec->sockfd,buffer,sizeof(buffer),0);
 								if(bytes==0)break;
 								grid_data_t->add(buffer,(size_t)bytes);
 							}
@@ -143,6 +144,6 @@ namespace newera_network{
 				}
 			}
 			if(flag)break;
-		}while(bytes>0);
+		}while(bytes==-1 && errno==EINTR);
 	}
 };

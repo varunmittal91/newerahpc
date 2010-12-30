@@ -56,6 +56,7 @@ namespace newera_network{
 		hpc_data = new newera_hpc;
 		hpc_data->init();
 		load_node_list();
+		//sig_handler(SIGINT);
 		cout<<"enter a port for server communication: ";
 		cin>>server_port;
 		pthread_t main_thread;

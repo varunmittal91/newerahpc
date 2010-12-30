@@ -1,6 +1,6 @@
 CC=g++
 INCLUDE_PATH := -I../../include
-EXTRA_CFLAGS_SERVER := -Dnewerahpc -g $(INCLUDE_PATH) -Ddebug
+EXTRA_CFLAGS_SERVER := -Dnewerahpc -g $(INCLUDE_PATH) -Ddebug -pg
 SOURCES=grid.cpp grid_conf.cpp grid_data.cpp grid_dynamic.cpp grid_instruction.cpp grid_lng.cpp grid_nxi.cpp grid_plugin.cpp grid_task.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=grid_all.a

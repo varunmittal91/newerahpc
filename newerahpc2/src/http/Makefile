@@ -1,6 +1,6 @@
 CC=g++
 INCLUDE_PATH := -I../../include
-EXTRA_CFLAGS_SERVER := -Dnewerahpc -g $(INCLUDE_PATH) -Ddebug
+EXTRA_CFLAGS_SERVER := -Dnewerahpc -g $(INCLUDE_PATH) -Ddebug -pg
 SOURCES=http.cpp http_client.cpp http_file.cpp http_reply.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=grid_all.a

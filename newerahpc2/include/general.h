@@ -29,5 +29,6 @@ namespace newera_network{
 	std::string return_file(int);
 	int get_file_size(char *);
 	void init_log();
+	void stop_log();
 	void add_log(const char *);
 };

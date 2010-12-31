@@ -22,10 +22,7 @@ namespace newera_network{
 		if(signal==SIGPIPE);
 		else if(signal==SIGINT){
 			cout<<"Exit function called"<<endl;
-#ifdef debug
-			(*log_file).close();
-			delete log_file;
-#endif			
+			stop_log();
 			delete local_rec;
 			delete database;
 			delete hpc_data;

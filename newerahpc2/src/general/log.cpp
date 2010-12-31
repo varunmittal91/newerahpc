@@ -25,6 +25,12 @@ namespace newera_network{
 	void init_log(){
 		log_file = new ofstream("log_file");
 	}
+	void stop_log(){
+#ifdef debug
+		(*log_file).close();
+		delete log_file;
+#endif					
+	}
 	void add_log(const char *str){
 		time_t rawtime;
 		time(&rawtime);

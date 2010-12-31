@@ -20,6 +20,7 @@
 #define DIR_T 2
 
 namespace newera_network{
+	extern std::ofstream *log_file;
 	size_t find(char *,char *);
 	size_t find(char *,char *,size_t);
 	char *substr(char *,size_t,size_t);
@@ -27,5 +28,6 @@ namespace newera_network{
 	std::string return_file();
 	std::string return_file(int);
 	int get_file_size(char *);
+	void init_log();
 	void add_log(const char *);
 };

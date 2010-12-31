@@ -41,7 +41,10 @@ namespace newera_network{
 			file = "/tmp/temp";
 			file += itoa(count);
 			ifstream temp(file.c_str());
-			if(!temp.is_open())stat=1;
+			if(!temp.is_open()){
+				stat=1;
+				temp.close();
+			}
 			count++;
 		}
 		string cmd;

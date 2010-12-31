@@ -20,12 +20,15 @@
 
 namespace newera_network{
 #ifdef debug
-	std::ofstream log_file("log_file");
+	std::ofstream *log_file;
 #endif
+	void init_log(){
+		log_file = new ofstream("log_file");
+	}
 	void add_log(const char *str){
 		time_t rawtime;
 		time(&rawtime);
-		log_file<<ctime(&rawtime)<<" "<<str<<endl;
+		(*log_file)<<ctime(&rawtime)<<" "<<str<<endl;
 	}
 };
 

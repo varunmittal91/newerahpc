@@ -19,6 +19,7 @@ namespace newera_network{
 	class tree{
 		struct tree_elem{
 			void *data;
+			tree_elem *parent;
 			tree_elem *left;
 			tree_elem *right;
 		};

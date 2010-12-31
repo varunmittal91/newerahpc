@@ -56,8 +56,7 @@ namespace newera_network{
 		char buffer[BUFFSIZE];
 		do{
 			bzero(buffer,sizeof(buffer));
-			bytes = recv(in_rec->sockfd,buffer,sizeof(buffer),MSG_WAITALL);
-			//bytes = recv(in_rec->sockfd,buffer,sizeof(buffer),0);
+			bytes = recv(in_rec->sockfd,buffer,sizeof(buffer),0);
 			fp.write(buffer,bytes);
 			file_size += bytes;
 			if(file_size_act!=0){
@@ -104,7 +103,6 @@ namespace newera_network{
 							grid_data_t->add(left_over,(size_t)(bytes-cnt_1));
 							while(1){
 								bzero(buffer,sizeof(buffer));
-								//bytes = recv(in_rec->sockfd,buffer,sizeof(buffer),0);
 								bytes = recv(in_rec->sockfd,buffer,sizeof(buffer),0);
 								if(bytes==0)break;
 								grid_data_t->add(buffer,(size_t)bytes);

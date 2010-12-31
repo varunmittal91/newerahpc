@@ -34,6 +34,7 @@
 #include <dirent.h>
 #include "queue.h"
 #include "tree.h"
+#include "rbtree.h"
 #include "general.h"
 #include "tcp.h"
 #include "http.h"

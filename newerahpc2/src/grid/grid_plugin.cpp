@@ -60,8 +60,7 @@ namespace newera_network{
 					write->add(itoa(server_port));
 					write->add("");
 					write->push();
-					shutdown(out_rec->sockfd,SHUT_RDWR);
-					close(out_rec->sockfd);
+					connection_close(out_rec);
 					delete write;
 				}
 				cntr++;

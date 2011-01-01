@@ -27,7 +27,6 @@ namespace newera_network{
 	void connection_close(conn_rec *in_rec){
 		shutdown(in_rec->sockfd,SHUT_RDWR);
 		close(in_rec->sockfd);
-		delete in_rec;
 	}
 	void *handle_connection(void *data){
 		signal(SIGPIPE,sig_handler);
@@ -46,6 +45,7 @@ namespace newera_network{
 		delete req;
 		database->remove(in_rec->host,in_rec->cid);
 		connection_close(in_rec);
+		delete in_rec;
 	}
 	void start(){
 		signal(SIGINT,sig_handler);

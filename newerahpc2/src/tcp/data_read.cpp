@@ -79,6 +79,8 @@ namespace newera_network{
 		do{
 			bzero(buffer,sizeof(buffer));
 			bytes = recv(in_rec->sockfd,buffer,sizeof(buffer),0);
+			if(bytes<0)
+				perror("read faile: ");
 			char *temp_buffer = buffer;
 			int postn = 0;
 			for(int cnt_1=0;cnt_1<bytes;cnt_1++){

@@ -18,6 +18,7 @@
 #include <network.h>
 #include <map>
 #include <dlfcn.h>
+#include <errno.h>
 
 namespace newera_network{
 	void *grid_execute_thread(void *data){
@@ -96,8 +97,7 @@ namespace newera_network{
 		write->add("");
 		write->push();
 		write->push_raw((char *)instruction->data,instruction->length);
-		shutdown(out_rec->sockfd,SHUT_RDWR);
-		close(out_rec->sockfd);
+		connection_close(out_rec);
 		delete write;
 	}
 	void newera_hpc::execute_client(instruction_set *instruction){
@@ -116,8 +116,7 @@ namespace newera_network{
 		write->add("");
 		write->push();
 		write->push_raw((char *)instruction->data,instruction->length);
-		shutdown(out_rec->sockfd,SHUT_RDWR);
-		close(out_rec->sockfd);
+		connection_close(out_rec);
 		delete write;
 	}
 };

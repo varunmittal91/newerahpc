@@ -66,8 +66,7 @@ namespace newera_network{
 				write->add("");
 				write->push();
 				sleep(2);
-				shutdown(out_rec->sockfd,SHUT_RDWR);
-				close(out_rec->sockfd);
+				connection_close(out_rec);
 				delete out_rec;
 				delete write;
 			}

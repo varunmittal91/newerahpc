@@ -111,5 +111,6 @@ namespace newera_network{
 	extern int server_port;
 	void *open_socket(void *);
 	void connect(conn_rec *);
+	void connection_close(conn_rec *);
 	void start();
 };

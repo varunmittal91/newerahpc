@@ -39,6 +39,6 @@ int main(){
 	task.check();
 	cout<<"task collecting"<<endl;
 	task.collect();
-	sig_handler(SIGINT);
+	//sig_handler(SIGINT);
 	return 0;
 }

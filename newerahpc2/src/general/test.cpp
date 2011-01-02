@@ -15,19 +15,26 @@
 //You should have received a copy of the GNU General Public License
 //along with newerahpc.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <network.h>
+#include "../../include/network.h"
 
-namespace newera_network{
-	void sig_handler(int signal){
-		if(signal==SIGPIPE);
-		else if(signal==SIGINT){
-			cout<<"Exit function called"<<endl;
-			//stop_log();
-			delete local_rec;
-			delete database;
-			delete hpc_data;
-			delete mem_obj;
-			exit(0);
-		}
-	}
-};
+using namespace newera_network;
+
+int main(){
+	tree test_tree;
+	int *tmp_elem[3];
+	tmp_elem[0] = new int;
+	tmp_elem[1] = new int;
+	tmp_elem[2] = new int;
+	tmp_elem[3] = new int;
+	cout<<tmp_elem[0]<<endl;
+	cout<<tmp_elem[1]<<endl;
+	cout<<tmp_elem[2]<<endl;
+	cout<<tmp_elem[3]<<endl;
+	test_tree += tmp_elem[3];
+	test_tree += tmp_elem[1];
+	test_tree += tmp_elem[0];
+	test_tree += tmp_elem[2];
+	test_tree.printTree(NULL);
+	cout<<endl;
+	return 0;
+}

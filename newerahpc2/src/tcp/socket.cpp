@@ -24,9 +24,17 @@ namespace newera_network{
 	conn_database *database;
 	int server_port;
 
+	void connection_close(conn_rec *in_rec,const char *msg){
+		shutdown(in_rec->sockfd,SHUT_RDWR);
+		close(in_rec->sockfd);
+		cout<<endl;
+		perror("@connection");
+		cout<<"		connection closed "<<msg<<endl;
+	}
 	void connection_close(conn_rec *in_rec){
 		shutdown(in_rec->sockfd,SHUT_RDWR);
 		close(in_rec->sockfd);
+		cout<<"		connection closed"<<endl;
 	}
 	void *handle_connection(void *data){
 		signal(SIGPIPE,sig_handler);
@@ -44,7 +52,7 @@ namespace newera_network{
 		}
 		delete req;
 		database->remove(in_rec->host,in_rec->cid);
-		connection_close(in_rec);
+		connection_close(in_rec,"@close connection");
 		delete in_rec;
 	}
 	void start(){

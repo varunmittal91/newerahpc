@@ -60,7 +60,7 @@ namespace newera_network{
 					write->add(itoa(server_port));
 					write->add("");
 					write->push();
-					connection_close(out_rec);
+					connection_close(out_rec,"@plugin send request");
 					delete write;
 				}
 				cntr++;

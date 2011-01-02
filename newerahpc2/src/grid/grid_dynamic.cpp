@@ -97,7 +97,7 @@ namespace newera_network{
 		write->add("");
 		write->push();
 		write->push_raw((char *)instruction->data,instruction->length);
-		connection_close(out_rec);
+		connection_close(out_rec,"@grid_execute");
 		delete write;
 	}
 	void newera_hpc::execute_client(instruction_set *instruction){
@@ -116,7 +116,7 @@ namespace newera_network{
 		write->add("");
 		write->push();
 		write->push_raw((char *)instruction->data,instruction->length);
-		connection_close(out_rec);
+		connection_close(out_rec,"@ client execution");
 		delete write;
 	}
 };

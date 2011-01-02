@@ -66,7 +66,7 @@ namespace newera_network{
 				write->add("");
 				write->push();
 				sleep(2);
-				connection_close(out_rec);
+				connection_close(out_rec,"@getplugin send");
 				delete out_rec;
 				delete write;
 			}

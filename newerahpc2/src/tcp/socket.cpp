@@ -25,16 +25,16 @@ namespace newera_network{
 	int server_port;
 
 	void connection_close(conn_rec *in_rec,const char *msg){
-		shutdown(in_rec->sockfd,SHUT_RDWR);
-		close(in_rec->sockfd);
 		cout<<endl;
-		perror("@connection");
-		cout<<"		connection closed "<<msg<<endl;
+		if(shutdown(in_rec->sockfd,SHUT_RDWR)<0)perror("@shutdown");
+		if(close(in_rec->sockfd)<0)perror("@close");
+		cout<<"connection closed "<<msg<<endl;
 	}
 	void connection_close(conn_rec *in_rec){
-		shutdown(in_rec->sockfd,SHUT_RDWR);
-		close(in_rec->sockfd);
-		cout<<"		connection closed"<<endl;
+		cout<<endl;
+		if(shutdown(in_rec->sockfd,SHUT_RDWR)<0)perror("@shutdown");
+		if(close(in_rec->sockfd)<0)perror("@close");
+		cout<<"connection closed"<<endl;
 	}
 	void *handle_connection(void *data){
 		signal(SIGPIPE,sig_handler);

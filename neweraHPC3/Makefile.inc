@@ -33,7 +33,7 @@ MKFLAGS =
 PRJFLAGS = -g 
 
 ifeq ($(UNAME),Linux)
-	OBJLIB		  = libneweraHPC.so.$(MAJOR_RELEASE)
+	OBJLIB		  = libneweraHPC.so.$(MAJOR_RELEASE).$(MINOR_RELEASE)
 	DYNAMIC_FLAGS = -shared -Wl,-soname,libneweraHPC.so.$(MAJOR_RELEASE) -o libneweraHPC.so.$(MAJOR_RELEASE).$(MINOR_RELEASE)
 endif
 ifeq ($(UNAME),Darwin)

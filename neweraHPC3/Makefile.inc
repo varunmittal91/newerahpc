@@ -35,11 +35,11 @@ PRJFLAGS = -g
 ifeq ($(UNAME),Linux)
 	OBJLIB	      = libneweraHPC.so.$(MAJOR_RELEASE).$(MINOR_RELEASE)
 	DYNAMIC_FLAGS = -shared -Wl,-soname,libneweraHPC.so.$(MAJOR_RELEASE) -o libneweraHPC.so.$(MAJOR_RELEASE).$(MINOR_RELEASE)
-	EXTRA_CMD_LIB = ln -s libneweraHPC.so.$(MAJOR_RELEASE).$(MINOR_RELEASE) libneweraHPC.so
+	EXTRA_CMD_LIB = ln -sf libneweraHPC.so.$(MAJOR_RELEASE).$(MINOR_RELEASE) libneweraHPC.so; ln -sf libneweraHPC.so.$(MAJOR_RELEASE).$(MINOR_RELEASE) libneweraHPC.so.$(MAJOR_RELEASE); export LD_LIBRARY_PATH=src
 endif
 ifeq ($(UNAME),Darwin)
 	OBJLIB        = libneweraHPC.$(MAJOR_RELEASE).dylib
 	DYNAMIC_FLAGS = -dynamiclib -o libneweraHPC.$(MAJOR_RELEASE).dylib
-	EXTRA_CMD_LIB = 
+	EXTRA_CMD_LIB = ln -sf libneweraHPC.$(MAJOR_RELEASE).dylib libneweraHPC.dylib; export DYLD_LIBRARY_PATH=src
 endif
 

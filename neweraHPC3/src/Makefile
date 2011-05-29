@@ -35,7 +35,7 @@ libs:
 	
 dynamic_lib:
 	$(CPPC) $(DYNAMIC_FLAGS) $(OBJECTS)
-	
+	$(EXTRA_CMD_LIB)	
 	
 clean:
 	for subdir in $(SUBDIRS); do \

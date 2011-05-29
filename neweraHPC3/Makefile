@@ -19,13 +19,15 @@
 
 include ./Makefile.inc
 
+SRC = server.cpp
+
 DIRS   = src tests
 EXE    = server
 
 all: $(EXE)
 	
 $(EXE): $(OBJLIB)	
-	$(CPPC) server.cpp -o $(EXE) $(LIBS) src/$(OBJLIB) $(PRJFLAGS)
+	$(CPPC) $(SRC) -o $(EXE) $(LIBS) -Lsrc -lneweraHPC $(PRJFLAGS)
 
 $(OBJLIB):
 	cd src; $(MAKE) $(MKFLAGS)

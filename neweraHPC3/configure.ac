@@ -10,7 +10,11 @@ AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
 AC_PROG_CXX
-
+AC_ARG_ENABLE([debug],AC_HELP_STRING([--enable-debug], [ENABLE debugging for the project]))
+AS_IF([test "x$enable_debug" != "xno"], [
+  #dnl Do the stuff needed for enabling the feature
+  CXXFLAGS = "$CXXFLAGS -g"
+])
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lneweraHPC':
 AC_CHECK_LIB([neweraHPC], [main])
@@ -19,7 +23,7 @@ AC_CHECK_LIB([neweraHPC], [main])
 # AC_CHECK_HEADERS([stddef.h])
 
 # Check for optional arguments
-AC_ARG_ENABLE([tests],[--enable-tests Build test files for various algorithms and features used in the system],[tests=yes])
+AC_ARG_ENABLE([tests],[  --enable-tests Build test files for various algorithms and features used in the system],[tests=yes])
 AM_CONDITIONAL([tests_enable], [test x$tests = xtrue])
 
 # Checks for typedefs, structures, and compiler characteristics.

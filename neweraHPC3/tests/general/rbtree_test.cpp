@@ -19,27 +19,39 @@
 
 #include <include/rbtree.h>
 #include <iostream>
+#include <stdio.h>
 
 using namespace std;
 using namespace neweraHPC;
 
 int main(){
-	rbtree test_tree;
-
+	
+	cout<<"This program is mainly build built for testing the efficiency of rbtree module used in the neweraHPC library"<<endl;
+	cout<<"Please use some tool to test for memory leaks\n"<<"Attach the binary to some tool and then press any key"<<endl;
+	
+	rbtree *test_tree = new rbtree;
+	
 	int *a,*b,*c,*d;
-	a = new int;
-	b = new int;
-	c = new int;
-	d = new int;
+	a = new int[122];
+	b = new int[122];
+	c = new int[122];
+	d = new int[122];
 	
 	cout<<a<<endl;
 	cout<<b<<endl;
 	cout<<c<<endl;
 	cout<<d<<endl;
 
-	cout<<test_tree.insert(a)<<endl;
-	cout<<test_tree.insert(b)<<endl;
-	cout<<test_tree.insert(c)<<endl;
-	cout<<test_tree.insert(d)<<endl;
+	cout<<(*test_tree).insert(a)<<endl;
+	cout<<(*test_tree).insert(b)<<endl;
+	cout<<(*test_tree).insert(c)<<endl;
+	cout<<(*test_tree).insert(d)<<endl;
 
+	delete test_tree;
+	delete a,b,c,d;
+	
+	cout<<"All tree structures and data have been deleted there should not be any trace of memory still remaining\n";
+	cout<<"If there is still some memory left that is not deallocated, we have a problem"<<endl;
+	
+	return 0;
 }

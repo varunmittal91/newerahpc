@@ -739,6 +739,7 @@ ac_user_opts='
 enable_option_checking
 enable_silent_rules
 enable_dependency_tracking
+enable_debug
 enable_tests
 enable_shared
 enable_static
@@ -1391,7 +1392,8 @@ Optional Features:
   --disable-silent-rules         verbose build output (undo: `make V=0')
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
---enable-tests Build test files for various algorithms and features used in the system
+  --enable-debug          ENABLE debugging for the project
+  --enable-tests Build test files for various algorithms and features used in the system
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
   --enable-fast-install[=PKGS]
@@ -3507,7 +3509,17 @@ else
 fi
 
 
+# Check whether --enable-debug was given.
+if test "${enable_debug+set}" = set; then :
+  enableval=$enable_debug;
+fi
 
+if test "x$enable_debug" != "xno"; then :
+
+  #dnl Do the stuff needed for enabling the feature
+  CXXFLAGS = "$CXXFLAGS -g"
+
+fi
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lneweraHPC':
 ac_ext=c

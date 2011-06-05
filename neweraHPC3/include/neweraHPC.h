@@ -17,11 +17,17 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _NEWERAHPC_H_
+#define _NEWERAHPC_H_
+
 namespace neweraHPC{
-   void opne_socket()
+   class neweraHPC_main
    {
-   }
-   void connect()
-   {
-   }
+   private:
+   public:
+      neweraHPC_main();
+      ~neweraHPC_main();
+   };  
 };
+
+#endif

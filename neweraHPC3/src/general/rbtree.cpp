@@ -626,4 +626,4 @@ namespace neweraHPC
 			return false;
 	}
 	
-}
+};

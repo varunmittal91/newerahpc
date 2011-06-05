@@ -123,6 +123,6 @@ namespace neweraHPC{
 		int erase(int);
 		int update(int, void *);
 	};
-}
+};
 
 #endif

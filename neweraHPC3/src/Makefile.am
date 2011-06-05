@@ -1,4 +1,4 @@
-SUBDIRS = network general
+SUBDIRS = network general internal
 
 lib_LTLIBRARIES         = libneweraHPC.la
 libneweraHPC_la_SOURCES = 

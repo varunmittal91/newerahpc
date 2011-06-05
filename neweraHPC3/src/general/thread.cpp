@@ -17,11 +17,16 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace neweraHPC{
-   void opne_socket()
+#include <include/thread.h>
+
+namespace neweraHPC
+{
+   thread_manager_t::thread_manager_t()
    {
+      active_threads = new rbtree;
    }
-   void connect()
+   thread_manager_t::~thread_manager_t()
    {
+      delete active_threads;
    }
 };

@@ -388,7 +388,8 @@ struct rb_node *rb_next(const struct rb_node *node)
 	
 	/* If we have a right-hand child, go down and then left as far
 	 as we can. */
-	if (node->rb_right) {
+	if (node->rb_right) 
+	{
 		node = node->rb_right; 
 		while (node->rb_left)
 			node=node->rb_left;
@@ -416,7 +417,8 @@ struct rb_node *rb_prev(const struct rb_node *node)
 	
 	/* If we have a left-hand child, go down and then right as far
 	 as we can. */
-	if (node->rb_left) {
+	if (node->rb_left) 
+	{
 		node = node->rb_left; 
 		while (node->rb_right)
 			node=node->rb_right;
@@ -441,7 +443,9 @@ void rb_replace_node(struct rb_node *victim, struct rb_node *new_node, struct rb
 			parent->rb_left = new_node;
 		else
 			parent->rb_right = new_node;
-	} else {
+	} 
+	else 
+	{
 		root->rb_node = new_node;
 	}
 	if (victim->rb_left)
@@ -494,13 +498,15 @@ namespace neweraHPC
 			else if(key>data->node_key){
 				result = -1;
 			}
-			if (result < 0){
+			if (result < 0)
+			{
 #ifdef debug
 				cout<<"curr:"<<key<<" searching at left node"<<endl;
 #endif
 				node = node->rb_left;
 			}
-			else if (result > 0){
+			else if (result > 0)
+			{
 #ifdef debug
 				cout<<"curr:"<<key<<" searching at right node"<<endl;
 #endif
@@ -526,16 +532,19 @@ namespace neweraHPC
 			{
 				result = 1;
 			}
-			else if(key>data->node_key){
+			else if(key>data->node_key)
+			{
 				result = -1;
 			}
-			if (result < 0){
+			if (result < 0)
+			{
 #ifdef debug
 				cout<<"curr:"<<key<<" searching at left node"<<endl;
 #endif
 				node = node->rb_left;
 			}
-			else if (result > 0){
+			else if (result > 0)
+			{
 #ifdef debug
 				cout<<"curr:"<<key<<" searching at right node"<<endl;
 #endif
@@ -557,7 +566,8 @@ namespace neweraHPC
 		
 		struct rb_node **new_node = &(root->rb_node), *parent = NULL;
 		/* Figure out where to put new node */
-		while (*new_node) {
+		while (*new_node) 
+		{
 			node *this_node = container_of(*new_node, node, node_next);
 			
 			int result = 0;
@@ -567,13 +577,15 @@ namespace neweraHPC
 				result = -1;
 			
 			parent = *new_node;
-			if (result < 0){
+			if (result < 0)
+			{
 #ifdef debug
 				cout<<"curr:"<<this_node->key<<" inserting at left node"<<endl;
 #endif
 				new_node = &((*new_node)->rb_left);
 			}
-			else if (result > 0){
+			else if (result > 0)
+			{
 #ifdef debug
 				cout<<"curr:"<<this_node->key<<" inserting at right node"<<endl;
 #endif

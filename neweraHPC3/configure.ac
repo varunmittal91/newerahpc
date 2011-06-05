@@ -35,9 +35,9 @@ LT_INIT()
 LT_SUPPORTED_TAG(CXX)
 
 AC_CONFIG_FILES([Makefile]
-                [src/Makefile]
+	        [src/Makefile]
                 [src/general/Makefile]
-				[src/network/Makefile]
+	        [src/network/Makefile]
                 [tests/Makefile]
                 [tests/general/Makefile])
 AC_OUTPUT

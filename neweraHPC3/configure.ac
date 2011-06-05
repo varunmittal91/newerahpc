@@ -12,8 +12,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_PROG_CXX
 AC_ARG_ENABLE([debug],AC_HELP_STRING([--enable-debug], [ENABLE debugging for the project]))
 AS_IF([test "x$enable_debug" != "xno"], [
-  #dnl Do the stuff needed for enabling the feature
-  CXXFLAGS = "$CXXFLAGS -g"
+CXXFLAGS = "$CXXFLAGS -g"
 ])
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lneweraHPC':
@@ -31,10 +30,14 @@ AC_HEADER_STDBOOL
 AC_C_INLINE
 
 # Checks for library functions.
+LD = g++
 LT_INIT()
+LT_SUPPORTED_TAG(CXX)
 
 AC_CONFIG_FILES([Makefile]
                 [src/Makefile]
-		[tests/Makefile]
-		[tests/general/Makefile])
+                [src/general/Makefile]
+				[src/network/Makefile]
+                [tests/Makefile]
+                [tests/general/Makefile])
 AC_OUTPUT

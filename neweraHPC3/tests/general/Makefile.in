@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = rbtree_test$(EXEEXT)
+bin_PROGRAMS = rbtree_test$(EXEEXT) thread_test$(EXEEXT)
 subdir = tests/general
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -53,6 +53,9 @@ rbtree_test_DEPENDENCIES = ../../src/libneweraHPC.la
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
+am_thread_test_OBJECTS = thread_test.$(OBJEXT)
+thread_test_OBJECTS = $(am_thread_test_OBJECTS)
+thread_test_DEPENDENCIES = ../../src/libneweraHPC.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -79,8 +82,8 @@ am__v_CXXLD_0 = @echo "  CXXLD " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(rbtree_test_SOURCES)
-DIST_SOURCES = $(rbtree_test_SOURCES)
+SOURCES = $(rbtree_test_SOURCES) $(thread_test_SOURCES)
+DIST_SOURCES = $(rbtree_test_SOURCES) $(thread_test_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -205,6 +208,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 rbtree_test_SOURCES = rbtree_test.cpp
 rbtree_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
+thread_test_SOURCES = thread_test.cpp
+thread_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
 all: all-am
 
 .SUFFIXES:
@@ -285,6 +290,9 @@ clean-binPROGRAMS:
 rbtree_test$(EXEEXT): $(rbtree_test_OBJECTS) $(rbtree_test_DEPENDENCIES) 
 	@rm -f rbtree_test$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(rbtree_test_OBJECTS) $(rbtree_test_LDADD) $(LIBS)
+thread_test$(EXEEXT): $(thread_test_OBJECTS) $(thread_test_DEPENDENCIES) 
+	@rm -f thread_test$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(thread_test_OBJECTS) $(thread_test_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -293,6 +301,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rbtree_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/thread_test.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

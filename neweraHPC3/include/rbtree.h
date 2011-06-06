@@ -22,13 +22,13 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef	_RBTREE_H_
+#define	_RBTREE_H_
+
 #include <stddef.h>
 #include <stdio.h>
 #include <cstddef>
 #include <pthread.h>
-
-#ifndef	_RBTREE_H_
-#define	_RBTREE_H_
 
 #define container_of(ptr, type, member) ({            \
 const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
@@ -116,7 +116,6 @@ namespace neweraHPC{
       };
       int last_assigned_key;
       node *search_node(int);
-      pthread_mutex_t *mutex;
    public:
       rbtree();
       ~rbtree();
@@ -124,7 +123,6 @@ namespace neweraHPC{
       int insert(void *);
       int erase(int);
       int update(int, void *);
-      void init_mutex();
    };
 };
 

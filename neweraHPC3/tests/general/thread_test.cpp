@@ -17,32 +17,26 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _THREAD_H_
-#define _THREAD_H_
+#include <include/neweraHPC.h>
+#include <iostream>
 
-#include "rbtree.h"
+using namespace std;
+using namespace neweraHPC;
 
-#define THREAD_DEFAULT 0
-#define THREAD_JOIN    1
-#define THREAD_DETACH  2
+void *test(void *args){
+   cout<<"Hi thread created successfully"<<endl;
+}
 
-namespace neweraHPC{
-   class thread_manager_t
-   {
-   private:
-      rbtree *active_threads;
-      pthread_mutex_t *mutex;
-   public:  
-      thread_manager_t();
-      ~thread_manager_t();
-      /* Lock and unlock pthread_mutex on request. */
-      inline void lock();
-      inline void unlock();
-      /* Create new thread on request. 'thread_state' to tell whether to join thread or dettach or do nothing. */
-      int create_thread(const pthread_attr_t *attr, 
-			void *(*start_routine)(void*), void *arg, int thread_state);
-      void delete_thread_data(int rbtree_id);
-   };
-};
+int main()
+{
+   thread_manager_t thread_manager;
 
-#endif
+   int thread_id = thread_manager.create_thread(NULL,test,NULL,THREAD_JOIN);
+   if(thread_id==0)
+      cout<<"Thread create failed"<<endl;
+   
+   thread_manager.delete_thread_data(thread_id);
+   
+   sleep(1);
+   return 0;
+}

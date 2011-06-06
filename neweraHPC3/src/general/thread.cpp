@@ -51,7 +51,7 @@ namespace neweraHPC
       int status_new = pthread_create(thread_new, attr, start_routine, arg);
       if(status_new!=0){
 	 perror("Thread creation failed");
-	 return NULL;
+	 return 0;
       }
       
       lock();

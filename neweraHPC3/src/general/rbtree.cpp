@@ -625,5 +625,11 @@ namespace neweraHPC
       else
 	 return false;
    }
-   
+   void rbtree::init_mutex()
+   {
+      if(!mutex){
+	 mutex = new pthread_mutex_t;
+	 pthread_mutex_init(mutex,NULL);
+      }
+   }
 };

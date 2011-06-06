@@ -124,7 +124,7 @@ namespace neweraHPC{
       int insert(void *);
       int erase(int);
       int update(int, void *);
-      int init_mutex_lock();
+      void init_mutex();
    };
 };
 

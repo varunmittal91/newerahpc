@@ -20,6 +20,9 @@
 #ifndef _NEWERAHPC_H_
 #define _NEWERAHPC_H_
 
+#include "rbtree.h"
+#include "thread.h"
+
 namespace neweraHPC{
    class neweraHPC_main
    {

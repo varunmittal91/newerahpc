@@ -25,6 +25,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <cstddef>
+#include <pthread.h>
 
 #ifndef	_RBTREE_H_
 #define	_RBTREE_H_
@@ -35,17 +36,17 @@ const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
 
 struct rb_node
 {
-	unsigned long  rb_parent_color;
+   unsigned long  rb_parent_color;
 #define	RB_RED		0
 #define	RB_BLACK	1
-	struct rb_node *rb_right;
-	struct rb_node *rb_left;
+   struct rb_node *rb_right;
+   struct rb_node *rb_left;
 } __attribute__((aligned(sizeof(long))));
 /* The alignment might seem pointless, but allegedly CRIS needs it */
 
 struct rb_root
 {
-	struct rb_node *rb_node;
+   struct rb_node *rb_node;
 };
 
 
@@ -58,11 +59,11 @@ struct rb_root
 
 static inline void rb_set_parent(struct rb_node *rb, struct rb_node *p)
 {
-	rb->rb_parent_color = (rb->rb_parent_color & 3) | (unsigned long)p;
+   rb->rb_parent_color = (rb->rb_parent_color & 3) | (unsigned long)p;
 }
 static inline void rb_set_color(struct rb_node *rb, int color)
 {
-	rb->rb_parent_color = (rb->rb_parent_color & ~1) | color;
+   rb->rb_parent_color = (rb->rb_parent_color & ~1) | color;
 }
 
 #define RB_ROOT	(struct rb_root) { NULL, }
@@ -78,10 +79,10 @@ extern void rb_erase(struct rb_node *, struct rb_root *);
 typedef void (*rb_augment_f)(struct rb_node *node, void *data);
 
 extern void rb_augment_insert(struct rb_node *node,
-							  rb_augment_f func, void *data);
+			      rb_augment_f func, void *data);
 extern struct rb_node *rb_augment_erase_begin(struct rb_node *node);
 extern void rb_augment_erase_end(struct rb_node *node,
-								 rb_augment_f func, void *data);
+				 rb_augment_f func, void *data);
 
 /* Find logical next and previous nodes in a tree */
 extern struct rb_node *rb_next(const struct rb_node *);
@@ -98,31 +99,33 @@ extern void rb_replace_node(struct rb_node *victim, struct rb_node *new_node, st
 
 static inline void rb_link_node(struct rb_node * node, struct rb_node * parent,	struct rb_node ** rb_link)
 {
-	node->rb_parent_color = (unsigned long )parent;
-	node->rb_left = node->rb_right = NULL;
-	
-	*rb_link = node;
+   node->rb_parent_color = (unsigned long )parent;
+   node->rb_left = node->rb_right = NULL;
+   
+   *rb_link = node;
 }
 
 namespace neweraHPC{
-	class rbtree{
-	private:
-		rb_root *root;
-		struct node{
-			struct rb_node node_next;
-			void *node_data;
-			int node_key;
-		};
-		int last_assigned_key;
-		node *search_node(int);
-	public:
-		rbtree();
-		~rbtree();
-		void *search(int);
-		int insert(void *);
-		int erase(int);
-		int update(int, void *);
-	};
+   class rbtree{
+   private:
+      rb_root *root;
+      struct node{
+	 struct rb_node node_next;
+	 void *node_data;
+	 int node_key;
+      };
+      int last_assigned_key;
+      node *search_node(int);
+      pthread_mutex_t *mutex;
+   public:
+      rbtree();
+      ~rbtree();
+      void *search(int);
+      int insert(void *);
+      int erase(int);
+      int update(int, void *);
+      int init_mutex_lock();
+   };
 };
 
 #endif

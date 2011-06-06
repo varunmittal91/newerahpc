@@ -12,14 +12,13 @@ AC_CONFIG_HEADERS([config.h])
 AC_PROG_CXX
 AC_ARG_ENABLE([debug],AC_HELP_STRING([--enable-debug], [ENABLE debugging for the project]))
 AS_IF([test "x$enable_debug" != "xno"], [
-CXXFLAGS = "$CXXFLAGS -g"
+#CXXFLAGS = "$CXXFLAGS -g"
 ])
 # Checks for libraries.
-# FIXME: Replace `main' with a function in `-lneweraHPC':
-AC_CHECK_LIB([neweraHPC], [main])
+AC_CHECK_LIB([pthread],[pthread_create],[],[AC_MSG_ERROR([libpthread not found])])
 
 # Checks for header files.
-# AC_CHECK_HEADERS([stddef.h])
+AC_CHECK_HEADERS([pthread.h])
 
 # Check for optional arguments
 AC_ARG_ENABLE([tests],[  --enable-tests Build test files for various algorithms and features used in the system],[tests=yes])

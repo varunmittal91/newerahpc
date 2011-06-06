@@ -45,7 +45,7 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libgeneral_la_LIBADD =
+libgeneral_la_DEPENDENCIES = libpthread
 am__objects_1 = rbtree.lo thread.lo
 am_libgeneral_la_OBJECTS = $(am__objects_1)
 libgeneral_la_OBJECTS = $(am_libgeneral_la_OBJECTS)
@@ -204,6 +204,7 @@ top_srcdir = @top_srcdir@
 SOURCES = rbtree.cpp thread.cpp
 noinst_LTLIBRARIES = libgeneral.la
 libgeneral_la_SOURCES = $(SOURCES)
+libgeneral_la_LIBADD = libpthread
 all: all-am
 
 .SUFFIXES:

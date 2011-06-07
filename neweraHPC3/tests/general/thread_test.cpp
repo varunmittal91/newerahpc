@@ -24,19 +24,20 @@ using namespace std;
 using namespace neweraHPC;
 
 void *test(void *args){
-   cout<<"Hi thread created successfully"<<endl;
+   while(1)
+      cout<<"Hi thread created successfully"<<endl;
 }
 
 int main()
 {
    thread_manager_t thread_manager;
 
-   int thread_id = thread_manager.create_thread(NULL,test,NULL,THREAD_JOIN);
+   int thread_id = thread_manager.create_thread(NULL,test,NULL,0);
    if(thread_id==0)
       cout<<"Thread create failed"<<endl;
-   
+   thread_manager.cancel_thread(thread_id);
    thread_manager.delete_thread_data(thread_id);
    
-   sleep(1);
+   //sleep(1);
    return 0;
 }

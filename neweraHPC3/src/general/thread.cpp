@@ -22,7 +22,7 @@
 namespace neweraHPC
 {
    thread_manager_t::thread_manager_t()
-   {
+   {          
       active_threads = new rbtree;
       mutex = new pthread_mutex_t;
       pthread_mutex_init(mutex,NULL);
@@ -32,6 +32,7 @@ namespace neweraHPC
    {
       delete active_threads;
       delete mutex;
+      pthread_mutex_destroy(mutex);
    }
    
    inline void thread_manager_t::lock()
@@ -81,5 +82,32 @@ namespace neweraHPC
 	 delete thread;
       }
       unlock();
-   }   
+   }
+   
+   int thread_manager_t::cancel_thread(int rbtree_id)
+   {
+      lock();
+      pthread_t *thread = (pthread_t *)(*active_threads).search(rbtree_id);
+      unlock();
+      if(thread){
+	 int status = pthread_cancel(*thread);
+	 return status;
+      }
+      else 
+	 return -1;
+   }
+   
+   int thread_manager_t::kill_thread(int rbtree_id)
+   {
+      lock();
+      pthread_t *thread = (pthread_t *)(*active_threads).search(rbtree_id);
+      unlock();
+
+      int status = -1;
+      if(thread)
+      {
+	 status = pthread_kill(*thread,SIGTERM); 
+      }
+      return status;
+   }
 };

@@ -21,6 +21,7 @@
 #define _THREAD_H_
 
 #include "rbtree.h"
+#include <signal.h>
 
 #define THREAD_DEFAULT 0
 #define THREAD_JOIN    1
@@ -32,9 +33,11 @@ namespace neweraHPC{
    private:
       rbtree *active_threads;
       pthread_mutex_t *mutex;
+      struct sigaction act;
    public:  
       thread_manager_t();
       ~thread_manager_t();
+      static void exit_handler(int sig);
       /* Lock and unlock pthread_mutex on request. */
       inline void lock();
       inline void unlock();
@@ -42,6 +45,9 @@ namespace neweraHPC{
       int create_thread(const pthread_attr_t *attr, 
 			void *(*start_routine)(void*), void *arg, int thread_state);
       void delete_thread_data(int rbtree_id);
+      /* Needs working not yet functional */
+      int cancel_thread(int rbtree_id);
+      int kill_thread(int rbtrr_id);
    };
 };
 

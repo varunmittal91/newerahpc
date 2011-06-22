@@ -19,13 +19,17 @@
 
 #include <include/neweraHPC.h>
 #include <iostream>
+#include <signal.h>
 
 using namespace std;
 using namespace neweraHPC;
 
 void *test(void *args){
    while(1)
+   {
       cout<<"Hi thread created successfully"<<endl;
+      pthread_testcancel();
+   }
 }
 
 int main()
@@ -37,7 +41,10 @@ int main()
       cout<<"Thread create failed"<<endl;
    thread_manager.cancel_thread(thread_id);
    thread_manager.delete_thread_data(thread_id);
-   
-   //sleep(1);
+   cout<<"thread created and destroyed"<<endl;
+   while(1)
+   {
+      sleep(1);
+   }
    return 0;
 }

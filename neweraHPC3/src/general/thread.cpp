@@ -18,6 +18,9 @@
  */
 
 #include <include/thread.h>
+#include <iostream>
+
+using namespace std;
 
 namespace neweraHPC
 {
@@ -95,19 +98,5 @@ namespace neweraHPC
       }
       else 
 	 return -1;
-   }
-   
-   int thread_manager_t::kill_thread(int rbtree_id)
-   {
-      lock();
-      pthread_t *thread = (pthread_t *)(*active_threads).search(rbtree_id);
-      unlock();
-
-      int status = -1;
-      if(thread)
-      {
-	 status = pthread_kill(*thread,SIGTERM); 
-      }
-      return status;
-   }
+   }   
 };

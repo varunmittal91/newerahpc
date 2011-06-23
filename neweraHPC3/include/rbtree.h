@@ -105,7 +105,8 @@ static inline void rb_link_node(struct rb_node * node, struct rb_node * parent,	
    *rb_link = node;
 }
 
-namespace neweraHPC{
+namespace neweraHPC
+{
    class rbtree{
    private:
       rb_root *root;

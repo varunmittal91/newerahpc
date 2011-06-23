@@ -19,7 +19,8 @@
 
 #include <include/neweraHPC.h>
 
-namespace neweraHPC{
+namespace neweraHPC
+{
    neweraHPC_main::neweraHPC_main()
    {
    }

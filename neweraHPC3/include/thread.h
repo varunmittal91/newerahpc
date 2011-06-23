@@ -27,7 +27,8 @@
 #define THREAD_JOIN    1
 #define THREAD_DETACH  2
 
-namespace neweraHPC{
+namespace neweraHPC
+{
    class thread_manager_t
    {
    private:

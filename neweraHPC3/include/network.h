@@ -17,22 +17,18 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NEWERAHPC_H_
-#define _NEWERAHPC_H_
-
-#include "rbtree.h"
-#include "thread.h"
-#include "network.h"
+#ifndef _NETWORK_H_
+#define _NETWORK_H_
 
 namespace neweraHPC
 {
-   class neweraHPC_main
+   class network
    {
-   private:
    public:
-      neweraHPC_main();
-      ~neweraHPC_main();
-   };  
+      network();
+      ~network();
+      int open_socket();
+   };
 };
 
 #endif

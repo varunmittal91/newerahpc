@@ -17,11 +17,17 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace neweraHPC{
-   void opne_socket()
+#include <include/network.h>
+
+namespace neweraHPC
+{
+   network::network()
    {
    }
-   void connect()
+   network::~network()
+   {
+   }
+   int network::open_socket()
    {
    }
 };

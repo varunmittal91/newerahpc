@@ -29,6 +29,7 @@ namespace neweraHPC
    class neweraHPC_main
    {
    private:
+      network_t main_network;
    public:
       neweraHPC_main();
       ~neweraHPC_main();

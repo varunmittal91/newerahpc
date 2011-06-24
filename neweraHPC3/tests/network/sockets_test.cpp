@@ -17,17 +17,11 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <include/network.h>
+#include <include/neweraHPC.h>
 
-namespace neweraHPC
-{
-   network_t::network_t()
-   {
-   }
-   network_t::~network_t()
-   {
-   }
-   int network_t::open_socket()
-   {
-   }
-};
+using namespace neweraHPC;
+
+int main(){
+   neweraHPC_main server_data;
+   return 0;
+}

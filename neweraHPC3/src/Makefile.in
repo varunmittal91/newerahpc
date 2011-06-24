@@ -68,7 +68,7 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libneweraHPC_la_DEPENDENCIES = network/libnetwork.la \
-	general/libgeneral.la
+	general/libgeneral.la internal/libinternal.la
 am_libneweraHPC_la_OBJECTS =
 libneweraHPC_la_OBJECTS = $(am_libneweraHPC_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -266,7 +266,7 @@ top_srcdir = @top_srcdir@
 SUBDIRS = network general internal
 lib_LTLIBRARIES = libneweraHPC.la
 libneweraHPC_la_SOURCES = 
-libneweraHPC_la_LIBADD = network/libnetwork.la general/libgeneral.la
+libneweraHPC_la_LIBADD = network/libnetwork.la general/libgeneral.la internal/libinternal.la
 libneweraHPC_la_LDFLAGS = -export-dynamic -shared -version-info 2:90
 all: all-recursive
 

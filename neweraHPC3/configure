@@ -15220,7 +15220,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/general/Makefile src/network/Makefile src/internal/Makefile tests/Makefile tests/general/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/general/Makefile src/network/Makefile src/internal/Makefile tests/Makefile tests/general/Makefile tests/network/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -16346,6 +16346,7 @@ do
     "src/internal/Makefile") CONFIG_FILES="$CONFIG_FILES src/internal/Makefile" ;;
     "tests/Makefile") CONFIG_FILES="$CONFIG_FILES tests/Makefile" ;;
     "tests/general/Makefile") CONFIG_FILES="$CONFIG_FILES tests/general/Makefile" ;;
+    "tests/network/Makefile") CONFIG_FILES="$CONFIG_FILES tests/network/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

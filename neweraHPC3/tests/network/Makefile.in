@@ -34,8 +34,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = rbtree_test$(EXEEXT) thread_test$(EXEEXT)
-subdir = tests/general
+bin_PROGRAMS = sockets_test$(EXEEXT)
+subdir = tests/network
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -47,15 +47,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_rbtree_test_OBJECTS = rbtree_test.$(OBJEXT)
-rbtree_test_OBJECTS = $(am_rbtree_test_OBJECTS)
-rbtree_test_DEPENDENCIES = ../../src/libneweraHPC.la
+am_sockets_test_OBJECTS = sockets_test.$(OBJEXT)
+sockets_test_OBJECTS = $(am_sockets_test_OBJECTS)
+sockets_test_DEPENDENCIES = ../../src/libneweraHPC.la
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
-am_thread_test_OBJECTS = thread_test.$(OBJEXT)
-thread_test_OBJECTS = $(am_thread_test_OBJECTS)
-thread_test_DEPENDENCIES = ../../src/libneweraHPC.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -82,8 +79,8 @@ am__v_CXXLD_0 = @echo "  CXXLD " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(rbtree_test_SOURCES) $(thread_test_SOURCES)
-DIST_SOURCES = $(rbtree_test_SOURCES) $(thread_test_SOURCES)
+SOURCES = $(sockets_test_SOURCES)
+DIST_SOURCES = $(sockets_test_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -206,10 +203,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-rbtree_test_SOURCES = rbtree_test.cpp
-rbtree_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
-thread_test_SOURCES = thread_test.cpp
-thread_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
+sockets_test_SOURCES = sockets_test.cpp
+sockets_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
 all: all-am
 
 .SUFFIXES:
@@ -223,9 +218,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign tests/general/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign tests/network/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign tests/general/Makefile
+	  $(AUTOMAKE) --foreign tests/network/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -287,12 +282,9 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-rbtree_test$(EXEEXT): $(rbtree_test_OBJECTS) $(rbtree_test_DEPENDENCIES) 
-	@rm -f rbtree_test$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(rbtree_test_OBJECTS) $(rbtree_test_LDADD) $(LIBS)
-thread_test$(EXEEXT): $(thread_test_OBJECTS) $(thread_test_DEPENDENCIES) 
-	@rm -f thread_test$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(thread_test_OBJECTS) $(thread_test_LDADD) $(LIBS)
+sockets_test$(EXEEXT): $(sockets_test_OBJECTS) $(sockets_test_DEPENDENCIES) 
+	@rm -f sockets_test$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(sockets_test_OBJECTS) $(sockets_test_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -300,8 +292,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rbtree_test.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/thread_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockets_test.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

@@ -39,5 +39,6 @@ AC_CONFIG_FILES([Makefile]
 	        [src/network/Makefile]
 		[src/internal/Makefile]
                 [tests/Makefile]
-                [tests/general/Makefile])
+                [tests/general/Makefile]
+                [tests/network/Makefile])
 AC_OUTPUT

@@ -1,3 +1,3 @@
-SUBDIRS = general
+SUBDIRS = general network
 
 

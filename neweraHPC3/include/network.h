@@ -22,11 +22,11 @@
 
 namespace neweraHPC
 {
-   class network
+   class network_t
    {
    public:
-      network();
-      ~network();
+      network_t();
+      ~network_t();
       int open_socket();
    };
 };

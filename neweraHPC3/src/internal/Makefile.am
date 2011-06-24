@@ -1,4 +1,4 @@
 SOURCES = main.cpp
 
-noinst_LTLIBRARIES    = libnetwork.la 
-libnetwork_la_SOURCES = $(SOURCES)
+noinst_LTLIBRARIES     = libinternal.la 
+libinternal_la_SOURCES = $(SOURCES)

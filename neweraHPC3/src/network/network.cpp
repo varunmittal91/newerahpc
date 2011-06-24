@@ -17,24 +17,28 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NEWERAHPC_H_
-#define _NEWERAHPC_H_
+#include <include/network.h>
+#include <iostream>
 
-#include "rbtree.h"
-#include "thread.h"
-#include "network.h"
-#include "strings.h"
+using namespace std;
 
 namespace neweraHPC
 {
-   class neweraHPC_main
+   network_t::network_t()
    {
-   private:
-      network_t *main_network;
-   public:
-      neweraHPC_main();
-      ~neweraHPC_main();
-   };  
+      external_thread_manager = false;
+      thread_manager = new thread_manager_t;
+      connection_stat = false;
+   }
+   network_t::network_t(thread_manager_t *in_thread_manager)
+   {
+      external_thread_manager = true;
+      thread_manager = in_thread_manager;
+      connection_stat = false;
+   }
+   network_t::~network_t()
+   {
+      if(!external_thread_manager)
+	 delete thread_manager;
+   }
 };
-
-#endif

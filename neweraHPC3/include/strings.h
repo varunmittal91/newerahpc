@@ -17,17 +17,14 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <include/network.h>
+#include <unistd.h>
+#include <string>
 
-namespace neweraHPC
-{
-   network_t::network_t()
-   {
-   }
-   network_t::~network_t()
-   {
-   }
-   int network_t::open_socket()
-   {
-   }
-};
+#ifndef _STRINGS_H_
+#define _STRINGS_H_
+
+namespace neweraHPC{
+   char *nhpc_strcpy(char *dst, const char *src, size_t dst_len);
+}
+
+#endif

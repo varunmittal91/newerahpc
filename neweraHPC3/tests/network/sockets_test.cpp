@@ -18,10 +18,17 @@
  */
 
 #include <include/neweraHPC.h>
+#include <unistd.h>
+#include <iostream>
 
 using namespace neweraHPC;
+using namespace std;
 
 int main(){
-   neweraHPC_main server_data;
+   network_t network;
+   bool stat = network.open_socket("127.0.0.1", "8080");
+   if(!stat)
+      cout<<"Socket creation failed"<<endl;
+   while(1)sleep(1);
    return 0;
 }

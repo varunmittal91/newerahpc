@@ -17,24 +17,34 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NEWERAHPC_H_
-#define _NEWERAHPC_H_
+#include <include/strings.h>
+#include <iostream>
 
-#include "rbtree.h"
-#include "thread.h"
-#include "network.h"
-#include "strings.h"
+using namespace std;
 
-namespace neweraHPC
-{
-   class neweraHPC_main
+namespace neweraHPC{
+   char *nhpc_strcpy(char *dst, const char *src, size_t dst_len)
    {
-   private:
-      network_t *main_network;
-   public:
-      neweraHPC_main();
-      ~neweraHPC_main();
-   };  
-};
-
-#endif
+      char *d, *end;
+      
+      if(dst_len == 0) 
+      {
+	 return (dst);
+      }
+      
+      d = dst;
+      end = dst + dst_len - 1;
+      
+      for(; d < end; ++d, ++src)
+      {
+	 if(!(*d = *src)) 
+	 {
+	    return (d);
+	 }
+      }
+      
+      *d = '\0';
+      
+      return (d);
+   }
+}

@@ -1,4 +1,4 @@
-SOURCES = socket.cpp
+SOURCES = network.cpp sockets.cpp
 
 noinst_LTLIBRARIES    = libnetwork.la 
 libnetwork_la_SOURCES = $(SOURCES)

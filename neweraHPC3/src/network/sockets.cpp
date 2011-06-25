@@ -31,19 +31,22 @@ namespace neweraHPC
    {
       host_addr = (char *)in_host_addr;
       host_port = (char *)in_host_port;
-      //////////////////////////
       
       connection_stat = true;
       
       struct addrinfo hints, *servinfo, *p;
-      socklen_t sin_size;
-      
-      struct sigaction sa;
       
       int rv;
       
       memset(&hints, 0, sizeof hints);
+      
+      /* If IPv4_ONLY is set in the configure script than only IPv4
+       addresses will be used otherwise both IPv4 and IPv6 */
+#ifdef IPv4_ONLY
+      hints.ai_family = AF_INET;
+#else
       hints.ai_family = AF_UNSPEC;
+#endif
       hints.ai_socktype = SOCK_STREAM;
       hints.ai_flags = AI_PASSIVE; // use my IP
       
@@ -96,28 +99,29 @@ namespace neweraHPC
       if(connection_stat)
       {
 	 server_details = new nhpc_server_details_t;
-	 (*server_details).sockfd = host_sockfd;
+	 (*server_details).thread_manager = thread_manager;
+	 (*server_details).sockfd	  = host_sockfd;
 	 (*server_details).main_thread_id = (*thread_manager).create_thread(NULL, connection_handler, 
-								       server_details, THREAD_DEFAULT);
+									    server_details, NHPC_THREAD_DEFAULT);
       }
       
       return connection_stat;
    }
+   
    void *connection_handler(void *data)
    {
       nhpc_server_details_t *server_details = (nhpc_server_details_t *)data;
-      cout<<server_details->main_thread_id<<endl;
+      thread_manager_t *thread_manager      = (*server_details).thread_manager;
       
       struct sockaddr_storage their_addr;
-      int new_fd;
+      int client_sockfd;
       char s[INET6_ADDRSTRLEN];
       
-      ///////////////////////////
       while(1) 
       {
 	 socklen_t sin_size = sizeof their_addr;
-	 new_fd = accept(server_details->sockfd, (struct sockaddr *)&their_addr, &sin_size);
-	 if (new_fd == -1) {
+	 client_sockfd = accept(server_details->sockfd, (struct sockaddr *)&their_addr, &sin_size);
+	 if (client_sockfd == -1) {
             perror("accept");
             continue;
 	 }
@@ -125,26 +129,37 @@ namespace neweraHPC
 	 inet_ntop(their_addr.ss_family,
 		   get_in_addr((struct sockaddr *)&their_addr),
 		   s, sizeof s);
+	 cout<<s<<endl;
 	 printf("server: got connection from %s\n", s);
-	 
-	 char buffer[1000];
-	 recv(new_fd, buffer, 1000, 0);
-	 printf(buffer,"%s");
-	 
-	 if (!fork()) { // this is the child process
-            //close(sockfd); // child doesn't need the listener
-            if (send(new_fd, "Hello, world!", 13, 0) == -1)
-	       perror("send");
-            //close(new_fd);
-            exit(0);
-	 }
-	 int test = (int)close(new_fd);  // parent doesn't need this
-      }      
-      ///////////////////////////
+	 	 
+	 nhpc_client_details_t *client_details = new nhpc_client_details_t;
+	 (*client_details).thread_manager = thread_manager;
+	 (*client_details).sockfd	  = client_sockfd;
+	 (*client_details).thread_id	  = (*thread_manager).create_thread(NULL, connection_thread,
+									    client_details, NHPC_THREAD_DEFAULT);								    
+      }     
    }
+   
+   void *connection_thread(void *data)
+   {
+      nhpc_client_details_t *client_details = (nhpc_client_details_t *)data;
+      thread_manager_t *thread_manager = (*client_details).thread_manager;
+
+      char buffer[NHPC_BUFFER_SIZE];
+      recv(client_details->sockfd, buffer, NHPC_BUFFER_SIZE, 0);
+      printf(buffer,"%s");
+      
+      if (send(client_details->sockfd, "Hello, world!", 13, 0) == -1)
+	 perror("send");
+
+      (*thread_manager).delete_thread_data((*client_details).thread_id);
+      close((*client_details).sockfd);
+      delete (client_details);
+   }
+	     
    void *get_in_addr(struct sockaddr *sa)
    {
-      if (sa->sa_family == AF_INET) 
+      if(sa->sa_family == AF_INET) 
       {
 	 return &(((struct sockaddr_in*)sa)->sin_addr);
       }

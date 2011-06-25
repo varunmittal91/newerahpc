@@ -40,12 +40,14 @@ namespace neweraHPC
    
    inline void thread_manager_t::lock()
    {
-      pthread_mutex_lock(mutex);
+      if(mutex)
+	 pthread_mutex_lock(mutex);
    }
    
    inline void thread_manager_t::unlock()
    {
-      pthread_mutex_unlock(mutex);
+      if(mutex)
+	 pthread_mutex_unlock(mutex);
    }
    
    int thread_manager_t::create_thread(const pthread_attr_t *attr, 
@@ -62,12 +64,12 @@ namespace neweraHPC
       int rbtree_id = (*active_threads).insert((void *)thread_new);
       unlock();
      
-      if(thread_state==THREAD_JOIN)
+      if(thread_state == NHPC_THREAD_JOIN)
       {
 	 status_new = pthread_join(*thread_new,NULL); 
 	 if(status_new!=0)perror("Error at joing thread");
       }
-      else if(thread_state==THREAD_DETACH)
+      else if(thread_state == NHPC_THREAD_DETACH)
       {
 	 status_new = pthread_detach(*thread_new);
 	 if(status_new!=0)perror("Error at detaching thread");

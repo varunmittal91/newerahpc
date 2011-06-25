@@ -23,9 +23,9 @@
 #include "rbtree.h"
 #include <signal.h>
 
-#define THREAD_DEFAULT 0
-#define THREAD_JOIN    1
-#define THREAD_DETACH  2
+#define NHPC_THREAD_DEFAULT 0
+#define NHPC_THREAD_JOIN    1
+#define NHPC_THREAD_DETACH  2
 
 namespace neweraHPC
 {

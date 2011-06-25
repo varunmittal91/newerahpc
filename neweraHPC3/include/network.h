@@ -22,6 +22,7 @@
 
 /* This will allow 10 connection to be queued */
 #define CONNECTION_QUEUE 10
+#define NHPC_BUFFER_SIZE 1000
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -38,11 +39,23 @@ namespace neweraHPC
    {
       int sockfd;
       int main_thread_id;
+      thread_manager_t *thread_manager;
+   };
+   
+   /* Local structure for sending data to the connection_thread */
+   struct nhpc_client_details_t
+   {
+      int sockfd;
+      int thread_id;
+      thread_manager_t *thread_manager;
    };
    
    /* Routine for handling tcp connections, *data is a nhpc_server_details_t 
     type which gives basic details to the thread */
    void *connection_handler(void *data);
+   
+   /* Routine for handling indivisual connection request */
+   void *connection_thread(void *data);
    
    /* Return sockaddr according to ipv4 or ipv6 type */
    void *get_in_addr(struct sockaddr *sa);

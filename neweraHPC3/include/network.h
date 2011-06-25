@@ -22,7 +22,6 @@
 
 /* This will allow 10 connection to be queued */
 #define CONNECTION_QUEUE 10
-#define NHPC_BUFFER_SIZE 1000
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -30,8 +29,10 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 
+#include "nhpc_constants.h"
 #include "thread.h"
 #include "strings.h"
+#include "poll.h"
 
 namespace neweraHPC
 {
@@ -87,6 +88,9 @@ namespace neweraHPC
       bool status();
       bool open_socket(const char *in_host_addr, const char *in_host_port);
    };
+   
+   /* Send and receive routines and variables */
+   nhpc_status_t nhpc_recv(int sockfd, char *buffer, size_t *len);
 };
 
 #endif

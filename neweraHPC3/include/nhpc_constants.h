@@ -17,19 +17,15 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <include/neweraHPC.h>
-#include <unistd.h>
-#include <iostream>
+#ifndef _NHPC_CONSTANTS_H_
+#define _NHPC_CONSTANTS_H_
 
-using namespace neweraHPC;
-using namespace std;
+typedef int nhpc_status_t;
+#define  NHPC_SUCCESS 0
 
-int main(){
-   network_t network;
-   bool stat = network.open_socket("127.0.0.1", "8080");
-   if(!stat)
-      cout<<"Socket creation failed"<<endl;
-   
-   while(1)sleep(1);
-   return 0;
-}
+#define NHPC_BUFFER_SIZE 1000
+
+#define NHPC_POLLING_READ  1
+#define NHPC_POLLING_WRITE 1
+
+#endif

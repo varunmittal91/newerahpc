@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = src/network
+subdir = src/poll
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -45,10 +45,10 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libnetwork_la_LIBADD =
-am__objects_1 = network.lo sockets.lo sendrecv.lo
-am_libnetwork_la_OBJECTS = $(am__objects_1)
-libnetwork_la_OBJECTS = $(am_libnetwork_la_OBJECTS)
+libpoll_la_LIBADD =
+am__objects_1 = wait_io.lo
+am_libpoll_la_OBJECTS = $(am__objects_1)
+libpoll_la_OBJECTS = $(am_libpoll_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
@@ -78,7 +78,7 @@ am__v_CXXLD_0 = @echo "  CXXLD " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-DIST_SOURCES = $(libnetwork_la_SOURCES)
+DIST_SOURCES = $(libpoll_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -201,9 +201,9 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SOURCES = network.cpp sockets.cpp sendrecv.cpp
-noinst_LTLIBRARIES = libnetwork.la 
-libnetwork_la_SOURCES = $(SOURCES)
+SOURCES = wait_io.cpp
+noinst_LTLIBRARIES = libpoll.la 
+libpoll_la_SOURCES = $(SOURCES)
 all: all-am
 
 .SUFFIXES:
@@ -217,9 +217,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/network/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/poll/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/network/Makefile
+	  $(AUTOMAKE) --foreign src/poll/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -247,8 +247,8 @@ clean-noinstLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libnetwork.la: $(libnetwork_la_OBJECTS) $(libnetwork_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(CXXLINK)  $(libnetwork_la_OBJECTS) $(libnetwork_la_LIBADD) $(LIBS)
+libpoll.la: $(libpoll_la_OBJECTS) $(libpoll_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(CXXLINK)  $(libpoll_la_OBJECTS) $(libpoll_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -256,9 +256,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/network.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sendrecv.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockets.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wait_io.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

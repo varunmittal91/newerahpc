@@ -17,19 +17,38 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <include/neweraHPC.h>
-#include <unistd.h>
+#include <include/network.h>
 #include <iostream>
+#include <errno.h>
 
-using namespace neweraHPC;
 using namespace std;
 
-int main(){
-   network_t network;
-   bool stat = network.open_socket("127.0.0.1", "8080");
-   if(!stat)
-      cout<<"Socket creation failed"<<endl;
-   
-   while(1)sleep(1);
-   return 0;
-}
+namespace neweraHPC
+{
+   nhpc_status_t nhpc_recv(int sockfd, char *buffer, size_t *len)
+   {
+      int rv = 0;
+      
+      do {
+	 rv = read(sockfd, buffer, *len);
+      } while (rv == -1 && errno == EINTR);
+      
+      while ((rv == -1) && (errno == EAGAIN || errno == EWOULDBLOCK))
+      {
+	 int arv = nhpc_wait_for_io_or_timeout();
+	 if (arv != NHPC_SUCCESS) 
+	 {
+            *len = 0;
+            return arv;
+	 }
+	 else 
+	 {
+            do
+	    {
+	       rv = read(sockfd, buffer, (*len));
+            } while (rv == -1 && errno == EINTR);
+	 }
+      }
+   }
+};
+

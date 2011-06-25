@@ -129,8 +129,6 @@ namespace neweraHPC
 	 inet_ntop(their_addr.ss_family,
 		   get_in_addr((struct sockaddr *)&their_addr),
 		   s, sizeof s);
-	 cout<<s<<endl;
-	 printf("server: got connection from %s\n", s);
 	 	 
 	 nhpc_client_details_t *client_details = new nhpc_client_details_t;
 	 (*client_details).thread_manager = thread_manager;
@@ -145,9 +143,10 @@ namespace neweraHPC
       nhpc_client_details_t *client_details = (nhpc_client_details_t *)data;
       thread_manager_t *thread_manager = (*client_details).thread_manager;
 
-      char buffer[NHPC_BUFFER_SIZE];
-      recv(client_details->sockfd, buffer, NHPC_BUFFER_SIZE, 0);
-      printf(buffer,"%s");
+      size_t len = 100;
+      char *buffer = new char [len];
+      nhpc_recv(client_details->sockfd, buffer, &len);
+      cout<<buffer<<endl;
       
       if (send(client_details->sockfd, "Hello, world!", 13, 0) == -1)
 	 perror("send");

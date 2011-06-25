@@ -17,19 +17,12 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <include/neweraHPC.h>
-#include <unistd.h>
-#include <iostream>
+#include <include/poll.h>
 
-using namespace neweraHPC;
-using namespace std;
-
-int main(){
-   network_t network;
-   bool stat = network.open_socket("127.0.0.1", "8080");
-   if(!stat)
-      cout<<"Socket creation failed"<<endl;
-   
-   while(1)sleep(1);
-   return 0;
+namespace neweraHPC
+{
+   nhpc_status_t nhpc_wait_for_io_or_timeout()
+   {
+      return NHPC_SUCCESS;
+   }
 }

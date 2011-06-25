@@ -38,6 +38,7 @@ AC_CONFIG_FILES([Makefile]
                 [src/general/Makefile]
 	        [src/network/Makefile]
 		[src/internal/Makefile]
+		[src/poll/Makefile]
                 [tests/Makefile]
                 [tests/general/Makefile]
                 [tests/network/Makefile])

@@ -31,6 +31,7 @@
 #include <arpa/inet.h>
 
 #include "thread.h"
+#include "strings.h"
 
 namespace neweraHPC
 {

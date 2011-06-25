@@ -18,6 +18,7 @@
  */
 
 #include <unistd.h>
+#include <string.h>
 #include <string>
 
 #ifndef _STRINGS_H_

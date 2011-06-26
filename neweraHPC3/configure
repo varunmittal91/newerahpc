@@ -748,7 +748,6 @@ enable_fast_install
 with_gnu_ld
 with_sysroot
 enable_libtool_lock
-with_gnu_ld
 '
       ac_precious_vars='build_alias
 host_alias
@@ -761,13 +760,8 @@ CPPFLAGS
 CCC
 CC
 CFLAGS
-LDFLAGS
-LIBS
-CPPFLAGS
 CPP
-CPPFLAGS
-CXXCPP
-CPPFLAGS'
+CXXCPP'
 
 
 # Initialize some variables set by options.
@@ -2901,6 +2895,7 @@ AM_BACKSLASH='\'
 
 
 ac_config_headers="$ac_config_headers config.h"
+
 
 
 # Checks for programs.

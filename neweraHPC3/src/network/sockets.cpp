@@ -21,6 +21,7 @@
  or connecting to other machines on given port */
 
 #include <include/network.h>
+#include <errno.h>
 #include <iostream>
 
 using namespace std;
@@ -143,17 +144,35 @@ namespace neweraHPC
       nhpc_client_details_t *client_details = (nhpc_client_details_t *)data;
       thread_manager_t *thread_manager = (*client_details).thread_manager;
 
-      size_t len = 100;
-      char *buffer = new char [len];
-      nhpc_recv(client_details->sockfd, buffer, &len);
-      cout<<buffer<<endl;
+      nhpc_socket_t *sock = new nhpc_socket_t;
+      sock->sockfd  = client_details->sockfd;
+      sock->timeout = 0;
+      sock->options |= NHPC_SUCCESS;
       
-      if (send(client_details->sockfd, "Hello, world!", 13, 0) == -1)
-	 perror("send");
+      size_t len = 500;
+      char *buffer = new char [len];
+      int nrv = nhpc_recv(sock, buffer, &len);
+      if(nrv == ECONNRESET)
+      {
+	 perror("nhpc_recv");
+	 goto connection_close;
+      }
+      
+      if(nrv & NHPC_SUCCESS)
+      {
+	 nhpc_analyze_stream(buffer, &len);
+      }
+      
+      if(send(client_details->sockfd, "Hello, world!", 13, 0) < 0)
+	 perror("Send");
 
+   connection_close:
       (*thread_manager).delete_thread_data((*client_details).thread_id);
       close((*client_details).sockfd);
       delete (client_details);
+      delete sock;
+      delete buffer;
+      pthread_exit(NULL);
    }
 	     
    void *get_in_addr(struct sockaddr *sa)

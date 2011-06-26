@@ -28,14 +28,24 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <time.h>
 
-#include "nhpc_constants.h"
+#include "constants.h"
 #include "thread.h"
 #include "strings.h"
 #include "poll.h"
+#include "network/headers.h"
 
 namespace neweraHPC
 {
+   /* General socket related data and options */
+   struct nhpc_socket_t
+   {
+      int sockfd;
+      int options;
+      time_t timeout;
+   };   
+   
    /* Local structure for sending data to the connection_handlre */
    struct nhpc_server_details_t
    {
@@ -50,8 +60,9 @@ namespace neweraHPC
       int sockfd;
       int thread_id;
       thread_manager_t *thread_manager;
+      nhpc_socket_t *socket;
    };
-   
+      
    /* Routine for handling tcp connections, *data is a nhpc_server_details_t 
     type which gives basic details to the thread */
    void *connection_handler(void *data);
@@ -90,7 +101,8 @@ namespace neweraHPC
    };
    
    /* Send and receive routines and variables */
-   nhpc_status_t nhpc_recv(int sockfd, char *buffer, size_t *len);
+   nhpc_status_t nhpc_recv(nhpc_socket_t *sock, char *buffer, size_t *len);
+   nhpc_status_t nhpc_analyze_stream(char *buffer, size_t *len);
 };
 
 #endif

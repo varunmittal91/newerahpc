@@ -17,14 +17,19 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _POLL_H_
-#define _POLL_H_
+#ifndef _CONSTANTS_H_
+#define _CONSTANTS_H_
 
-#include "constants.h"
+#include <unistd.h>
 
-namespace neweraHPC
-{
-   nhpc_status_t nhpc_wait_for_io_or_timeout();
-}
+typedef int    nhpc_status_t;
+typedef size_t nhpc_size_t;
+
+#define  NHPC_SUCCESS 1
+
+#define NHPC_BUFFER_SIZE 1000
+
+#define NHPC_POLLING_READ  1
+#define NHPC_POLLING_WRITE 1
 
 #endif

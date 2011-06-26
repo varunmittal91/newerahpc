@@ -25,30 +25,59 @@ using namespace std;
 
 namespace neweraHPC
 {
-   nhpc_status_t nhpc_recv(int sockfd, char *buffer, size_t *len)
+   nhpc_status_t nhpc_recv(nhpc_socket_t *sock, char *buffer, size_t *len)
    {
       int rv = 0;
       
       do {
-	 rv = read(sockfd, buffer, *len);
+	 rv = read(sock->sockfd, buffer, *len);
       } while (rv == -1 && errno == EINTR);
       
       while ((rv == -1) && (errno == EAGAIN || errno == EWOULDBLOCK))
       {
-	 int arv = nhpc_wait_for_io_or_timeout();
-	 if (arv != NHPC_SUCCESS) 
+      do_select:
+	 int nrv = nhpc_wait_for_io_or_timeout();
+	 if (nrv != NHPC_SUCCESS) 
 	 {
             *len = 0;
-            return arv;
+            return nrv;
 	 }
 	 else 
 	 {
             do
 	    {
-	       rv = read(sockfd, buffer, (*len));
+	       rv = read(sock->sockfd, buffer, (*len));
             } while (rv == -1 && errno == EINTR);
 	 }
       }
+      
+      if(rv == -1){
+	 *len = 0;
+	 return errno;
+      }
+      if((sock->timeout > 0) && (rv < *len))
+      {
+	 sock->options |= NHPC_POLLING_READ;
+      }
+      
+      (*len) = rv;
+      return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t nhpc_analyze_stream(char *buffer, size_t *len)
+   {
+      int cntr = 0;
+      char *start = buffer;
+      
+      cout<<buffer<<endl;
+      
+      while(cntr != *len)
+      {
+	 cout<<"("<<(int)*start<<")";
+	 start++;
+	 cntr++;
+      }
+      cout<<endl;
    }
 };
 

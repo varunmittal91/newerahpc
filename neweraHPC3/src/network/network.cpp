@@ -17,8 +17,10 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <include/network.h>
+#include <errno.h>
 #include <iostream>
+
+#include <include/network.h>
 
 using namespace std;
 

@@ -17,14 +17,22 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _POLL_H_
-#define _POLL_H_
+/* These routines are for generating and reading http like headers */
 
-#include "constants.h"
+#ifndef _NETWORK_HEADERS_H_
+#define _NETWORK_HEADERS_H_
+
+#include "../general/containers.h"
 
 namespace neweraHPC
 {
-   nhpc_status_t nhpc_wait_for_io_or_timeout();
+   /* Http like headers definition */
+   struct nhpc_headers_t
+   {
+      char **headers;
+      nhpc_size_t lines_count;
+      nhpc_size_t len;
+   };
 }
 
 #endif

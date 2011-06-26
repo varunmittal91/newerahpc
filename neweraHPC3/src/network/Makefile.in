@@ -46,7 +46,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libnetwork_la_LIBADD =
-am__objects_1 = network.lo sockets.lo sendrecv.lo
+am__objects_1 = network.lo sockets.lo sendrecv.lo headers.lo
 am_libnetwork_la_OBJECTS = $(am__objects_1)
 libnetwork_la_OBJECTS = $(am_libnetwork_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -201,7 +201,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SOURCES = network.cpp sockets.cpp sendrecv.cpp
+SOURCES = network.cpp sockets.cpp sendrecv.cpp headers.cpp
 noinst_LTLIBRARIES = libnetwork.la 
 libnetwork_la_SOURCES = $(SOURCES)
 all: all-am
@@ -256,6 +256,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/headers.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/network.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sendrecv.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockets.Plo@am__quote@

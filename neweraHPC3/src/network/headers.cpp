@@ -17,15 +17,9 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NHPC_CONSTANTS_H_
-#define _NHPC_CONSTANTS_H_
-
-typedef int nhpc_status_t;
-#define  NHPC_SUCCESS 0
-
-#define NHPC_BUFFER_SIZE 1000
-
-#define NHPC_POLLING_READ  1
-#define NHPC_POLLING_WRITE 1
-
-#endif
+namespace neweraHPC
+{
+   void test()
+   {
+   }
+}

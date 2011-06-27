@@ -34,7 +34,7 @@
 #include "thread.h"
 #include "strings.h"
 #include "poll.h"
-#include "network/headers.h"
+#include "headers.h"
 
 namespace neweraHPC
 {
@@ -97,7 +97,10 @@ namespace neweraHPC
       ~network_t();
       /* Return status of the connection */ 
       bool status();
+      /* Routine for creating socket */
       bool open_socket(const char *in_host_addr, const char *in_host_port);
+      /* Routine for connecting to remote server */
+      nhpc_status_t connect(const char *in_host_addr, const char *in_host_port);
    };
    
    /* Send and receive routines and variables */

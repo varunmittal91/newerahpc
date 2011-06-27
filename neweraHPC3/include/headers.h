@@ -22,7 +22,7 @@
 #ifndef _NETWORK_HEADERS_H_
 #define _NETWORK_HEADERS_H_
 
-#include "../general/containers.h"
+#include "containers.h"
 
 namespace neweraHPC
 {

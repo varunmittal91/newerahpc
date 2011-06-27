@@ -109,6 +109,27 @@ namespace neweraHPC
       return connection_stat;
    }
    
+   nhpc_status_t network_t::connect(const char *in_host_addr, const char *in_host_port)
+   {
+      char *host_addr = (char *)in_host_addr;
+      char *host_port = (char *)in_host_port;
+
+      struct addrinfo local_addr, *servinfo;
+      int rv;
+
+#ifdef IPv4_ONLY
+      local_addr.ai_family = AF_INET;
+#else
+      local_addr.ai_family = AF_UNSPEC;
+#endif
+      local_addr.ai_socktype = SOCK_STREAM;
+
+      if ((rv = getaddrinfo(host_addr, host_port, &local_addr, &servinfo)) != 0) {
+	 fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+      }
+
+   }   
+   
    void *connection_handler(void *data)
    {
       nhpc_server_details_t *server_details = (nhpc_server_details_t *)data;
@@ -152,6 +173,7 @@ namespace neweraHPC
       size_t len = 500;
       char *buffer = new char [len];
       int nrv = nhpc_recv(sock, buffer, &len);
+      perror("read");
       if(nrv == ECONNRESET)
       {
 	 perror("nhpc_recv");
@@ -174,7 +196,7 @@ namespace neweraHPC
       delete buffer;
       pthread_exit(NULL);
    }
-	     
+   
    void *get_in_addr(struct sockaddr *sa)
    {
       if(sa->sa_family == AF_INET) 

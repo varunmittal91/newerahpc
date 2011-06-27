@@ -29,7 +29,11 @@ int main(){
    bool stat = network.open_socket("127.0.0.1", "8080");
    if(!stat)
       cout<<"Socket creation failed"<<endl;
-   
+   else 
+   {
+      stat = network.connect("localhost", "80");
+   }
+
    while(1)sleep(1);
    return 0;
 }

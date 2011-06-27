@@ -22,7 +22,7 @@
 #ifndef _GENERAL_CONTAINERS_H_
 #define _GENERAL_CONTAINERS_H_
 
-#include "../constants.h"
+#include "constants.h"
 
 namespace neweraHPC
 {

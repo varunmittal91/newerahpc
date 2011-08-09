@@ -19,6 +19,7 @@
 
 #include <include/neweraHPC.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <iostream>
 
 using namespace neweraHPC;

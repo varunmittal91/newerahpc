@@ -17,36 +17,43 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <fstream>
+#include <sys/poll.h>
 #include <errno.h>
 #include <iostream>
 
-#include <include/poll.h>
+#include <include/network.h>
 
 using namespace std;
 
 namespace neweraHPC
 {
-   nhpc_status_t nhpc_wait_for_io_or_timeout(struct nhpc_socket_t *sock)
+   nhpc_status_t nhpc_wait_for_io_or_timeout(struct nhpc_socket_t *sock, int for_read)
    {
       struct pollfd pfd;
       int rc, timeout;
       
-      timeout = NHPC_TIMEOUT;
+      timeout = sock->timeout;
+      pfd.fd = sock->sockfd;
+      pfd.events = for_read ? POLLIN : POLLOUT;      
       
-      do {
+      do 
+      {
 	 rc = poll(&pfd, 1, timeout);
-      } while (rc == -1 && errno == EINTR);
-      if (rc == 0) {
+      }while (rc == -1 && errno == EINTR);
+      
+      if(rc == 0) 
+      {
 	 return NHPC_TIMEUP;
       }
-      else if (rc > 0) {
+      else if(rc > 0) 
+      {
 	 return NHPC_SUCCESS;
       }
-      else {
+      else 
+      {
 	 return errno;
       }
       
       return NHPC_SUCCESS;
-   }
+   }   
 }

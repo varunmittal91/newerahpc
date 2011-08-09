@@ -6,7 +6,6 @@ AC_INIT([neweraHPC], [2.90], [varunmittal91@gmail.com])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AM_SILENT_RULES([yes])
 AC_CONFIG_SRCDIR([server.cpp])
-AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
 # Checks for programs.
@@ -20,6 +19,9 @@ AC_CHECK_LIB([pthread],[pthread_create],[],[AC_MSG_ERROR([libpthread not found])
 
 # Checks for header files.
 AC_CHECK_HEADERS([pthread.h])
+
+# Add HAVE_header-files to project build
+AC_CONFIG_HEADERS([config.h])
 
 # Check for optional arguments
 AC_ARG_ENABLE([tests],[  --enable-tests Build test files for various algorithms and features used in the system],[tests=yes])

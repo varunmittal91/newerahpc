@@ -26,6 +26,7 @@ using namespace std;
 
 int main(){
    network_t network;
+   /*
    bool stat = network.open_socket("127.0.0.1", "8080");
    if(!stat)
       cout<<"Socket creation failed"<<endl;
@@ -34,6 +35,11 @@ int main(){
       stat = network.connect("localhost", "80");
    }
 
+   nhpc_socket_t *sock = new nhpc_socket_t;
+   int rv = nhpc_create_socket("10.0.0.3", "80", sock, NHPC_CONNECTING_SOCKET);
+   cout<<rv<<endl;
+   
    while(1)sleep(1);
+    */
    return 0;
 }

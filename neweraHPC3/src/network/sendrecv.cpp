@@ -25,59 +25,90 @@ using namespace std;
 
 namespace neweraHPC
 {
-   nhpc_status_t nhpc_recv(nhpc_socket_t *sock, char *buffer, size_t *len)
+   nhpc_status_t socket_recv(nhpc_socket_t *sock, char *buffer, size_t *length)
    {
-      int rv = 0;
+      int rv;
+      nhpc_status_t nrv;
       
-      do {
-	 rv = read(sock->sockfd, buffer, *len);
-      } while (rv == -1 && errno == EINTR);
+      if(sock->incomplete_operation == NHPC_INCOMPLETE)
+	 goto do_select;
       
-      while ((rv == -1) && (errno == EAGAIN || errno == EWOULDBLOCK))
+      do 
+      {
+	 rv = read(sock->sockfd, buffer, (*length));
+      }while(rv == -1 && errno == EINTR);    
+      
+      while ((rv == -1) && (errno == EAGAIN || errno == EWOULDBLOCK) && (sock->timeout > 0)) 
       {
       do_select:
-	 int nrv = nhpc_wait_for_io_or_timeout();
+	 nrv = nhpc_wait_for_io_or_timeout(sock, 1);
 	 if (nrv != NHPC_SUCCESS) 
 	 {
-            *len = 0;
+            *length = 0;
             return nrv;
 	 }
-	 else 
-	 {
-            do
-	    {
-	       rv = read(sock->sockfd, buffer, (*len));
+	 else {
+            do {
+	       rv = read(sock->sockfd, buffer, (*length));
+	       if(rv == -1)perror("error at read");
             } while (rv == -1 && errno == EINTR);
-	 }
+	 }	 
       }
       
-      if(rv == -1){
-	 *len = 0;
+      if (rv == -1) {
+	 (*length) = 0;
 	 return errno;
       }
-      if((sock->timeout > 0) && (rv < *len))
-      {
-	 sock->options |= NHPC_POLLING_READ;
+      if ((sock->timeout > 0) && (rv < *length)) {
+	 sock->incomplete_operation = NHPC_INCOMPLETE;
+      }
+      (*length) = rv;
+      if (rv == 0) {
+	 sock->incomplete_operation = 0;
+	 return NHPC_EOF;
       }
       
-      (*len) = rv;
       return NHPC_SUCCESS;
    }
    
-   nhpc_status_t nhpc_analyze_stream(char *buffer, size_t *len)
+   nhpc_status_t socket_send(nhpc_socket_t *sock, char *buffer, size_t *length)
    {
-      int cntr = 0;
-      char *start = buffer;
+      int rv;
+      int nrv;
       
-      cout<<buffer<<endl;
-      
-      while(cntr != *len)
+      do 
       {
-	 cout<<"("<<(int)*start<<")";
-	 start++;
-	 cntr++;
+	 rv = write(sock->sockfd, buffer, (*length));
+      } while(rv == -1 && errno == EINTR);      
+      
+      while ((rv == -1) && (errno == EAGAIN || errno == EWOULDBLOCK) && (sock->timeout > 0)) 
+      {
+      do_select:
+	 nrv = nhpc_wait_for_io_or_timeout(sock, 1);
+	 if (nrv != NHPC_SUCCESS) {
+            *length = 0;
+            return nrv;
+	 }
+	 else {
+            do {
+	       rv =write(sock->sockfd, buffer, (*length));
+            } while (rv == -1 && errno == EINTR);
+	 }	 
       }
-      cout<<endl;
-   }
+      
+      if(rv == -1)
+      {
+	 *length = 0;
+	 return errno;
+      }
+      
+      if ((sock->timeout > 0) && (rv < *length)) {
+	 sock->incomplete_operation = NHPC_INCOMPLETE;
+      }
+      
+      *length = rv;
+      
+      return NHPC_SUCCESS;
+   }   
 };
 

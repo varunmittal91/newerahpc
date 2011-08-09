@@ -20,181 +20,237 @@
 /* These routines are usefull for creating listening sockets(opening sockets)
  or connecting to other machines on given port */
 
-#include <include/network.h>
-#include <errno.h>
 #include <iostream>
+
+#include <include/network.h>
 
 using namespace std;
 
 namespace neweraHPC
 {
-   bool network_t::open_socket(const char *in_host_addr, const char *in_host_port)
+   nhpc_status_t socket_create(nhpc_socket_t **sock, int family, int type, int protocol)
    {
-      host_addr = (char *)in_host_addr;
-      host_port = (char *)in_host_port;
+      if (!(*sock)){
+	 *sock = new nhpc_socket_t;
+	 memset(sock, 0, sizeof(nhpc_socket_t));
+      }
       
-      connection_stat = true;
+      (*sock)->sockfd = socket(family, type, protocol);
       
-      struct addrinfo hints, *servinfo, *p;
+      if (((*sock)->sockfd) == -1)
+	 return errno;
       
+      return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t socket_create(nhpc_socket_t **sock)
+   {
+      if(!(*sock))
+	 return ~NHPC_SUCCESS;
+      
+      addrinfo **hints = &((*sock)->hints);
+      if(!(*hints))
+	 return ~NHPC_SUCCESS;
+      
+      int rv = socket_create(sock, (*hints)->ai_family, (*hints)->ai_socktype, (*hints)->ai_protocol);
+      return rv;
+   }
+   
+   nhpc_status_t socket_connect(nhpc_socket_t *sock) 
+   {
       int rv;
       
-      memset(&hints, 0, sizeof hints);
+      if (!(sock->hints))
+      {
+	 return ~NHPC_SUCCESS;
+      }
       
-      /* If IPv4_ONLY is set in the configure script than only IPv4
-       addresses will be used otherwise both IPv4 and IPv6 */
-#ifdef IPv4_ONLY
-      hints.ai_family = AF_INET;
-#else
-      hints.ai_family = AF_UNSPEC;
-#endif
-      hints.ai_socktype = SOCK_STREAM;
-      hints.ai_flags = AI_PASSIVE; // use my IP
+      addrinfo *hints = sock->hints;
+      
+      do 
+      {
+	 rv = connect(sock->sockfd, hints->ai_addr, hints->ai_addrlen);
+      } while (rv == -1 && errno == EINTR);
+      
+      if(rv == -1 && (errno == EINPROGRESS || errno == EALREADY) && sock->timeout > 0)
+      {
+	 rv = nhpc_wait_for_io_or_timeout(sock, 0);
+	 if(rv != NHPC_SUCCESS)return rv;
+      }
+      
+      if(rv == -1)
+	 return errno;
+      
+      return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t socket_open(nhpc_socket_t *sock, int connection_queue)
+   {
+      int rv;
+      int nrv;
       
       int enable_opts = 1;
       
-      if ((rv = getaddrinfo(NULL, host_port, &hints, &servinfo)) != 0) {
-	 fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-      }
-      
-      /* Loop for creating socket, setting socket options
-       and bind to the address */
-      for(p = servinfo; p != NULL; p = p->ai_next) 
+      rv = setsockopt(sock->sockfd, SOL_SOCKET, SO_REUSEADDR, &enable_opts, sizeof(int));
+      if(rv == -1)
       {
-	 if ((host_sockfd = socket(p->ai_family, p->ai_socktype,
-				   p->ai_protocol)) == -1)
-	 {
-	    perror("server: socket");
-	    connection_stat = false;
-	    continue;
-	 }
-	 
-	 if (setsockopt(host_sockfd, SOL_SOCKET, SO_REUSEADDR, &enable_opts,
-			sizeof(int)) == -1) 
-	 {
-	    perror("setsockopt");
-	    connection_stat = false;
-	 }
-	 
-	 if (bind(host_sockfd, p->ai_addr, p->ai_addrlen) == -1) 
-	 {
-	    close(host_sockfd);
-	    perror("server: bind");
-	    connection_stat = false;
-	    continue;
-	 }
-	 
-	 if (p == NULL)  {
-	    fprintf(stderr, "server: failed to bind\n");
-	 }
-	 
-	 break;
+	 perror("set sock options");
+	 return errno;
       }
       
-      freeaddrinfo(servinfo);
-      
-      if (listen(host_sockfd, CONNECTION_QUEUE) == -1) {
-	 perror("listen");
-      }
-      
-      if(connection_stat)
+      nrv = socket_bind(sock);
+      if(nrv != NHPC_SUCCESS)
       {
-	 server_details = new nhpc_server_details_t;
-	 (*server_details).thread_manager = thread_manager;
-	 (*server_details).sockfd	  = host_sockfd;
-	 (*server_details).main_thread_id = (*thread_manager).create_thread(NULL, connection_handler, 
-									    server_details, NHPC_THREAD_DEFAULT);
+	 perror("bind socket");
+	 return errno;
       }
       
-      return connection_stat;
+      nrv = socket_listen(sock, &connection_queue);
+      if(nrv != NHPC_SUCCESS)
+      {
+	 perror("socket listen");
+	 return errno;
+      }
+      
+      nrv = socket_accept(sock);
+      if(nrv != NHPC_SUCCESS){
+	 perror("socket accept");
+	 return errno;
+      }
+      
+      return NHPC_SUCCESS;
    }
    
-   nhpc_status_t network_t::connect(const char *in_host_addr, const char *in_host_port)
+   nhpc_status_t socket_bind(nhpc_socket_t *sock)
    {
-      char *host_addr = (char *)in_host_addr;
-      char *host_port = (char *)in_host_port;
-
-      struct addrinfo local_addr, *servinfo;
       int rv;
-
-#ifdef IPv4_ONLY
-      local_addr.ai_family = AF_INET;
-#else
-      local_addr.ai_family = AF_UNSPEC;
-#endif
-      local_addr.ai_socktype = SOCK_STREAM;
-
-      if ((rv = getaddrinfo(host_addr, host_port, &local_addr, &servinfo)) != 0) {
-	 fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-      }
-
-   }   
-   
-   void *connection_handler(void *data)
-   {
-      nhpc_server_details_t *server_details = (nhpc_server_details_t *)data;
-      thread_manager_t *thread_manager      = (*server_details).thread_manager;
+      rv = bind(sock->sockfd, sock->hints->ai_addr, sock->hints->ai_addrlen);
       
-      struct sockaddr_storage their_addr;
+      if(rv == -1)
+	 return errno;
+      
+      return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t socket_listen(nhpc_socket_t *sock, int *connection_queue)
+   {
+      int rv;
+      rv = listen(sock->sockfd, *connection_queue);
+      
+      if(rv == -1)
+	 return errno;
+      
+      return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t socket_accept(nhpc_socket_t *sock)
+   {
+      int rv;
+      int nrv;
+      
+      struct sockaddr_storage client_addr;
       int client_sockfd;
+      socklen_t sin_size = sizeof client_addr;
       char s[INET6_ADDRSTRLEN];
       
-      while(1) 
+      while(1)
       {
-	 socklen_t sin_size = sizeof their_addr;
-	 client_sockfd = accept(server_details->sockfd, (struct sockaddr *)&their_addr, &sin_size);
-	 if (client_sockfd == -1) {
-            perror("accept");
-            continue;
+	 nrv = nhpc_wait_for_io_or_timeout(sock, 1);
+	 if(nrv != NHPC_SUCCESS)
+	    continue;
+	 else
+	 {
+	    rv = accept(sock->sockfd, (struct sockaddr *)&client_addr, &sin_size);
+	    if(rv != -1)
+	    {
+	       cout<<"connection accepted"<<endl;
+	       
+	       char buffer[1000];
+	       size_t size = 1000;
+	       nhpc_socket_t *sock_new = new nhpc_socket_t;
+	       sock_new->sockfd = rv;
+	       sock_new->timeout = sock->timeout;
+	       nrv = 0;
+	       int exit_status = 0;
+	       while(exit_status != NHPC_EOF)
+	       {
+		  bzero(buffer, 1000);
+		  nrv = socket_recv(sock_new, buffer, &size);
+		  cout<<size<<nrv<<endl;
+		  cout<<buffer<<endl;		  
+		  
+		  size_t start_pos = 0;
+		  size_t end_pos = 0;
+		  
+		  for(int cntr = 0; cntr < size; cntr++)
+		  {
+		     if(buffer[cntr] == '\r')
+		     {
+			end_pos = cntr;
+			size_t length = end_pos - start_pos;
+			cout<<length<<" string terminated "<<start_pos<<" "<<end_pos<<endl;
+			if(length == 0)
+			{
+			   exit_status = NHPC_EOF;
+			   break;
+			}
+		     }
+		     else if(buffer[cntr] == '\n')
+		     {
+			cout<<"new line"<<endl;
+			start_pos = cntr + 1;
+		     }
+		     
+		  }
+	       }
+	       
+	       const char *buffer_send = "Welcome to NeweraCLuster";
+	       size = strlen(buffer_send);
+	       socket_send(sock_new, (char *)buffer_send, &size);
+	       close(sock_new->sockfd);
+	    }
+	    else {
+	       cout<<"hi"<<endl;
+	    }
 	 }
-	 
-	 inet_ntop(their_addr.ss_family,
-		   get_in_addr((struct sockaddr *)&their_addr),
-		   s, sizeof s);
-	 	 
-	 nhpc_client_details_t *client_details = new nhpc_client_details_t;
-	 (*client_details).thread_manager = thread_manager;
-	 (*client_details).sockfd	  = client_sockfd;
-	 (*client_details).thread_id	  = (*thread_manager).create_thread(NULL, connection_thread,
-									    client_details, NHPC_THREAD_DEFAULT);								    
-      }     
+      }
+      
+      return NHPC_SUCCESS;
    }
    
-   void *connection_thread(void *data)
+   nhpc_status_t socket_getaddrinfo(nhpc_socket_t **sock, const char *host_addr, const char *host_port,
+				    int family, int type, int protocol) 
    {
-      nhpc_client_details_t *client_details = (nhpc_client_details_t *)data;
-      thread_manager_t *thread_manager = (*client_details).thread_manager;
-
-      nhpc_socket_t *sock = new nhpc_socket_t;
-      sock->sockfd  = client_details->sockfd;
-      sock->timeout = 0;
-      sock->options |= NHPC_SUCCESS;
+      int rv;
       
-      size_t len = 500;
-      char *buffer = new char [len];
-      int nrv = nhpc_recv(sock, buffer, &len);
-      perror("read");
-      if(nrv == ECONNRESET)
+      addrinfo **hints, **res, *p;
+      
+      if (!(*sock))
       {
-	 perror("nhpc_recv");
-	 goto connection_close;
+	 (*sock) = new nhpc_socket_t;
+	 memset((*sock), 0, sizeof(nhpc_socket_t));
       }
       
-      if(nrv & NHPC_SUCCESS)
+      hints = &((*sock)->hints);
+      res   = &((*sock)->hints);
+      
+      if (!(*hints))
       {
-	 nhpc_analyze_stream(buffer, &len);
+	 (*hints) = new addrinfo;
+	 memset(*hints, 0, sizeof(addrinfo));
       }
       
-      if(send(client_details->sockfd, "Hello, world!", 13, 0) < 0)
-	 perror("Send");
-
-   connection_close:
-      (*thread_manager).delete_thread_data((*client_details).thread_id);
-      close((*client_details).sockfd);
-      delete (client_details);
-      delete sock;
-      delete buffer;
-      pthread_exit(NULL);
+      (*hints)->ai_family   = family;
+      (*hints)->ai_socktype = type;
+      (*hints)->ai_protocol = protocol;
+      
+      rv = getaddrinfo(host_addr, host_port, *hints, res);
+      if (rv == -1)
+      {
+	 return errno;
+      }
+      
+      return NHPC_SUCCESS;
    }
    
    void *get_in_addr(struct sockaddr *sa)
@@ -204,5 +260,13 @@ namespace neweraHPC
 	 return &(((struct sockaddr_in*)sa)->sin_addr);
       }
       return &(((struct sockaddr_in6*)sa)->sin6_addr);
-   }   
+   }      
+   
+   nhpc_status_t socket_delete(nhpc_socket_t *sock)
+   {
+      freeaddrinfo(sock->hints);
+      delete sock;
+      
+      return NHPC_SUCCESS;
+   }
 }

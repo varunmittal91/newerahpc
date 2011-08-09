@@ -1,5 +1,10 @@
 /*
+ *  Original Author
+ *	(C) 1999  Andrea Arcangeli <andrea@suse.de>
+ *
+ *	Modified by
  *	(C) 2011 Varun Mittal <varunmittal91@gmail.com>
+ *
  *	NeweraHPC program is distributed under the terms of the GNU General Public License v2
  *
  *	This file is part of NeweraHPC.
@@ -17,36 +22,27 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <fstream>
-#include <errno.h>
-#include <iostream>
-
-#include <include/poll.h>
-
-using namespace std;
+#ifndef _SOCKOPTS_H_
+#define _SOCKOPTS_H_
 
 namespace neweraHPC
 {
-   nhpc_status_t nhpc_wait_for_io_or_timeout(struct nhpc_socket_t *sock)
-   {
-      struct pollfd pfd;
-      int rc, timeout;
-      
-      timeout = NHPC_TIMEOUT;
-      
-      do {
-	 rc = poll(&pfd, 1, timeout);
-      } while (rc == -1 && errno == EINTR);
-      if (rc == 0) {
-	 return NHPC_TIMEUP;
-      }
-      else if (rc > 0) {
-	 return NHPC_SUCCESS;
-      }
-      else {
-	 return errno;
-      }
-      
-      return NHPC_SUCCESS;
-   }
+   
+   nhpc_status_t socket_options_set(nhpc_socket_t *sock, int sockopt, int on);
+   nhpc_status_t socket_nonblock(nhpc_socket_t *sock);
+   nhpc_status_t socket_block(nhpc_socket_t *sock);
+   
+#define socket_is_option_set(skt, option)  \
+(((skt)->sockopt & (option)) == (option))
+   
+#define socket_set_option(skt, option, on) \
+do {                                 \
+if (on)                          \
+(skt)->sockopt |= (option);         \
+else                             \
+(skt)->sockopt &= ~(option);        \
+} while (0)
+   
 }
+
+#endif

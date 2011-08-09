@@ -27,9 +27,27 @@ typedef size_t nhpc_size_t;
 
 #define  NHPC_SUCCESS 1
 
+#define NHPC_ON  1
+#define NHPC_OFF 0
+
+/* Network specific constants */
 #define NHPC_BUFFER_SIZE 1000
 
 #define NHPC_POLLING_READ  1
 #define NHPC_POLLING_WRITE 1
+
+#define NHPC_BINDING_SOCKET    1
+#define NHPC_CONNECTING_SOCKET 2
+#define NHPC_INCOMPLETE 4
+#define NHPC_EOF 8
+
+#define NHPC_KEEP_ALIVE SO_KEEPALIVE
+
+#define NHPC_NONBLOCK  1
+#define NHPC_REUSEADDR 2
+
+/* Polling and timeout specific constants */
+#define NHPC_TIMEUP  2
+#define NHPC_TIMEOUT 30
 
 #endif

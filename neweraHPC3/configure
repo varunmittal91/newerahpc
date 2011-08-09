@@ -2894,8 +2894,6 @@ esac
 AM_BACKSLASH='\'
 
 
-ac_config_headers="$ac_config_headers config.h"
-
 
 
 # Checks for programs.
@@ -4731,6 +4729,10 @@ _ACEOF
 fi
 
 done
+
+
+# Add HAVE_header-files to project build
+ac_config_headers="$ac_config_headers config.h"
 
 
 # Check for optional arguments
@@ -16331,8 +16333,8 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
+    "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;

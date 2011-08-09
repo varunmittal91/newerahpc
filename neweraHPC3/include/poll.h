@@ -20,11 +20,14 @@
 #ifndef _POLL_H_
 #define _POLL_H_
 
+#include <sys/poll.h>
+
 #include "constants.h"
+#include "network.h"
 
 namespace neweraHPC
 {
-   nhpc_status_t nhpc_wait_for_io_or_timeout();
+   nhpc_status_t nhpc_wait_for_io_or_timeout(struct nhpc_socket_t *sock);
 }
 
 #endif

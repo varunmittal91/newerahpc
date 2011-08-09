@@ -24,22 +24,60 @@
 using namespace neweraHPC;
 using namespace std;
 
-int main(){
-   network_t network;
-   /*
-   bool stat = network.open_socket("127.0.0.1", "8080");
-   if(!stat)
-      cout<<"Socket creation failed"<<endl;
-   else 
-   {
-      stat = network.connect("localhost", "80");
-   }
-
-   nhpc_socket_t *sock = new nhpc_socket_t;
-   int rv = nhpc_create_socket("10.0.0.3", "80", sock, NHPC_CONNECTING_SOCKET);
-   cout<<rv<<endl;
+int main(int argc, char *argv[]){
+   int nrv;
    
-   while(1)sleep(1);
-    */
+   if(argc<3)
+   {
+      printf("usage ./test host port\n");
+      exit(0);
+   }
+   nhpc_socket_t *sock;
+   
+   nrv = socket_getaddrinfo(&sock, argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
+   if (nrv != NHPC_SUCCESS)
+   {
+      perror("getaddrinfo");
+      exit(0);
+   }   
+   
+   nrv = socket_create(&sock);     
+   if(nrv != NHPC_SUCCESS)
+   {
+      perror("error at socket create");
+      exit(0);
+   }   
+   
+   socket_options_set(sock, NHPC_NONBLOCK, 1);
+
+   nrv = socket_connect(sock);
+   if(nrv != NHPC_SUCCESS)
+   {
+      if(nrv == NHPC_TIMEUP)cout<<"process timed out"<<endl;
+      perror("error at sockets connect");
+      exit(0);
+   }
+   
+   const char *mssg = "GET / HTTP/1.1 \r\n\r\n";
+   size_t size = strlen(mssg);
+   nrv = socket_send(sock, (char *)mssg, &size);
+   if(nrv == -1)perror("write");
+   
+   char buffer[1000];
+   size = 1000;
+   int rv;
+   
+   while(rv != NHPC_EOF)
+   {
+      rv = socket_recv(sock, buffer, &size);
+   }
+   
+   if(rv == -1)
+      perror("read:");
+   
+   cout<<buffer<<endl;
+   
+   socket_delete(sock);
+   
    return 0;
 }

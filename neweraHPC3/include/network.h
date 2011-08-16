@@ -71,15 +71,9 @@ namespace neweraHPC
       network_t();
       network_t(thread_manager_t *in_thread_manager);
       ~network_t();
-      bool status();
-      nhpc_status_t connect(const char *in_host_addr, const char *in_host_port);
-      nhpc_status_t socket_create(nhpc_socket_t **sock);
-      nhpc_status_t socket_create(nhpc_socket_t **sock, int family, int type, int protocol);
-      nhpc_status_t socket_delete(nhpc_socket_t *sock);
-      nhpc_status_t socket_connect(nhpc_socket_t *sock);      
-      nhpc_status_t socket_getaddrinfo(nhpc_socket_t **sock, const char *host_addr, const char *host_port,
-				       int family, int type, int protocol);
-      
+      nhpc_status_t connect(nhpc_socket_t **sock, const char *host_addr, 
+			    const char *host_port, int family, int type, int protocol);
+      nhpc_status_t create_server();
    };
    
    nhpc_status_t nhpc_recv(nhpc_socket_t *sock, char *buffer, size_t *len);

@@ -32,15 +32,50 @@ namespace neweraHPC
       thread_manager = new thread_manager_t;
       connection_stat = false;
    }
+   
    network_t::network_t(thread_manager_t *in_thread_manager)
    {
       external_thread_manager = true;
       thread_manager = in_thread_manager;
       connection_stat = false;
    }
+   
    network_t::~network_t()
    {
       if(!external_thread_manager)
 	 delete thread_manager;
+   }
+   
+   nhpc_status_t network_t::connect(nhpc_socket_t **sock, const char *host_addr, 
+				    const char *host_port, int family, int type, int protocol)
+   {
+      int nrv;
+      
+      *sock = new nhpc_socket_t;
+      
+      nrv = socket_getaddrinfo(sock, host_addr, host_port, family, type, protocol);
+      if(nrv != NHPC_SUCCESS)
+      {
+	 delete *sock;
+	 return nrv;
+      }
+      
+      nrv = socket_create(sock);     
+      if(nrv != NHPC_SUCCESS)
+      {
+	 delete *sock;
+	 return nrv;
+      }   
+      
+      socket_options_set(*sock, NHPC_NONBLOCK, 1);
+      
+      nrv = socket_connect(*sock);
+      if(nrv != NHPC_SUCCESS)
+      {
+	 delete *sock;
+	 return nrv;
+      }      
+      
+      return NHPC_SUCCESS;
    }
 };

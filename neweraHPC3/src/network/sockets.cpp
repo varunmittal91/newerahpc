@@ -58,7 +58,7 @@ namespace neweraHPC
    
    nhpc_status_t socket_connect(nhpc_socket_t *sock) 
    {
-      int rv, nrv;
+      int rv;
       
       if (!(sock->hints))
       {

@@ -30,9 +30,6 @@ namespace neweraHPC
 {
    nhpc_status_t socket_create(nhpc_socket_t **sock, int family, int type, int protocol)
    {
-      *sock = new nhpc_socket_t;
-      memset(sock, 0, sizeof(nhpc_socket_t));
-      
       (*sock)->sockfd = socket(family, type, protocol);
       
       if (((*sock)->sockfd) == -1)
@@ -225,20 +222,14 @@ namespace neweraHPC
       
       addrinfo **hints, **res, *p;
       
-      if (!(*sock))
-      {
-	 (*sock) = new nhpc_socket_t;
-	 memset((*sock), 0, sizeof(nhpc_socket_t));
-      }
+      (*sock) = new nhpc_socket_t;
+      memset((*sock), 0, sizeof(nhpc_socket_t));
       
       hints = &((*sock)->hints);
       res   = &((*sock)->hints);
       
-      if (!(*hints))
-      {
-	 (*hints) = new addrinfo;
-	 memset(*hints, 0, sizeof(addrinfo));
-      }
+      (*hints) = new addrinfo;
+      memset(*hints, 0, sizeof(addrinfo));
       
       (*hints)->ai_family   = family;
       (*hints)->ai_socktype = type;

@@ -58,7 +58,7 @@ namespace neweraHPC
    
    nhpc_status_t socket_connect(nhpc_socket_t *sock) 
    {
-      int rv;
+      int rv, nrv;
       
       if (!(sock->hints))
       {
@@ -76,9 +76,11 @@ namespace neweraHPC
       {
 	 rv = nhpc_wait_for_io_or_timeout(sock, 0);
 	 if(rv != NHPC_SUCCESS)return rv;
+	 else if(rv == NHPC_SUCCESS)
+	    rv = connect(sock->sockfd, hints->ai_addr, hints->ai_addrlen);
       }
-      
-      if(rv == -1)
+	 
+      if(rv == -1 && errno != EISCONN)
 	 return errno;
       
       return NHPC_SUCCESS;

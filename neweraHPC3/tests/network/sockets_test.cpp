@@ -52,17 +52,22 @@ int main(int argc, char *argv[]){
    size = 1000;
    int rv;
    
-   while(rv != NHPC_EOF)
+   int timeup_count = 0;
+   while(rv != NHPC_EOF && timeup_count != 5)
    {
       rv = socket_recv(sock, buffer, &size);
+      cout<<buffer;
+      timeup_count++;
    }
+   cout<<endl;
    
    if(rv == -1)
       perror("read:");
-   
-   cout<<buffer<<endl;
-   
+      
    socket_delete(sock);
    
+   nrv = network.create_server(argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
+   if(nrv != NHPC_SUCCESS)perror("error at creating server");
+      
    return 0;
 }

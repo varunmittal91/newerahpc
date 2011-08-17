@@ -31,6 +31,9 @@ namespace neweraHPC
       external_thread_manager = false;
       thread_manager = new thread_manager_t;
       connection_stat = false;
+      client_connections = new rbtree;
+      mutex = new pthread_mutex_t;
+      server_sock = NULL;
    }
    
    network_t::network_t(thread_manager_t *in_thread_manager)
@@ -38,12 +41,38 @@ namespace neweraHPC
       external_thread_manager = true;
       thread_manager = in_thread_manager;
       connection_stat = false;
+
+      delete client_connections;
+      delete mutex;
+
+      if(server_sock != NULL)
+	 delete server_sock;
    }
    
    network_t::~network_t()
    {
-      if(!external_thread_manager)
+      if(!external_thread_manager) 
 	 delete thread_manager;
+   }
+   
+   inline void network_t::lock()
+   {
+      pthread_mutex_lock(mutex);
+   }
+   
+   inline void network_t::unlock()
+   {
+      pthread_mutex_unlock(mutex);
+   }
+   
+   int network_t::add_client_connection(nhpc_socket_t *sock)
+   {
+      int id;
+      lock();
+      id = (*client_connections).insert(sock);
+      unlock();
+      
+      return id;
    }
    
    nhpc_status_t network_t::connect(nhpc_socket_t **sock, const char *host_addr, 
@@ -75,7 +104,49 @@ namespace neweraHPC
 	 delete *sock;
 	 return nrv;
       }      
-      
+
+      add_client_connection(*sock);
       return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t network_t::create_server(const char *host_addr, const char *host_port,
+					  int family, int type, int protocol)
+   {
+      int rv, nrv;
+      int connection_queue = 10;
+      
+      int enable_opts = 1;
+      
+      if(server_sock == NULL)
+	 server_sock = new nhpc_socket_t;
+      
+      rv = setsockopt(server_sock->sockfd, SOL_SOCKET, SO_REUSEADDR, &enable_opts, sizeof(int));
+      if(rv == -1)
+      {
+	 perror("sock opts");
+	 return errno;
+      }
+      
+      nrv = socket_bind(server_sock);
+      if(nrv != NHPC_SUCCESS)
+      {
+	 perror("sock bind");
+	 return errno;
+      }
+      
+      nrv = socket_listen(server_sock, &connection_queue);
+      if(nrv != NHPC_SUCCESS)
+      {
+	 return errno;
+      }
+      
+      nrv = socket_accept(server_sock);
+      if(nrv != NHPC_SUCCESS){
+	 return errno;
+      }
+      
+      (*thread_manager).create_thread(NULL, (void* (*)(void*))socket_accept, (void *)server_sock, NHPC_THREAD_JOIN);
+      
+      return NHPC_SUCCESS;      
    }
 };

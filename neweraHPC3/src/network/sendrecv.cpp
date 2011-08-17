@@ -30,6 +30,8 @@ namespace neweraHPC
       int rv;
       nhpc_status_t nrv;
       
+      bzero(buffer, *length);
+      
       if(sock->incomplete_operation == NHPC_INCOMPLETE)
 	 goto do_select;
       

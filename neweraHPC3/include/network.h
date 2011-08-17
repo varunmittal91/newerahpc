@@ -58,22 +58,26 @@ namespace neweraHPC
    class network_t
    {
    private:
-      char *host_addr;
-      char *host_port;
       int  host_port_network_byte;
-      int  host_sockfd;
       bool connection_stat;
       thread_manager_t *thread_manager;
       bool external_thread_manager;
       struct nhpc_thrad_details_t *server_thread_details;
+      rbtree *client_connections;
+      pthread_mutex_t *mutex;
+      nhpc_socket_t *server_sock;
       
    public:
       network_t();
       network_t(thread_manager_t *in_thread_manager);
       ~network_t();
+      inline void lock();
+      inline void unlock();
+      int add_client_connection(nhpc_socket_t *sock);
       nhpc_status_t connect(nhpc_socket_t **sock, const char *host_addr, 
 			    const char *host_port, int family, int type, int protocol);
-      nhpc_status_t create_server();
+      nhpc_status_t create_server(const char *host_addr, const char *host_port,
+				  int family, int type, int protocol);
    };
    
    nhpc_status_t nhpc_recv(nhpc_socket_t *sock, char *buffer, size_t *len);

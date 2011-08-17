@@ -36,8 +36,8 @@ namespace neweraHPC
       int family;
       int incomplete_operation;
       time_t timeout;
-      char *host;
-      char *port;
+      const char *host;
+      const char *port;
       addrinfo *hints;
       addrinfo *hints_res;
    };

@@ -66,6 +66,7 @@ namespace neweraHPC
       rbtree *client_connections;
       pthread_mutex_t *mutex;
       nhpc_socket_t *server_sock;
+      static void *accept_connection(nhpc_socket_t *sock);
       
    public:
       network_t();

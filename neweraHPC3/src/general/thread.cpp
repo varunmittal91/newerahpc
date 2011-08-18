@@ -68,7 +68,6 @@ namespace neweraHPC
       {
 	 status_new = pthread_join(*thread_new,NULL); 
 	 if(status_new!=0)perror("Error at joing thread");
-	 cout<<"joining thread for you";
       }
       else if(thread_state == NHPC_THREAD_DETACH)
       {

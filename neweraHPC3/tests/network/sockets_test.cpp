@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
    nrv = network.connect(&sock, argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
    if(nrv != NHPC_SUCCESS)
    {
-      perror("");
+      perror("connect");
       exit(0);
    }
       

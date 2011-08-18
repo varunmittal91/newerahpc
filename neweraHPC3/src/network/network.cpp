@@ -120,33 +120,52 @@ namespace neweraHPC
       if(server_sock == NULL)
 	 server_sock = new nhpc_socket_t;
       
+      nrv = socket_getaddrinfo(&server_sock, host_addr, host_port, family, type, protocol);
+      if(nrv != NHPC_SUCCESS)
+      {
+	 delete server_sock;
+	 server_sock = NULL;
+	 return nrv;
+      }      
+      
+      nrv = socket_create(&server_sock);     
+      if(nrv != NHPC_SUCCESS)
+      {
+	 delete server_sock;
+	 return nrv;
+      }         
+      
       rv = setsockopt(server_sock->sockfd, SOL_SOCKET, SO_REUSEADDR, &enable_opts, sizeof(int));
       if(rv == -1)
       {
-	 perror("sock opts");
+	 delete server_sock;
+	 server_sock = NULL;
 	 return errno;
       }
       
       nrv = socket_bind(server_sock);
       if(nrv != NHPC_SUCCESS)
       {
-	 perror("sock bind");
+	 delete server_sock;
+	 server_sock = NULL;
 	 return errno;
       }
       
       nrv = socket_listen(server_sock, &connection_queue);
       if(nrv != NHPC_SUCCESS)
       {
+	 delete server_sock;
+	 server_sock = NULL;
 	 return errno;
       }
       
-      nrv = socket_accept(server_sock);
-      if(nrv != NHPC_SUCCESS){
-	 return errno;
-      }
-      
-      (*thread_manager).create_thread(NULL, (void* (*)(void*))socket_accept, (void *)server_sock, NHPC_THREAD_JOIN);
+      (*thread_manager).create_thread(NULL, (void * (*)(void *))network_t::accept_connection, (void *)server_sock, NHPC_THREAD_JOIN);
       
       return NHPC_SUCCESS;      
+   }
+   
+   void *network_t::accept_connection(nhpc_socket_t *sock)
+   {
+      cout<<"hello guys"<<endl;
    }
 };

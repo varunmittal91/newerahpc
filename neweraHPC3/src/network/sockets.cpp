@@ -31,6 +31,8 @@ namespace neweraHPC
    nhpc_status_t socket_create(nhpc_socket_t **sock, int family, int type, int protocol)
    {
       (*sock)->sockfd = socket(family, type, protocol);
+      if((*sock)->sockfd == -1)
+	 perror("error at creating sockets");
       
       if (((*sock)->sockfd) == -1)
 	 return errno;
@@ -40,12 +42,7 @@ namespace neweraHPC
    
    nhpc_status_t socket_create(nhpc_socket_t **sock)
    {
-      if(!(*sock))
-	 return 0;
-      
       addrinfo **hints = &((*sock)->hints);
-      if(!(*hints))
-	 return 0;
       
       int rv = socket_create(sock, (*hints)->ai_family, (*hints)->ai_socktype, (*hints)->ai_protocol);
       return rv;
@@ -224,6 +221,7 @@ namespace neweraHPC
       
       (*sock) = new nhpc_socket_t;
       memset((*sock), 0, sizeof(nhpc_socket_t));
+      (*sock)->hints = new addrinfo;
       
       hints = &((*sock)->hints);
       res   = &((*sock)->hints);
@@ -236,9 +234,9 @@ namespace neweraHPC
       (*hints)->ai_protocol = protocol;
       
       rv = getaddrinfo(host_addr, host_port, *hints, res);
-      if (rv == -1)
+      if (rv == -1 || *hints == 0)
       {
-	 return errno;
+	 return rv;
       }
       
       return NHPC_SUCCESS;

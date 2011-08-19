@@ -43,10 +43,8 @@ namespace neweraHPC
 {   
    struct nhpc_thread_details_t
    {
-      int sockfd;
-      int main_thread_id;
       thread_manager_t *thread_manager;
-      nhpc_socket_t *socket;
+      nhpc_socket_t *sock;
    };
             
    void *connection_handler(void *data);
@@ -66,7 +64,8 @@ namespace neweraHPC
       rbtree *client_connections;
       pthread_mutex_t *mutex;
       nhpc_socket_t *server_sock;
-      static void *accept_connection(nhpc_socket_t *sock);
+      static void *accept_connection(nhpc_thread_details_t *main_thread);
+      static void *connection_handler(nhpc_socket_t *sock);
       
    public:
       network_t();

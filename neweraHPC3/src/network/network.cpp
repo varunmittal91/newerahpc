@@ -159,13 +159,51 @@ namespace neweraHPC
 	 return errno;
       }
       
-      (*thread_manager).create_thread(NULL, (void * (*)(void *))network_t::accept_connection, (void *)server_sock, NHPC_THREAD_JOIN);
+      nhpc_thread_details_t *accept_thread = new nhpc_thread_details_t;
+      accept_thread->sock = server_sock;
+      accept_thread->thread_manager = thread_manager;
+      (*thread_manager).create_thread(NULL, (void * (*)(void *))network_t::accept_connection, (void *)accept_thread, NHPC_THREAD_JOIN);
+      
+      while(1)sleep(1);
       
       return NHPC_SUCCESS;      
    }
    
-   void *network_t::accept_connection(nhpc_socket_t *sock)
+   void *network_t::accept_connection(nhpc_thread_details_t *main_thread)
    {
+      int rv;
+      int nrv;
+      
+      thread_manager_t *thread_manager = main_thread->thread_manager;
+      nhpc_socket_t *server_sock = main_thread->sock;
+
+      struct sockaddr_storage client_addr;
+      int client_sockfd;
+      socklen_t sin_size = sizeof client_addr;
+      char s[INET6_ADDRSTRLEN];
+      
+      while(1)
+      {
+	 nrv = nhpc_wait_for_io_or_timeout(server_sock, 1);
+	 cout<<"IN tight loop"<<endl;
+	 if(nrv != NHPC_SUCCESS)
+	    continue;
+	 else
+	 {
+	    rv = accept(server_sock->sockfd, (struct sockaddr *)&client_addr, &sin_size);
+	    if(rv != -1)
+	    {
+	       cout<<"Connection accepted";
+	       (*thread_manager).create_thread(NULL, (void * (*)(void *))network_t::connection_handler, (void *)server_sock, 0);
+	    }
+	 }
+      }
+      
       cout<<"hello guys"<<endl;
+   }
+   
+   void *network_t::connection_handler(nhpc_socket_t *sock)
+   {
+      
    }
 };

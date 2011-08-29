@@ -111,9 +111,9 @@ namespace neweraHPC
    
    nhpc_status_t network_t::create_server(const char *host_addr, const char *host_port,
 					  int family, int type, int protocol)
-   {
+   {            
       int rv, nrv;
-      int connection_queue = 10;
+      int connection_queue = 0;
       
       int enable_opts = 1;
       
@@ -133,7 +133,9 @@ namespace neweraHPC
       {
 	 delete server_sock;
 	 return nrv;
-      }         
+      }    
+      
+      //socket_options_set(server_sock, NHPC_NONBLOCK, 1);
       
       rv = setsockopt(server_sock->sockfd, SOL_SOCKET, SO_REUSEADDR, &enable_opts, sizeof(int));
       if(rv == -1)
@@ -163,9 +165,7 @@ namespace neweraHPC
       accept_thread->sock = server_sock;
       accept_thread->thread_manager = thread_manager;
       (*thread_manager).create_thread(NULL, (void * (*)(void *))network_t::accept_connection, (void *)accept_thread, NHPC_THREAD_JOIN);
-      
-      while(1)sleep(1);
-      
+            
       return NHPC_SUCCESS;      
    }
    
@@ -177,33 +177,85 @@ namespace neweraHPC
       thread_manager_t *thread_manager = main_thread->thread_manager;
       nhpc_socket_t *server_sock = main_thread->sock;
 
-      struct sockaddr_storage client_addr;
-      int client_sockfd;
-      socklen_t sin_size = sizeof client_addr;
-      char s[INET6_ADDRSTRLEN];
+      struct sockaddr_storage *client_addr;
+      socklen_t sin_size;
       
       while(1)
       {
-	 nrv = nhpc_wait_for_io_or_timeout(server_sock, 1);
-	 cout<<"IN tight loop"<<endl;
-	 if(nrv != NHPC_SUCCESS)
-	    continue;
-	 else
+	 client_addr = new sockaddr_storage;
+	 sin_size = sizeof(*client_addr);
+
+	 bzero(&client_addr, sizeof(sockaddr_storage));
+	 rv = accept(server_sock->sockfd, (struct sockaddr *)&client_addr, &sin_size);
+	 if(rv < 0)
 	 {
-	    rv = accept(server_sock->sockfd, (struct sockaddr *)&client_addr, &sin_size);
-	    if(rv != -1)
-	    {
-	       cout<<"Connection accepted";
-	       (*thread_manager).create_thread(NULL, (void * (*)(void *))network_t::connection_handler, (void *)server_sock, 0);
-	    }
+	    perror("error at accept");
+	    sleep(1);
+	 }
+	 else	
+	 {
+	    nhpc_socket_t *client_sock = new nhpc_socket_t;
+	    client_sock->sockfd = rv;
+	    cout<<"Connection accepted";
+	    (*thread_manager).create_thread(NULL, (void * (*)(void *))network_t::connection_handler, (void *)client_sock, 0);
+	    cout<<"thread created"<<endl;
 	 }
       }
-      
       cout<<"hello guys"<<endl;
    }
    
    void *network_t::connection_handler(nhpc_socket_t *sock)
    {
+      cout<<"hi in connection"<<endl;
+
+      char buffer[1000];
+      size_t size = 1000;
+      socket_recv(sock, buffer, &size);
+      cout<<buffer<<endl;
       
+      socket_send(sock, buffer, &size);
+      
+      close(sock->sockfd);
+      delete sock;
    }
+   
+   int test_socket_factory()
+   {
+      int sockfd, newsockfd, portno;
+      socklen_t clilen;
+      char buffer[256];
+      struct sockaddr_in serv_addr, cli_addr;
+      int n;
+
+      sockfd = socket(AF_INET, SOCK_STREAM, 0);
+      if (sockfd < 0) 
+	 perror("ERROR opening socket");
+      bzero((char *) &serv_addr, sizeof(serv_addr));
+      portno = atoi("8080");
+      serv_addr.sin_family = AF_INET;
+      serv_addr.sin_addr.s_addr = INADDR_ANY;
+      serv_addr.sin_port = htons(portno);
+      if (bind(sockfd, (struct sockaddr *) &serv_addr,
+	       sizeof(serv_addr)) < 0) 
+	 perror("ERROR on binding");
+      listen(sockfd,5);
+      while(1)
+      {
+	 clilen = sizeof(cli_addr);
+	 newsockfd = accept(sockfd, 
+			    (struct sockaddr *) &cli_addr, 
+			    &clilen);
+	 if (newsockfd < 0) 
+	    perror("ERROR on accept");
+	 bzero(buffer,256);
+	 n = read(newsockfd,buffer,255);
+	 if (n < 0) perror("ERROR reading from socket");
+	 printf("Here is the message: %s\n",buffer);
+	 n = write(newsockfd,"I got your message",18);
+	 if (n < 0) perror("ERROR writing to socket");
+	 close(newsockfd);
+	 close(sockfd);
+      }
+      return 0; 
+   }      
 };

@@ -131,7 +131,7 @@ namespace neweraHPC
       int rv;
       rv = listen(sock->sockfd, *connection_queue);
       
-      if(rv == -1)
+      if(rv < 0)
 	 return errno;
       
       return NHPC_SUCCESS;

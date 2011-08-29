@@ -82,6 +82,8 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_recv(nhpc_socket_t *sock, char *buffer, size_t *len);
    nhpc_status_t nhpc_analyze_stream(char *buffer, size_t *len);
+   
+   int test_socket_factory();
 };
 
 #endif

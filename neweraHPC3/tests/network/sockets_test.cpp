@@ -30,7 +30,7 @@ int main(int argc, char *argv[]){
    
    if(argc<4)
    {
-      printf("usage ./test host port mode\n\t1 for server\n\t2 for client\n");
+      printf("usage ./test host port mode\n\t1 for client\n\t2 for server\n");
       exit(0);
    }
    
@@ -70,8 +70,10 @@ int main(int argc, char *argv[]){
       socket_delete(sock);
       
    }
-   else if(strcmp(argv[3],"2") == 0)
+   if(strcmp(argv[3],"2") == 0)
    {
+      //test_socket_factory();
+      //while(1)sleep(1);
       nrv = network.create_server(argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
       if(nrv != NHPC_SUCCESS)perror("error at creating server");
    }

@@ -27,10 +27,16 @@
 
 namespace neweraHPC
 {
+   struct worker_threads
+   {
+      int connection_id;
+   };
+   
    class neweraHPC_main
    {
    private:
       network_t *main_network;
+      rbtree *worker_threads;
    public:
       neweraHPC_main();
       ~neweraHPC_main();

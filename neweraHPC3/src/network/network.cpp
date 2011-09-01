@@ -165,7 +165,7 @@ namespace neweraHPC
       accept_thread->sock = server_sock;
       accept_thread->thread_manager = thread_manager;
       (*thread_manager).create_thread(NULL, (void * (*)(void *))network_t::accept_connection, (void *)accept_thread, NHPC_THREAD_JOIN);
-            
+
       return NHPC_SUCCESS;      
    }
    

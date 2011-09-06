@@ -27,6 +27,11 @@ namespace neweraHPC
 {
    nhpc_status_t socket_recv(nhpc_socket_t *sock, char *buffer, size_t *length)
    {
+      /* Just for testing purpose */
+      char **mssgs;
+      int count = 0;
+      /* */
+      
       int rv;
       nhpc_status_t nrv;
       
@@ -64,12 +69,27 @@ namespace neweraHPC
       if ((sock->timeout > 0) && (rv < *length)) {
 	 sock->incomplete_operation = NHPC_INCOMPLETE;
       }
+      
       (*length) = rv;
+      
+      if(*length >= 0)
+      {
+	 count = *length;
+	 cout<<count<<endl;
+	 for(int cntr = 0; cntr < count; cntr++)
+	 {
+	    if(buffer[cntr] == '\r')
+	       cout<<"Carriage return"<<endl;
+	    else if(buffer[cntr] == '\n')
+	       cout<<"New line feed"<<endl;
+	 }	 
+      }
+      
       if (rv == 0) {
 	 sock->incomplete_operation = 0;
 	 return NHPC_EOF;
       }
-      
+            
       return NHPC_SUCCESS;
    }
    

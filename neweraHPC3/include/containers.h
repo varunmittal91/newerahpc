@@ -27,13 +27,13 @@
 namespace neweraHPC
 {
    template<class T>
-   void nhpc_container_add(T* container,T value, nhpc_size_t *len, nhpc_size_t *lines_count)
+   void nhpc_container_add(T* container, T value, nhpc_size_t *len, nhpc_size_t *lines_count)
    {
       
    }
 
    template<class T>
-   void nhpc_container_remove(T* container,T value, nhpc_size_t *len, nhpc_size_t *lines_count)
+   void nhpc_container_remove(T* container, T value, nhpc_size_t *len, nhpc_size_t *lines_count)
    {
       
    }

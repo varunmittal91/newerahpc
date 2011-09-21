@@ -135,7 +135,7 @@ namespace neweraHPC
 	 return nrv;
       }    
       
-      //socket_options_set(server_sock, NHPC_NONBLOCK, 1);
+      socket_options_set(server_sock, NHPC_NONBLOCK, 1);
       
       rv = setsockopt(server_sock->sockfd, SOL_SOCKET, SO_REUSEADDR, &enable_opts, sizeof(int));
       if(rv == -1)
@@ -180,6 +180,120 @@ namespace neweraHPC
       struct sockaddr_storage *client_addr;
       socklen_t sin_size;
       
+      //////Select data types
+      int max_sd, desc_ready;
+      int new_sd;
+      bool end_server = false, close_conn;
+      struct fd_set master_set, working_set;
+      FD_ZERO(&master_set);
+      max_sd = server_sock->sockfd;
+      FD_SET(server_sock->sockfd, &master_set);
+      
+      do 
+      {
+	 memcpy(&working_set, &master_set, sizeof(master_set));	 
+	 
+	 printf("Waiting on select()...\n");
+	 
+	 rv = select(max_sd + 1, &working_set, NULL, NULL, NULL);
+	 if(rv < 0)
+	 {
+	    perror("Select failed \n");
+	    break;
+	 }
+	 
+	 desc_ready = rv;
+	 
+	 for (int i=0; i <= max_sd && desc_ready > 0; ++i)
+	 {
+	    if (FD_ISSET(i, &working_set))
+	    {
+	       desc_ready -= 1;
+	       
+	       if (i == server_sock->sockfd)
+	       {
+		  printf("  Listening socket is readable\n");
+		  do
+		  {
+		     new_sd = accept(server_sock->sockfd, NULL, NULL);
+		     if (new_sd < 0)
+		     {
+			if (errno != EWOULDBLOCK)
+			{
+			   perror("  accept() failed");
+			   end_server = true;
+			}
+			break;
+		     }
+
+		     printf("  New incoming connection - %d\n", new_sd);
+		     FD_SET(new_sd, &master_set);
+		     if (new_sd > max_sd)
+			max_sd = new_sd;
+		     
+		  } while (new_sd != -1);
+	       }
+	       else
+	       {
+		  printf("  Descriptor %d is readable\n", i);
+		  close_conn = false;
+		  do
+		  {
+		     char buffer[1000];
+		     bzero(&buffer, 1000);
+		     
+		     rv = recv(i, buffer, sizeof(buffer), 0);
+		     if (rv < 0)
+		     {
+			if (errno != EWOULDBLOCK)
+			{
+			   perror("  recv() failed");
+			   close_conn = true;
+			}
+			printf("breaking off at recv @ %d ewouldblock-%d eagain-%d\n", errno, EWOULDBLOCK, EAGAIN);
+			perror(" recv() failed");
+			break;
+		     }
+      
+		     if (rv == 0)
+		     {
+			printf("  Connection closed\n");
+			close_conn = true;
+			printf("breaking off at 0\n");
+			break;
+		     }
+		     
+		     int len = rv;
+		     printf("  %d bytes received\n", len);
+		     cout<<buffer<<endl;
+		     
+		     rv = send(i, buffer, len, 0);
+		     if(rv < 0)
+		     {
+			perror("  send() failed");
+			close_conn = true;
+			printf("breaking off at send\n");
+			break;
+		     }
+		     
+		  }while(true);
+		  
+		  if (close_conn)
+		  {
+		     printf("closing connection\n");
+		     close(i);
+		     FD_CLR(i, &master_set);
+		     if (i == max_sd)
+		     {
+			while (FD_ISSET(max_sd, &master_set) == false)
+			   max_sd -= 1;
+		     }
+		  }
+	       }
+	    }
+	 }
+      }while(1);
+      
       while(1)
       {
 	 client_addr = new sockaddr_storage;
@@ -187,27 +301,15 @@ namespace neweraHPC
 
 	 bzero(&client_addr, sizeof(sockaddr_storage));
 	 rv = accept(server_sock->sockfd, (struct sockaddr *)&client_addr, &sin_size);
-	 if(rv < 0)
-	 {
-	    perror("error at accept");
-	    sleep(1);
-	 }
-	 else	
-	 {
-	    nhpc_socket_t *client_sock = new nhpc_socket_t;
-	    client_sock->sockfd = rv;
-	    cout<<"Connection accepted";
-	    (*thread_manager).create_thread(NULL, (void * (*)(void *))network_t::connection_handler, (void *)client_sock, 0);
-	    cout<<"thread created"<<endl;
-	 }
+	 
+	 nhpc_socket_t *client_sock = new nhpc_socket_t;
+	 client_sock->sockfd = rv;
+	 (*thread_manager).create_thread(NULL, (void * (*)(void *))network_t::connection_handler, (void *)client_sock, 0);
       }
-      cout<<"hello guys"<<endl;
    }
    
    void *network_t::connection_handler(nhpc_socket_t *sock)
    {
-      cout<<"hi in connection"<<endl;
-
       char buffer[1000];
       size_t size = 1000;
       socket_recv(sock, buffer, &size);
@@ -218,44 +320,4 @@ namespace neweraHPC
       close(sock->sockfd);
       delete sock;
    }
-   
-   int test_socket_factory()
-   {
-      int sockfd, newsockfd, portno;
-      socklen_t clilen;
-      char buffer[256];
-      struct sockaddr_in serv_addr, cli_addr;
-      int n;
-
-      sockfd = socket(AF_INET, SOCK_STREAM, 0);
-      if (sockfd < 0) 
-	 perror("ERROR opening socket");
-      bzero((char *) &serv_addr, sizeof(serv_addr));
-      portno = atoi("8080");
-      serv_addr.sin_family = AF_INET;
-      serv_addr.sin_addr.s_addr = INADDR_ANY;
-      serv_addr.sin_port = htons(portno);
-      if (bind(sockfd, (struct sockaddr *) &serv_addr,
-	       sizeof(serv_addr)) < 0) 
-	 perror("ERROR on binding");
-      listen(sockfd,5);
-      while(1)
-      {
-	 clilen = sizeof(cli_addr);
-	 newsockfd = accept(sockfd, 
-			    (struct sockaddr *) &cli_addr, 
-			    &clilen);
-	 if (newsockfd < 0) 
-	    perror("ERROR on accept");
-	 bzero(buffer,256);
-	 n = read(newsockfd,buffer,255);
-	 if (n < 0) perror("ERROR reading from socket");
-	 printf("Here is the message: %s\n",buffer);
-	 n = write(newsockfd,"I got your message",18);
-	 if (n < 0) perror("ERROR writing to socket");
-	 close(newsockfd);
-	 close(sockfd);
-      }
-      return 0; 
-   }      
 };

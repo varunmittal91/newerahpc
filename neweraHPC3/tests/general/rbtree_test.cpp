@@ -24,7 +24,13 @@
 using namespace std;
 using namespace neweraHPC;
 
-int main(){
+void func_sleep(void)
+{
+   while(1)sleep(60);
+}
+
+int main()
+{
    
    cout<<"This program is mainly build built for testing the efficiency of rbtree module used in the neweraHPC library"<<endl;
    cout<<"Please use some tool to test for memory leaks\n"<<"Attach the binary to some tool and then press any key"<<endl;
@@ -48,10 +54,15 @@ int main(){
    cout<<(*test_tree).insert(d)<<endl;
 
    delete test_tree;
-   delete a,b,c,d;
+   delete[] a; 
+   delete[] b; 
+   delete[] c; 
+   delete[] d;
    
    cout<<"All tree structures and data have been deleted there should not be any trace of memory still remaining\n";
    cout<<"If there is still some memory left that is not deallocated, we have a problem"<<endl;
+   
+   atexit(func_sleep);
    
    return 0;
 }

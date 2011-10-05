@@ -34,7 +34,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = rbtree_test$(EXEEXT) thread_test$(EXEEXT)
+bin_PROGRAMS = rbtree_test$(EXEEXT) thread_test$(EXEEXT) \
+	tree_test$(EXEEXT) cfg_test$(EXEEXT)
 subdir = tests/general
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -47,15 +48,21 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_rbtree_test_OBJECTS = rbtree_test.$(OBJEXT)
-rbtree_test_OBJECTS = $(am_rbtree_test_OBJECTS)
-rbtree_test_DEPENDENCIES = ../../src/libneweraHPC.la
+am_cfg_test_OBJECTS = thread_test.$(OBJEXT)
+cfg_test_OBJECTS = $(am_cfg_test_OBJECTS)
+cfg_test_DEPENDENCIES = ../../src/libneweraHPC.la
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
+am_rbtree_test_OBJECTS = rbtree_test.$(OBJEXT)
+rbtree_test_OBJECTS = $(am_rbtree_test_OBJECTS)
+rbtree_test_DEPENDENCIES = ../../src/libneweraHPC.la
 am_thread_test_OBJECTS = thread_test.$(OBJEXT)
 thread_test_OBJECTS = $(am_thread_test_OBJECTS)
 thread_test_DEPENDENCIES = ../../src/libneweraHPC.la
+am_tree_test_OBJECTS = thread_test.$(OBJEXT)
+tree_test_OBJECTS = $(am_tree_test_OBJECTS)
+tree_test_DEPENDENCIES = ../../src/libneweraHPC.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -82,8 +89,10 @@ am__v_CXXLD_0 = @echo "  CXXLD " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(rbtree_test_SOURCES) $(thread_test_SOURCES)
-DIST_SOURCES = $(rbtree_test_SOURCES) $(thread_test_SOURCES)
+SOURCES = $(cfg_test_SOURCES) $(rbtree_test_SOURCES) \
+	$(thread_test_SOURCES) $(tree_test_SOURCES)
+DIST_SOURCES = $(cfg_test_SOURCES) $(rbtree_test_SOURCES) \
+	$(thread_test_SOURCES) $(tree_test_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -210,6 +219,10 @@ rbtree_test_SOURCES = rbtree_test.cpp
 rbtree_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
 thread_test_SOURCES = thread_test.cpp
 thread_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
+tree_test_SOURCES = thread_test.cpp
+tree_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
+cfg_test_SOURCES = thread_test.cpp
+cfg_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
 all: all-am
 
 .SUFFIXES:
@@ -287,12 +300,18 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+cfg_test$(EXEEXT): $(cfg_test_OBJECTS) $(cfg_test_DEPENDENCIES) 
+	@rm -f cfg_test$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(cfg_test_OBJECTS) $(cfg_test_LDADD) $(LIBS)
 rbtree_test$(EXEEXT): $(rbtree_test_OBJECTS) $(rbtree_test_DEPENDENCIES) 
 	@rm -f rbtree_test$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(rbtree_test_OBJECTS) $(rbtree_test_LDADD) $(LIBS)
 thread_test$(EXEEXT): $(thread_test_OBJECTS) $(thread_test_DEPENDENCIES) 
 	@rm -f thread_test$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(thread_test_OBJECTS) $(thread_test_LDADD) $(LIBS)
+tree_test$(EXEEXT): $(tree_test_OBJECTS) $(tree_test_DEPENDENCIES) 
+	@rm -f tree_test$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(tree_test_OBJECTS) $(tree_test_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

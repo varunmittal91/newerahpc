@@ -1,5 +1,5 @@
 <word>noun
-<description>a word (other than a pronoun) used to identify any of a class of people, places, or things
+<description>a word other than a pronoun used to identify any of a class of people, places, or things
 <end>
 <word>adjectve
 <description>a word or phrase naming an attribute, added to or grammatically related to a noun to modify or describe
@@ -28,6 +28,27 @@
 <word>of/preposition
 <description>expressing the relationship between a part and a whole
 <end>
+<word>a/preposition
+<description>used when referring to someone or something for the first time in a text or conversation
+<end>
+<word>than/preposition
+<description>introducing the second element in a comparison
+<end>
 <word>preposition/noun
 <description>a word governing, and usually preceding, a noun or pronoun and expressing a relation to another word or element in the clause
+<end>
+<word>word/noun
+<description>a single distinct meaningful element of speech or writing used with others or sometimes alone to form a sentence and typically shown with a space on either side when written or printed
+<end>
+<word>word/verb
+<description>choose and use particular words in order to say or write
+<end>
+<word>other/adjective>
+<description>used to refer to a person or thing that is different or distinct from one already mentioned or known about
+<end>
+<word>pro+noun/noun
+<description>a word that can function by itself as a noun phrase and that refers either to the participants in the discourse or to someone or something mentioned elsewhere in the discourse
+<end>
+<word>used/adjective
+<description>having already been used
 <end>

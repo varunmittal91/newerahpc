@@ -20,4 +20,47 @@
 #ifndef _CFG_H_
 #define _CFG_H_
 
+#include "rbtree.h"
+
+namespace neweraHPC
+{
+   struct parse_node
+   {
+      parse_node *parent;
+      parse_node **children;
+      void       *symbol;
+   };
+   
+   class cfg_t
+   {
+   private:
+      struct drvtn_rule_t
+      {
+	 int        count;
+	 const char *word;
+	 rbtree	    *words;
+	 int        wrd_count;
+      };
+      rbtree *symbols;
+      int     rule_cnt;
+      
+   public:
+      cfg_t();
+      ~cfg_t();
+      int add_rule(const char *word, const char **words, int count);
+      void display(int rule_id);
+      void display();
+   };
+   
+   class parse_tree
+   {
+   private:
+      parse_node *root;
+      
+   public:
+      parse_tree();
+      ~parse_tree();
+   };
+}
+
 #endif

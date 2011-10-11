@@ -17,7 +17,18 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace neweraHPC
-{
+#include <iostream>
 
+#include <include/cfg.h>
+
+using namespace std;
+using namespace neweraHPC;
+
+int main()
+{
+   cfg_t cfg;
+
+   int rv = cfg.add_rule("abcd", (const char **)"1234", 1);
+   
+   cfg.display();
 }

@@ -17,7 +17,17 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <include/tree.h>
+
 namespace neweraHPC
 {
-
+   tree::tree()
+   {
+      
+   }
+   
+   tree::~tree()
+   {
+      
+   }
 }

@@ -17,9 +17,10 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <include/rbtree.h>
 #include <iostream>
 #include <stdio.h>
+
+#include <include/rbtree.h>
 
 using namespace std;
 using namespace neweraHPC;

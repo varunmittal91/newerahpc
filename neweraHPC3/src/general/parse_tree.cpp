@@ -17,27 +17,17 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _TREE_H_
-#define _THEE_H_
+#include <include/cfg.h>
 
 namespace neweraHPC
 {
-   struct tree_node
+   parse_tree::parse_tree()
    {
-      tree_node *root;
-      tree_node *parent;
-      tree_node *tree_left;
-      tree_node *tree_right;
-   };
+      
+   }
    
-   class tree
+   parse_tree::~parse_tree()
    {
-   private:
-   public:
-      tree();
-      ~tree();
-   };
-   
+      
+   }
 }
-
-#endif

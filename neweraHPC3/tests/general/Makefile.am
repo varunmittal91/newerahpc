@@ -10,7 +10,7 @@ thread_test_LDADD   = ../../src/libneweraHPC.la $(INITLIBS)
 tree_test_SOURCES = thread_test.cpp
 tree_test_LDADD   = ../../src/libneweraHPC.la $(INITLIBS)
 
-cfg_test_SOURCES = thread_test.cpp
+cfg_test_SOURCES = cfg_test.cpp
 cfg_test_LDADD   = ../../src/libneweraHPC.la $(INITLIBS)
 
 ../../src/libneweraHPC.la:

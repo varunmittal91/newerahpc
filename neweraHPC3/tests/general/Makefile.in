@@ -48,7 +48,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_cfg_test_OBJECTS = thread_test.$(OBJEXT)
+am_cfg_test_OBJECTS = cfg_test.$(OBJEXT)
 cfg_test_OBJECTS = $(am_cfg_test_OBJECTS)
 cfg_test_DEPENDENCIES = ../../src/libneweraHPC.la
 AM_V_lt = $(am__v_lt_$(V))
@@ -221,7 +221,7 @@ thread_test_SOURCES = thread_test.cpp
 thread_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
 tree_test_SOURCES = thread_test.cpp
 tree_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
-cfg_test_SOURCES = thread_test.cpp
+cfg_test_SOURCES = cfg_test.cpp
 cfg_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
 all: all-am
 
@@ -319,6 +319,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cfg_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rbtree_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/thread_test.Po@am__quote@
 

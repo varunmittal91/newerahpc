@@ -47,8 +47,10 @@ namespace neweraHPC
       tmp_rule->word  = word;
       tmp_rule->words = new rbtree;
       tmp_rule->wrd_count = count;
+      
       for(int cntr = 0; cntr < count; cntr++)
       {
+	 cout<<words[cntr]<<endl;
 	 (*tmp_rule->words).insert((void *)words[cntr]);
       }
       

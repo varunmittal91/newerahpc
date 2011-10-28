@@ -172,7 +172,6 @@ namespace neweraHPC
    static void test_signal_hndlr(int signal)
    {
       printf("Received a signal from the accept thread\n");
-      //exit(1);
    }
    
    void *network_t::accept_connection(nhpc_thread_details_t *main_thread)

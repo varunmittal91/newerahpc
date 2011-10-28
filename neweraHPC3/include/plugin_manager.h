@@ -17,16 +17,16 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-
-#include <include/cfg.h>
-
-using namespace std;
-using namespace neweraHPC;
-
-int main()
+namespace neweraHPC
 {
-   cfg_t cfg;
-   
-   cfg.display();
+   class plugin_manager
+   {
+   private:
+      struct request
+      {
+	 const char *host;
+      };
+      
+   public:
+   };
 }

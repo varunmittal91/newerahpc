@@ -32,7 +32,7 @@ namespace neweraHPC
    class thread_manager_t
    {
    private:
-      rbtree *active_threads;
+      rbtree_t *active_threads;
       pthread_mutex_t *mutex;
       struct sigaction act;
    public:  
@@ -45,9 +45,9 @@ namespace neweraHPC
       /* Create new thread on request. 'thread_state' to tell whether to join thread or dettach or do nothing. */
       int create_thread(const pthread_attr_t *attr, 
 			void *(*start_routine)(void*), void *arg, int thread_state);
-      void delete_thread_data(int rbtree_id);
+      void delete_thread_data(int rbtree_t_id);
       /* Needs working not yet functional */
-      int cancel_thread(int rbtree_id);
+      int cancel_thread(int rbtree_t_id);
       int kill_thread(int rbtrr_id);
    };
 };

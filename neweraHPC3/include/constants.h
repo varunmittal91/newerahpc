@@ -26,6 +26,7 @@ typedef int    nhpc_status_t;
 typedef size_t nhpc_size_t;
 
 #define  NHPC_SUCCESS 1
+#define  NHPC_FAIL 0
 
 #define NHPC_ON  1
 #define NHPC_OFF 0

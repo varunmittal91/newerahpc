@@ -31,7 +31,7 @@ namespace neweraHPC
       external_thread_manager = false;
       thread_manager = new thread_manager_t;
       connection_stat = false;
-      client_connections = new rbtree;
+      client_connections = new rbtree_t;
       mutex = new pthread_mutex_t;
       server_sock = NULL;
    }
@@ -186,6 +186,7 @@ namespace neweraHPC
 
       struct sockaddr_storage *client_addr;
       socklen_t sin_size;
+      rbtree_t *headers = NULL;
       
       //////Select data types
       int max_sd, desc_ready;
@@ -254,40 +255,36 @@ namespace neweraHPC
 		     {
 			if (errno != EWOULDBLOCK)
 			{
-			   perror("  recv() failed");
 			   close_conn = true;
 			}
-			printf("breaking off at recv @ %d ewouldblock-%d eagain-%d\n", errno, EWOULDBLOCK, EAGAIN);
-			perror(" recv() failed");
 			break;
 		     }
-      
-		     if (rv == 0)
+		     else if (rv == 0)
 		     {
 			printf("  Connection closed\n");
 			close_conn = true;
 			printf("breaking off at 0\n");
 			break;
 		     }
-		     
-		     int len = rv;
-		     printf("  %d bytes received\n", len);
-		     cout<<buffer<<endl;
-		     
-		     rv = send(i, buffer, len, 0);
-		     if(rv < 0)
+		     else 
 		     {
-			perror("  send() failed");
-			close_conn = true;
-			printf("breaking off at send\n");
-			break;
+			cout<<"  length "<<rv<<endl;
+			if(nhpc_analyze_stream(&headers, buffer, &rv) == NHPC_SUCCESS)
+			{
+			   close_conn = true;
+			   break;
+			}
 		     }
+		     
+		     int len = rv;		     
+		     printf("  %d bytes received\n", len);
 		     
 		  }while(true);
 		  
 		  if (close_conn)
 		  {
 		     printf("closing connection\n");
+		     send(i, (const char *)"NeweraHPC\n", 11, 0);
 		     close(i);
 		     FD_CLR(i, &master_set);
 		     if (i == max_sd)
@@ -299,32 +296,44 @@ namespace neweraHPC
 	       }
 	    }
 	 }
-      }while(1);
-      
-      while(1)
-      {
-	 client_addr = new sockaddr_storage;
-	 sin_size = sizeof(*client_addr);
-
-	 bzero(&client_addr, sizeof(sockaddr_storage));
-	 rv = accept(server_sock->sockfd, (struct sockaddr *)&client_addr, &sin_size);
-	 
-	 nhpc_socket_t *client_sock = new nhpc_socket_t;
-	 client_sock->sockfd = rv;
-	 (*thread_manager).create_thread(NULL, (void * (*)(void *))network_t::connection_handler, (void *)client_sock, 0);
-      }
+      }while(1);      
    }
    
-   void *network_t::connection_handler(nhpc_socket_t *sock)
+   nhpc_status_t nhpc_analyze_stream(rbtree_t **headers, char *data, int *len)
    {
-      char buffer[1000];
-      size_t size = 1000;
-      socket_recv(sock, buffer, &size);
-      cout<<buffer<<endl;
+      int line_len = 0;
+      int old_pos = 0;
+
+      for(int cntr = 0; cntr < *len; cntr++)
+      {
+	 if(data[cntr] == '\r')
+	 {
+	    line_len = cntr - old_pos;
+	    if(line_len != 0)
+	    {
+	       char *line = new char [line_len + 1];
+	       memcpy(line, (data + old_pos), (line_len));
+	       line[line_len] = '\0';
+
+	       header_t *header = new header_t;
+	       header->string = line;
+	       header->len    = line_len;
+	       
+	       if(*headers == NULL)
+		  *headers = new rbtree_t;
+	    }
+	    else 
+	       return NHPC_SUCCESS;
+	    
+	    line_len = 0;
+	 }
+	 else if(data[cntr] == '\n')
+	 {
+	    old_pos = cntr + 1;
+	 }
+      }
       
-      socket_send(sock, buffer, &size);
-      
-      close(sock->sockfd);
-      delete sock;
+      return NHPC_FAIL;
    }
+
 };

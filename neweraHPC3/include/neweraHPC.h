@@ -36,7 +36,7 @@ namespace neweraHPC
    {
    private:
       network_t *main_network;
-      rbtree *worker_threads;
+      rbtree_t *worker_threads;
    public:
       neweraHPC_main();
       ~neweraHPC_main();

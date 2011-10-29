@@ -33,10 +33,10 @@ void func_sleep(void)
 int main()
 {
    
-   cout<<"This program is mainly build built for testing the efficiency of rbtree module used in the neweraHPC library"<<endl;
+   cout<<"This program is mainly build built for testing the efficiency of rbtree_t module used in the neweraHPC library"<<endl;
    cout<<"Please use some tool to test for memory leaks\n"<<"Attach the binary to some tool and then press any key"<<endl;
    
-   rbtree *test_tree = new rbtree;
+   rbtree_t *test_tree = new rbtree_t;
    
    int *a,*b,*c,*d;
    a = new int[122];

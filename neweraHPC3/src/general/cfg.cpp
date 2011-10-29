@@ -41,11 +41,11 @@ namespace neweraHPC
    int cfg_t::add_rule(const char *word, const char **words, int count)
    {
       if(symbols == NULL)
-	 symbols = new rbtree;
+	 symbols = new rbtree_t;
       
       drvtn_rule_t *tmp_rule = new drvtn_rule_t;
       tmp_rule->word  = word;
-      tmp_rule->words = new rbtree;
+      tmp_rule->words = new rbtree_t;
       tmp_rule->wrd_count = count;
       
       for(int cntr = 0; cntr < count; cntr++)

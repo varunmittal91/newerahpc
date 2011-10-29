@@ -462,7 +462,7 @@ void rb_replace_node(struct rb_node *victim, struct rb_node *new_node, struct rb
 namespace neweraHPC
 {
    
-   rbtree::rbtree()
+   rbtree_t::rbtree_t()
    {
       root = new rb_root;
       struct rb_root node = RB_ROOT;
@@ -470,18 +470,18 @@ namespace neweraHPC
       last_assigned_key = 0;
    }
    
-   rbtree::~rbtree()
+   rbtree_t::~rbtree_t()
    {
       struct rb_node *node;
       for (node = rb_first(root); node; node = rb_next(node))
       {
-	 rbtree::node *data = rb_entry(node, rbtree::node, node_next);
+	 rbtree_t::node *data = rb_entry(node, rbtree_t::node, node_next);
 	 rb_erase(&data->node_next,root);
 	 delete data;
       }
    }
    
-   void *rbtree::search(int key)
+   void *rbtree_t::search(int key)
    {
       struct rb_node *node = root->rb_node;
       
@@ -489,7 +489,7 @@ namespace neweraHPC
       {
 	 int result = 0;
 	 
-	 rbtree::node *data = container_of(node, rbtree::node, node_next);
+	 rbtree_t::node *data = container_of(node, rbtree_t::node, node_next);
 	 
 	 if(key<data->node_key)
 	 {
@@ -518,7 +518,7 @@ namespace neweraHPC
       return NULL;
    }
    
-   rbtree::node *rbtree::search_node(int key)
+   rbtree_t::node *rbtree_t::search_node(int key)
    {
       struct rb_node *node = root->rb_node;
       
@@ -526,7 +526,7 @@ namespace neweraHPC
       {
 	 int result = 0;
 	 
-	 rbtree::node *data = container_of(node, rbtree::node, node_next);
+	 rbtree_t::node *data = container_of(node, rbtree_t::node, node_next);
 	 
 	 if(key<data->node_key)
 	 {
@@ -556,10 +556,10 @@ namespace neweraHPC
       return NULL;
    }
    
-   int rbtree::insert(void *in_data)
+   int rbtree_t::insert(void *in_data)
    {
-      /* Create a new rbtree::node type and initialize values */
-      rbtree::node *data = new rbtree::node;
+      /* Create a new rbtree_t::node type and initialize values */
+      rbtree_t::node *data = new rbtree_t::node;
       data->node_data = in_data;
       last_assigned_key++;
       data->node_key = last_assigned_key;
@@ -602,9 +602,9 @@ namespace neweraHPC
       return data->node_key;
    }
    
-   int rbtree::erase(int key)
+   int rbtree_t::erase(int key)
    {
-      rbtree::node *data = rbtree::search_node(key);
+      rbtree_t::node *data = rbtree_t::search_node(key);
       if(data){
 	 rb_erase(&data->node_next,root);
 	 delete data;
@@ -614,9 +614,9 @@ namespace neweraHPC
 	 return false;
    }
    
-   int rbtree::update(int key, void *new_in_data)
+   int rbtree_t::update(int key, void *new_in_data)
    {
-      rbtree::node *data = search_node(key);
+      rbtree_t::node *data = search_node(key);
       if(data)
       {
 	 data->node_data = new_in_data;

@@ -38,10 +38,10 @@ namespace neweraHPC
       {
 	 int        count;
 	 const char *word;
-	 rbtree	    *words;
+	 rbtree_t	    *words;
 	 int        wrd_count;
       };
-      rbtree *symbols;
+      rbtree_t *symbols;
       int     rule_cnt;
       
    public:

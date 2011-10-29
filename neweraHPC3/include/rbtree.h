@@ -110,10 +110,12 @@ static inline void rb_link_node(struct rb_node * node, struct rb_node * parent,	
 
 namespace neweraHPC
 {
-   class rbtree{
+   class rbtree_t
+   {
    private:
       rb_root *root;
-      struct node{
+      struct node
+      {
 	 struct rb_node node_next;
 	 void *node_data;
 	 int  node_key;
@@ -122,8 +124,8 @@ namespace neweraHPC
       node *search_node(int);
       
    public:
-      rbtree();
-      ~rbtree();
+      rbtree_t();
+      ~rbtree_t();
       void *search(int);
       int insert(void *);
       int erase(int);

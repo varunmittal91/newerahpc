@@ -61,11 +61,10 @@ namespace neweraHPC
       thread_manager_t *thread_manager;
       bool external_thread_manager;
       struct nhpc_thrad_details_t *server_thread_details;
-      rbtree *client_connections;
+      rbtree_t *client_connections;
       pthread_mutex_t *mutex;
       nhpc_socket_t *server_sock;
       static void *accept_connection(nhpc_thread_details_t *main_thread);
-      static void *connection_handler(nhpc_socket_t *sock);
       
    public:
       network_t();
@@ -80,10 +79,14 @@ namespace neweraHPC
 				  int family, int type, int protocol);
    };
    
-   nhpc_status_t nhpc_recv(nhpc_socket_t *sock, char *buffer, size_t *len);
-   nhpc_status_t nhpc_analyze_stream(char *buffer, size_t *len);
+   struct header_t
+   {
+      char *string;
+      size_t len;
+   };
    
-   int test_socket_factory();
+   nhpc_status_t nhpc_recv(nhpc_socket_t *sock, char *buffer, size_t *len);
+   nhpc_status_t nhpc_analyze_stream(rbtree_t **headers, char *buffer, int *len);
 };
 
 #endif

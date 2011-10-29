@@ -26,7 +26,7 @@ namespace neweraHPC
 {
    thread_manager_t::thread_manager_t()
    {          
-      active_threads = new rbtree;
+      active_threads = new rbtree_t;
       mutex = new pthread_mutex_t;
       pthread_mutex_init(mutex,NULL);
    }
@@ -61,7 +61,7 @@ namespace neweraHPC
       }
       
       lock();
-      int rbtree_id = (*active_threads).insert((void *)thread_new);
+      int rbtree_t_id = (*active_threads).insert((void *)thread_new);
       unlock();
      
       if(thread_state == NHPC_THREAD_JOIN)
@@ -75,24 +75,24 @@ namespace neweraHPC
 	 if(status_new!=0)perror("Error at detaching thread");
       }
       
-      return rbtree_id;
+      return rbtree_t_id;
    }
    
-   void thread_manager_t::delete_thread_data(int rbtree_id)
+   void thread_manager_t::delete_thread_data(int rbtree_t_id)
    {
       lock();
-      pthread_t *thread = (pthread_t *)(*active_threads).search(rbtree_id);
+      pthread_t *thread = (pthread_t *)(*active_threads).search(rbtree_t_id);
       if(thread){
-	 (*active_threads).erase(rbtree_id);
+	 (*active_threads).erase(rbtree_t_id);
 	 delete thread;
       }
       unlock();
    }
    
-   int thread_manager_t::cancel_thread(int rbtree_id)
+   int thread_manager_t::cancel_thread(int rbtree_t_id)
    {
       lock();
-      pthread_t *thread = (pthread_t *)(*active_threads).search(rbtree_id);
+      pthread_t *thread = (pthread_t *)(*active_threads).search(rbtree_t_id);
       unlock();
       if(thread){
 	 int status = pthread_cancel(*thread);

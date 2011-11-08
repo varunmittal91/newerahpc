@@ -19,6 +19,9 @@
 
 #include <iostream>
 #include <stdio.h>
+#ifdef linux
+#include <stdlib.h>
+#endif
 
 #include <include/rbtree.h>
 

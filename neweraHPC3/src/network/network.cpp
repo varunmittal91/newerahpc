@@ -192,7 +192,7 @@ namespace neweraHPC
       int max_sd, desc_ready;
       int new_sd;
       bool end_server = false, close_conn;
-      struct fd_set master_set, working_set;
+      fd_set master_set, working_set;
       FD_ZERO(&master_set);
       max_sd = server_sock->sockfd;
       FD_SET(server_sock->sockfd, &master_set);

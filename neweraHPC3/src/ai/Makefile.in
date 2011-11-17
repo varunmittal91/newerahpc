@@ -46,7 +46,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libai_la_LIBADD =
-am__objects_1 = dictionary.lo
+am__objects_1 = dictionary.lo neuron.lo
 am_libai_la_OBJECTS = $(am__objects_1)
 libai_la_OBJECTS = $(am_libai_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -202,7 +202,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
-SOURCES = dictionary.cpp
+SOURCES = dictionary.cpp neuron.cpp
 noinst_LTLIBRARIES = libai.la 
 libai_la_SOURCES = $(SOURCES)
 all: all-am
@@ -258,6 +258,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dictionary.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/neuron.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

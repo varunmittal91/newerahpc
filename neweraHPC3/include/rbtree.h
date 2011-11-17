@@ -122,14 +122,17 @@ namespace neweraHPC
       };
       int last_assigned_key;
       node *search_node(int);
+      int count;
       
    public:
       rbtree_t();
       ~rbtree_t();
       void *search(int);
       int insert(void *);
+      int insert(void *, int);
       int erase(int);
       int update(int, void *);
+      int ret_count();
    };
 };
 

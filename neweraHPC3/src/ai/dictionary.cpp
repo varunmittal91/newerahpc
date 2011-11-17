@@ -19,5 +19,8 @@
 
 namespace neweraHPC
 {
-
+   void test()
+   {
+      
+   }
 }

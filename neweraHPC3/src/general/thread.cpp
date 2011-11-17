@@ -17,8 +17,9 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <include/thread.h>
 #include <iostream>
+
+#include <include/thread.h>
 
 using namespace std;
 

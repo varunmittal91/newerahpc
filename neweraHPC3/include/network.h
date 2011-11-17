@@ -44,7 +44,8 @@ namespace neweraHPC
    struct nhpc_thread_details_t
    {
       thread_manager_t *thread_manager;
-      nhpc_socket_t *sock;
+      nhpc_socket_t    *sock;
+      rbtree_t         *client_socks;
    };
             
    void *connection_handler(void *data);
@@ -86,7 +87,8 @@ namespace neweraHPC
    };
    
    nhpc_status_t nhpc_recv(nhpc_socket_t *sock, char *buffer, size_t *len);
-   nhpc_status_t nhpc_analyze_stream(rbtree_t **headers, char *buffer, int *len);
+   nhpc_status_t nhpc_analyze_stream(rbtree_t *headers, char *buffer, int *len);
+   void nhpc_display_headers(rbtree_t *headers);
 };
 
 #endif

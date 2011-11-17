@@ -20,8 +20,9 @@
 #ifndef _THREAD_H_
 #define _THREAD_H_
 
-#include "rbtree.h"
 #include <signal.h>
+
+#include "rbtree.h"
 
 #define NHPC_THREAD_DEFAULT 0
 #define NHPC_THREAD_JOIN    1

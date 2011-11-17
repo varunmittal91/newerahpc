@@ -22,10 +22,237 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <include/rbtree.h>
 #include <iostream>
 
+#include <include/rbtree.h>
+
 using namespace std;
+
+namespace neweraHPC
+{
+   rbtree_t::rbtree_t()
+   {
+      root = new rb_root;
+      root->rb_node = NULL;
+      
+      last_assigned_key = 0;
+      count = 0;
+   }
+   
+   rbtree_t::~rbtree_t()
+   {
+      struct rb_node *node;
+      for (node = rb_first(root); node; node = rb_next(node))
+      {
+	 rbtree_t::node *data = rb_entry(node, rbtree_t::node, node_next);
+	 rb_erase(&data->node_next,root);
+	 delete data;
+      }
+   }
+   
+   void *rbtree_t::search(int key)
+   {
+      struct rb_node *node = root->rb_node;
+      
+      while (node) 
+      {
+	 int result = 0;
+	 
+	 rbtree_t::node *data = container_of(node, rbtree_t::node, node_next);
+	 if(data == NULL)
+	    return NULL;
+	 
+	 if(key<data->node_key)
+	 {
+	    result = 1;
+	 }
+	 else if(key>data->node_key){
+	    result = -1;
+	 }
+	 if (result < 0)
+	 {
+#ifdef debug
+	    cout<<"curr:"<<key<<" searching at left node"<<endl;
+#endif
+	    node = node->rb_left;
+	 }
+	 else if (result > 0)
+	 {
+#ifdef debug
+	    cout<<"curr:"<<key<<" searching at right node"<<endl;
+#endif
+	    node = node->rb_right;
+	 }
+	 else
+	    return data->node_data;
+      }
+      return NULL;
+   }
+   
+   rbtree_t::node *rbtree_t::search_node(int key)
+   {
+      struct rb_node *node = root->rb_node;
+      
+      while (node) 
+      {
+	 int result = 0;
+	 
+	 rbtree_t::node *data = container_of(node, rbtree_t::node, node_next);
+	 
+	 if(key<data->node_key)
+	 {
+	    result = 1;
+	 }
+	 else if(key>data->node_key)
+	 {
+	    result = -1;
+	 }
+	 if (result < 0)
+	 {
+#ifdef debug
+	    cout<<"curr:"<<key<<" searching at left node"<<endl;
+#endif
+	    node = node->rb_left;
+	 }
+	 else if (result > 0)
+	 {
+#ifdef debug
+	    cout<<"curr:"<<key<<" searching at right node"<<endl;
+#endif
+	    node = node->rb_right;
+	 }
+	 else
+	    return data;
+      }
+      return NULL;
+   }
+   
+   int rbtree_t::insert(void *in_data)
+   {
+      /* Create a new rbtree_t::node type and initialize values */
+      rbtree_t::node *data = new rbtree_t::node;
+      data->node_data = in_data;
+      last_assigned_key++;
+      data->node_key = last_assigned_key;
+      
+      struct rb_node **new_node = &(root->rb_node), *parent = NULL;
+      /* Figure out where to put new node */
+      while (*new_node) 
+      {
+	 node *this_node = container_of(*new_node, rbtree_t::node, node_next);
+	 
+	 int result = 0;
+	 if(data->node_key<this_node->node_key)
+	    result = 1;
+	 else if(data->node_key>this_node->node_key)
+	    result = -1;
+	 
+	 parent = *new_node;
+	 if (result < 0)
+	 {
+#ifdef debug
+	    cout<<"curr:"<<this_node->key<<" inserting at left node"<<endl;
+#endif
+	    new_node = &((*new_node)->rb_left);
+	 }
+	 else if (result > 0)
+	 {
+#ifdef debug
+	    cout<<"curr:"<<this_node->key<<" inserting at right node"<<endl;
+#endif
+	    new_node = &((*new_node)->rb_right);
+	 }
+	 else
+	    return false;
+      }
+      
+      /* Add new node and rebalance tree. */
+      rb_link_node(&data->node_next, parent, new_node);
+      rb_insert_color(&data->node_next, root);
+      count++;
+      
+      return data->node_key;
+   }
+   
+   int rbtree_t::insert(void *in_data, int key)
+   {      
+      /* Create a new rbtree_t::node type and initialize values */
+      rbtree_t::node *data = new rbtree_t::node;
+      data->node_data = in_data;
+      last_assigned_key++;
+      data->node_key = key;
+      
+      struct rb_node **new_node = &(root->rb_node), *parent = NULL;
+      /* Figure out where to put new node */
+      while (*new_node) 
+      {
+	 node *this_node = container_of(*new_node, node, node_next);
+	 if(this_node == NULL)
+	    return NULL;
+	 
+	 int result = 0;
+	 if(data->node_key<this_node->node_key)
+	    result = 1;
+	 else if(data->node_key>this_node->node_key)
+	    result = -1;
+	 
+	 parent = *new_node;
+	 if (result < 0)
+	 {
+#ifdef debug
+	    cout<<"curr:"<<this_node->key<<" inserting at left node"<<endl;
+#endif
+	    new_node = &((*new_node)->rb_left);
+	 }
+	 else if (result > 0)
+	 {
+#ifdef debug
+	    cout<<"curr:"<<this_node->key<<" inserting at right node"<<endl;
+#endif
+	    new_node = &((*new_node)->rb_right);
+	 }
+	 else
+	    return false;
+      }
+      
+      /* Add new node and rebalance tree. */
+      rb_link_node(&data->node_next, parent, new_node);
+      rb_insert_color(&data->node_next, root);
+      count++;
+      
+      return data->node_key;
+   }   
+   
+   int rbtree_t::erase(int key)
+   {
+      rbtree_t::node *data = rbtree_t::search_node(key);
+      if(data){
+	 rb_erase(&data->node_next,root);
+	 delete data;
+	 count--;
+	 return true;
+      }
+      else
+	 return false;
+   }
+   
+   int rbtree_t::update(int key, void *new_in_data)
+   {
+      rbtree_t::node *data = search_node(key);
+      if(data)
+      {
+	 data->node_data = new_in_data;
+	 return true;
+      }
+      else
+	 return false;
+   }
+   
+   int rbtree_t::ret_count()
+   {
+      return count;
+   }
+};
 
 static void __rb_rotate_left(struct rb_node *node, struct rb_root *root)
 {
@@ -456,173 +683,3 @@ void rb_replace_node(struct rb_node *victim, struct rb_node *new_node, struct rb
    /* Copy the pointers/colour from the victim to the replacement */
    *new_node = *victim;
 }
-
-/////////////////////////////////////////////////////////////////////////////
-
-namespace neweraHPC
-{
-   
-   rbtree_t::rbtree_t()
-   {
-      root = new rb_root;
-      struct rb_root node = RB_ROOT;
-      
-      last_assigned_key = 0;
-   }
-   
-   rbtree_t::~rbtree_t()
-   {
-      struct rb_node *node;
-      for (node = rb_first(root); node; node = rb_next(node))
-      {
-	 rbtree_t::node *data = rb_entry(node, rbtree_t::node, node_next);
-	 rb_erase(&data->node_next,root);
-	 delete data;
-      }
-   }
-   
-   void *rbtree_t::search(int key)
-   {
-      struct rb_node *node = root->rb_node;
-      
-      while (node) 
-      {
-	 int result = 0;
-	 
-	 rbtree_t::node *data = container_of(node, rbtree_t::node, node_next);
-	 
-	 if(key<data->node_key)
-	 {
-	    result = 1;
-	 }
-	 else if(key>data->node_key){
-	    result = -1;
-	 }
-	 if (result < 0)
-	 {
-#ifdef debug
-	    cout<<"curr:"<<key<<" searching at left node"<<endl;
-#endif
-	    node = node->rb_left;
-	 }
-	 else if (result > 0)
-	 {
-#ifdef debug
-	    cout<<"curr:"<<key<<" searching at right node"<<endl;
-#endif
-	    node = node->rb_right;
-	 }
-	 else
-	    return data->node_data;
-      }
-      return NULL;
-   }
-   
-   rbtree_t::node *rbtree_t::search_node(int key)
-   {
-      struct rb_node *node = root->rb_node;
-      
-      while (node) 
-      {
-	 int result = 0;
-	 
-	 rbtree_t::node *data = container_of(node, rbtree_t::node, node_next);
-	 
-	 if(key<data->node_key)
-	 {
-	    result = 1;
-	 }
-	 else if(key>data->node_key)
-	 {
-	    result = -1;
-	 }
-	 if (result < 0)
-	 {
-#ifdef debug
-	    cout<<"curr:"<<key<<" searching at left node"<<endl;
-#endif
-	    node = node->rb_left;
-	 }
-	 else if (result > 0)
-	 {
-#ifdef debug
-	    cout<<"curr:"<<key<<" searching at right node"<<endl;
-#endif
-	    node = node->rb_right;
-	 }
-	 else
-	    return data;
-      }
-      return NULL;
-   }
-   
-   int rbtree_t::insert(void *in_data)
-   {
-      /* Create a new rbtree_t::node type and initialize values */
-      rbtree_t::node *data = new rbtree_t::node;
-      data->node_data = in_data;
-      last_assigned_key++;
-      data->node_key = last_assigned_key;
-      
-      struct rb_node **new_node = &(root->rb_node), *parent = NULL;
-      /* Figure out where to put new node */
-      while (*new_node) 
-      {
-	 node *this_node = container_of(*new_node, node, node_next);
-	 
-	 int result = 0;
-	 if(data->node_key<this_node->node_key)
-	    result = 1;
-	 else if(data->node_key>this_node->node_key)
-	    result = -1;
-	 
-	 parent = *new_node;
-	 if (result < 0)
-	 {
-#ifdef debug
-	    cout<<"curr:"<<this_node->key<<" inserting at left node"<<endl;
-#endif
-	    new_node = &((*new_node)->rb_left);
-	 }
-	 else if (result > 0)
-	 {
-#ifdef debug
-	    cout<<"curr:"<<this_node->key<<" inserting at right node"<<endl;
-#endif
-	    new_node = &((*new_node)->rb_right);
-	 }
-	 else
-	    return false;
-      }
-      
-      /* Add new node and rebalance tree. */
-      rb_link_node(&data->node_next, parent, new_node);
-      rb_insert_color(&data->node_next, root);
-      
-      return data->node_key;
-   }
-   
-   int rbtree_t::erase(int key)
-   {
-      rbtree_t::node *data = rbtree_t::search_node(key);
-      if(data){
-	 rb_erase(&data->node_next,root);
-	 delete data;
-	 return true;
-      }
-      else
-	 return false;
-   }
-   
-   int rbtree_t::update(int key, void *new_in_data)
-   {
-      rbtree_t::node *data = search_node(key);
-      if(data)
-      {
-	 data->node_data = new_in_data;
-	 return true;
-      }
-      else
-	 return false;
-   }
-};

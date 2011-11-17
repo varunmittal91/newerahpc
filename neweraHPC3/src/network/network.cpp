@@ -162,148 +162,128 @@ namespace neweraHPC
       }
       
       nhpc_thread_details_t *accept_thread = new nhpc_thread_details_t;
-      accept_thread->sock = server_sock;
+      accept_thread->sock           = server_sock;
       accept_thread->thread_manager = thread_manager;
+      accept_thread->client_socks   = new rbtree_t;
       (*thread_manager).create_thread(NULL, (void * (*)(void *))network_t::accept_connection, (void *)accept_thread, NHPC_THREAD_JOIN);
 
       return NHPC_SUCCESS;      
    }
    
-   static void test_signal_hndlr(int signal)
-   {
-      printf("Received a signal from the accept thread\n");
-   }
-   
    void *network_t::accept_connection(nhpc_thread_details_t *main_thread)
    {
-      signal(SIGPIPE, test_signal_hndlr);
-      
       int rv;
       int nrv;
+      pthread_mutex_t mutex;
+      pthread_mutex_init(&mutex, NULL);
       
       thread_manager_t *thread_manager = main_thread->thread_manager;
       nhpc_socket_t *server_sock = main_thread->sock;
-
-      struct sockaddr_storage *client_addr;
-      socklen_t sin_size;
-      rbtree_t *headers = NULL;
+      main_thread->client_socks = new rbtree_t;
+      rbtree_t *client_socks = main_thread->client_socks;
       
-      //////Select data types
-      int max_sd, desc_ready;
-      int new_sd;
-      bool end_server = false, close_conn;
-      fd_set master_set, working_set;
-      FD_ZERO(&master_set);
-      max_sd = server_sock->sockfd;
-      FD_SET(server_sock->sockfd, &master_set);
+      struct pollfd fds[200];
+      int nfds         = 1;
+      int current_size = 0;
+      int timeout      = (3 * 60 * 1000);
+
+      int *server_sockfd = &(main_thread->sock->sockfd);
+      
+      fds[0].fd     = *server_sockfd;
+      fds[0].events = POLLIN;
+      
+      bool end_server = false;
       
       do 
       {
-	 memcpy(&working_set, &master_set, sizeof(master_set));	 
+	 cout<<"Waiting on poll()..."<<endl;
+	 rv = poll(fds, nfds, timeout);
 	 
-	 printf("Waiting on select()...\n");
-	 
-	 rv = select(max_sd + 1, &working_set, NULL, NULL, NULL);
 	 if(rv < 0)
 	 {
-	    perror("Select failed \n");
+	    cout<<"\tpoll() failed"<<endl;
 	    break;
 	 }
 	 
-	 desc_ready = rv;
-	 
-	 for (int i=0; i <= max_sd && desc_ready > 0; ++i)
+	 if(rv == 0)
 	 {
-	    if (FD_ISSET(i, &working_set))
+	    cout<<"\tpoll() timed out."<<endl;
+	    break;
+	 }
+	 
+	 current_size = nfds;
+	 for(int cntr = 0; cntr < current_size; cntr++)
+	 {
+	    if(fds[cntr].revents == 0)
+	       continue;
+	    
+	    if(fds[cntr].revents != POLLIN)
+	       break;
+	    
+	    if(fds[cntr].fd == *server_sockfd)
 	    {
-	       desc_ready -= 1;
+	       cout<<"\tListening socket is readable"<<endl;
+	       int new_sd;
 	       
-	       if (i == server_sock->sockfd)
+	       do
 	       {
-		  printf("  Listening socket is readable\n");
-		  do
+		  new_sd = accept(*server_sockfd, NULL, NULL);
+		  if(new_sd < 0)
 		  {
-		     new_sd = accept(server_sock->sockfd, NULL, NULL);
-		     if (new_sd < 0)
+		     if(errno != EWOULDBLOCK)
 		     {
-			if (errno != EWOULDBLOCK)
-			{
-			   perror("  accept() failed");
-			   end_server = true;
-			}
+			end_server = true;
 			break;
 		     }
-
-		     printf("  New incoming connection - %d\n", new_sd);
-		     FD_SET(new_sd, &master_set);
-		     if (new_sd > max_sd)
-			max_sd = new_sd;
-		     
-		  } while (new_sd != -1);
-	       }
-	       else
-	       {
-		  printf("  Descriptor %d is readable\n", i);
-		  close_conn = false;
-		  do
-		  {
-		     char buffer[1000];
-		     bzero(&buffer, 1000);
-		     
-		     rv = recv(i, buffer, sizeof(buffer), 0);
-		     if (rv < 0)
-		     {
-			if (errno != EWOULDBLOCK)
-			{
-			   close_conn = true;
-			}
-			break;
-		     }
-		     else if (rv == 0)
-		     {
-			printf("  Connection closed\n");
-			close_conn = true;
-			printf("breaking off at 0\n");
-			break;
-		     }
-		     else 
-		     {
-			cout<<"  length "<<rv<<endl;
-			if(nhpc_analyze_stream(&headers, buffer, &rv) == NHPC_SUCCESS)
-			{
-			   close_conn = true;
-			   break;
-			}
-		     }
-		     
-		     int len = rv;		     
-		     printf("  %d bytes received\n", len);
-		     
-		  }while(true);
-		  
-		  if (close_conn)
-		  {
-		     printf("closing connection\n");
-		     send(i, (const char *)"NeweraHPC\n", 11, 0);
-		     close(i);
-		     FD_CLR(i, &master_set);
-		     if (i == max_sd)
-		     {
-			while (FD_ISSET(max_sd, &master_set) == false)
-			   max_sd -= 1;
-		     }
+		     break;
 		  }
+		  
+		  cout<<"\tNew incoming connection - "<<new_sd<<endl;
+		  fds[nfds].fd     = new_sd;
+		  fds[nfds].events = POLLIN;
+		  nfds++;
+		  nhpc_socket_t *client_sock = new nhpc_socket_t;
+		  client_sock->sockfd = new_sd;
+		  client_sock->headers = NULL;
+		  client_socks->insert(client_sock, new_sd);
+	       }while(new_sd != -1);
+	    }
+	    else 
+	    {
+	       cout<<"\tDescriptor is readable - "<<fds[cntr].fd<<endl;
+	       bool close_conn = false;
+	       
+	       nhpc_socket_t *client_sock = (nhpc_socket_t *)client_socks->search(fds[cntr].fd);
+	       //nhpc_socket_t *client_sock = NULL;
+	       
+	       char buffer[1000];
+	       memset(buffer, 0,sizeof(buffer));
+	       
+	       rv = recv(fds[cntr].fd, buffer, sizeof(buffer), 0);
+	       if(rv < 0)
+	       {
+		  break;
 	       }
+
+	       if(client_sock != NULL)
+	       {
+		  if(client_sock->headers == NULL)
+		     client_sock->headers = new rbtree_t;
+		  nhpc_analyze_stream(client_sock->headers, buffer, &rv);
+		  nhpc_display_headers(client_sock->headers);
+	       }	       
 	    }
 	 }
-      }while(1);      
+	 
+      }while(true);
+
    }
    
-   nhpc_status_t nhpc_analyze_stream(rbtree_t **headers, char *data, int *len)
+   nhpc_status_t nhpc_analyze_stream(rbtree_t *headers, char *data, int *len)
    {
       int line_len = 0;
       int old_pos = 0;
-
+     
       for(int cntr = 0; cntr < *len; cntr++)
       {
 	 if(data[cntr] == '\r')
@@ -318,9 +298,7 @@ namespace neweraHPC
 	       header_t *header = new header_t;
 	       header->string = line;
 	       header->len    = line_len;
-	       
-	       if(*headers == NULL)
-		  *headers = new rbtree_t;
+	       headers->insert(header);
 	    }
 	    else 
 	       return NHPC_SUCCESS;
@@ -332,8 +310,21 @@ namespace neweraHPC
 	    old_pos = cntr + 1;
 	 }
       }
-      
       return NHPC_FAIL;
+   }
+   
+   void nhpc_display_headers(rbtree_t *headers)
+   {
+      if(headers == NULL)return;
+      
+      header_t *tmp_header;
+      
+      cout<<"Headers found in the message:"<<(*headers).ret_count()<<endl;
+      for(int cntr = 1; cntr <= (*headers).ret_count(); cntr++)
+      {
+	 tmp_header = (header_t *)(*headers).search(cntr);
+	 cout<<"\t"<<tmp_header->string<<endl;
+      }
    }
 
 };

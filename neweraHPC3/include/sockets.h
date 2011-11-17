@@ -40,6 +40,7 @@ namespace neweraHPC
       const char *port;
       addrinfo *hints;
       addrinfo *hints_res;
+      rbtree_t *headers;
    };
    
    nhpc_status_t socket_create(nhpc_socket_t **sock);

@@ -239,7 +239,6 @@ namespace neweraHPC
 		     if(errno != EWOULDBLOCK)
 		     {
 			end_server = true;
-			exit(1);
 			break;
 		     }
 		     break;
@@ -270,7 +269,6 @@ namespace neweraHPC
 	       if(rv < 0)
 	       {
 		  break;
-		  exit(1);
 	       }
 	       
 	       send(fds[cntr].fd, "hi", 2, 0);

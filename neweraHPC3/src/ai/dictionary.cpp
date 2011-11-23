@@ -19,7 +19,7 @@
 
 namespace neweraHPC
 {
-   void test()
+   void test_dict()
    {
       
    }

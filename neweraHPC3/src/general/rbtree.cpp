@@ -188,7 +188,7 @@ namespace neweraHPC
       {
 	 node *this_node = container_of(*new_node, node, node_next);
 	 if(this_node == NULL)
-	    return NULL;
+	    return false;
 	 
 	 int result = 0;
 	 if(data->node_key<this_node->node_key)

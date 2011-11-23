@@ -218,7 +218,13 @@ namespace neweraHPC
 	       continue;
 	    
 	    if(fds[cntr].revents != POLLIN)
+	    {
+	       nhpc_socket_t *sock = (nhpc_socket_t *)client_socks->search(fds[cntr].fd);
+	       nhpc_sock_cleanup(sock);
+	       client_socks->erase(fds[cntr].fd);
+	       memset(&fds[cntr], 0, sizeof(pollfd));
 	       break;
+	    }
 	    
 	    if(fds[cntr].fd == *server_sockfd)
 	    {
@@ -233,6 +239,7 @@ namespace neweraHPC
 		     if(errno != EWOULDBLOCK)
 		     {
 			end_server = true;
+			exit(1);
 			break;
 		     }
 		     break;
@@ -263,7 +270,10 @@ namespace neweraHPC
 	       if(rv < 0)
 	       {
 		  break;
+		  exit(1);
 	       }
+	       
+	       send(fds[cntr].fd, "hi", 2, 0);
 
 	       if(client_sock != NULL)
 	       {
@@ -276,7 +286,15 @@ namespace neweraHPC
 	 }
 	 
       }while(true);
-
+   }
+   
+   nhpc_status_t nhpc_sock_cleanup(nhpc_socket_t *sock)
+   {
+      close(sock->sockfd);
+      if(sock->headers != NULL)
+	 delete sock->headers;
+      
+      delete sock;
    }
    
    nhpc_status_t nhpc_analyze_stream(rbtree_t *headers, char *data, int *len)

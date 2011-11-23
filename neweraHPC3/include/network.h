@@ -89,6 +89,7 @@ namespace neweraHPC
    nhpc_status_t nhpc_recv(nhpc_socket_t *sock, char *buffer, size_t *len);
    nhpc_status_t nhpc_analyze_stream(rbtree_t *headers, char *buffer, int *len);
    void nhpc_display_headers(rbtree_t *headers);
+   nhpc_status_t nhpc_sock_cleanup(nhpc_socket_t *sock);
 };
 
 #endif

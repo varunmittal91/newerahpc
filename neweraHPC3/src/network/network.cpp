@@ -78,8 +78,8 @@ namespace neweraHPC
    nhpc_status_t network_t::connect(nhpc_socket_t **sock, const char *host_addr, 
 				    const char *host_port, int family, int type, int protocol)
    {
-      int nrv;
-      
+      nhpc_status_t nrv;
+   
       *sock = new nhpc_socket_t;
       
       nrv = socket_getaddrinfo(sock, host_addr, host_port, family, type, protocol);
@@ -105,6 +105,7 @@ namespace neweraHPC
 	 return nrv;
       }      
 
+      (*sock)->headers = new rbtree_t;
       add_client_connection(*sock);
       return NHPC_SUCCESS;
    }
@@ -172,8 +173,8 @@ namespace neweraHPC
    
    void *network_t::accept_connection(nhpc_thread_details_t *main_thread)
    {
-      int rv;
-      int nrv;
+      nhpc_size_t rv;
+      nhpc_status_t nrv;
       pthread_mutex_t mutex;
       pthread_mutex_init(&mutex, NULL);
       
@@ -251,6 +252,7 @@ namespace neweraHPC
 		  nhpc_socket_t *client_sock = new nhpc_socket_t;
 		  client_sock->sockfd = new_sd;
 		  client_sock->headers = NULL;
+		  client_sock->have_headers = false;
 		  client_socks->insert(client_sock, new_sd);
 	       }while(new_sd != -1);
 	    }
@@ -260,7 +262,6 @@ namespace neweraHPC
 	       bool close_conn = false;
 	       
 	       nhpc_socket_t *client_sock = (nhpc_socket_t *)client_socks->search(fds[cntr].fd);
-	       //nhpc_socket_t *client_sock = NULL;
 	       
 	       char buffer[1000];
 	       memset(buffer, 0,sizeof(buffer));
@@ -271,18 +272,20 @@ namespace neweraHPC
 		  break;
 	       }
 	       
-	       send(fds[cntr].fd, "hi", 2, 0);
+	       if(rv >= 0)
+	          send(fds[cntr].fd, "hi", 2, 0);
 
-	       if(client_sock != NULL)
+	       if(client_sock != NULL && client_sock->have_headers == false)
 	       {
 		  if(client_sock->headers == NULL)
 		     client_sock->headers = new rbtree_t;
-		  nhpc_analyze_stream(client_sock->headers, buffer, &rv);
-		  nhpc_display_headers(client_sock->headers);
+		  nrv = nhpc_analyze_stream(client_sock, buffer, &rv);
+		  if(nrv == NHPC_SUCCESS)
+		     client_sock->have_headers = true;
+		  nhpc_display_headers(client_sock);
 	       }	       
 	    }
 	 }
-	 
       }while(true);
    }
    
@@ -295,10 +298,11 @@ namespace neweraHPC
       delete sock;
    }
    
-   nhpc_status_t nhpc_analyze_stream(rbtree_t *headers, char *data, int *len)
+   nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *data, nhpc_size_t *len)
    {
       int line_len = 0;
       int old_pos = 0;
+      rbtree_t *headers = sock->headers;
      
       for(int cntr = 0; cntr < *len; cntr++)
       {
@@ -317,7 +321,14 @@ namespace neweraHPC
 	       headers->insert(header);
 	    }
 	    else 
+	    {
+	       (*len) = (*len) - (cntr + 1);
+	       if(data[cntr + 1] == '\n')
+		  (*len)--;
+		  
+	       sock->have_headers = true;
 	       return NHPC_SUCCESS;
+	    }
 	    
 	    line_len = 0;
 	 }
@@ -329,8 +340,10 @@ namespace neweraHPC
       return NHPC_FAIL;
    }
    
-   void nhpc_display_headers(rbtree_t *headers)
+   void nhpc_display_headers(nhpc_socket_t *sock)
    {
+      rbtree_t *headers = sock->headers;
+      
       if(headers == NULL)return;
       
       header_t *tmp_header;

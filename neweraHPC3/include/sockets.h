@@ -41,6 +41,7 @@ namespace neweraHPC
       addrinfo *hints;
       addrinfo *hints_res;
       rbtree_t *headers;
+      bool have_headers;
    };
    
    nhpc_status_t socket_create(nhpc_socket_t **sock);

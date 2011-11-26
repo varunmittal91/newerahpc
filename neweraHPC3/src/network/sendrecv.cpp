@@ -25,7 +25,7 @@ using namespace std;
 
 namespace neweraHPC
 {
-   nhpc_status_t socket_recv(nhpc_socket_t *sock, char *buffer, size_t *length)
+   nhpc_status_t socket_recv(nhpc_socket_t *sock, char *buffer, nhpc_size_t *length)
    {
       /* Just for testing purpose */
       char **mssgs;
@@ -57,7 +57,9 @@ namespace neweraHPC
 	 else {
             do {
 	       rv = read(sock->sockfd, buffer, (*length));
-	       if(rv == -1)perror("error at read");
+
+	       if(rv == -1)
+		  perror("error at read");
             } while (rv == -1 && errno == EINTR);
 	 }	 
       }
@@ -75,14 +77,6 @@ namespace neweraHPC
       if(*length >= 0)
       {
 	 count = *length;
-	 cout<<count<<endl;
-	 for(int cntr = 0; cntr < count; cntr++)
-	 {
-	    if(buffer[cntr] == '\r')
-	       cout<<"Carriage return"<<endl;
-	    else if(buffer[cntr] == '\n')
-	       cout<<"New line feed"<<endl;
-	 }	 
       }
       
       if (rv == 0) {
@@ -93,7 +87,7 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
-   nhpc_status_t socket_send(nhpc_socket_t *sock, char *buffer, size_t *length)
+   nhpc_status_t socket_send(nhpc_socket_t *sock, char *buffer, nhpc_size_t *length)
    {
       int rv;
       int nrv;

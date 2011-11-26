@@ -254,6 +254,9 @@ namespace neweraHPC
    nhpc_status_t socket_delete(nhpc_socket_t *sock)
    {
       freeaddrinfo(sock->hints);
+
+      if(sock->headers != NULL)
+	 delete sock->headers;
       delete sock;
       
       return NHPC_SUCCESS;

@@ -17,31 +17,7 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NEWERAHPC_H_
-#define _NEWERAHPC_H_
-
-#include "rbtree.h"
-#include "thread.h"
-#include "network.h"
-#include "strings.h"
-#include "general.h"
-
 namespace neweraHPC
 {
-   struct worker_threads
-   {
-      int connection_id;
-   };
-   
-   class neweraHPC_main
-   {
-   private:
-      network_t *main_network;
-      rbtree_t *worker_threads;
-   public:
-      neweraHPC_main();
-      ~neweraHPC_main();
-   };  
+   void nhpc_perror(nhpc_status_t status, const char *message);
 };
-
-#endif

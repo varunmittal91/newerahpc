@@ -48,10 +48,6 @@ namespace neweraHPC
       rbtree_t         *client_socks;
    };
             
-   void *connection_handler(void *data);
-   
-   void *connection_thread(void *data);
-   
    void *get_in_addr(struct sockaddr *sa);
    
    class network_t
@@ -86,9 +82,12 @@ namespace neweraHPC
       size_t len;
    };
    
-   nhpc_status_t nhpc_recv(nhpc_socket_t *sock, char *buffer, size_t *len);
-   nhpc_status_t nhpc_analyze_stream(rbtree_t *headers, char *buffer, int *len);
-   void nhpc_display_headers(rbtree_t *headers);
+   nhpc_status_t nhpc_recv(nhpc_socket_t *sock, char *buffer, nhpc_size_t *len);
+   nhpc_status_t nhpc_send(nhpc_socket_t *sock, char *buffer, nhpc_size_t *len);
+   
+   nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *buffer, nhpc_size_t *len);
+   void nhpc_display_headers(nhpc_socket_t *sock);
+
    nhpc_status_t nhpc_sock_cleanup(nhpc_socket_t *sock);
 };
 

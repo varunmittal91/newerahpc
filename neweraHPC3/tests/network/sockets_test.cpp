@@ -42,38 +42,41 @@ int main(int argc, char *argv[]){
       nrv = network.connect(&sock, argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
       if(nrv != NHPC_SUCCESS)
       {
-	 perror("connect");
+	 nhpc_perror(nrv, "connect");
 	 exit(0);
       }
       
-      const char *mssg = "GET / HTTP/1.1 \r\n\r\n";
+      const char *mssg = "GET / HTTP/1.1\r\nHost: localhost\r\n\r\n";
       size_t size = strlen(mssg);
       nrv = socket_send(sock, (char *)mssg, &size);
       if(nrv == -1)perror("write");
       
       char buffer[1000];
       size = 1000;
-      int rv;
+      int rv = 0;
       
       int timeup_count = 0;
       while(rv != NHPC_EOF && timeup_count != 5)
       {
 	 rv = socket_recv(sock, buffer, &size);
-	 cout<<buffer;
+
+	 if(sock->have_headers != true)
+	 {
+	    nhpc_analyze_stream(sock, buffer, &size);
+	 }
 	 timeup_count++;
       }
       cout<<endl;
+      
+      nhpc_display_headers(sock);
       
       if(rv == -1)
 	 perror("read:");
       
       socket_delete(sock);
-      
    }
    if(strcmp(argv[3],"2") == 0)
    {
-      //test_socket_factory();
-      //while(1)sleep(1);
       nrv = network.create_server(argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
       if(nrv != NHPC_SUCCESS)perror("error at creating server");
    }

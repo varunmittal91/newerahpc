@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <iostream>
+#include <fstream>
 
 using namespace neweraHPC;
 using namespace std;
@@ -39,6 +40,8 @@ int main(int argc, char *argv[]){
    
    if(strcmp(argv[3],"1") == 0)
    {
+      ofstream datafile("datafile");
+      
       nrv = network.connect(&sock, argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
       if(nrv != NHPC_SUCCESS)
       {
@@ -46,24 +49,31 @@ int main(int argc, char *argv[]){
 	 exit(0);
       }
       
-      const char *mssg = "GET / HTTP/1.1\r\nHost: localhost\r\n\r\n";
+      const char *mssg = "GET /cmg/ HTTP/1.1\r\nHost: localhost\r\n\r\n";
       size_t size = strlen(mssg);
       nrv = socket_send(sock, (char *)mssg, &size);
       if(nrv == -1)perror("write");
       
-      char buffer[1000];
+      char *buffer = new char [1000];
       size = 1000;
       int rv = 0;
       
       int timeup_count = 0;
-      while(rv != NHPC_EOF && timeup_count != 5)
+      while(rv != NHPC_EOF)
       {
+	 bzero(buffer, 1000);
 	 rv = socket_recv(sock, buffer, &size);
+	 if(size == 0)
+	    continue;
+	 
+	 nhpc_size_t data_size;
 
-	 if(sock->have_headers != true)
-	 {
-	    nhpc_analyze_stream(sock, buffer, &size);
-	 }
+	 nhpc_analyze_stream(sock, buffer, &size, &data_size);
+
+	 char *tmp_buffer = buffer + (size - data_size);
+	 datafile<<tmp_buffer;
+	 cout<<tmp_buffer<<endl;
+
 	 timeup_count++;
       }
       cout<<endl;

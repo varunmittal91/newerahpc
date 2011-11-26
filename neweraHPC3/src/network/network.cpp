@@ -279,7 +279,7 @@ namespace neweraHPC
 	       {
 		  if(client_sock->headers == NULL)
 		     client_sock->headers = new rbtree_t;
-		  nrv = nhpc_analyze_stream(client_sock, buffer, &rv);
+		  nrv = nhpc_analyze_stream(client_sock, buffer, &rv, NULL);
 		  if(nrv == NHPC_SUCCESS)
 		     client_sock->have_headers = true;
 		  nhpc_display_headers(client_sock);
@@ -298,8 +298,14 @@ namespace neweraHPC
       delete sock;
    }
    
-   nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *data, nhpc_size_t *len)
+   nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *data, nhpc_size_t *len, nhpc_size_t *header_size)
    {
+      if(header_size != NULL)
+	 *header_size = *len;
+      
+      if(sock->have_headers == true)
+	 return NHPC_SUCCESS;
+      
       int line_len = 0;
       int old_pos = 0;
       rbtree_t *headers = sock->headers;
@@ -322,9 +328,12 @@ namespace neweraHPC
 	    }
 	    else 
 	    {
-	       (*len) = (*len) - (cntr + 1);
-	       if(data[cntr + 1] == '\n')
-		  (*len)--;
+	       if(header_size != NULL)
+	       {
+		  (*header_size) = (*len) - (cntr + 1);
+		  if(data[cntr + 1] == '\n')
+		     (*header_size)--;
+	       }
 		  
 	       sock->have_headers = true;
 	       return NHPC_SUCCESS;

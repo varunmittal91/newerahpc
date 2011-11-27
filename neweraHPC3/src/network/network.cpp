@@ -272,16 +272,18 @@ namespace neweraHPC
 		  break;
 	       }
 	       
-	       if(rv >= 0)
-	          send(fds[cntr].fd, "hi", 2, 0);
-
 	       if(client_sock != NULL && client_sock->have_headers == false)
 	       {
 		  if(client_sock->headers == NULL)
 		     client_sock->headers = new rbtree_t;
 		  nrv = nhpc_analyze_stream(client_sock, buffer, &rv, NULL);
 		  if(nrv == NHPC_SUCCESS)
+		  {
 		     client_sock->have_headers = true;
+		     if(rv >= 0)
+			send(fds[cntr].fd, "HTTP/1.0 200 OK\r\n\r\nhi", 22, 0);
+		     close(client_sock->sockfd);
+		  }
 		  nhpc_display_headers(client_sock);
 	       }	       
 	    }

@@ -47,7 +47,7 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libnetwork_la_DEPENDENCIES = web_server/libweb_server.la
 am__objects_1 = network.lo sockets.lo sendrecv.lo headers.lo waitio.lo \
-	sockopts.lo
+	sockopts.lo communication.lo
 am_libnetwork_la_OBJECTS = $(am__objects_1)
 libnetwork_la_OBJECTS = $(am_libnetwork_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -241,7 +241,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = web_server
-SOURCES = network.cpp sockets.cpp sendrecv.cpp headers.cpp waitio.cpp sockopts.cpp
+SOURCES = network.cpp sockets.cpp sendrecv.cpp headers.cpp waitio.cpp sockopts.cpp communication.cpp
 noinst_LTLIBRARIES = libnetwork.la 
 libnetwork_la_SOURCES = $(SOURCES)
 libnetwork_la_LIBADD = web_server/libweb_server.la
@@ -297,6 +297,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/communication.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/headers.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/network.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sendrecv.Plo@am__quote@

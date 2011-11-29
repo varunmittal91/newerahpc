@@ -38,6 +38,7 @@
 #include "headers.h"
 #include "sockets.h"
 #include "sockopts.h"
+#include "communication.h"
 
 namespace neweraHPC
 {   

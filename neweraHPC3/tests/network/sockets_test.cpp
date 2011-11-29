@@ -72,9 +72,8 @@ int main(int argc, char *argv[]){
 
 	 char *tmp_buffer = buffer + (size - data_size);
 	 datafile<<tmp_buffer;
-	 cout<<tmp_buffer<<endl;
 
-	 timeup_count++;
+	 timeup_count++;	 
       }
       cout<<endl;
       

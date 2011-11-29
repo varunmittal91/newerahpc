@@ -17,8 +17,10 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <include/strings.h>
 #include <iostream>
+
+#include <include/strings.h>
+#include <include/constants.h>
 
 using namespace std;
 
@@ -47,4 +49,61 @@ namespace neweraHPC{
       
       return (d);
    }
+   
+   nhpc_status_t nhpc_strcmp(const char *s1, const char *s2)
+   {
+      const char *tmp_s1 = s1;
+      const char *tmp_s2 = s2;
+      bool loop = false;
+      const char *tmp_loop_s2;
+      
+      while(*tmp_s2 != '\0' || *tmp_s1 != '\0')
+      {
+	 if(*tmp_s1 == '\0' && *tmp_s2 == '*')
+	    return NHPC_SUCCESS;
+	 else if(*tmp_s1 == '\0' || (*tmp_s2 == '\0'))
+	    return NHPC_FAIL;
+	 else if(*tmp_s2 == '*')
+	 {
+	    while(*tmp_s1 != '\0')
+	    {
+	       if(tmp_s2 == s2 && *tmp_s2 == '*')
+	       {
+		  tmp_s2++;
+		  break;
+	       }
+	       
+	       loop = true;
+	       tmp_loop_s2 = tmp_s2;
+	       tmp_s1++;
+
+	       if(*tmp_s1 == *(tmp_s2 + 1))
+	       {
+		  tmp_s2++;
+		  break;
+	       }
+	       
+	       if(*(tmp_s2 + 1) == '\0')
+		  return NHPC_SUCCESS;	       
+	    }
+	 }
+	 else if(*tmp_s1 == *tmp_s2)
+	 {
+	    tmp_s1++;
+	    tmp_s2++;
+	 }
+	 else 
+	 {
+	    if(loop != true)
+	       return NHPC_FAIL;
+	    else 
+	    {
+	       loop = false;
+	       tmp_s2 = tmp_loop_s2;
+	    }
+	 }
+      }
+      
+      return NHPC_SUCCESS;
+   }      
 }

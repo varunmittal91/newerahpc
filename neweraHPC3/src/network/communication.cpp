@@ -17,17 +17,27 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _COMMUNICATION_H_
-#define _COMMUNICATION_H_
+#include <iostream>
+
+#include <include/network.h>
+
+using namespace std;
 
 namespace neweraHPC
 {
-   struct communication_t
+   void read_communication(nhpc_socket_t *sock, char *remaining_data)
    {
-      nhpc_socket_t *sock;
-   };
-   
-   void read_communication(nhpc_socket_t *sock, char *remaining_data);
+      if(sock->headers != NULL)
+      {
+	 header_t *header = (header_t *)sock->headers->search(1);
+	 cout<<sock->headers->ret_count()<<endl;
+	 cout<<header->string<<endl;
+	 cout<<strcmp(header->string, "GET")<<endl;
+	 if(header != NULL)
+	 {
+	    if(nhpc_strcmp(header->string, "GET*HTTP/1*") == NHPC_SUCCESS)
+	       cout<<"HTTP 1.1 Communication Detected"<<endl;
+	 }
+      }
+   }
 };
-
-#endif

@@ -21,11 +21,14 @@
 #include <string.h>
 #include <string>
 
+#include "constants.h"
+
 #ifndef _STRINGS_H_
 #define _STRINGS_H_
 
 namespace neweraHPC{
    char *nhpc_strcpy(char *dst, const char *src, size_t dst_len);
+   nhpc_status_t nhpc_strcmp(const char *s1, const char *s2);
 }
 
 #endif

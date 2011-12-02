@@ -60,8 +60,8 @@ int main()
       cout<<"string found"<<endl;
    cout<<endl;
 
-   s1 = "GET abc HTTP/1.1";
-   s2 = "**GET*a*b*c**";
+   s1 = "ASB GET abc HTTP/1.1";
+   s2 = "*GET";
    cout<<"s1: "<<s1<<" s2: "<<s2<<endl;
    nrv = nhpc_strcmp(s1, s2);
    if(nrv == NHPC_FAIL)
@@ -80,8 +80,8 @@ int main()
       cout<<"string found"<<endl;
    cout<<endl;
    
-   s1 = "GET abc";
-   s2 = "****";
+   s1 = "";
+   s2 = "";
    cout<<"s1: "<<s1<<" s2: "<<s2<<endl;
    nrv = nhpc_strcmp(s1, s2);
    if(nrv == NHPC_FAIL)

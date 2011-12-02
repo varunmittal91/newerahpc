@@ -57,8 +57,9 @@ namespace neweraHPC{
       bool loop = false;
       const char *tmp_loop_s2;
       
-      while(*tmp_s2 == '*')
-	 tmp_s2++;
+      if(*tmp_s2 == '*')
+	 while(*(tmp_s2 + 1) == '*')
+	    tmp_s2++;
       
       if(*tmp_s2 == '\0')
 	 return NHPC_SUCCESS;

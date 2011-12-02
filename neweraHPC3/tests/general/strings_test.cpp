@@ -27,41 +27,68 @@ using namespace neweraHPC;
 int main()
 {
    nhpc_status_t nrv;
+   const char *s1;
+   const char *s2;
    
-   nrv = nhpc_strcmp("GET", "GET");
-   if(nrv == NHPC_FAIL)
-      cout<<"string not found"<<endl;
-   else
-      cout<<"string found"<<endl;
-   cout<<endl;
-   
-   nrv = nhpc_strcmp("GET abc", "GET");
-   if(nrv == NHPC_FAIL)
-      cout<<"string not found"<<endl;
-   else
-      cout<<"string found"<<endl;
-   cout<<endl;
-
-   nrv = nhpc_strcmp("GET abc", "GET*");
-   if(nrv == NHPC_FAIL)
-      cout<<"string not found"<<endl;
-   else
-      cout<<"string found"<<endl;
-   cout<<endl;
-
-   nrv = nhpc_strcmp("GET abc", "GET*a*b*c*");
-   if(nrv == NHPC_FAIL)
-      cout<<"string not found"<<endl;
-   else
-      cout<<"string found"<<endl;
-   cout<<endl;
-
-   nrv = nhpc_strcmp("GET abc", "*SET*a*b*c");
+   s1 = "GET";
+   s2 = "GET";
+   cout<<"s1: "<<s1<<" s2: "<<s2<<endl;
+   nrv = nhpc_strcmp(s1, s2);
    if(nrv == NHPC_FAIL)
       cout<<"string not found"<<endl;
    else
       cout<<"string found"<<endl;
    cout<<endl;
    
+   s1 = "GET abc";
+   s2 = "GET";
+   cout<<"s1: "<<s1<<" s2: "<<s2<<endl;
+   nrv = nhpc_strcmp(s1, s2);
+   if(nrv == NHPC_FAIL)
+      cout<<"string not found"<<endl;
+   else
+      cout<<"string found"<<endl;
+   cout<<endl;
+
+   s1 = "GET abc";
+   s2 = "GET*";
+   cout<<"s1: "<<s1<<" s2: "<<s2<<endl;
+   nrv = nhpc_strcmp(s1, s2);
+   if(nrv == NHPC_FAIL)
+      cout<<"string not found"<<endl;
+   else
+      cout<<"string found"<<endl;
+   cout<<endl;
+
+   s1 = "GET abc HTTP/1.1";
+   s2 = "**GET*a*b*c**";
+   cout<<"s1: "<<s1<<" s2: "<<s2<<endl;
+   nrv = nhpc_strcmp(s1, s2);
+   if(nrv == NHPC_FAIL)
+      cout<<"string not found"<<endl;
+   else
+      cout<<"string found"<<endl;
+   cout<<endl;
+
+   s1 = "GET abc";
+   s2 = "**GET*a***bd***c**";
+   cout<<"s1: "<<s1<<" s2: "<<s2<<endl;
+   nrv = nhpc_strcmp(s1, s2);
+   if(nrv == NHPC_FAIL)
+      cout<<"string not found"<<endl;
+   else
+      cout<<"string found"<<endl;
+   cout<<endl;
+   
+   s1 = "GET abc";
+   s2 = "****";
+   cout<<"s1: "<<s1<<" s2: "<<s2<<endl;
+   nrv = nhpc_strcmp(s1, s2);
+   if(nrv == NHPC_FAIL)
+      cout<<"string not found"<<endl;
+   else
+      cout<<"string found"<<endl;
+   cout<<endl;
+
    return 0;
 }

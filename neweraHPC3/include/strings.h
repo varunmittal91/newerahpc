@@ -29,6 +29,7 @@
 namespace neweraHPC{
    char *nhpc_strcpy(char *dst, const char *src, size_t dst_len);
    nhpc_status_t nhpc_strcmp(const char *s1, const char *s2);
+   nhpc_status_t nhpc_strcmpi(const char *s1, const char *s2);
 }
 
 #endif

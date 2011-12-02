@@ -90,5 +90,15 @@ int main()
       cout<<"string found"<<endl;
    cout<<endl;
 
+   s1 = "Varun Dhawan";
+   s2 = "*varun*";
+   cout<<"s1: "<<s1<<" s2: "<<s2<<endl;
+   nrv = nhpc_strcmpi(s1, s2);
+   if(nrv == NHPC_FAIL)
+      cout<<"string not found"<<endl;
+   else
+      cout<<"string found"<<endl;
+   cout<<endl;
+
    return 0;
 }

@@ -107,4 +107,62 @@ namespace neweraHPC{
       
       return NHPC_SUCCESS;
    }
+   
+   nhpc_status_t nhpc_strcmpi(const char *s1, const char *s2)
+   {
+      const char *tmp_s1 = s1;
+      const char *tmp_s2 = s2;
+      bool loop = false;
+      const char *tmp_loop_s2;
+      
+      if(*tmp_s2 == '*')
+	 while(*(tmp_s2 + 1) == '*')
+	    tmp_s2++;
+      
+      if(*tmp_s2 == '\0')
+	 return NHPC_SUCCESS;
+      
+      while(*tmp_s1 != '\0' || *tmp_s2 != '\0')
+      {
+	 if(tolower(*tmp_s1) == tolower(*tmp_s2))
+	 {
+	    tmp_s1++;
+	    tmp_s2++;
+	    continue;
+	 }
+	 else if(*tmp_s1 == '\0' && *tmp_s2 == '*')
+	 {
+	    while(*tmp_s2 == '*')
+	       tmp_s2++;
+	    continue;
+	 }
+	 else if(*tmp_s2 == '*')
+	 {
+	    while(*(tmp_s2 + 1) == '*')
+	       tmp_s2++;
+	    
+	    loop = true;
+	    tmp_loop_s2 = tmp_s2;
+	    
+	    while(tolower(*tmp_s1) != tolower(*(tmp_s2 + 1)) && *tmp_s1 != '\0')
+	    {
+	       *tmp_s1++;
+	    }
+	    
+	    *tmp_s2++;
+	 }
+	 else 
+	 {
+	    if(loop != true)
+	       return NHPC_FAIL;
+	    else 
+	    {
+	       loop = false;
+	       tmp_s2 = tmp_loop_s2;
+	    }
+	 }
+      }
+      
+      return NHPC_SUCCESS;
+   }
 }

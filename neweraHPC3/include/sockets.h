@@ -26,24 +26,10 @@
 #define _SOCKETS_H_
 
 #include "constants.h"
+#include "communication.h"
 
 namespace neweraHPC
 {
-   struct nhpc_socket_t
-   {
-      int sockfd;
-      int sockopt;
-      int family;
-      int incomplete_operation;
-      time_t timeout;
-      const char *host;
-      const char *port;
-      addrinfo *hints;
-      addrinfo *hints_res;
-      rbtree_t *headers;
-      bool have_headers;
-   };
-   
    nhpc_status_t socket_create(nhpc_socket_t **sock);
    nhpc_status_t socket_create(nhpc_socket_t **sock, int family, int type, int protocol);
    

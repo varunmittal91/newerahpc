@@ -25,7 +25,7 @@ using namespace std;
 
 namespace neweraHPC
 {
-   void read_communication(nhpc_socket_t *sock, char *partial_content)
+   void read_communication(nhpc_socket_t *sock)
    {
       if(sock->headers != NULL)
       {
@@ -33,8 +33,12 @@ namespace neweraHPC
 	 if(header != NULL)
 	 {
 	    if(nhpc_strcmp(header->string, "*HTTP*") == NHPC_SUCCESS)
-	       http_init(sock, partial_content);
+	       http_init(sock);
 	 }
       }
+            
+      pthread_mutex_lock(sock->server_details->mutex);
+      nhpc_socket_cleanup(sock, sock->server_details->client_socks, sock->server_details->fds, sock->fds_pos, sock->server_details->nfds);
+      pthread_mutex_unlock(sock->server_details->mutex);
    }
 };

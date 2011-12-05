@@ -20,6 +20,8 @@
 #ifndef _COMMUNICATION_H_
 #define _COMMUNICATION_H_
 
+#include "network.h"
+
 namespace neweraHPC
 {
    struct communication_t
@@ -27,7 +29,7 @@ namespace neweraHPC
       nhpc_socket_t *sock;
    };
    
-   void read_communication(nhpc_socket_t *sock, char *partial_content);
+   void read_communication(nhpc_socket_t *sock);
 };
 
 #endif

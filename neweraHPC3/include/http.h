@@ -19,5 +19,7 @@
 
 namespace neweraHPC
 {
-   void http_init(nhpc_socket_t *sock, char *partial_content);
+   void http_init(nhpc_socket_t *sock);
+   void http_request(nhpc_socket_t *sock);
+   void http_response(nhpc_socket_t *sock);
 };

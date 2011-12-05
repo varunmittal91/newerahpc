@@ -31,6 +31,7 @@
 #include <errno.h>
 #include <fcntl.h>
 
+#include "network_data.h"
 #include "constants.h"
 #include "thread.h"
 #include "strings.h"
@@ -45,11 +46,12 @@ namespace neweraHPC
 {   
    struct nhpc_thread_details_t
    {
+      void             *network;
       thread_manager_t *thread_manager;
       nhpc_socket_t    *sock;
       rbtree_t         *client_socks;
    };
-            
+   
    void *get_in_addr(struct sockaddr *sa);
    
    class network_t
@@ -71,7 +73,7 @@ namespace neweraHPC
       ~network_t();
       inline void lock();
       inline void unlock();
-      int add_client_connection(nhpc_socket_t *sock);
+      int add_client_connection(nhpc_socket_t *sock, int sockfd);
       nhpc_status_t connect(nhpc_socket_t **sock, const char *host_addr, 
 			    const char *host_port, int family, int type, int protocol);
       nhpc_status_t create_server(const char *host_addr, const char *host_port,
@@ -86,6 +88,8 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_recv(nhpc_socket_t *sock, char *buffer, nhpc_size_t *len);
    nhpc_status_t nhpc_send(nhpc_socket_t *sock, char *buffer, nhpc_size_t *len);
+   
+   void nhpc_socket_cleanup(nhpc_socket_t *client_sock, rbtree_t *client_socks, pollfd *fds, int cntr, int *nfds);
    
    nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *buffer, nhpc_size_t *len, nhpc_size_t *header_size);
    void nhpc_display_headers(nhpc_socket_t *sock);

@@ -25,16 +25,32 @@ using namespace std;
 
 namespace neweraHPC
 {
-   void http_init(nhpc_socket_t *sock, char *partial_content)
+   void http_init(nhpc_socket_t *sock)
    {
       header_t *header = (header_t *)sock->headers->search(1);
       
       if(nhpc_strcmp(header->string, "GET*") == NHPC_SUCCESS)
-	 cout<<"HTTP Request"<<endl;
+	 http_request(sock);
       else if(nhpc_strcmp(header->string, "HTTP*") == NHPC_SUCCESS)
 	 cout<<"HTTP Response"<<endl;
       else 
 	 cout<<"Invalid HTTP Header"<<endl;
    }
+   
+   void http_request(nhpc_socket_t *sock)
+   {
+      cout<<"HTTP Request"<<endl;
 
+      nhpc_display_headers(sock);
+
+      const char *mssg = "HTTP/1.1 200 OK\r\n\r\nWelcome to NeweraHPC Cluster\r\n";
+      nhpc_size_t size = strlen(mssg);
+      socket_send(sock, (char *)mssg, &size);
+
+   }
+   
+   void http_response(nhpc_socket_t *sock)
+   {
+      
+   }
 };

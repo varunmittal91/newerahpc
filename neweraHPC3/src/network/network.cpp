@@ -41,10 +41,10 @@ namespace neweraHPC
       external_thread_manager = true;
       thread_manager = in_thread_manager;
       connection_stat = false;
-
+      
       delete client_connections;
       delete mutex;
-
+      
       if(server_sock != NULL)
 	 delete server_sock;
    }
@@ -79,7 +79,7 @@ namespace neweraHPC
 				    const char *host_port, int family, int type, int protocol)
    {
       nhpc_status_t nrv;
-   
+      
       *sock = new nhpc_socket_t;
       
       nrv = socket_getaddrinfo(sock, host_addr, host_port, family, type, protocol);
@@ -104,7 +104,7 @@ namespace neweraHPC
 	 delete *sock;
 	 return nrv;
       }      
-
+      
       (*sock)->headers = new rbtree_t;
       add_client_connection(*sock);
       return NHPC_SUCCESS;
@@ -167,7 +167,7 @@ namespace neweraHPC
       accept_thread->thread_manager = thread_manager;
       accept_thread->client_socks   = new rbtree_t;
       (*thread_manager).create_thread(NULL, (void * (*)(void *))network_t::accept_connection, (void *)accept_thread, NHPC_THREAD_JOIN);
-
+      
       return NHPC_SUCCESS;      
    }
    
@@ -187,7 +187,7 @@ namespace neweraHPC
       int nfds         = 1;
       int current_size = 0;
       int timeout      = (3 * 60 * 1000);
-
+      
       int *server_sockfd = &(main_thread->sock->sockfd);
       
       fds[0].fd     = *server_sockfd;
@@ -208,28 +208,26 @@ namespace neweraHPC
 	 
 	 if(rv == 0)
 	 {
-	    cout<<"\tpoll() timed out."<<endl;
-	    break;
+	    continue;
 	 }
 	 
 	 current_size = nfds;
 	 for(int cntr = 0; cntr < current_size; cntr++)
 	 {
+	    bool close_conn = false;
+	    
 	    if(fds[cntr].revents == 0)
 	       continue;
 	    
+	    nhpc_socket_t *client_sock = (nhpc_socket_t *)client_socks->search(fds[cntr].fd);
+	    
 	    if(fds[cntr].revents != POLLIN)
 	    {
-	       nhpc_socket_t *sock = (nhpc_socket_t *)client_socks->search(fds[cntr].fd);
-	       nhpc_sock_cleanup(sock);
-	       client_socks->erase(fds[cntr].fd);
-	       memset(&fds[cntr], 0, sizeof(pollfd));
-	       break;
+	       close_conn = true;
 	    }
 	    
 	    if(fds[cntr].fd == *server_sockfd)
 	    {
-	       cout<<"\tListening socket is readable"<<endl;
 	       int new_sd;
 	       
 	       do
@@ -245,7 +243,6 @@ namespace neweraHPC
 		     break;
 		  }
 		  
-		  cout<<"\tNew incoming connection - "<<new_sd<<endl;
 		  fds[nfds].fd     = new_sd;
 		  fds[nfds].events = POLLIN;
 		  nfds++;
@@ -258,11 +255,6 @@ namespace neweraHPC
 	    }
 	    else 
 	    {
-	       cout<<"\tDescriptor is readable - "<<fds[cntr].fd<<endl;
-	       bool close_conn = false;
-	       
-	       nhpc_socket_t *client_sock = (nhpc_socket_t *)client_socks->search(fds[cntr].fd);
-	       
 	       char buffer[1000];
 	       memset(buffer, 0,sizeof(buffer));
 	       
@@ -280,28 +272,35 @@ namespace neweraHPC
 		  nrv = nhpc_analyze_stream(client_sock, buffer, &rv, NULL);
 		  if(nrv == NHPC_SUCCESS)
 		  {
-		     cout<<"reading communication"<<endl;
-		     
 		     read_communication(client_sock, NULL);
 		     client_sock->have_headers = true;
-		     if(rv >= 0);
-			//send(fds[cntr].fd, "HTTP/1.0 200 OK\r\n\r\nhi", 22, 0);
-		     close(client_sock->sockfd);
-		  }
-		  nhpc_display_headers(client_sock);
-	       }	       
-	    }
+		     
+		     nhpc_display_headers(client_sock);
+
+		     const char *mssg = "HTTP/1.1 200 OK\r\n\r\nWelcome to NeweraHPC Cluster\r\n";
+		     nhpc_size_t size = strlen(mssg);
+		     socket_send(client_sock, (char *)mssg, &size);
+		     close_conn = true;
+		  }		  
+	       }
+	    }	    
+	    
+	    if(close_conn)
+	    {
+	       if(client_sock != NULL)
+	       {
+		  if(client_sock->headers != NULL)
+		     delete client_sock->headers;
+		  client_socks->erase(fds[cntr].fd);
+	       }
+	       
+	       shutdown(fds[cntr].fd, SHUT_RDWR);
+	       close(fds[cntr].fd);
+	       memcpy(&fds[cntr], &fds[cntr+1], (nfds-cntr-1)*sizeof(pollfd));
+	       nfds--;
+	    }	       	    
 	 }
       }while(true);
-   }
-   
-   nhpc_status_t nhpc_sock_cleanup(nhpc_socket_t *sock)
-   {
-      close(sock->sockfd);
-      if(sock->headers != NULL)
-	 delete sock->headers;
-      
-      delete sock;
    }
    
    nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *data, nhpc_size_t *len, nhpc_size_t *header_size)
@@ -315,7 +314,7 @@ namespace neweraHPC
       int line_len = 0;
       int old_pos = 0;
       rbtree_t *headers = sock->headers;
-     
+      
       for(int cntr = 0; cntr < *len; cntr++)
       {
 	 if(data[cntr] == '\r')
@@ -326,7 +325,7 @@ namespace neweraHPC
 	       char *line = new char [line_len + 1];
 	       memcpy(line, (data + old_pos), (line_len));
 	       line[line_len] = '\0';
-
+	       
 	       header_t *header = new header_t;
 	       header->string = line;
 	       header->len    = line_len;
@@ -340,7 +339,7 @@ namespace neweraHPC
 		  if(data[cntr + 1] == '\n')
 		     (*header_size)--;
 	       }
-		  
+	       
 	       sock->have_headers = true;
 	       return NHPC_SUCCESS;
 	    }
@@ -370,5 +369,5 @@ namespace neweraHPC
 	 cout<<"\t"<<tmp_header->string<<endl;
       }
    }
-
+   
 };

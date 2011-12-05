@@ -17,17 +17,7 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _COMMUNICATION_H_
-#define _COMMUNICATION_H_
-
 namespace neweraHPC
 {
-   struct communication_t
-   {
-      nhpc_socket_t *sock;
-   };
-   
-   void read_communication(nhpc_socket_t *sock, char *partial_content);
+   void http_init(nhpc_socket_t *sock, char *partial_content);
 };
-
-#endif

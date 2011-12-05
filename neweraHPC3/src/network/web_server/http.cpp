@@ -17,11 +17,24 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
+
+#include <include/network.h>
+
+using namespace std;
+
 namespace neweraHPC
 {
-   void http_init()
+   void http_init(nhpc_socket_t *sock, char *partial_content)
    {
+      header_t *header = (header_t *)sock->headers->search(1);
       
+      if(nhpc_strcmp(header->string, "GET*") == NHPC_SUCCESS)
+	 cout<<"HTTP Request"<<endl;
+      else if(nhpc_strcmp(header->string, "HTTP*") == NHPC_SUCCESS)
+	 cout<<"HTTP Response"<<endl;
+      else 
+	 cout<<"Invalid HTTP Header"<<endl;
    }
 
 };

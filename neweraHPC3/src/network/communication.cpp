@@ -25,18 +25,15 @@ using namespace std;
 
 namespace neweraHPC
 {
-   void read_communication(nhpc_socket_t *sock, char *remaining_data)
+   void read_communication(nhpc_socket_t *sock, char *partial_content)
    {
       if(sock->headers != NULL)
       {
 	 header_t *header = (header_t *)sock->headers->search(1);
-	 cout<<sock->headers->ret_count()<<endl;
-	 cout<<header->string<<endl;
-	 cout<<strcmp(header->string, "GET")<<endl;
 	 if(header != NULL)
 	 {
-	    if(nhpc_strcmp(header->string, "GET*HTTP/1*") == NHPC_SUCCESS)
-	       cout<<"HTTP 1.1 Communication Detected"<<endl;
+	    if(nhpc_strcmp(header->string, "*HTTP*") == NHPC_SUCCESS)
+	       http_init(sock, partial_content);
 	 }
       }
    }

@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
    
    if(argc<4)
    {
-      printf("usage ./test host port mode\n\t1 for client\n\t2 for server\n");
+      printf("usage ./test host port mode\n\t1 for client\n\t2 for server\n\t give path for client\n");
       exit(0);
    }
    
@@ -40,7 +40,13 @@ int main(int argc, char *argv[]){
    
    if(strcmp(argv[3],"1") == 0)
    {
-      ofstream datafile("datafile");
+      if(argc < 5)
+      {
+	 printf("no get directory given\n");
+	 exit(0);
+      }
+      
+      ofstream fp("datafile.html");
       
       nrv = network.connect(&sock, argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
       if(nrv != NHPC_SUCCESS)
@@ -49,31 +55,44 @@ int main(int argc, char *argv[]){
 	 exit(0);
       }
       
-      const char *mssg = "GET /cmg/ HTTP/1.1\r\nHost: localhost\r\n\r\n";
+      const char *mssg = "GET ";
       size_t size = strlen(mssg);
       nrv = socket_send(sock, (char *)mssg, &size);
       if(nrv == -1)perror("write");
+      
+      mssg = argv[4];
+      size = strlen(mssg);
+      nrv = socket_send(sock, (char *)mssg, &size);
+      if(nrv == -1)perror("write");            
+      
+      mssg = " HTTP/1.1\r\nHost: localhost\r\n\r\n";
+      size = strlen(mssg);
+      nrv = socket_send(sock, (char *)mssg, &size);
+      if(nrv == -1)perror("write");      
       
       char *buffer = new char [1000];
       size = 1000;
       int rv = 0;
       
-      int timeup_count = 0;
-      while(rv != NHPC_EOF)
+      nhpc_size_t total_size = 0;
+      
+      while(rv != NHPC_EOF && size != 0)
       {
+	 size = 1000;
+	 
 	 bzero(buffer, 1000);
 	 rv = socket_recv(sock, buffer, &size);
-	 if(size == 0)
-	    continue;
 	 
 	 nhpc_size_t data_size;
 
 	 nhpc_analyze_stream(sock, buffer, &size, &data_size);
 
 	 char *tmp_buffer = buffer + (size - data_size);
-	 datafile<<tmp_buffer;
-
-	 timeup_count++;	 
+	 fp.write(tmp_buffer, data_size);
+	 total_size += data_size;
+	 
+	 if(size == 0)
+	    continue;
       }
       cout<<endl;
       

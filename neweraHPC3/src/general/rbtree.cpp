@@ -42,6 +42,9 @@ namespace neweraHPC
    rbtree_t::~rbtree_t()
    {
       struct rb_node *node;
+      
+      node = rb_first(root);
+      
       for (node = rb_first(root); node; node = rb_next(node))
       {
 	 rbtree_t::node *data = rb_entry(node, rbtree_t::node, node_next);

@@ -219,12 +219,10 @@ namespace neweraHPC
 	    pthread_mutex_unlock(&mutex);
 	 }
 	 
-	 cout<<"Waiting on poll()..."<<endl;
 	 rv = poll(fds, nfds, timeout);
 	 
 	 if(rv < 0)
 	 {
-	    cout<<"\tpoll() failed"<<endl;
 	    break;
 	 }
 	 
@@ -245,10 +243,10 @@ namespace neweraHPC
 	    if(fds[cntr].revents != POLLIN)
 	    {
 	       pthread_mutex_lock(&mutex);
+	       nhpc_socket_cleanup(client_sock, client_socks, fds, cntr, &nfds);
 	       nhpc_poll_clean(fds, &nfds, &cntr);
 	       pthread_mutex_unlock(&mutex);
 	       continue;
-	       //close_conn = true;
 	    }
 	    
 	    if(fds[cntr].fd == *server_sockfd)
@@ -306,36 +304,29 @@ namespace neweraHPC
 		  }		  
 	       }
 	    }	    
-	    
-	    if(close_conn)
-	    {
-	       nhpc_socket_cleanup(client_sock, client_socks, fds, cntr, &nfds);
-	    }
 	 }
       }while(true);
    }
    
    void nhpc_socket_cleanup(nhpc_socket_t *client_sock, rbtree_t *client_socks, pollfd *fds, int cntr, int *nfds)
    {
-      cout<<*nfds<<" "<<cntr<<endl;
-
       if(client_sock != NULL)
       {
 	 if(client_sock->headers != NULL)
 	 {
-	    for(int i = 1; i <= client_sock->headers->ret_count(); i++)
+	    int count = client_sock->headers->ret_count();
+	    for(int i = 1; i <= count; i++)
 	    {	
 	       header_t *header = (header_t *)client_sock->headers->search(i);
-	       if(header != NULL)
-	       {
-		  delete header->string;
-		  client_sock->headers->erase(i);
-	       }
+	       delete[] header->string;
+	       delete header;
+	       client_sock->headers->erase(i);
 	    }
 	    
 	    delete client_sock->headers;
 	 }
 	 client_socks->erase(fds[cntr].fd);
+	 delete client_sock;
       }
       
       shutdown(fds[cntr].fd, SHUT_RDWR);
@@ -347,8 +338,13 @@ namespace neweraHPC
    void nhpc_poll_clean(pollfd *fds, int *nfds, int *cntr)
    {
       for(int i = *cntr; i < *nfds; i++)
-	 fds[i].fd = fds[i+1].fd;
-      (*nfds)--;
+      {
+	 if(fds[i].fd == 0)
+	 {
+	    fds[i].fd = fds[i+1].fd;
+	    (*nfds)--;
+	 }
+      }
    }
    
    nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *data, nhpc_size_t *len, nhpc_size_t *header_size)

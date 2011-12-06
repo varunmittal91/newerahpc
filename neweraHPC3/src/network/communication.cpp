@@ -37,7 +37,9 @@ namespace neweraHPC
 	 }
       }
             
+      cout<<"waiting for lock"<<endl;
       pthread_mutex_lock(sock->server_details->mutex);
+      cout<<"lock granted"<<endl;
       nhpc_socket_cleanup(sock, sock->server_details->client_socks, sock->server_details->fds, sock->fds_pos, sock->server_details->nfds);
       pthread_mutex_unlock(sock->server_details->mutex);
    }

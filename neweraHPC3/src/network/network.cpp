@@ -204,10 +204,23 @@ namespace neweraHPC
       
       do 
       {
+	 if(nfds == poll_limit)
+	 {
+	    pthread_mutex_lock(&mutex);
+	    int not_null = 1;
+	    for(int i = 1; i < nfds; i++)
+	    {
+	       if(fds[i].fd == 0)
+	       {
+		  memcpy(&fds[i], &fds[i + 1], (nfds - i) * sizeof(pollfd));
+		  nfds--;
+	       }
+	    }
+	    pthread_mutex_unlock(&mutex);
+	 }
+	 
 	 cout<<"Waiting on poll()..."<<endl;
-	 pthread_mutex_lock(&mutex);
 	 rv = poll(fds, nfds, timeout);
-	 pthread_mutex_unlock(&mutex);
 	 
 	 if(rv < 0)
 	 {
@@ -227,13 +240,15 @@ namespace neweraHPC
 	    if(fds[cntr].revents == 0)
 	       continue;
 	    
-            pthread_mutex_lock(&mutex);
 	    nhpc_socket_t *client_sock = (nhpc_socket_t *)client_socks->search(fds[cntr].fd);
-            pthread_mutex_unlock(&mutex);
 	    
 	    if(fds[cntr].revents != POLLIN)
 	    {
-	       close_conn = true;
+	       pthread_mutex_lock(&mutex);
+	       nhpc_poll_clean(fds, &nfds, &cntr);
+	       pthread_mutex_unlock(&mutex);
+	       continue;
+	       //close_conn = true;
 	    }
 	    
 	    if(fds[cntr].fd == *server_sockfd)
@@ -288,27 +303,14 @@ namespace neweraHPC
 		  {
                      client_sock->fds_pos = cntr;
 		     thread_manager->create_thread(NULL, (void* (*)(void*))read_communication, client_sock, NHPC_THREAD_DEFAULT);
-	
-		     //read_communication(client_sock);
-		     
-		     /*
-		     nhpc_display_headers(client_sock);
-		     
-		     const char *mssg = "HTTP/1.1 200 OK\r\n\r\nWelcome to NeweraHPC Cluster\r\n";
-		     nhpc_size_t size = strlen(mssg);
-		     socket_send(client_sock, (char *)mssg, &size);
-		     close_conn = true;
-                     */
 		  }		  
 	       }
 	    }	    
 	    
-	    /*
 	    if(close_conn)
 	    {
 	       nhpc_socket_cleanup(client_sock, client_socks, fds, cntr, &nfds);
 	    }
-            */	       	    
 	 }
       }while(true);
    }
@@ -339,10 +341,15 @@ namespace neweraHPC
       shutdown(fds[cntr].fd, SHUT_RDWR);
       close(fds[cntr].fd);
       
-      memcpy(&fds[cntr], &fds[cntr+1], (*nfds-cntr-1)*sizeof(pollfd));
-      (*nfds)--;
+      fds[cntr].fd = 0;
    }
    
+   void nhpc_poll_clean(pollfd *fds, int *nfds, int *cntr)
+   {
+      for(int i = *cntr; i < *nfds; i++)
+	 fds[i].fd = fds[i+1].fd;
+      (*nfds)--;
+   }
    
    nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *data, nhpc_size_t *len, nhpc_size_t *header_size)
    {

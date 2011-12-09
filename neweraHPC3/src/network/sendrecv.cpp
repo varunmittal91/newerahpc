@@ -27,11 +27,6 @@ namespace neweraHPC
 {
    nhpc_status_t socket_recv(nhpc_socket_t *sock, char *buffer, nhpc_size_t *length)
    {
-      /* Just for testing purpose */
-      char **mssgs;
-      int count = 0;
-      /* */
-      
       int rv;
       nhpc_status_t nrv;
       
@@ -73,11 +68,6 @@ namespace neweraHPC
       }
       
       (*length) = rv;
-      
-      if(*length >= 0)
-      {
-	 count = *length;
-      }
       
       if (rv == 0) {
 	 sock->incomplete_operation = 0;

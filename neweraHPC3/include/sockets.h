@@ -46,10 +46,10 @@ namespace neweraHPC
    void *get_in_addr(struct sockaddr *sa);
    
    /* Function for receiving data from scoket file description */
-   nhpc_status_t socket_recv(nhpc_socket_t *sock, char *buffer, size_t *length);
+   nhpc_status_t socket_recv(nhpc_socket_t *sock, char *buffer, nhpc_size_t *length);
    
    /* Function for sending data to socket file description */
-   nhpc_status_t socket_send(nhpc_socket_t *sock, char *buffer, size_t *length);
+   nhpc_status_t socket_send(nhpc_socket_t *sock, char *buffer, nhpc_size_t *length);
    
    nhpc_status_t nhpc_wait_for_io_or_timeout(nhpc_socket_t *sock, int for_read);
 }

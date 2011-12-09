@@ -204,21 +204,6 @@ namespace neweraHPC
       
       do 
       {
-	 if(nfds == poll_limit)
-	 {
-	    pthread_mutex_lock(&mutex);
-	    int not_null = 1;
-	    for(int i = 1; i < nfds; i++)
-	    {
-	       if(fds[i].fd == 0)
-	       {
-		  memcpy(&fds[i], &fds[i + 1], (nfds - i) * sizeof(pollfd));
-		  nfds--;
-	       }
-	    }
-	    pthread_mutex_unlock(&mutex);
-	 }
-	 
 	 rv = poll(fds, nfds, timeout);
 	 
 	 if(rv < 0)
@@ -246,7 +231,14 @@ namespace neweraHPC
 	       nhpc_socket_cleanup(client_sock, client_socks, fds, cntr, &nfds);
 	       nhpc_poll_clean(fds, &nfds, &cntr);
 	       pthread_mutex_unlock(&mutex);
-	       continue;
+	       break;
+	    }
+	    else 
+	    {
+	       fds[cntr].revents = 0;
+	       
+	       if(cntr != 0)
+	       fds[cntr].events = 0;
 	    }
 	    
 	    if(fds[cntr].fd == *server_sockfd)
@@ -282,27 +274,8 @@ namespace neweraHPC
 	    }
 	    else 
 	    {
-	       char buffer[1000];
-	       memset(buffer, 0,sizeof(buffer));
-	       
-	       rv = recv(fds[cntr].fd, buffer, sizeof(buffer), 0);
-	       if(rv < 0)
-	       {
-		  break;
-	       }
-	       
-	       if(client_sock != NULL && client_sock->have_headers == false)
-	       {
-		  if(client_sock->headers == NULL)
-		     client_sock->headers = new rbtree_t;
-		  
-		  nrv = nhpc_analyze_stream(client_sock, buffer, &rv, NULL);
-		  if(nrv == NHPC_SUCCESS)
-		  {
-                     client_sock->fds_pos = cntr;
-		     thread_manager->create_thread(NULL, (void* (*)(void*))read_communication, client_sock, NHPC_THREAD_DEFAULT);
-		  }		  
-	       }
+	       client_sock->fds_pos = cntr;
+	       thread_manager->create_thread(NULL, (void* (*)(void*))read_communication, client_sock, NHPC_THREAD_DEFAULT);
 	    }	    
 	 }
       }while(true);
@@ -332,19 +305,20 @@ namespace neweraHPC
       shutdown(fds[cntr].fd, SHUT_RDWR);
       close(fds[cntr].fd);
       
-      fds[cntr].fd = 0;
+      memset((fds + (cntr)), 0, sizeof(pollfd));
    }
    
    void nhpc_poll_clean(pollfd *fds, int *nfds, int *cntr)
    {
       for(int i = *cntr; i < *nfds; i++)
-      {
-	 if(fds[i].fd == 0)
+      {	 
+	 if(fds[i].fd == 0 && fds[i + 1].fd != 0)
 	 {
-	    fds[i].fd = fds[i+1].fd;
+	    memcpy((fds + i), (fds + i + 1), sizeof(pollfd));
+	    memset((fds + i + 1), 0, sizeof(pollfd));
 	    (*nfds)--;
 	 }
-      }
+      }      
    }
    
    nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *data, nhpc_size_t *len, nhpc_size_t *header_size)

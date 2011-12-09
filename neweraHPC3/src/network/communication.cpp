@@ -27,16 +27,31 @@ namespace neweraHPC
 {
    void read_communication(nhpc_socket_t *sock)
    {
-      if(sock->headers != NULL)
+      sock->headers = new rbtree_t;
+      
+      char buffer[1000];
+      nhpc_size_t size = 1000;
+      nhpc_status_t nrv = 0;
+      
+      while(sock->have_headers != true)
       {
-	 header_t *header = (header_t *)sock->headers->search(1);
-	 if(header != NULL)
-	 {
-	    if(nhpc_strcmp(header->string, "*HTTP*") == NHPC_SUCCESS)
-	       http_init(sock);
-	 }
+	 size = 1000;
+	 bzero(buffer, size);
+	 
+	 nrv = socket_recv(sock, buffer, &size);
+	 nhpc_analyze_stream(sock, buffer, &size, NULL);
+	 
+	 if(nrv == NHPC_EOF)
+	    break;
       }
-            
+      
+      header_t *header = (header_t *)sock->headers->search(1);
+      if(header != NULL)
+      {
+	 if(nhpc_strcmp(header->string, "*HTTP*") == NHPC_SUCCESS)
+	    http_init(sock);
+      }
+      
       pthread_mutex_lock(sock->server_details->mutex);
       nhpc_socket_cleanup(sock, sock->server_details->client_socks, sock->server_details->fds, sock->fds_pos, sock->server_details->nfds);
       pthread_mutex_unlock(sock->server_details->mutex);

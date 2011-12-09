@@ -46,7 +46,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libweb_server_la_LIBADD =
-am__objects_1 = http.lo
+am__objects_1 = http.lo http_headers.lo
 am_libweb_server_la_OBJECTS = $(am__objects_1)
 libweb_server_la_OBJECTS = $(am_libweb_server_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -201,7 +201,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SOURCES = http.cpp
+SOURCES = http.cpp http_headers.cpp
 noinst_LTLIBRARIES = libweb_server.la 
 libweb_server_la_SOURCES = $(SOURCES)
 all: all-am
@@ -257,6 +257,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/http_headers.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

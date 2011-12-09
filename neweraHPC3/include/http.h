@@ -17,9 +17,25 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _HTTP_H_
+#define _HTTP_H_
+
+#include "constants.h"
+#include "network.h"
+
 namespace neweraHPC
 {
+   struct http_data_t
+   {
+      nhpc_size_t content_length;
+      char        *user_agent;
+      char        *request;
+      int         status;
+   };
+   
    void http_init(nhpc_socket_t *sock);
    void http_request(nhpc_socket_t *sock);
    void http_response(nhpc_socket_t *sock);
 };
+
+#endif

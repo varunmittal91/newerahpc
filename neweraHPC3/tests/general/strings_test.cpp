@@ -99,6 +99,11 @@ int main()
    else
       cout<<"string found"<<endl;
    cout<<endl;
-
+   
+   string_t *string = nhpc_substr("My name is   varun", ' ');
+   string = nhpc_substr("   My name is   varun", ' ');
+   string = nhpc_substr("My name is   varun   ", ' ');
+   string = nhpc_substr("My name is varun", 's');
+   
    return 0;
 }

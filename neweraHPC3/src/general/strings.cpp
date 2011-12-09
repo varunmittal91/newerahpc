@@ -165,4 +165,81 @@ namespace neweraHPC{
       
       return NHPC_SUCCESS;
    }
+   
+   string_t *nhpc_substr(const char *s1, const char s2)
+   {
+      string_t *string = NULL;
+      
+      const char *tmp_s1 = s1;
+      int old_pos = 0;
+      int current_pos = 1;
+      size_t len = 0;
+      
+      while(*tmp_s1 != '\0')
+      {
+	 if(*tmp_s1 == s2)
+	 {
+	    len = current_pos - old_pos - 1;
+	    
+	    char *tmp_string;
+	    if(len != 0)
+	    {
+	       if(string == NULL)
+	       {
+		  string = new string_t;
+		  string->strings = new char*;
+		  string->strings[0] = new char [len + 1];
+		  tmp_string = string->strings[0];
+		  string->count = 1;
+	       }
+	       else 
+	       {
+		  char **tmp_strings = new char* [string->count + 1];
+		  memcpy(tmp_strings, string->strings, sizeof(char*)*(string->count));
+		  delete string->strings;
+		  string->strings = tmp_strings;
+		  string->strings[string->count] = new char [len + 1];
+		  tmp_string = string->strings[string->count];
+		  (string->count)++;
+	       }
+	       
+	       memcpy(tmp_string, (tmp_s1 - len), len);
+	       tmp_string[len] = '\0';
+	    }
+	    
+	    old_pos = current_pos;
+	    
+	    while(*(tmp_s1 + 1) == s2)
+	    {
+	       tmp_s1++;
+	       current_pos++;
+	       old_pos++;
+	    }
+	 }
+	 
+	 current_pos++;
+	 tmp_s1++;
+      }
+      
+      if(old_pos != 0)
+      {
+	 len = (current_pos - old_pos -1);
+	 
+	 if(len != 0)
+	 {
+	    char **tmp_strings = new char* [string->count + 1];
+	    memcpy(tmp_strings, string->strings, sizeof(char*)*(string->count));
+	    delete string->strings;
+	    string->strings = tmp_strings;
+	    string->strings[string->count] = new char [len + 1];
+	    char *tmp_string = string->strings[string->count];
+	    (string->count)++;	 
+	    
+	    memcpy(tmp_string, (tmp_s1 - len), len);
+	    tmp_string[len] = '\0';
+	 }
+      }
+      
+      return string;
+   }
 }

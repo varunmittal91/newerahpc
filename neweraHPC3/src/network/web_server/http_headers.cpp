@@ -17,36 +17,12 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-
-#include <include/network.h>
-
-using namespace std;
+#include <include/http.h>
+#include <include/rbtree.h>
 
 namespace neweraHPC
 {
-   void http_init(nhpc_socket_t *sock)
-   {
-      header_t *header = (header_t *)sock->headers->search(1);
-      
-      if(nhpc_strcmp(header->string, "GET*") == NHPC_SUCCESS)
-	 http_request(sock);
-      else if(nhpc_strcmp(header->string, "HTTP*") == NHPC_SUCCESS)
-	 cout<<"HTTP Response"<<endl;
-      else 
-	 cout<<"Invalid HTTP Header"<<endl;
-   }
-   
-   void http_request(nhpc_socket_t *sock)
-   {
-      cout<<"HTTP Request"<<endl;
-
-      const char *mssg = "HTTP/1.1 200 OK\r\n\r\nWelcome to NeweraHPC Cluster\r\n";
-      nhpc_size_t size = strlen(mssg);
-      socket_send(sock, (char *)mssg, &size);
-   }
-   
-   void http_response(nhpc_socket_t *sock)
+   void read_headers(rbtree_t *headers, http_data_t *http_data)
    {
       
    }

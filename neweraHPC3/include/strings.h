@@ -17,19 +17,33 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _STRINGS_H_
+#define _STRINGS_H_
+
 #include <unistd.h>
 #include <string.h>
 #include <string>
 
 #include "constants.h"
 
-#ifndef _STRINGS_H_
-#define _STRINGS_H_
-
 namespace neweraHPC{
+   struct string_t
+   {
+      char **strings;
+      int count;
+   };
+   
    char *nhpc_strcpy(char *dst, const char *src, size_t dst_len);
+   
+   /* nhpc_strcmp and nhpc_strcmpi takes two strings as input.
+      First string is the subject and the second string is 
+      the string to be matched. Second string can have * operator,
+      kleen closure.
+      First function is case sensitive while other is not. */
    nhpc_status_t nhpc_strcmp(const char *s1, const char *s2);
    nhpc_status_t nhpc_strcmpi(const char *s1, const char *s2);
-}
+   
+   string_t *nhpc_substr(const char *s1, const char s2);
+};
 
 #endif

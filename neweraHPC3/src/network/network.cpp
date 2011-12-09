@@ -186,7 +186,7 @@ namespace neweraHPC
       int poll_limit   = 200;
       struct pollfd *fds = new pollfd[200];
       int nfds           = 1;
-      int current_size   = 0;
+      int current_size   = 1;
       int timeout        = (3 * 60 * 1000);
       
       nhpc_server_details_t *server_details = new nhpc_server_details_t;
@@ -227,8 +227,9 @@ namespace neweraHPC
 	    
 	    if(fds[cntr].revents != POLLIN)
 	    {
-	       pthread_mutex_lock(&mutex);
 	       nhpc_socket_cleanup(client_sock, client_socks, fds, cntr, &nfds);
+
+	       pthread_mutex_lock(&mutex);
 	       nhpc_poll_clean(fds, &nfds, &cntr);
 	       pthread_mutex_unlock(&mutex);
 	       break;

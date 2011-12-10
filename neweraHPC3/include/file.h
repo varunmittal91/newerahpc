@@ -23,5 +23,5 @@
 
 namespace neweraHPC
 {
-   nhpc_status_t nhpc_file_size(FILE *fp, nhpc_size_t *size);
+   nhpc_size_t nhpc_file_size(FILE *fp);
 };

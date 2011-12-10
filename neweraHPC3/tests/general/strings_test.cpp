@@ -114,5 +114,7 @@ int main()
    cout<<s2<<" len "<<strlen(s2)<<endl;
    cout<<s3<<" len "<<strlen(s3)<<endl;
    
+   cout<<nhpc_itostr(123)<<endl;
+   
    return 0;
 }

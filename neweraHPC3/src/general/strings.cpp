@@ -281,4 +281,31 @@ namespace neweraHPC{
 
       return string;
    }
+   
+   char *nhpc_itostr(int num)
+   {
+      int tmp_num = num;
+      int count = 0;
+      
+      while(tmp_num != 0)
+      {
+	 int digit = tmp_num % 10;
+	 tmp_num = tmp_num / 10;	 
+	 count++;
+      }
+      
+      tmp_num = num;
+      char *string = new char [count];
+      int i = 0;
+      
+      while(tmp_num != 0)
+      {
+	 int digit = tmp_num % 10;
+	 tmp_num = tmp_num / 10;
+	 string[count - i - 1] = digit + 48;
+	 i++;
+      }      
+
+      return string;
+   }
 }

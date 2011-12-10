@@ -18,8 +18,11 @@
  */
 
 #include <iostream>
+#include <fstream>
+#include <sys/stat.h>
 
 #include <include/network.h>
+#include <include/general.h>
 
 using namespace std;
 
@@ -39,16 +42,73 @@ namespace neweraHPC
    
    void http_request(nhpc_socket_t *sock)
    {
-      cout<<"HTTP Request"<<endl;
-      
       header_t *header = (header_t *)sock->headers->search(1);
       string_t *request = nhpc_substr(header->string, ' ');
-      for(int i = 0; i < request->count; i++)
-	 cout<<request->strings[i]<<endl;
+      
+      if(request->count < 3)
+      {
+	 const char *mssg = "HTTP/1.1 403 Invalid Request\r\n\r\nInvalid request\r\n";
+	 nhpc_size_t size = strlen(mssg);
+	 socket_send(sock, (char *)mssg, &size);
+      }
+      else 
+      {
+	 char *file_url = nhpc_strconcat(HTTP_ROOT, request->strings[1]);
+	 
+	 FILE *fp = fopen(file_url, "r");
+	 if(fp == NULL)
+	 {
+	    const char *mssg = "HTTP/1.1 404 Content Not Found\r\n\r\nContent Not Found\r\n";
+	    nhpc_size_t size = strlen(mssg);
+	    socket_send(sock, (char *)mssg, &size);
+	 }
+	 else 
+	 {
+	    struct stat bufferx;
+	    stat(file_url, &bufferx);
+	    
+	    size_t file_size = bufferx.st_size;
+	    
+	    const char *mssg = "HTTP/1.1 200 OK\r\nContent-Length: ";
+	    char *file_size_str = nhpc_itostr(file_size);
+	    mssg = nhpc_strconcat(mssg, file_size_str);
+	    mssg = nhpc_strconcat(mssg, "\r\n\r\n");
+	    cout<<mssg<<endl;
+	    nhpc_size_t size = strlen(mssg);
+	    socket_send(sock, (char *)mssg, &size);
 
-      const char *mssg = "HTTP/1.1 200 OK\r\n\r\nWelcome to NeweraHPC Cluster\r\n";
-      nhpc_size_t size = strlen(mssg);
-      socket_send(sock, (char *)mssg, &size);
+	    nhpc_status_t nrv;
+	    
+	    char buffer[1000];
+	    
+	    int bytes = 0;
+	    
+	    while(1)
+	    {
+	       bzero(buffer, 1000);
+
+	       nhpc_size_t len = fread(buffer, 1, sizeof(buffer), fp);
+	       bytes += len;
+	       nhpc_size_t size = len;
+	       nrv = write(sock->sockfd, buffer, len);
+
+	       cout<<nrv<<" "<<len<<endl;
+	       
+	       if(len == 0)
+		  break;
+	       /*
+	       else if(nrv == -1)
+	       {
+		  perror("httP");
+		  break;
+	       }
+		*/
+	    }
+	    
+	    cout<<"bytes transmitted: "<<bytes<<endl;
+	    fclose(fp);
+	 }
+      }
    }
    
    void http_response(nhpc_socket_t *sock)

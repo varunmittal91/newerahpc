@@ -97,7 +97,7 @@ namespace neweraHPC
 	 }
 	 else {
             do {
-	       rv =write(sock->sockfd, buffer, (*length));
+	       rv = write(sock->sockfd, buffer, (*length));
             } while (rv == -1 && errno == EINTR);
 	 }	 
       }
@@ -105,7 +105,7 @@ namespace neweraHPC
       if(rv == -1)
       {
 	 *length = 0;
-	 return errno;
+	 return -1;
       }
       
       if ((sock->timeout > 0) && (rv < *length)) {

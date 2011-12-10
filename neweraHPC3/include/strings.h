@@ -46,6 +46,8 @@ namespace neweraHPC{
    string_t *nhpc_substr(const char *s1, const char s2);
    
    char *nhpc_strconcat(const char *s1, const char *s2);
+   
+   char *nhpc_itostr(int num);
 };
 
 #endif

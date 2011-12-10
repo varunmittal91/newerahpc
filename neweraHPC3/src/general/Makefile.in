@@ -47,7 +47,7 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgeneral_la_LIBADD =
 am__objects_1 = rbtree.lo thread.lo strings.lo tree.lo cfg.lo \
-	parse_tree.lo error.lo
+	parse_tree.lo error.lo file.lo
 am_libgeneral_la_OBJECTS = $(am__objects_1)
 libgeneral_la_OBJECTS = $(am_libgeneral_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -206,10 +206,11 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SOURCES = rbtree.cpp thread.cpp strings.cpp tree.cpp cfg.cpp parse_tree.cpp error.cpp
+SOURCES = rbtree.cpp thread.cpp strings.cpp tree.cpp cfg.cpp parse_tree.cpp error.cpp file.cpp
 noinst_LTLIBRARIES = libgeneral.la
 libgeneral_la_SOURCES = $(SOURCES)
 libgeneral_la_LDFLAGS = -lpthread
+libgeneral_la_CFLAGS = CFLAGS
 all: all-am
 
 .SUFFIXES:
@@ -264,6 +265,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cfg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/error.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parse_tree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rbtree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strings.Plo@am__quote@

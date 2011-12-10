@@ -10,10 +10,8 @@ AC_CONFIG_MACRO_DIR([m4])
 
 # Checks for programs.
 AC_PROG_CXX
-AC_ARG_ENABLE([debug],AC_HELP_STRING([--enable-debug], [ENABLE debugging for the project]))
-AS_IF([test "x$enable_debug" != "xno"], [
-#CXXFLAGS = "$CXXFLAGS -g"
-])
+AC_ARG_ENABLE(debug, "turn on debug flag", CFLAGS = "$CFLAGS -debug")
+
 # Checks for libraries.
 AC_CHECK_LIB([pthread],[pthread_create],[],[AC_MSG_ERROR([libpthread not found])])
 

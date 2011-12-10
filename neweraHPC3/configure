@@ -1386,7 +1386,7 @@ Optional Features:
   --disable-silent-rules         verbose build output (undo: `make V=0')
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
-  --enable-debug          ENABLE debugging for the project
+"turn on debug flag"
   --enable-tests Build test files for various algorithms and features used in the system
   --enable-shared[=PKGS]  build shared libraries [default=yes]
   --enable-static[=PKGS]  build static libraries [default=yes]
@@ -3595,14 +3595,10 @@ fi
 
 # Check whether --enable-debug was given.
 if test "${enable_debug+set}" = set; then :
-  enableval=$enable_debug;
+  enableval=$enable_debug; CFLAGS = "$CFLAGS -debug"
 fi
 
-if test "x$enable_debug" != "xno"; then :
 
-#CXXFLAGS = "$CXXFLAGS -g"
-
-fi
 # Checks for libraries.
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'

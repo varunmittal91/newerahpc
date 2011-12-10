@@ -34,8 +34,7 @@ void func_sleep(void)
 }
 
 int main()
-{
-   
+{   
    cout<<"This program is mainly build built for testing the efficiency of rbtree_t module used in the neweraHPC library"<<endl;
    cout<<"Please use some tool to test for memory leaks\n"<<"Attach the binary to some tool and then press any key"<<endl;
    

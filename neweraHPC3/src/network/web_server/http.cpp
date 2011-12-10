@@ -40,6 +40,11 @@ namespace neweraHPC
    void http_request(nhpc_socket_t *sock)
    {
       cout<<"HTTP Request"<<endl;
+      
+      header_t *header = (header_t *)sock->headers->search(1);
+      string_t *request = nhpc_substr(header->string, ' ');
+      for(int i = 0; i < request->count; i++)
+	 cout<<request->strings[i]<<endl;
 
       const char *mssg = "HTTP/1.1 200 OK\r\n\r\nWelcome to NeweraHPC Cluster\r\n";
       nhpc_size_t size = strlen(mssg);

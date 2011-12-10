@@ -17,11 +17,12 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GENERAL_H_
-#define _GENERAL_H_
+#ifndef _CONFIG_H_
+#define _CONFIG_H_
 
-#include "error.h"
-#include "containers.h"
-#include "file.h"
+namespace neweraHPC
+{
+   void read_config();
+};
 
 #endif

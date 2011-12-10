@@ -242,4 +242,43 @@ namespace neweraHPC{
       
       return string;
    }
+   
+   char *nhpc_strconcat(const char *s1, const char *s2)
+   {
+      char *string = NULL;
+      
+      if(s1 == NULL || s2 == NULL)
+	 return NULL;
+      
+      nhpc_size_t len_s1 = strlen(s1);
+      nhpc_size_t len_s2 = strlen(s2);
+      
+      if((len_s1 == 0) && (len_s2 == 0))
+	 return NULL;
+      else if(len_s1 == 0)
+      {
+	 string = new char [len_s2 + 1];
+	 memcpy(string, s2, len_s2);
+	 string[len_s2] = '\0';
+      }
+      else if(len_s2 == 0)
+      {
+	 cout<<"len s2 = 0"<<endl;
+	 
+	 string = new char [len_s1 + 1];
+	 memcpy(string, s1, len_s1);
+	 string[len_s1] = '\0';
+      }
+      else 
+      {
+	 nhpc_size_t len = strlen(s1) + strlen(s2);
+
+	 string = new char [len + 1];
+	 memcpy(string, s1, len_s1);
+	 memcpy(string + len_s1, s2, len_s2);
+	 string[len] = '\0';
+      }
+
+      return string;
+   }
 }

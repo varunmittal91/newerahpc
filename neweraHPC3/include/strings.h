@@ -44,6 +44,8 @@ namespace neweraHPC{
    nhpc_status_t nhpc_strcmpi(const char *s1, const char *s2);
    
    string_t *nhpc_substr(const char *s1, const char s2);
+   
+   char *nhpc_strconcat(const char *s1, const char *s2);
 };
 
 #endif

@@ -77,8 +77,8 @@ am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 libneweraHPC_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(AM_CFLAGS) $(CFLAGS) $(libneweraHPC_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
+	$(libneweraHPC_la_CFLAGS) $(CFLAGS) $(libneweraHPC_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -269,6 +269,7 @@ lib_LTLIBRARIES = libneweraHPC.la
 libneweraHPC_la_SOURCES = 
 libneweraHPC_la_LIBADD = network/libnetwork.la general/libgeneral.la internal/libinternal.la poll/libpoll.la ai/libai.la
 libneweraHPC_la_LDFLAGS = -version-info 2:90
+libneweraHPC_la_CFLAGS = CFLAGS
 all: all-recursive
 
 .SUFFIXES:

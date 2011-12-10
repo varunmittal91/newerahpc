@@ -17,11 +17,17 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GENERAL_H_
-#define _GENERAL_H_
+#include <include/file.h>
 
-#include "error.h"
-#include "containers.h"
-#include "file.h"
-
-#endif
+namespace neweraHPC
+{
+   nhpc_size_t nhpc_file_size(FILE *fp)
+   {
+      size_t size = fseek(fp, 0L, SEEK_END);
+      size = ftell(fp);
+      
+      fseek(fp, 0L, SEEK_SET);
+      
+      return size;
+   }
+};

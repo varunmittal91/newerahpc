@@ -23,6 +23,8 @@
 #include "constants.h"
 #include "network.h"
 
+#define HTTP_ROOT "/www"
+
 namespace neweraHPC
 {
    struct http_data_t

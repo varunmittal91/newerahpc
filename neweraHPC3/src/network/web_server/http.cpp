@@ -84,35 +84,17 @@ namespace neweraHPC
 
 	    nhpc_status_t nrv;
 	    
-	    char buffer[10000];
+	    char buffer[10000];	    
+	    int len;
 	    
-	    int bytes = 0;
-	    
-	    while(1)
+	    do
 	    {
-	       int len = fread(buffer, 1, sizeof(buffer), fp);
-	       bytes += len;
+	       len = fread(buffer, 1, sizeof(buffer), fp);
+	       size = len;
 	       
-	       
-	       int offset = 0;
-	       do
-	       {
-		  size = len - offset;
-		  
-		  nrv = socket_send(sock, (buffer + offset), &size);
-		  
-		  offset += size;
-	       }while(offset != len);
-	       
-	       if(nrv != 1)
-		  exit(0);
-	       	       		
-	       if(nrv == EPIPE)
-		  break;
-		  
-	       if(len == 0)
-		  break;
-	    }
+	       nrv = socket_send(sock, buffer, &size);	
+	    }while(nrv != EPIPE && len != 0);
+		   
 	    fclose(fp);
 	 }
       }

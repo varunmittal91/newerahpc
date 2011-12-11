@@ -94,15 +94,39 @@ namespace neweraHPC
       {
       do_select:
 	 nrv = nhpc_wait_for_io_or_timeout(sock, 0);
-	 if (nrv != NHPC_SUCCESS) {
+	 if (nrv != NHPC_SUCCESS) 
+	 {
             *length = 0;
             return nrv;
 	 }
-	 else {
+	 else 
+	 {
+	    nhpc_size_t offset = 0;
+	    nhpc_size_t data_sent = 0;
+	    
             do 
 	    {
-	       rv = write(sock->sockfd, buffer, (*length));
-            }while (rv == -1 && errno == EINTR);
+	       rv = write(sock->sockfd, (buffer + data_sent), ((*length) - data_sent));
+	       
+	       if(rv > 0)
+	       {
+		  data_sent += rv;
+		  offset = *length - data_sent;
+		  rv = data_sent;
+	       }
+	       else 
+	       {
+		  if(errno == EAGAIN)
+		  { 
+		     nrv = nhpc_wait_for_io_or_timeout(sock, 0);
+		     if (nrv != NHPC_SUCCESS) 
+		     {
+			*length = 0;
+			return nrv;
+		     }
+		  }
+	       }
+            }while (((rv == -1 && errno == EINTR) || data_sent < *length) && errno != EPIPE);   
 	 }
       }
       

@@ -173,8 +173,6 @@ namespace neweraHPC
    
    void sig_action(int sig)
    {
-      cout<<"pipe broken: ";
-      cout<<pthread_self()<<endl;
    }
    
    void *network_t::accept_connection(nhpc_thread_details_t *main_thread)

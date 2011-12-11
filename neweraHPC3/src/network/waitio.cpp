@@ -32,7 +32,7 @@ namespace neweraHPC
       struct pollfd pfd;
       int rc, timeout;
       
-      timeout = sock->timeout;
+      timeout = 3 * 60 *60;
       pfd.fd = sock->sockfd;
       pfd.events = for_read ? POLLIN : POLLOUT;      
       

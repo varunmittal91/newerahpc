@@ -63,13 +63,13 @@ namespace neweraHPC
 	 (*length) = 0;
 	 return errno;
       }
-      if ((sock->timeout > 0) && (rv < *length)) {
+      if((sock->timeout > 0) && (rv < *length)){
 	 sock->incomplete_operation = NHPC_INCOMPLETE;
       }
       
       (*length) = rv;
       
-      if (rv == 0) {
+      if(rv == 0){
 	 sock->incomplete_operation = 0;
 	 return NHPC_EOF;
       }
@@ -82,6 +82,9 @@ namespace neweraHPC
       int rv;
       int nrv;
       
+      if(sock->incomplete_operation == NHPC_INCOMPLETE)
+	 goto do_select;
+      
       do 
       {
 	 rv = write(sock->sockfd, buffer, (*length));
@@ -90,25 +93,26 @@ namespace neweraHPC
       while ((rv == -1) && (errno == EAGAIN || errno == EWOULDBLOCK) && (sock->timeout > 0)) 
       {
       do_select:
-	 nrv = nhpc_wait_for_io_or_timeout(sock, 1);
+	 nrv = nhpc_wait_for_io_or_timeout(sock, 0);
 	 if (nrv != NHPC_SUCCESS) {
             *length = 0;
             return nrv;
 	 }
 	 else {
-            do {
+            do 
+	    {
 	       rv = write(sock->sockfd, buffer, (*length));
-            } while (rv == -1 && errno == EINTR);
-	 }	 
+            }while (rv == -1 && errno == EINTR);
+	 }
       }
       
       if(rv == -1)
       {
 	 *length = 0;
-	 return -1;
+	 return errno;
       }
       
-      if ((sock->timeout > 0) && (rv < *length)) {
+      if((sock->timeout > 0) && (rv < *length)) {
 	 sock->incomplete_operation = NHPC_INCOMPLETE;
       }
       
@@ -117,4 +121,3 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }   
 };
-

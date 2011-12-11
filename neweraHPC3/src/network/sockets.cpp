@@ -77,44 +77,7 @@ namespace neweraHPC
       
       return NHPC_SUCCESS;
    }
-   
-   nhpc_status_t socket_open(nhpc_socket_t *sock, int connection_queue)
-   {
-      int rv;
-      int nrv;
-      
-      int enable_opts = 1;
-      
-      rv = setsockopt(sock->sockfd, SOL_SOCKET, SO_REUSEADDR, &enable_opts, sizeof(int));
-      if(rv == -1)
-      {
-	 perror("set sock options");
-	 return errno;
-      }
-      
-      nrv = socket_bind(sock);
-      if(nrv != NHPC_SUCCESS)
-      {
-	 perror("bind socket");
-	 return errno;
-      }
-      
-      nrv = socket_listen(sock, &connection_queue);
-      if(nrv != NHPC_SUCCESS)
-      {
-	 perror("socket listen");
-	 return errno;
-      }
-      
-      nrv = socket_accept(sock);
-      if(nrv != NHPC_SUCCESS){
-	 perror("socket accept");
-	 return errno;
-      }
-      
-      return NHPC_SUCCESS;
-   }
-   
+     
    nhpc_status_t socket_bind(nhpc_socket_t *sock)
    {
       int rv;
@@ -136,82 +99,7 @@ namespace neweraHPC
       
       return NHPC_SUCCESS;
    }
-   
-   nhpc_status_t socket_accept(nhpc_socket_t *sock)
-   {
-      int rv;
-      int nrv;
       
-      struct sockaddr_storage client_addr;
-      int client_sockfd;
-      socklen_t sin_size = sizeof client_addr;
-      char s[INET6_ADDRSTRLEN];
-      
-      while(1)
-      {
-	 nrv = nhpc_wait_for_io_or_timeout(sock, 1);
-	 if(nrv != NHPC_SUCCESS)
-	    continue;
-	 else
-	 {
-	    rv = accept(sock->sockfd, (struct sockaddr *)&client_addr, &sin_size);
-	    if(rv != -1)
-	    {
-	       cout<<"connection accepted"<<endl;
-	       
-	       char buffer[1000];
-	       size_t size = 1000;
-	       nhpc_socket_t *sock_new = new nhpc_socket_t;
-	       sock_new->sockfd = rv;
-	       sock_new->timeout = sock->timeout;
-	       nrv = 0;
-	       int exit_status = 0;
-	       while(exit_status != NHPC_EOF)
-	       {
-		  bzero(buffer, 1000);
-		  nrv = socket_recv(sock_new, buffer, &size);
-		  cout<<size<<nrv<<endl;
-		  cout<<buffer<<endl;		  
-		  
-		  size_t start_pos = 0;
-		  size_t end_pos = 0;
-		  
-		  for(int cntr = 0; cntr < size; cntr++)
-		  {
-		     if(buffer[cntr] == '\r')
-		     {
-			end_pos = cntr;
-			size_t length = end_pos - start_pos;
-			cout<<length<<" string terminated "<<start_pos<<" "<<end_pos<<endl;
-			if(length == 0)
-			{
-			   exit_status = NHPC_EOF;
-			   break;
-			}
-		     }
-		     else if(buffer[cntr] == '\n')
-		     {
-			cout<<"new line"<<endl;
-			start_pos = cntr + 1;
-		     }
-		     
-		  }
-	       }
-	       
-	       const char *buffer_send = "Welcome to NeweraCLuster";
-	       size = strlen(buffer_send);
-	       socket_send(sock_new, (char *)buffer_send, &size);
-	       close(sock_new->sockfd);
-	    }
-	    else {
-	       cout<<"hi"<<endl;
-	    }
-	 }
-      }
-      
-      return NHPC_SUCCESS;
-   }
-   
    nhpc_status_t socket_getaddrinfo(nhpc_socket_t **sock, const char *host_addr, const char *host_port,
 				    int family, int type, int protocol) 
    {

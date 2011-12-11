@@ -171,6 +171,12 @@ namespace neweraHPC
       return NHPC_SUCCESS;      
    }
    
+   void sig_action(int sig)
+   {
+      cout<<"pipe broken: ";
+      cout<<pthread_self()<<endl;
+   }
+   
    void *network_t::accept_connection(nhpc_thread_details_t *main_thread)
    {
       nhpc_size_t rv;
@@ -267,6 +273,7 @@ namespace neweraHPC
 		  client_sock->headers = NULL;
 		  client_sock->have_headers = false;
 	  	  client_sock->server_details = server_details;
+		  client_sock->timeout = 3 * 60 * 60;
 
                   pthread_mutex_lock(&mutex);
 		  client_socks->insert(client_sock, new_sd);

@@ -28,6 +28,8 @@ using namespace std;
 
 namespace neweraHPC
 {
+   void sig_action(int);
+   
    void http_init(nhpc_socket_t *sock)
    {
       header_t *header = (header_t *)sock->headers->search(1);
@@ -42,6 +44,8 @@ namespace neweraHPC
    
    void http_request(nhpc_socket_t *sock)
    {
+      signal(SIGPIPE, sig_action);
+      
       header_t *header = (header_t *)sock->headers->search(1);
       string_t *request = nhpc_substr(header->string, ' ');
       
@@ -53,6 +57,8 @@ namespace neweraHPC
       }
       else 
       {
+	 nhpc_display_headers(sock);
+	 
 	 char *file_url = nhpc_strconcat(HTTP_ROOT, request->strings[1]);
 	 
 	 FILE *fp = fopen(file_url, "r");
@@ -73,39 +79,40 @@ namespace neweraHPC
 	    char *file_size_str = nhpc_itostr(file_size);
 	    mssg = nhpc_strconcat(mssg, file_size_str);
 	    mssg = nhpc_strconcat(mssg, "\r\n\r\n");
-	    cout<<mssg<<endl;
 	    nhpc_size_t size = strlen(mssg);
 	    socket_send(sock, (char *)mssg, &size);
 
 	    nhpc_status_t nrv;
 	    
-	    char buffer[1000];
+	    char buffer[10000];
 	    
 	    int bytes = 0;
 	    
 	    while(1)
 	    {
-	       bzero(buffer, 1000);
-
-	       nhpc_size_t len = fread(buffer, 1, sizeof(buffer), fp);
+	       int len = fread(buffer, 1, sizeof(buffer), fp);
 	       bytes += len;
-	       nhpc_size_t size = len;
-	       nrv = write(sock->sockfd, buffer, len);
-
-	       cout<<nrv<<" "<<len<<endl;
 	       
+	       
+	       int offset = 0;
+	       do
+	       {
+		  size = len - offset;
+		  
+		  nrv = socket_send(sock, (buffer + offset), &size);
+		  
+		  offset += size;
+	       }while(offset != len);
+	       
+	       if(nrv != 1)
+		  exit(0);
+	       	       		
+	       if(nrv == EPIPE)
+		  break;
+		  
 	       if(len == 0)
 		  break;
-	       /*
-	       else if(nrv == -1)
-	       {
-		  perror("httP");
-		  break;
-	       }
-		*/
 	    }
-	    
-	    cout<<"bytes transmitted: "<<bytes<<endl;
 	    fclose(fp);
 	 }
       }

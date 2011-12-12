@@ -1,10 +1,5 @@
 /*
- *  Original Author
- *	(C) 1999  Andrea Arcangeli <andrea@suse.de>
- *
- *	Modified by
  *	(C) 2011 Varun Mittal <varunmittal91@gmail.com>
- *
  *	NeweraHPC program is distributed under the terms of the GNU General Public License v2
  *
  *	This file is part of NeweraHPC.
@@ -21,6 +16,7 @@
  *	You should have received a copy of the GNU General Public License
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 #ifndef _SOCKETS_H_
 #define _SOCKETS_H_

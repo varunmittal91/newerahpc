@@ -46,7 +46,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgrid_la_LIBADD =
-am__objects_1 = grid_scheduler.lo
+am__objects_1 = grid_scheduler.lo grid_plugin.lo
 am_libgrid_la_OBJECTS = $(am__objects_1)
 libgrid_la_OBJECTS = $(am_libgrid_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -204,7 +204,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SOURCES = grid_scheduler.cpp
+SOURCES = grid_scheduler.cpp grid_plugin.cpp
 noinst_LTLIBRARIES = libgrid.la
 libgrid_la_SOURCES = $(SOURCES)
 libgrid_la_LDFLAGS = -lpthread
@@ -261,6 +261,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_plugin.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_scheduler.Plo@am__quote@
 
 .cpp.o:

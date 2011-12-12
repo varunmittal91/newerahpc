@@ -1,5 +1,5 @@
 /*
- *	(C) 2011 Varun Mittal <varunmittal91@gmail.com>
+ *	(C) 2011 Varun Mittal <varunmittal91@gmail.com> & Varun Dhawan <varundhawan5792@gmail.com>
  *	NeweraHPC program is distributed under the terms of the GNU General Public License v2
  *
  *	This file is part of NeweraHPC.
@@ -17,7 +17,17 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
+
+#include <include/neweraHPC.h>
+
+using namespace std;
+using namespace neweraHPC;
+
 int main(int argc,char **argv)
 {
-	return 0;
+   thread_manager_t thread_manager;
+   plugin_manager_t plugin_manager(&thread_manager);
+   
+   return 0;
 }

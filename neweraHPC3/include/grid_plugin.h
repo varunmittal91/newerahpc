@@ -1,5 +1,5 @@
 /*
- *	(C) 2011 Varun Mittal <varunmittal91@gmail.com>
+ *	(C) 2011 Varun Mittal <varunmittal91@gmail.com> & Varun Dhawan <varundhawan5792@gmail.com>
  *	NeweraHPC program is distributed under the terms of the GNU General Public License v2
  *
  *	This file is part of NeweraHPC.
@@ -17,32 +17,29 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NEWERAHPC_H_
-#define _NEWERAHPC_H_
+#ifndef _GRID_PLUGIN_H_
+#define _GRID_PLUGIN_H_
+
+#include <pthread.h>
 
 #include "rbtree.h"
 #include "thread.h"
-#include "network.h"
-#include "strings.h"
-#include "general.h"
-#include "grid.h"
 
-namespace neweraHPC
+namespace neweraHPC 
 {
-   struct worker_threads
-   {
-      int connection_id;
-   };
-   
-   class neweraHPC_main
+   class plugin_manager_t
    {
    private:
-      network_t *main_network;
-      rbtree_t *worker_threads;
+      rbtree_t *plugins_installed;
+      rbtree_t *plugins_requested;
+      thread_manager_t *thread_manager;
+      pthread_mutex_t *mutex;
+      
    public:
-      neweraHPC_main();
-      ~neweraHPC_main();
-   };  
+      plugin_manager_t(thread_manager_t *in_thread_manager);
+      ~plugin_manager_t();
+      int request_plugin(int peer_id, int remote_plugin_id);
+   };
 };
 
 #endif

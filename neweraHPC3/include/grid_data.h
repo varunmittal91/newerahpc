@@ -74,7 +74,7 @@ namespace neweraHPC
    struct plugin_request_t
    {
       int peer_id;
-      int plugin_id;
+      int remote_plugin_id;
       bool status;
    };   
 };

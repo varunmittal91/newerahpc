@@ -1,5 +1,5 @@
 /*
- *	(C) 2011 Varun Mittal <varunmittal91@gmail.com>
+ *	(C) 2011 Varun Mittal <varunmittal91@gmail.com> & Varun Dhawan <varundhawan5792@gmail.com>
  *	NeweraHPC program is distributed under the terms of the GNU General Public License v2
  *
  *	This file is part of NeweraHPC.
@@ -17,32 +17,21 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NEWERAHPC_H_
-#define _NEWERAHPC_H_
+#include <iostream>
 
-#include "rbtree.h"
-#include "thread.h"
-#include "network.h"
-#include "strings.h"
-#include "general.h"
-#include "grid.h"
+#include <include/grid.h>
+
+using namespace std;
 
 namespace neweraHPC
 {
-   struct worker_threads
+   plugin_manager_t::plugin_manager_t(thread_manager_t *in_thread_manager)
    {
-      int connection_id;
-   };
+      thread_manager = in_thread_manager;
+      cout<<this<<endl;
+   }
    
-   class neweraHPC_main
-   {
-   private:
-      network_t *main_network;
-      rbtree_t *worker_threads;
-   public:
-      neweraHPC_main();
-      ~neweraHPC_main();
-   };  
+   plugin_manager_t::~plugin_manager_t(){
+      
+   }
 };
-
-#endif

@@ -281,9 +281,6 @@ namespace neweraHPC{
 
       return string;
    }
-<<<<<<< .mine
-}
-=======
    
    char *nhpc_itostr(int num)
    {
@@ -311,4 +308,4 @@ namespace neweraHPC{
 
       return string;
    }
-}>>>>>>> .r156
+}

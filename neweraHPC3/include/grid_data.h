@@ -20,25 +20,43 @@
 #ifndef _GRID_DATA_H_
 #define _GRID_DATA_H_
 
+/* Grid configuration file which will contain peer list */
+#define grid_conf_file "/etc/grid.conf"
+
 typedef (void *(fnc_ptr)(void *));
 
 namespace neweraHPC
 {
-   struct fnc_details_t
+   /* Plugin details for the modules that are added to be run in a grid */
+   struct plugin_details_t
    {
+      /* Address of the base plugin function that server will run*/
       fnc_ptr ptr_exec;
+      /* Address of the plugin function that client will run 
+       for assembly of data and other purposes */
       fnc_ptr ptr_client;
+      /* Address of processing function for actual implementation 
+       of the algorith in plugin */
       fnc_ptr ptr_processor;
-      char *path_dll;
+      /* Path of plugin on the server */
+      char *path_plugin;
+      /* Path of nxi file for plugin on server */
       char *path_nxi;
    };
    
+   /* Peer details maintained at the server */
    struct peer_details_t
    {
+      /* Port for peer server */
       int port;
+      /* Address for peer server */
       char *host;
+      /* Number of processors on perr server */
       int processors;
+      /* Weight of the peer server, calculated on the basis
+       of processors and network latency */
       int weight;
+      /* Status of peer server, wether busy or available */
       int status;
    };
 };

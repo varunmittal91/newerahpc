@@ -38,8 +38,12 @@ namespace neweraHPC
    public:
       plugin_manager_t(thread_manager_t *in_thread_manager);
       ~plugin_manager_t();
+      void lock();
+      void unlock();
       int request_plugin(int peer_id, int remote_plugin_id);
    };
+   
+   void *plugin_request_thread(plugin_manager_t *plugin_manager);
 };
 
 #endif

@@ -28,10 +28,26 @@ namespace neweraHPC
    plugin_manager_t::plugin_manager_t(thread_manager_t *in_thread_manager)
    {
       thread_manager = in_thread_manager;
-      cout<<this<<endl;
+      plugins_installed = new rbtree_t;
+      plugins_requested = new rbtree_t;
+      mutex = new pthread_mutex_t;
+      pthread_mutex_init(mutex, NULL);
+      
+      thread_manager->create_thread(NULL, (void* (*)(void*))plugin_request_thread, this, NHPC_THREAD_DEFAULT);
    }
    
-   plugin_manager_t::~plugin_manager_t(){
+   plugin_manager_t::~plugin_manager_t()
+   {
       
+   }
+   
+   void plugin_manager_t::lock()
+   {
+      pthread_mutex_lock(mutex);
+   }
+   
+   void *plugin_request_thread(plugin_manager_t *plugin_manager)
+   {
+
    }
 };

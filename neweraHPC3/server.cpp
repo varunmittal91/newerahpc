@@ -29,5 +29,8 @@ int main(int argc,char **argv)
    thread_manager_t thread_manager;
    plugin_manager_t plugin_manager(&thread_manager);
    
+   while(1)
+      sleep(1);
+   
    return 0;
 }

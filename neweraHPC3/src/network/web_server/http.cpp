@@ -44,7 +44,7 @@ namespace neweraHPC
    
    void http_request(nhpc_socket_t *sock)
    {
-      signal(SIGPIPE, sig_action);
+      signal(SIGPIPE, SIG_IGN);
       
       header_t *header = (header_t *)sock->headers->search(1);
       string_t *request = nhpc_substr(header->string, ' ');
@@ -93,6 +93,7 @@ namespace neweraHPC
 	       size = len;
 	       
 	       nrv = socket_send(sock, buffer, &size);	
+	       
 	    }while(nrv != EPIPE && len != 0);
 		   
 	    fclose(fp);

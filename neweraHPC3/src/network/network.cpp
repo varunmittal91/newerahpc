@@ -173,6 +173,8 @@ namespace neweraHPC
    
    void sig_action(int sig)
    {
+      if(sig == SIGPIPE)
+	 cout<<"PIPE Broken at thread - "<<pthread_self()<<endl;
    }
    
    void *network_t::accept_connection(nhpc_thread_details_t *main_thread)
@@ -219,6 +221,7 @@ namespace neweraHPC
 	 {
 	    continue;
 	 }
+	 
 	 current_size = nfds;
 	 for(int cntr = 0; cntr < current_size; cntr++)
 	 {

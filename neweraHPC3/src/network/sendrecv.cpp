@@ -87,7 +87,12 @@ namespace neweraHPC
       
       do 
       {
-	 rv = write(sock->sockfd, buffer, (*length));
+	 rv = send(sock->sockfd, buffer, (*length), 0);
+	 if(errno == EPIPE)
+	 {
+	    *length = 0;
+	    return EPIPE;
+	 }
       } while(rv == -1 && errno == EINTR);      
       
       while ((rv == -1) && (errno == EAGAIN || errno == EWOULDBLOCK) && (sock->timeout > 0)) 
@@ -106,7 +111,7 @@ namespace neweraHPC
 	    
             do 
 	    {
-	       rv = write(sock->sockfd, (buffer + data_sent), ((*length) - data_sent));
+	       rv = send(sock->sockfd, (buffer + data_sent), ((*length) - data_sent), 0);
 	       
 	       if(rv > 0)
 	       {

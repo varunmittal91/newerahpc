@@ -32,14 +32,18 @@ namespace neweraHPC
    {
       /* Address of the base plugin function that server will run*/
       fnc_ptr ptr_exec;
+      
       /* Address of the plugin function that client will run 
        for assembly of data and other purposes */
       fnc_ptr ptr_client;
+
       /* Address of processing function for actual implementation 
        of the algorith in plugin */
       fnc_ptr ptr_processor;
+      
       /* Path of plugin on the server */
       char *path_plugin;
+      
       /* Path of nxi file for plugin on server */
       char *path_nxi;
    };
@@ -49,19 +53,30 @@ namespace neweraHPC
    {
       /* Unique Peer id */
       int id;
+      
       /* Port for peer server */
       int port;
+      
       /* Address for peer server */
       char *host;
+      
       /* Number of processors on perr server */
       int processors;
+      
       /* Weight of the peer server, calculated on the basis
        of processors and network latency */
       int weight;
+      
       /* Status of peer server, wether busy or available */
-      int status;
+      bool status;
    };
-
+   
+   struct plugin_request_t
+   {
+      int peer_id;
+      int plugin_id;
+      bool status;
+   };   
 };
 
 #endif

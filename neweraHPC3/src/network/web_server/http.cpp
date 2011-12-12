@@ -44,8 +44,6 @@ namespace neweraHPC
    
    void http_request(nhpc_socket_t *sock)
    {
-      signal(SIGPIPE, SIG_IGN);
-      
       header_t *header = (header_t *)sock->headers->search(1);
       string_t *request = nhpc_substr(header->string, ' ');
       

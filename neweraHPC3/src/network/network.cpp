@@ -179,6 +179,8 @@ namespace neweraHPC
    
    void *network_t::accept_connection(nhpc_thread_details_t *main_thread)
    {
+      signal(SIGPIPE, SIG_IGN);
+      
       nhpc_size_t rv;
       nhpc_status_t nrv;
       pthread_mutex_t mutex;

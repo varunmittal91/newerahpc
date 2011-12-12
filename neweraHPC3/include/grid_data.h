@@ -47,6 +47,8 @@ namespace neweraHPC
    /* Peer details maintained at the server */
    struct peer_details_t
    {
+      /* Unique Peer id */
+      int id;
       /* Port for peer server */
       int port;
       /* Address for peer server */
@@ -59,6 +61,7 @@ namespace neweraHPC
       /* Status of peer server, wether busy or available */
       int status;
    };
+
 };
 
 #endif

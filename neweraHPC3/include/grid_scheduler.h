@@ -20,6 +20,8 @@
 #ifndef _GRID_DATA_H_
 #define _GRID_DATA_H_
 
+#include "grid_data.h"
+
 namespace neweraHPC
 {
    /* Store Network connection details */

@@ -17,6 +17,8 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <include/grid.h>
+
 namespace neweraHPC
 {
    void test_grid()

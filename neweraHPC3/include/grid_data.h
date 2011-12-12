@@ -23,7 +23,7 @@
 /* Grid configuration file which will contain peer list */
 #define grid_conf_file "/etc/grid.conf"
 
-typedef (void *(fnc_ptr)(void *));
+typedef void *(fnc_ptr)(void *);
 
 namespace neweraHPC
 {

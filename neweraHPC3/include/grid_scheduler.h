@@ -21,28 +21,35 @@
 #define _GRID_DATA_H_
 
 #include "grid_data.h"
+#define MAX_LVL_1 3
 
 namespace neweraHPC
 {
    /* Store Network connection details */
-   struct list_node_t
+   typedef struct list_node_t
    {
       struct peer_details_t *info;
       struct list_node_t    *next;
       struct list_node_t    *connection;
-   };
+   }list_node_t;
 
-   class grid_scheduler
+   class grid_scheduler_t
    {
+   private:
+      list_node_t *level1;
+      list_node_t **lists;
    public:
+      void init();
+      grid_scheduler_t();
+      ~grid_scheduler_t();
       /* Adds a new node to network and schedules it */
-      void insert(struct peer_details_t *child);
+      int insert(struct peer_details_t *child);
 
       /* Adds the child to parent node */
-      void insert(struct peer_details_t *parent, struct peer_details_t *child);
+      int insert(struct peer_details_t *parent, struct peer_details_t *child);
 
       /* Remove a node from network and re-schedule if required */
-      void remove(struct peer_details_t *node);
+      int remove(struct peer_details_t *node);
    };
 
 #endif

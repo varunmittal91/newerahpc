@@ -18,9 +18,31 @@
  */
 
 #include <include/grid.h>
+#include <cstdlib>
 
 namespace neweraHPC
 {
+   /*
+   void grid_scheduler_t::init()
+   {
+      head=NULL;
+   }
+   int grid_scheduler_t::insert(struct peer_details_t *child)
+   {
+	list_node_t *temp;
+	temp = head;
+	list_node_t *node;
+	if(temp==NULL)
+	{
+ 	   node = (list_node_t*)malloc(sizeof(list_node_t));
+	   
+	}
+	else
+	{
+	   
+	}
+   }
+   */
    void test_grid()
    {
       

@@ -295,7 +295,8 @@ namespace neweraHPC{
       }
       
       tmp_num = num;
-      char *string = new char [count];
+      char *string = new char [count + 1];
+      string[count] = '\0';
       int i = 0;
       
       while(tmp_num != 0)

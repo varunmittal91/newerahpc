@@ -193,15 +193,10 @@ namespace neweraHPC
       main_thread->client_socks = new rbtree_t;
       rbtree_t *client_socks = main_thread->client_socks;
       
-      int poll_limit   = 200;
-      struct pollfd *fds = new pollfd[200];
-      int nfds           = 1;
-      int current_size   = 1;
+      struct pollfd *fds = new pollfd;
       int timeout        = (3 * 60 * 1000);
       
       nhpc_server_details_t *server_details = new nhpc_server_details_t;
-      server_details->fds          = fds;
-      server_details->nfds         = &nfds;
       server_details->mutex        = &mutex;
       server_details->client_socks = client_socks;
       
@@ -214,7 +209,7 @@ namespace neweraHPC
       
       do 
       {
-	 rv = poll(fds, nfds, timeout);
+	 rv = poll(fds, 1, timeout);
 	 
 	 if(rv < 0)
 	 {
@@ -225,79 +220,48 @@ namespace neweraHPC
 	 {
 	    continue;
 	 }
+	 	 
+	 int new_sd;
 	 
-	 current_size = nfds;
-	 for(int cntr = 0; cntr < current_size; cntr++)
+	 do
 	 {
-	    bool close_conn = false;
-	    
-	    if(fds[cntr].revents == 0)
-	       continue;
-	    
-	    nhpc_socket_t *client_sock = (nhpc_socket_t *)client_socks->search(fds[cntr].fd);
-	    
-	    if(fds[cntr].revents != POLLIN)
+	    new_sd = accept(*server_sockfd, NULL, NULL);
+	    if(new_sd < 0)
 	    {
-	       nhpc_socket_cleanup(client_sock, client_socks, fds, cntr, &nfds);
-
-	       pthread_mutex_lock(&mutex);
-	       nhpc_poll_clean(fds, &nfds, &cntr);
-	       pthread_mutex_unlock(&mutex);
+	       if(errno != EWOULDBLOCK)
+	       {
+		  end_server = true;
+		  break;
+	       }
 	       break;
 	    }
-	    else 
-	    {
-	       fds[cntr].revents = 0;
-	       
-	       if(cntr != 0)
-	       fds[cntr].events = 0;
-	    }
 	    
-	    if(fds[cntr].fd == *server_sockfd)
-	    {
-	       int new_sd;
-	       
-	       do
-	       {
-		  new_sd = accept(*server_sockfd, NULL, NULL);
-		  if(new_sd < 0)
-		  {
-		     if(errno != EWOULDBLOCK)
-		     {
-			end_server = true;
-			break;
-		     }
-		     break;
-		  }
-		  
-		  fds[nfds].fd     = new_sd;
-		  fds[nfds].events = POLLIN;
-		  nfds++;
-		  nhpc_socket_t *client_sock = new nhpc_socket_t;
-		  client_sock->sockfd = new_sd;
-		  client_sock->headers = NULL;
-		  client_sock->have_headers = false;
-	  	  client_sock->server_details = server_details;
-		  client_sock->timeout = 3 * 60 * 60;
-
-                  pthread_mutex_lock(&mutex);
-		  client_socks->insert(client_sock, new_sd);
-                  pthread_mutex_unlock(&mutex);
-	       }while(new_sd != -1);
-	    }
-	    else 
-	    {
-	       client_sock->fds_pos = cntr;
-	       thread_manager->create_thread(NULL, (void* (*)(void*))read_communication, client_sock, NHPC_THREAD_DEFAULT);
-	    }	    
-	 }
+	    nhpc_socket_t *client_sock = new nhpc_socket_t;
+	    client_sock->sockfd = new_sd;
+	    client_sock->headers = NULL;
+	    client_sock->have_headers = false;
+	    client_sock->server_details = server_details;
+	    client_sock->timeout = 3 * 60 * 60;
+	    
+	    pthread_mutex_lock(&mutex);
+	    client_socks->insert(client_sock, new_sd);
+	    pthread_mutex_unlock(&mutex);
+	    
+	    thread_manager->create_thread(NULL, (void* (*)(void*))read_communication, client_sock, NHPC_THREAD_DEFAULT);		  
+	 }while(new_sd != -1);
       }while(true);
    }
    
-   void nhpc_socket_cleanup(nhpc_socket_t *client_sock, rbtree_t *client_socks, pollfd *fds, int cntr, int *nfds)
-   {
+   void nhpc_socket_cleanup(nhpc_socket_t *client_sock)
+   {      
       if(client_sock != NULL)
       {
+	 rbtree_t *client_socks = client_sock->server_details->client_socks;
+	 pthread_mutex_t *mutex = client_sock->server_details->mutex;
+	 
+	 shutdown(client_sock->sockfd, SHUT_RDWR);
+	 close(client_sock->sockfd);
+	 
 	 if(client_sock->headers != NULL)
 	 {
 	    int count = client_sock->headers->ret_count();
@@ -311,14 +275,12 @@ namespace neweraHPC
 	    
 	    delete client_sock->headers;
 	 }
-	 client_socks->erase(fds[cntr].fd);
+	 pthread_mutex_lock(mutex);
+	 client_socks->erase(client_sock->sockfd);
+	 pthread_mutex_unlock(mutex);
+	 
 	 delete client_sock;
       }
-      
-      shutdown(fds[cntr].fd, SHUT_RDWR);
-      close(fds[cntr].fd);
-      
-      memset((fds + (cntr)), 0, sizeof(pollfd));
    }
    
    void nhpc_poll_clean(pollfd *fds, int *nfds, int *cntr)

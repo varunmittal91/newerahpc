@@ -86,8 +86,7 @@ namespace neweraHPC
       size_t len;
    };
    
-   void nhpc_socket_cleanup(nhpc_socket_t *client_sock, rbtree_t *client_socks, pollfd *fds, int cntr, int *nfds);
-   void nhpc_poll_clean(pollfd *fds, int *nfds, int *cntr);
+   void nhpc_socket_cleanup(nhpc_socket_t *client_sock);
    
    nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *buffer, nhpc_size_t *len, nhpc_size_t *header_size);
    void nhpc_display_headers(nhpc_socket_t *sock);

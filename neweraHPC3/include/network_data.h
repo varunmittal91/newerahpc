@@ -9,8 +9,6 @@ namespace neweraHPC
 {
    struct nhpc_server_details_t
    {
-      pollfd          *fds;
-      int             *nfds;
       pthread_mutex_t *mutex;
       rbtree_t        *client_socks;
    };
@@ -30,7 +28,6 @@ namespace neweraHPC
       bool have_headers;
       nhpc_server_details_t *server_details;
       char *partial_content;
-      int fds_pos;
    };
 };
 

@@ -51,4 +51,8 @@ typedef size_t nhpc_size_t;
 #define NHPC_TIMEUP  2
 #define NHPC_TIMEOUT 30
 
+#define NHPC_FILE_NOT_FOUND 0
+#define NHPC_FILE 1
+#define NHPC_DIRECTORY 2
+
 #endif

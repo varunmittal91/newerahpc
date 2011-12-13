@@ -20,6 +20,7 @@
 #include <iostream>
 
 #include <include/network.h>
+#include <include/grid.h>
 
 using namespace std;
 
@@ -50,6 +51,8 @@ namespace neweraHPC
       {
 	 if(nhpc_strcmp(header->string, "*HTTP*") == NHPC_SUCCESS)
 	    http_init(sock);
+	 else if(nhpc_strcmp(header->string, "*GRID*") == NHPC_SUCCESS)
+	    grid_init(sock);
       }
       
       nhpc_socket_cleanup(sock);

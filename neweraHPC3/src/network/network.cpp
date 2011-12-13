@@ -225,7 +225,11 @@ namespace neweraHPC
 	 
 	 do
 	 {
-	    new_sd = accept(*server_sockfd, NULL, NULL);
+	    nhpc_size_t size = sizeof(sockaddr_in);
+	    struct sockaddr_in *client_sockaddr = new sockaddr_in;
+	    
+	    new_sd = accept(*server_sockfd, (sockaddr *)client_sockaddr, (socklen_t *)&size);
+
 	    if(new_sd < 0)
 	    {
 	       if(errno != EWOULDBLOCK)
@@ -242,6 +246,10 @@ namespace neweraHPC
 	    client_sock->have_headers = false;
 	    client_sock->server_details = server_details;
 	    client_sock->timeout = 3 * 60 * 60;
+	    client_sock->host = inet_ntoa(client_sockaddr->sin_addr);
+	    client_sock->port = nhpc_itostr(ntohs(client_sockaddr->sin_port));
+	    
+	    delete client_sockaddr;
 	    
 	    pthread_mutex_lock(&mutex);
 	    client_socks->insert(client_sock, new_sd);
@@ -281,19 +289,6 @@ namespace neweraHPC
 	 
 	 delete client_sock;
       }
-   }
-   
-   void nhpc_poll_clean(pollfd *fds, int *nfds, int *cntr)
-   {
-      for(int i = *cntr; i < *nfds; i++)
-      {	 
-	 if(fds[i].fd == 0 && fds[i + 1].fd != 0)
-	 {
-	    memcpy((fds + i), (fds + i + 1), sizeof(pollfd));
-	    memset((fds + i + 1), 0, sizeof(pollfd));
-	    (*nfds)--;
-	 }
-      }      
    }
    
    nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *data, nhpc_size_t *len, nhpc_size_t *header_size)

@@ -17,17 +17,33 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sys/stat.h>
+
 #include <include/file.h>
 
 namespace neweraHPC
 {
-   nhpc_size_t nhpc_file_size(FILE *fp)
+   nhpc_size_t nhpc_file_size(const char *file_path, nhpc_size_t *size)
    {
-      size_t size = fseek(fp, 0L, SEEK_END);
-      size = ftell(fp);
+      struct stat *buffer = new struct stat;
+      nhpc_status_t rv = stat(file_path, buffer);
+      if(rv != 0)
+      {
+	 *size = 0;
+	 rv = NHPC_FILE_NOT_FOUND;
+      }
+      else if(S_ISDIR (buffer->st_mode))
+      {
+	 *size = 0;
+	 rv = NHPC_DIRECTORY;
+      }
+      else 
+      {
+	 *size = buffer->st_size;
+	 rv = NHPC_FILE;
+      }
       
-      fseek(fp, 0L, SEEK_SET);
-      
-      return size;
+      delete buffer;
+      return rv;
    }
 };

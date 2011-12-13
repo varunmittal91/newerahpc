@@ -17,17 +17,17 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GRID_H_
-#define _GRID_H_
+#include <iostream>
 
-#include "network_data.h"
-#include "grid_data.h"
-#include "grid_scheduler.h"
-#include "grid_plugin.h"
+#include <include/grid.h>
+#include <include/network_data.h>
 
-namespace neweraHPC 
+using namespace std;
+
+namespace neweraHPC
 {
-   void grid_init(nhpc_socket_t *sock);
+   void grid_init(nhpc_socket_t *sock)
+   {
+      cout<<"GRID Request Encountered"<<endl;
+   }
 };
-
-#endif

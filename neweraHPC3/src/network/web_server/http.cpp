@@ -57,22 +57,27 @@ namespace neweraHPC
       {
 	 nhpc_display_headers(sock);
 	 
-	 char *file_url = nhpc_strconcat(HTTP_ROOT, request->strings[1]);
+	 char *file_path = nhpc_strconcat(HTTP_ROOT, request->strings[1]);
 	 
-	 FILE *fp = fopen(file_url, "r");
-	 if(fp == NULL)
+	 nhpc_size_t file_size;
+	 nhpc_status_t nrv = nhpc_file_size(file_path, &file_size);
+	 
+	 if(nrv == NHPC_FILE_NOT_FOUND)
 	 {
 	    const char *mssg = "HTTP/1.1 404 Content Not Found\r\n\r\nContent Not Found\r\n";
 	    nhpc_size_t size = strlen(mssg);
 	    socket_send(sock, (char *)mssg, &size);
 	 }
+	 else if(nrv == NHPC_DIRECTORY)
+	 {
+	    const char *mssg = "HTTP/1.1 404 Content Not Found\r\n\r\nServer Doesn't Know How To Handle Directory\r\n";
+	    nhpc_size_t size = strlen(mssg);
+	    socket_send(sock, (char *)mssg, &size);
+	 }
 	 else 
 	 {
-	    struct stat bufferx;
-	    stat(file_url, &bufferx);
-	    
-	    size_t file_size = bufferx.st_size;
-	    
+	    FILE *fp = fopen(file_path, "r");
+
 	    const char *mssg = "HTTP/1.1 200 OK\r\nContent-Length: ";
 	    char *file_size_str = nhpc_itostr(file_size);
 	    mssg = nhpc_strconcat(mssg, file_size_str);
@@ -91,7 +96,6 @@ namespace neweraHPC
 	       size = len;
 	       
 	       nrv = socket_send(sock, buffer, &size);	
-	       
 	    }while(nrv != EPIPE && len != 0);
 		   
 	    fclose(fp);

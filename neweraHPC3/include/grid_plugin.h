@@ -38,6 +38,7 @@ namespace neweraHPC
       thread_manager_t *thread_manager;
       pthread_mutex_t *mutex;
       nhpc_status_t install_plugin_dll(const char *dll_path);
+      char *copy_filetogrid(const char *file_path);
       
    public:
       plugin_manager_t(thread_manager_t *in_thread_manager);

@@ -263,8 +263,6 @@ namespace neweraHPC{
       }
       else if(len_s2 == 0)
       {
-	 cout<<"len s2 = 0"<<endl;
-	 
 	 string = new char [len_s1 + 1];
 	 memcpy(string, s1, len_s1);
 	 string[len_s1] = '\0';

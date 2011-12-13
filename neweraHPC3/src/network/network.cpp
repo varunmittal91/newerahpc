@@ -41,16 +41,18 @@ namespace neweraHPC
       external_thread_manager = true;
       thread_manager = in_thread_manager;
       connection_stat = false;
-      
-      delete client_connections;
-      delete mutex;
-      
-      if(server_sock != NULL)
-	 delete server_sock;
+      client_connections = new rbtree_t;
+      mutex = new pthread_mutex_t;      
+      server_sock = NULL;
    }
    
    network_t::~network_t()
    {
+      delete client_connections;
+      delete mutex;
+      if(!server_sock)
+	 delete server_sock;
+      
       if(!external_thread_manager) 
 	 delete thread_manager;
    }

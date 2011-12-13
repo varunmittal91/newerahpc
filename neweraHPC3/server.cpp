@@ -26,11 +26,29 @@ using namespace neweraHPC;
 
 int main(int argc,char **argv)
 {
-   thread_manager_t thread_manager;
-   plugin_manager_t plugin_manager(&thread_manager);
+   if(argc < 3)
+   {
+      cout<<"Usage: server 'hostname' 'port number'"<<endl;
+      exit(0);
+   }
    
-   while(1)
-      sleep(1);
+   cout<<"Starting Thread Manager: ";
+   thread_manager_t thread_manager;
+   cout<<"\t\t\t OK"<<endl;
+   
+   cout<<"Starting Plugin Manager: ";
+   plugin_manager_t plugin_manager(&thread_manager);
+   cout<<"\t\t\t OK"<<endl;
+   
+   plugin_manager.install_plugin("samples/plugin.nxi");
+
+   network_t network(&thread_manager);
+   nhpc_status_t nrv = network.create_server(argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
+   if(nrv != NHPC_SUCCESS)
+   {
+      perror("error at creating server");
+      exit(1);
+   }
    
    return 0;
 }

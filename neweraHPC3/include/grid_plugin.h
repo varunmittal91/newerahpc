@@ -24,6 +24,9 @@
 
 #include "rbtree.h"
 #include "thread.h"
+#include "constants.h"
+#include "strings.h"
+#include "http.h"
 
 namespace neweraHPC 
 {
@@ -34,6 +37,7 @@ namespace neweraHPC
       rbtree_t *plugins_requested;
       thread_manager_t *thread_manager;
       pthread_mutex_t *mutex;
+      nhpc_status_t install_plugin_dll(const char *dll_path);
       
    public:
       plugin_manager_t(thread_manager_t *in_thread_manager);
@@ -41,9 +45,13 @@ namespace neweraHPC
       void lock();
       void unlock();
       int request_plugin(int peer_id, int remote_plugin_id);
+      nhpc_status_t install_plugin(const char *file_path);
    };
    
-   void *plugin_request_thread(plugin_manager_t *plugin_manager);
+   void *nhpc_plugin_request_thread(plugin_manager_t *plugin_manager);
+   
+   nhpc_status_t nhpc_check_nxi(const char *file_path);
+   char *nhpc_nxitodll(const char *file_path);
 };
 
 #endif

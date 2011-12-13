@@ -33,7 +33,7 @@ namespace neweraHPC
       mutex = new pthread_mutex_t;
       pthread_mutex_init(mutex, NULL);
       
-      thread_manager->create_thread(NULL, (void* (*)(void*))plugin_request_thread, this, NHPC_THREAD_DEFAULT);
+      thread_manager->create_thread(NULL, (void* (*)(void*))nhpc_plugin_request_thread, this, NHPC_THREAD_DEFAULT);
    }
    
    plugin_manager_t::~plugin_manager_t()
@@ -46,8 +46,31 @@ namespace neweraHPC
       pthread_mutex_lock(mutex);
    }
    
-   void *plugin_request_thread(plugin_manager_t *plugin_manager)
+   void plugin_manager_t::unlock()
    {
+      pthread_mutex_unlock(mutex);
+   }
+   
+   nhpc_status_t plugin_manager_t::install_plugin(const char *file_path)
+   {
+      nhpc_status_t nrv = nhpc_check_nxi(file_path);
+      const char *dll_path;
+      
+      if(nrv == NHPC_SUCCESS)
+	 dll_path = nhpc_nxitodll(file_path);
+      else 
+	 dll_path = file_path;
 
+      install_plugin_dll(dll_path);
+   }
+   
+   nhpc_status_t plugin_manager_t::install_plugin_dll(const char *dll_path)
+   {
+      
+   }
+   
+   void *nhpc_plugin_request_thread(plugin_manager_t *plugin_manager)
+   {
+      
    }
 };

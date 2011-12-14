@@ -20,6 +20,7 @@
 #ifndef _NEWERAHPC_H_
 #define _NEWERAHPC_H_
 
+#include "file.h"
 #include "rbtree.h"
 #include "thread.h"
 #include "network.h"

@@ -23,27 +23,66 @@
 
 namespace neweraHPC
 {
-   nhpc_size_t nhpc_file_size(const char *file_path, nhpc_size_t *size)
+   nhpc_status_t nhpc_file_size(const char *file_path, nhpc_size_t *size)
    {
       struct stat *buffer = new struct stat;
+      nhpc_size_t *tmp_size = new nhpc_size_t;
+      
       nhpc_status_t rv = stat(file_path, buffer);
       if(rv != 0)
       {
-	 *size = 0;
+	 *tmp_size = 0;
 	 rv = NHPC_FILE_NOT_FOUND;
       }
       else if(S_ISDIR (buffer->st_mode))
       {
-	 *size = 0;
+	 *tmp_size = 0;
 	 rv = NHPC_DIRECTORY;
       }
       else 
       {
-	 *size = buffer->st_size;
+	 *tmp_size = buffer->st_size;
 	 rv = NHPC_FILE;
       }
       
+      if(size != NULL)
+	 *size = *tmp_size;
+      
+      delete tmp_size;
       delete buffer;
       return rv;
+   }
+   
+   nhpc_status_t nhpc_filecopy(const char *dst, const char *src)
+   {
+      if(dst == NULL || src == NULL)
+	 return NHPC_FAIL;
+      
+      if(nhpc_file_size(dst, NULL) != NHPC_FILE_NOT_FOUND || nhpc_file_size(src, NULL) != NHPC_FILE)
+	 return NHPC_FAIL;
+      
+      FILE *fp_src = fopen(src, "r");
+      if(!fp_src)
+	 return NHPC_FAIL;
+      
+      FILE *fp_dst = fopen(dst, "w+");
+      if(!fp_dst)
+      {
+	 fclose(fp_src);
+	 return NHPC_FAIL;
+      }
+      
+      nhpc_size_t size;
+      char buffer[1000];
+      while(!feof(fp_src))
+      {
+	 size = fread(buffer, 1, sizeof(buffer), fp_src); 
+	 fwrite(buffer, 1, size, fp_dst);
+      }
+      
+      fclose(fp_src);
+      fclose(fp_dst);
+      
+      return NHPC_SUCCESS;
    }
 };

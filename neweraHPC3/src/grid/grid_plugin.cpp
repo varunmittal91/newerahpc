@@ -32,6 +32,7 @@ namespace neweraHPC
       plugins_requested = new rbtree_t;
       mutex = new pthread_mutex_t;
       pthread_mutex_init(mutex, NULL);
+      grid_directory = nhpc_strconcat(HTTP_ROOT, "/grid/");
       
       thread_manager->create_thread(NULL, (void* (*)(void*))nhpc_plugin_request_thread, this, NHPC_THREAD_DEFAULT);
    }
@@ -54,17 +55,34 @@ namespace neweraHPC
    nhpc_status_t plugin_manager_t::install_plugin(const char *file_path)
    {
       nhpc_status_t nrv = nhpc_check_nxi(file_path);
-      const char *dll_path;
+      char *dll_path;
       
       if(nrv == NHPC_SUCCESS)
+      {
 	 dll_path = nhpc_nxitodll(file_path);
+	 if(dll_path != NULL)
+	 {
+	    dll_path = copy_filetogrid(dll_path);
+	 }
+      }
       else 
-	 dll_path = file_path;
-
-      install_plugin_dll(dll_path);
+	 dll_path = (char *)file_path;
+      
+      nrv = install_plugin_dll(dll_path);
+      if(nrv == NHPC_SUCCESS)
+      {
+	 dll_path = copy_filetogrid(dll_path);
+      }
+      
+      return nrv;
    }
    
    nhpc_status_t plugin_manager_t::install_plugin_dll(const char *dll_path)
+   {
+      
+   }
+   
+   char *plugin_manager_t::copy_filetogrid(const char *file_path)
    {
       
    }

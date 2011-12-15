@@ -25,32 +25,39 @@ namespace neweraHPC
 {
    nhpc_status_t nhpc_file_size(const char *file_path, nhpc_size_t *size)
    {
-      struct stat *buffer = new struct stat;
-      nhpc_size_t *tmp_size = new nhpc_size_t;
-      
-      nhpc_status_t rv = stat(file_path, buffer);
-      if(rv != 0)
-      {
-	 *tmp_size = 0;
-	 rv = NHPC_FILE_NOT_FOUND;
-      }
-      else if(S_ISDIR (buffer->st_mode))
-      {
-	 *tmp_size = 0;
-	 rv = NHPC_DIRECTORY;
-      }
+      nhpc_status_t nrv = nhpc_fileordirectory(file_path);
+
+      if(nrv != NHPC_FILE)
+	 *size = 0;
       else 
       {
-	 *tmp_size = buffer->st_size;
-	 rv = NHPC_FILE;
+	 struct stat *buffer = new struct stat;
+	 nhpc_status_t nrv = stat(file_path, buffer);
+	 
+	 *size = buffer->st_size;
+	 
+	 delete buffer;
       }
       
-      if(size != NULL)
-	 *size = *tmp_size;
+      return nrv;
+   }
+   
+   nhpc_status_t nhpc_fileordirectory(const char *file_path)
+   {
+      struct stat *buffer = new struct stat;
+      nhpc_status_t nrv = stat(file_path, buffer);
       
-      delete tmp_size;
+      if(nrv != 0)
+      {
+	 nrv = NHPC_FILE_NOT_FOUND;
+      }
+      else if(!S_ISDIR(buffer->st_mode))
+	 nrv = NHPC_FILE;
+      else 
+	 nrv = NHPC_DIRECTORY;
+	 
       delete buffer;
-      return rv;
+      return nrv;
    }
    
    nhpc_status_t nhpc_filecopy(const char *dst, const char *src)

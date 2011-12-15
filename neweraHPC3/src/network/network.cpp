@@ -199,6 +199,7 @@ namespace neweraHPC
       nhpc_server_details_t *server_details = new nhpc_server_details_t;
       server_details->mutex        = &mutex;
       server_details->client_socks = client_socks;
+      server_details->thread_manager = thread_manager;
       
       int *server_sockfd = &(main_thread->sock->sockfd);
       
@@ -255,7 +256,8 @@ namespace neweraHPC
 	    client_socks->insert(client_sock, new_sd);
 	    pthread_mutex_unlock(&mutex);
 	    
-	    thread_manager->create_thread(NULL, (void* (*)(void*))read_communication, client_sock, NHPC_THREAD_DEFAULT);		  
+	    client_sock->thread_id = thread_manager->create_thread(NULL, (void* (*)(void*))read_communication, 
+								   client_sock, NHPC_THREAD_DEFAULT);		  
 	 }while(new_sd != -1);
       }while(true);
    }
@@ -266,6 +268,7 @@ namespace neweraHPC
       {
 	 rbtree_t *client_socks = client_sock->server_details->client_socks;
 	 pthread_mutex_t *mutex = client_sock->server_details->mutex;
+	 thread_manager_t *thread_manager = client_sock->server_details->thread_manager;
 	 
 	 shutdown(client_sock->sockfd, SHUT_RDWR);
 	 close(client_sock->sockfd);
@@ -287,6 +290,8 @@ namespace neweraHPC
 	 client_socks->erase(client_sock->sockfd);
 	 pthread_mutex_unlock(mutex);
 	 
+	 thread_manager->delete_thread_data(client_sock->thread_id);
+	 delete client_sock->port;
 	 delete client_sock;
       }
    }

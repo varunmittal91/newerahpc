@@ -43,10 +43,6 @@ int main(int argc,char **argv)
    
    plugin_manager.install_plugin("samples/plugin.nxi");
    
-   nhpc_status_t nrvx = nhpc_filecopy("/tmp/test.nxi", "/samples/plugin.nxi");
-   if(nrvx == NHPC_FAIL)
-      cout<<"file copy failed"<<endl;
-
    network_t network(&thread_manager);
    nhpc_status_t nrv = network.create_server(argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
    if(nrv != NHPC_SUCCESS)

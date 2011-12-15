@@ -25,5 +25,8 @@
 namespace neweraHPC
 {
    nhpc_status_t nhpc_file_size(const char *file_path, nhpc_size_t *size);
+
+   nhpc_status_t nhpc_fileordirectory(const char *file_path);
+   
    nhpc_status_t nhpc_filecopy(const char *dst, const char *src);
 };

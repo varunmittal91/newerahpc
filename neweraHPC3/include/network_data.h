@@ -24,6 +24,7 @@
 #include <netdb.h>
 
 #include "rbtree.h"
+#include "thread.h"
 
 namespace neweraHPC
 {
@@ -31,6 +32,7 @@ namespace neweraHPC
    {
       pthread_mutex_t *mutex;
       rbtree_t        *client_socks;
+      thread_manager_t *thread_manager;
    };
 
    struct nhpc_socket_t
@@ -48,6 +50,7 @@ namespace neweraHPC
       bool have_headers;
       nhpc_server_details_t *server_details;
       char *partial_content;
+      int thread_id;
    };
 };
 

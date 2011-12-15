@@ -55,12 +55,12 @@ namespace neweraHPC
    nhpc_status_t plugin_manager_t::install_plugin(const char *file_path)
    {
       nhpc_status_t nrv = nhpc_check_nxi(file_path);
-      char *dll_path;
+      const char *dll_path;
       
       if(nrv == NHPC_SUCCESS)
       {
-	 dll_path = nhpc_nxitodll(file_path);
-	 if(dll_path != NULL)
+	 nrv = nhpc_nxitodll(&dll_path, file_path);
+	 if(nrv == NHPC_SUCCESS)
 	 {
 	    char *dll_path_new;
 	    

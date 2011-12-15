@@ -19,6 +19,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <sys/stat.h>
 
 #include "constants.h"
 
@@ -30,5 +31,5 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_filecopy(const char *dst, const char *src);
    
-   nhpc_status_t nhpc_create_tmp_file_or_dir(char **new_file_dir, const char *target, int target_type);
+   nhpc_status_t nhpc_create_tmp_file_or_dir(const char **new_file_dir, const char *target, int target_type);
 };

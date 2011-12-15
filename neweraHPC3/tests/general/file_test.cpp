@@ -26,11 +26,22 @@ using namespace neweraHPC;
 
 int main()
 {
-   char *tmp_file;
-   nhpc_status_t nrv = nhpc_create_tmp_file_or_dir(&tmp_file, NULL, NHPC_DIRECTORY);
-
+   const char *tmp_file;
+   nhpc_status_t nrv;
+   
+   nrv = nhpc_create_tmp_file_or_dir(&tmp_file, "neweraHPC", NHPC_FILE);
    if(nrv == NHPC_SUCCESS)
+   {
       cout<<tmp_file<<endl;
+      delete[] tmp_file;
+   }
+   
+   nrv = nhpc_create_tmp_file_or_dir(&tmp_file, "neweraHPC", NHPC_DIRECTORY);
+   if(nrv == NHPC_SUCCESS)
+   {
+      cout<<tmp_file<<endl;
+      delete[] tmp_file;
+   }
 
    return 0;
 }

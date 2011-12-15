@@ -53,7 +53,7 @@ namespace neweraHPC
    void *nhpc_plugin_request_thread(plugin_manager_t *plugin_manager);
    
    nhpc_status_t nhpc_check_nxi(const char *file_path);
-   char *nhpc_nxitodll(const char *file_path);
+   nhpc_status_t nhpc_nxitodll(const char **dll_path, const char *file_path);
 };
 
 #endif

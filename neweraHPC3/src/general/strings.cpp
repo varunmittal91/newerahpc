@@ -246,6 +246,14 @@ namespace neweraHPC{
       return string;
    }
    
+   void nhpc_string_delete(string_t *string)
+   {
+      for(int i = 0; i < string->count; i++)
+	 delete[] string->strings[i];
+      
+      delete[] string->strings;
+   }
+   
    char *nhpc_strconcat(const char *s1, const char *s2)
    {
       char *string = NULL;

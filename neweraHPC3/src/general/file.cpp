@@ -30,7 +30,7 @@ namespace neweraHPC
    nhpc_status_t nhpc_file_size(const char *file_path, nhpc_size_t *size)
    {
       nhpc_status_t nrv = nhpc_fileordirectory(file_path);
-
+      
       if(nrv != NHPC_FILE)
 	 *size = 0;
       else 
@@ -59,7 +59,7 @@ namespace neweraHPC
 	 nrv = NHPC_FILE;
       else 
 	 nrv = NHPC_DIRECTORY;
-	 
+      
       delete buffer;
       return nrv;
    }
@@ -97,19 +97,89 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
-   nhpc_status_t nhpc_create_tmp_file_or_dir(char **new_file_dir, const char *target_dir, int target_type)
+   nhpc_status_t nhpc_create_tmp_file_or_dir(const char **new_file_dir, const char *target_dir, int target_type)
    {
+      *new_file_dir = NULL;
+      
+      if(target_type != NHPC_FILE && target_type != NHPC_DIRECTORY)
+      {
+	 return NHPC_FAIL;
+      }
+      
       const char *final_target;
       if(target_dir != NULL)
       {
-	 if(*target_dir == '/')
-	    final_target = nhpc_strconcat("/tmp", target_dir);
-	 else 
-	    final_target = nhpc_strconcat("/tmp/", target_dir);
+	 final_target = nhpc_strconcat("/tmp/", target_dir);
+	 string_t *string = nhpc_substr(final_target, '/');
+	 delete[] final_target;
+	 
+	 final_target = nhpc_strconcat("/", string->strings[0]);
+	 
+	 const char *tmp_str;
+	 
+	 for(int i = 1; i < string->count; i++)
+	 {
+	    tmp_str = nhpc_strconcat(final_target, "/");
+	    delete[] final_target;
+
+	    final_target = nhpc_strconcat(tmp_str, string->strings[i]);
+	    delete[] tmp_str;
+	 }
+
+	 nhpc_string_delete(string);
       }
       else 
 	 final_target = "/tmp";
-            
-      cout<<final_target<<endl;
+      
+      nhpc_status_t nrv = nhpc_fileordirectory(final_target);
+      if(nrv != NHPC_DIRECTORY)
+      {
+	 if(target_dir != NULL)
+	    delete[] final_target;
+	 return NHPC_FAIL;
+      }
+      
+      const char *tmp_target = nhpc_strconcat(final_target, "/");
+      if(target_dir != NULL   )
+	 delete[] final_target;
+      final_target = tmp_target;
+      
+      bool unique_found = false;
+      const char *unique_name;
+      const char *target_name;
+      
+      while(unique_found == false)
+      {
+	 unique_name = nhpc_random_string(7);
+	 target_name = nhpc_strconcat(final_target, unique_name);
+	 if(nhpc_fileordirectory(target_name) != NHPC_FILE_NOT_FOUND)
+	 {
+	    delete[] unique_name;
+	    delete[] target_name;
+	 }
+	 else 
+	 {
+	    unique_found = true;
+	 }
+      }
+      
+      if(target_type == NHPC_DIRECTORY)
+      {
+	 int rv = mkdir(target_name, 0777);
+	 if(rv == -1)
+	    return NHPC_FAIL;
+	 
+	 const char *tmp_str = nhpc_strconcat(target_name, "/");
+	 delete[] target_name;
+	 target_name = tmp_str;
+      }
+      else if(target_type == NHPC_FILE)
+      {
+	 FILE *fp = fopen(target_name, "w+");
+	 fclose(fp);
+      }
+	 
+      *new_file_dir = target_name;
+      return NHPC_SUCCESS;
    }
 };

@@ -1,6 +1,7 @@
 build-command:cd mpix && mkdir bin && make mpi
 build-command:cd ..
 build-command:make
+
 <<file:plugin.cpp>>
 //Copyright 2010 Varun Mittal ©
 //newerahpc program is distributed under the terms of the GNU General Public License

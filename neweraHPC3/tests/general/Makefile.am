@@ -1,5 +1,4 @@
-bin_PROGRAMS 	    = rbtree_test thread_test tree_test cfg_test strings_test rb_queue
-
+bin_PROGRAMS 	    = rbtree_test thread_test tree_test cfg_test strings_test rb_queue file_test
 
 rbtree_test_SOURCES = rbtree_test.cpp
 rbtree_test_LDADD   = ../../src/libneweraHPC.la $(INITLIBS)
@@ -18,6 +17,9 @@ strings_test_LDADD   = ../../src/libneweraHPC.la $(INITLIBS)
 
 rb_queue_SOURCES = rb_queue.cpp
 rb_queue_LDADD   = ../../src/libneweraHPC.la $(INITLIBS)
+
+file_test_SOURCES = file_test.cpp
+file_test_LDADD   = ../../src/libneweraHPC.la $(INITLIBS)
 
 ../../src/libneweraHPC.la:
 	make -C "../../src/"

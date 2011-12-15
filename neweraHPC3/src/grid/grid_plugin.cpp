@@ -62,7 +62,11 @@ namespace neweraHPC
 	 dll_path = nhpc_nxitodll(file_path);
 	 if(dll_path != NULL)
 	 {
-	    dll_path = copy_filetogrid(dll_path);
+	    char *dll_path_new;
+	    
+	    nrv = copy_filetogrid(dll_path, &dll_path_new);
+	    if(nrv == NHPC_SUCCESS)
+	       return nrv;
 	 }
       }
       else 
@@ -71,7 +75,11 @@ namespace neweraHPC
       nrv = install_plugin_dll(dll_path);
       if(nrv == NHPC_SUCCESS)
       {
-	 dll_path = copy_filetogrid(dll_path);
+	 char *dll_path_new;
+	 
+	 nrv = copy_filetogrid(dll_path, &dll_path_new);
+	 if(nrv == NHPC_FAIL)
+	    return nrv;
       }
       
       return nrv;
@@ -82,9 +90,20 @@ namespace neweraHPC
       
    }
    
-   char *plugin_manager_t::copy_filetogrid(const char *file_path)
-   {
+   nhpc_status_t plugin_manager_t::copy_filetogrid(const char *file_path, char **file_path_new)
+   {  
+      *file_path_new = NULL;
       
+      char *search_path = nhpc_strconcat(grid_directory, "*");
+      
+      if(nhpc_strcmp(file_path, search_path) == NHPC_FAIL)
+      {
+	 cout<<search_path<<endl; 
+      }
+      
+      delete[] search_path;
+      
+      return NHPC_SUCCESS;
    }
    
    void *nhpc_plugin_request_thread(plugin_manager_t *plugin_manager)

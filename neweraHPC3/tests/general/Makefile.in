@@ -36,7 +36,7 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = rbtree_test$(EXEEXT) thread_test$(EXEEXT) \
 	tree_test$(EXEEXT) cfg_test$(EXEEXT) strings_test$(EXEEXT) \
-	rb_queue$(EXEEXT)
+	rb_queue$(EXEEXT) file_test$(EXEEXT)
 subdir = tests/general
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -55,6 +55,9 @@ cfg_test_DEPENDENCIES = ../../src/libneweraHPC.la
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
+am_file_test_OBJECTS = file_test.$(OBJEXT)
+file_test_OBJECTS = $(am_file_test_OBJECTS)
+file_test_DEPENDENCIES = ../../src/libneweraHPC.la
 am_rb_queue_OBJECTS = rb_queue.$(OBJEXT)
 rb_queue_OBJECTS = $(am_rb_queue_OBJECTS)
 rb_queue_DEPENDENCIES = ../../src/libneweraHPC.la
@@ -96,12 +99,13 @@ am__v_CXXLD_0 = @echo "  CXXLD " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(cfg_test_SOURCES) $(rb_queue_SOURCES) \
+SOURCES = $(cfg_test_SOURCES) $(file_test_SOURCES) $(rb_queue_SOURCES) \
 	$(rbtree_test_SOURCES) $(strings_test_SOURCES) \
 	$(thread_test_SOURCES) $(tree_test_SOURCES)
-DIST_SOURCES = $(cfg_test_SOURCES) $(rb_queue_SOURCES) \
-	$(rbtree_test_SOURCES) $(strings_test_SOURCES) \
-	$(thread_test_SOURCES) $(tree_test_SOURCES)
+DIST_SOURCES = $(cfg_test_SOURCES) $(file_test_SOURCES) \
+	$(rb_queue_SOURCES) $(rbtree_test_SOURCES) \
+	$(strings_test_SOURCES) $(thread_test_SOURCES) \
+	$(tree_test_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -236,6 +240,8 @@ strings_test_SOURCES = strings_test.cpp
 strings_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
 rb_queue_SOURCES = rb_queue.cpp
 rb_queue_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
+file_test_SOURCES = file_test.cpp
+file_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
 all: all-am
 
 .SUFFIXES:
@@ -316,6 +322,9 @@ clean-binPROGRAMS:
 cfg_test$(EXEEXT): $(cfg_test_OBJECTS) $(cfg_test_DEPENDENCIES) 
 	@rm -f cfg_test$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(cfg_test_OBJECTS) $(cfg_test_LDADD) $(LIBS)
+file_test$(EXEEXT): $(file_test_OBJECTS) $(file_test_DEPENDENCIES) 
+	@rm -f file_test$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(file_test_OBJECTS) $(file_test_LDADD) $(LIBS)
 rb_queue$(EXEEXT): $(rb_queue_OBJECTS) $(rb_queue_DEPENDENCIES) 
 	@rm -f rb_queue$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(rb_queue_OBJECTS) $(rb_queue_LDADD) $(LIBS)
@@ -339,6 +348,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cfg_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rb_queue.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rbtree_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strings_test.Po@am__quote@

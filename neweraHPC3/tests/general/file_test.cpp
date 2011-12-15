@@ -17,18 +17,20 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <fstream>
 #include <iostream>
 
-#include "constants.h"
+#include <include/neweraHPC.h>
 
-namespace neweraHPC
+using namespace std;
+using namespace neweraHPC;
+
+int main()
 {
-   nhpc_status_t nhpc_file_size(const char *file_path, nhpc_size_t *size);
+   char *tmp_file;
+   nhpc_status_t nrv = nhpc_create_tmp_file_or_dir(&tmp_file, NULL, NHPC_DIRECTORY);
 
-   nhpc_status_t nhpc_fileordirectory(const char *file_path);
-   
-   nhpc_status_t nhpc_filecopy(const char *dst, const char *src);
-   
-   nhpc_status_t nhpc_create_tmp_file_or_dir(char **new_file_dir, const char *target, int target_type);
-};
+   if(nrv == NHPC_SUCCESS)
+      cout<<tmp_file<<endl;
+
+   return 0;
+}

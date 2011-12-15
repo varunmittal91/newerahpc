@@ -18,8 +18,12 @@
  */
 
 #include <sys/stat.h>
+#include <iostream>
 
 #include <include/file.h>
+#include <include/strings.h>
+
+using namespace std;
 
 namespace neweraHPC
 {
@@ -91,5 +95,21 @@ namespace neweraHPC
       fclose(fp_dst);
       
       return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t nhpc_create_tmp_file_or_dir(char **new_file_dir, const char *target_dir, int target_type)
+   {
+      const char *final_target;
+      if(target_dir != NULL)
+      {
+	 if(*target_dir == '/')
+	    final_target = nhpc_strconcat("/tmp", target_dir);
+	 else 
+	    final_target = nhpc_strconcat("/tmp/", target_dir);
+      }
+      else 
+	 final_target = "/tmp";
+            
+      cout<<final_target<<endl;
    }
 };

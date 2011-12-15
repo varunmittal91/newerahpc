@@ -116,5 +116,10 @@ int main()
    
    cout<<nhpc_itostr(123)<<endl;
    
+   cout<<"Generating random strings of length 5"<<endl;
+   for(int i = 0; i < 10; i++)
+   {
+      cout<<nhpc_random_string(5)<<endl;
+   }
    return 0;
 }

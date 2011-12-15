@@ -27,6 +27,8 @@
 #include "constants.h"
 
 namespace neweraHPC{
+   static const char *alphabets = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+   
    struct string_t
    {
       char **strings;
@@ -48,6 +50,8 @@ namespace neweraHPC{
    char *nhpc_strconcat(const char *s1, const char *s2);
    
    char *nhpc_itostr(int num);
+   
+   char *nhpc_random_string(nhpc_size_t len);
 };
 
 #endif

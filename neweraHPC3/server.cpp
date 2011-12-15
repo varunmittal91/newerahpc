@@ -40,7 +40,7 @@ int main(int argc,char **argv)
    cout<<"Starting Plugin Manager: ";
    plugin_manager_t plugin_manager(&thread_manager);
    cout<<"\t\t\t OK"<<endl;
-   
+
    plugin_manager.install_plugin("samples/plugin.nxi");
    
    network_t network(&thread_manager);

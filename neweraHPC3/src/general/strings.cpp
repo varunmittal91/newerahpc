@@ -18,6 +18,9 @@
  */
 
 #include <iostream>
+#ifdef linux
+#include <stdlib.h>
+#endif
 
 #include <include/strings.h>
 #include <include/constants.h>

@@ -21,35 +21,43 @@
 #define _GRID_DATA_H_
 
 #include "grid_data.h"
-#define MAX_LVL_1 3
 
 namespace neweraHPC
 {
-   /* Store Network connection details */
-   typedef struct list_node_t
-   {
-      struct peer_details_t *info;
-      struct list_node_t    *next;
-      struct list_node_t    *connection;
-   }list_node_t;
-
+	
+   typedef struct queue_struct{
+      int front;
+      int rear;
+      int task_total;
+      int task_completed;
+   }queue_t;
+   
    class grid_scheduler_t
    {
-   private:
-      list_node_t *level1;
-      list_node_t **lists;
-   public:
-      void init();
-      grid_scheduler_t();
-      ~grid_scheduler_t();
-      /* Adds a new node to network and schedules it */
-      int insert(struct peer_details_t *child);
-
-      /* Adds the child to parent node */
-      int insert(struct peer_details_t *parent, struct peer_details_t *child);
-
-      /* Remove a node from network and re-schedule if required */
-      int remove(struct peer_details_t *node);
+    private:
+       int node_count;
+	   int client_count;
+       queue_t *q;
+       rbtree_t *tree;
+       struct peer_details_t *clientList;
+       bool enqueue(int, int);
+       int dequeue(int);
+       bool isIdle(int);
+       int find_min(int);
+	   bool send(peer_details_t *client, plugin_details_t *task);
+	   bool get(peer_details_t *client);
+       void dispatcherThread(struct peer_details_t *client);
+      
+    public:
+       grid_scheduler_t();
+       grid_scheduler_t(int nodes);
+       bool addClient(struct peer_details_t *client);
+       bool removeClient(struct peer_details_t *client);
+       struct peer_details_t* addTask(struct plugin_details_t *task);
+       bool dispatch();
+      
    };
+   
+};
 
 #endif

@@ -18,31 +18,80 @@
  */
 
 #include <include/grid.h>
-#include <cstdlib>
+#include <iostream>
+
+using namespace std;
 
 namespace neweraHPC
 {
-   /*
-   void grid_scheduler_t::init()
+	
+   grid_scheduler_t::grid_scheduler_t()
    {
-      head=NULL;
+	   node_count = 5;
+	   client_count = 5;
+	   q = new queue_t[node_count];
+	   tree = new rbtree_t[node_count];
+	   clientList = new struct peer_details_t[client_count];
    }
-   int grid_scheduler_t::insert(struct peer_details_t *child)
+   grid_scheduler_t::grid_scheduler_t(int nodes)
    {
-	list_node_t *temp;
-	temp = head;
-	list_node_t *node;
-	if(temp==NULL)
-	{
- 	   node = (list_node_t*)malloc(sizeof(list_node_t));
-	   
-	}
-	else
-	{
-	   
-	}
+	   node_count = nodes;
+	   client_count = nodes;
+	   q = new queue_t[node_count];
+	   tree = new rbtree_t[node_count];
+	   clientList = new struct peer_details_t[client_count];
    }
-   */
+   bool grid_scheduler_t::enqueue(int value, int id)
+   {
+      int status = -1;
+      if(q[id].front == q[id].rear && q[id].front == -1)
+      {
+         q[id].front = q[id].rear = 1;
+      }
+      else
+      {
+         q[id].rear++;
+      }
+      q[id].task_total++;
+      status = tree[id].insert(&value, q[id].rear);
+      if(status > -1)
+         return true;
+      return false;
+   }
+
+   int grid_scheduler_t::dequeue(int id)
+   {
+      int *value, status = -1;
+      if(q[id].front == q[id].rear && q[id].front == -1)
+      {
+         return -9999;
+      }
+      else
+      {
+         value = (int*)tree[id].search(q[id].front);
+         status = tree[id].erase(q[id].front);
+         if(status != 1)
+            return -9999;
+         q[id].front++;
+         q[id].task_completed++;
+         return *value;
+      }
+   }
+   
+   int grid_scheduler_t::find_min(int length)
+   {
+      int min = tree[0].ret_count();
+      int pos = 0;
+      int i;
+      for(i=1; i<length; i++)
+         if(tree[i].ret_count() < min)
+         {
+             min = tree[i].ret_count();
+             pos = i;
+         }
+      return pos;
+   }
+   
    void test_grid()
    {
       

@@ -146,7 +146,6 @@ namespace neweraHPC
 	 if(nhpc_fileordirectory(dll_file) == NHPC_FILE)
 	 {
 	    *dll_path = dll_file;
-	    cout<<"created dll: "<<*dll_path<<" in directory "<<directory<<endl;
 	    return NHPC_SUCCESS;
 	 }
 	 

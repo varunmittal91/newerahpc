@@ -56,7 +56,8 @@ namespace neweraHPC
    nhpc_status_t plugin_manager_t::install_plugin(const char *file_path)
    {
       const char *dll_path;
-      const char *base_dir;
+      const char *base_dir = NULL;
+      char *dll_path_new;
       bool have_nxi = false;
       
       nhpc_status_t nrv = nhpc_check_nxi(file_path);
@@ -67,9 +68,9 @@ namespace neweraHPC
 	 if(nrv != NHPC_SUCCESS)
 	 {
 	    return nrv;
-	    
-	    have_nxi = true;
 	 }
+	 
+	 have_nxi = true;
       }
       else 
 	 dll_path = (char *)file_path;
@@ -77,19 +78,16 @@ namespace neweraHPC
       nrv = install_plugin_dll(dll_path);
       if(nrv == NHPC_SUCCESS)
       {
-	 char *dll_path_new;
-
 	 if(have_nxi)
 	 {
 	    nrv = copy_filetogrid(file_path, &base_dir, &dll_path_new);
-	    
-	    cout<<file_path<<" "<<base_dir<<" "<<dll_path_new<<endl;
 	    
 	    if(nrv == NHPC_FAIL)
 	       return nrv;
 	 }
 	 
 	 nrv = copy_filetogrid(dll_path, &base_dir, &dll_path_new);
+	 
 	 if(nrv == NHPC_FAIL)
 	    return nrv;
       }
@@ -112,16 +110,28 @@ namespace neweraHPC
       {
 	 string_t *string = nhpc_substr(file_path, '/');
 	 
-	 *base_dir = nhpc_random_string(7);
+	 char *grid_dir;
+	 char *mkdir_path;
 	 
-	 char *grid_dir = nhpc_strconcat(grid_directory, *base_dir);
-	 
-	 if(mkdir(grid_dir, 0777) == -1)
+	 if(*base_dir == NULL)
 	 {
-	    delete[] grid_dir;
-	    nhpc_string_delete(string);
-	    return NHPC_FAIL;
+	    *base_dir = nhpc_random_string(7);
+	    mkdir_path = nhpc_strconcat(grid_directory, *base_dir);
+	    
+	    if(mkdir(mkdir_path, 0777) == -1)
+	    {
+	       delete[] mkdir_path;
+	       delete[] base_dir;
+	       
+	       nhpc_string_delete(string);
+	       return NHPC_FAIL;
+	    }
+	    
+	    grid_dir = mkdir_path;
 	 }
+	 else 
+	    grid_dir = nhpc_strconcat(grid_directory, *base_dir);
+	 
 	 
 	 char *new_path = nhpc_strconcat(grid_dir, "/");
 	 delete[] grid_dir;
@@ -133,16 +143,16 @@ namespace neweraHPC
 	 
 	 nhpc_status_t nrv = nhpc_filecopy(new_path, file_path);
 
-	 delete[] new_path;
-
 	 if(nrv != NHPC_SUCCESS)
 	 {
 	    return NHPC_FAIL;
 	 }
+	 
+	 *file_path_new = new_path;
       }
       
       delete[] search_path;
-      
+            
       return NHPC_SUCCESS;
    }
    

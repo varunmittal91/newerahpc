@@ -41,10 +41,14 @@ int main(int argc,char **argv)
    plugin_manager_t plugin_manager(&thread_manager);
    cout<<"\t\t\t OK"<<endl;
 
-   plugin_manager.install_plugin("samples/plugin.nxi");
-   
+   nhpc_status_t nrv = plugin_manager.install_plugin("samples/plugin.nxi");
+   if(nrv == NHPC_SUCCESS)
+      cout<<"Plugin Installed"<<endl;
+   else
+      cout<<"Plugin Installation Failed"<<endl;
+      
    network_t network(&thread_manager);
-   nhpc_status_t nrv = network.create_server(argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
+   nrv = network.create_server(argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
    if(nrv != NHPC_SUCCESS)
    {
       perror("error at creating server");

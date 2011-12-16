@@ -39,7 +39,7 @@ namespace neweraHPC
       pthread_mutex_t *mutex;
       const char *grid_directory;
       nhpc_status_t install_plugin_dll(const char *dll_path);
-      nhpc_status_t copy_filetogrid(const char *file_path, char **file_path_new);
+      nhpc_status_t copy_filetogrid(const char *file_path, const char *base_dir, char **file_path_new);
       
    public:
       plugin_manager_t(thread_manager_t *in_thread_manager);

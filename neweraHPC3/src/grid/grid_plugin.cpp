@@ -20,6 +20,7 @@
 #include <iostream>
 
 #include <include/grid.h>
+#include <include/file.h>
 
 using namespace std;
 
@@ -64,7 +65,7 @@ namespace neweraHPC
 	 {
 	    char *dll_path_new;
 	    
-	    nrv = copy_filetogrid(dll_path, &dll_path_new);
+	    nrv = copy_filetogrid(dll_path, NULL, &dll_path_new);
 	    if(nrv == NHPC_SUCCESS)
 	       return nrv;
 	 }
@@ -79,7 +80,7 @@ namespace neweraHPC
       {
 	 char *dll_path_new;
 	 
-	 nrv = copy_filetogrid(dll_path, &dll_path_new);
+	 nrv = copy_filetogrid(dll_path, NULL, &dll_path_new);
 	 if(nrv == NHPC_FAIL)
 	    return nrv;
       }
@@ -92,7 +93,7 @@ namespace neweraHPC
       
    }
    
-   nhpc_status_t plugin_manager_t::copy_filetogrid(const char *file_path, char **file_path_new)
+   nhpc_status_t plugin_manager_t::copy_filetogrid(const char *file_path, const char *base_dir, char **file_path_new)
    {  
       *file_path_new = NULL;
       
@@ -100,7 +101,36 @@ namespace neweraHPC
       
       if(nhpc_strcmp(file_path, search_path) == NHPC_FAIL)
       {
-	 cout<<search_path<<endl; 
+	 string_t *string = nhpc_substr(file_path, '/');
+	 
+	 char *grid_dir = nhpc_random_string(7);
+	 char *tmp_dir = nhpc_strconcat(grid_directory, grid_dir);
+	 delete[] grid_dir;
+	 grid_dir = tmp_dir;
+	 
+	 if(mkdir(grid_dir, 0777) == -1)
+	 {
+	    delete[] grid_dir;
+	    nhpc_string_delete(string);
+	    return NHPC_FAIL;
+	 }
+	 
+	 char *new_path = nhpc_strconcat(grid_dir, "/");
+	 delete[] grid_dir;
+	 grid_dir = new_path;
+	 new_path = nhpc_strconcat(new_path, string->strings[string->count - 1]);
+	 delete[] grid_dir;
+	 
+	 nhpc_string_delete(string);
+	 
+	 nhpc_status_t nrv = nhpc_filecopy(new_path, file_path);
+
+	 delete[] new_path;
+
+	 if(nrv != NHPC_SUCCESS)
+	 {
+	    return NHPC_FAIL;
+	 }
       }
       
       delete[] search_path;

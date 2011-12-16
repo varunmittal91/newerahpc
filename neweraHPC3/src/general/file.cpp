@@ -69,7 +69,7 @@ namespace neweraHPC
       if(dst == NULL || src == NULL)
 	 return NHPC_FAIL;
       
-      if(nhpc_file_size(dst, NULL) != NHPC_FILE_NOT_FOUND || nhpc_file_size(src, NULL) != NHPC_FILE)
+      if(nhpc_fileordirectory(dst) != NHPC_FILE_NOT_FOUND || nhpc_fileordirectory(src) != NHPC_FILE)
 	 return NHPC_FAIL;
       
       FILE *fp_src = fopen(src, "r");

@@ -104,7 +104,7 @@ int main()
    string = nhpc_substr("   My name is   varun", ' ');
    string = nhpc_substr("My name is   varun   ", ' ');
    string = nhpc_substr("My name is varun", 's');
-   
+      
    cout<<endl<<"Concatenating strings:"<<endl;
    
    s1 = "Varun";

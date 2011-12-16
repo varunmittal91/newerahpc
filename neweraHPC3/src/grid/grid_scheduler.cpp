@@ -17,30 +17,34 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <include/grid.h>
 #include <iostream>
+
+#include <include/grid.h>
+//#include <include/grid_scheduler.h>
+//#include <include/grid_data.h>
 
 using namespace std;
 
 namespace neweraHPC
-{
-	
+{	
    grid_scheduler_t::grid_scheduler_t()
    {
-	   node_count = 5;
-	   client_count = 5;
-	   q = new queue_t[node_count];
-	   tree = new rbtree_t[node_count];
-	   clientList = new struct peer_details_t[client_count];
+      node_count = 5;
+      client_count = 5;
+      q = new queue_t[node_count];
+      tree = new rbtree_t[node_count];
+      clientList = new struct peer_details_t[client_count];
    }
+   
    grid_scheduler_t::grid_scheduler_t(int nodes)
    {
-	   node_count = nodes;
-	   client_count = nodes;
-	   q = new queue_t[node_count];
-	   tree = new rbtree_t[node_count];
-	   clientList = new struct peer_details_t[client_count];
+      node_count = nodes;
+      client_count = nodes;
+      q = new queue_t[node_count];
+      tree = new rbtree_t[node_count];
+      clientList = new struct peer_details_t[client_count];
    }
+   
    bool grid_scheduler_t::enqueue(int value, int id)
    {
       int status = -1;
@@ -58,7 +62,7 @@ namespace neweraHPC
          return true;
       return false;
    }
-
+   
    int grid_scheduler_t::dequeue(int id)
    {
       int *value, status = -1;
@@ -86,14 +90,9 @@ namespace neweraHPC
       for(i=1; i<length; i++)
          if(tree[i].ret_count() < min)
          {
-             min = tree[i].ret_count();
-             pos = i;
+	    min = tree[i].ret_count();
+	    pos = i;
          }
       return pos;
-   }
-   
-   void test_grid()
-   {
-      
    }
 };

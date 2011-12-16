@@ -68,6 +68,8 @@ namespace neweraHPC
 	    if(nrv == NHPC_SUCCESS)
 	       return nrv;
 	 }
+	 else 
+	    cout<<"DLL Creation Failed"<<endl;
       }
       else 
 	 dll_path = (char *)file_path;

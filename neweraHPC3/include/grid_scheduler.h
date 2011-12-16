@@ -17,47 +17,46 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GRID_DATA_H_
-#define _GRID_DATA_H_
+#ifndef _GRID_SCHEDULER_H_
+#define _GRID_SCHEDULER_H_
 
 #include "grid_data.h"
+#include "rbtree.h"
 
 namespace neweraHPC
 {
-	
-   typedef struct queue_struct{
+   struct queue_t{
       int front;
       int rear;
       int task_total;
       int task_completed;
-   }queue_t;
+   };
    
    class grid_scheduler_t
    {
-    private:
-       int node_count;
-	   int client_count;
-       queue_t *q;
-       rbtree_t *tree;
-       struct peer_details_t *clientList;
-       bool enqueue(int, int);
-       int dequeue(int);
-       bool isIdle(int);
-       int find_min(int);
-	   bool send(peer_details_t *client, plugin_details_t *task);
-	   bool get(peer_details_t *client);
-       void dispatcherThread(struct peer_details_t *client);
+   private:
+      int node_count;
+      int client_count;
+      queue_t *q;
+      rbtree_t *tree;
+      struct peer_details_t *clientList;
+      bool enqueue(int, int);
+      int dequeue(int);
+      bool isIdle(int);
+      int find_min(int);
+      bool send(peer_details_t *client, plugin_details_t *task);
+      bool get(peer_details_t *client);
+      void dispatcherThread(struct peer_details_t *client);
       
-    public:
-       grid_scheduler_t();
-       grid_scheduler_t(int nodes);
-       bool addClient(struct peer_details_t *client);
-       bool removeClient(struct peer_details_t *client);
-       struct peer_details_t* addTask(struct plugin_details_t *task);
-       bool dispatch();
+   public:
+      grid_scheduler_t();
+      grid_scheduler_t(int nodes);
+      bool addClient(struct peer_details_t *client);
+      bool removeClient(struct peer_details_t *client);
+      struct peer_details_t* addTask(struct plugin_details_t *task);
+      bool dispatch();
       
    };
-   
 };
 
 #endif

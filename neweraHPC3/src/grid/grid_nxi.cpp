@@ -31,6 +31,15 @@ namespace neweraHPC
    {
       nhpc_status_t nrv = nhpc_strcmp(file_path, "*.nxi");
       
+      if(nrv == NHPC_SUCCESS)
+      {
+	 nrv = nhpc_fileordirectory(file_path);
+	 if(nrv == NHPC_FILE)
+	    nrv = NHPC_SUCCESS;
+	 else 
+	    nrv = NHPC_FAIL;
+      }
+      
       return nrv;
    }
    
@@ -132,8 +141,18 @@ namespace neweraHPC
       delete[] exec_cmd;
       
       if(rv == 0)
-	 cout<<"plugin built successfully"<<endl;
-
-      cout<<"creating dll: "<<file_path<<" in directory "<<directory<<endl;
+      {
+	 const char *dll_file = nhpc_strconcat(directory, "bin/libplugin.so");
+	 if(nhpc_fileordirectory(dll_file) == NHPC_FILE)
+	 {
+	    *dll_path = dll_file;
+	    cout<<"created dll: "<<*dll_path<<" in directory "<<directory<<endl;
+	    return NHPC_SUCCESS;
+	 }
+	 
+	 delete[] dll_file;
+      }
+      
+      return NHPC_FAIL;
    }
 };

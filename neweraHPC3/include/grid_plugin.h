@@ -21,6 +21,7 @@
 #define _GRID_PLUGIN_H_
 
 #include <pthread.h>
+#include <stdlib.h>
 
 #include "rbtree.h"
 #include "thread.h"

@@ -55,22 +55,21 @@ namespace neweraHPC
    
    nhpc_status_t plugin_manager_t::install_plugin(const char *file_path)
    {
-      nhpc_status_t nrv = nhpc_check_nxi(file_path);
       const char *dll_path;
+      const char *base_dir;
+      bool have_nxi = false;
+      
+      nhpc_status_t nrv = nhpc_check_nxi(file_path);
       
       if(nrv == NHPC_SUCCESS)
       {
 	 nrv = nhpc_nxitodll(&dll_path, file_path);
-	 if(nrv == NHPC_SUCCESS)
+	 if(nrv != NHPC_SUCCESS)
 	 {
-	    char *dll_path_new;
+	    return nrv;
 	    
-	    nrv = copy_filetogrid(dll_path, NULL, &dll_path_new);
-	    if(nrv == NHPC_SUCCESS)
-	       return nrv;
+	    have_nxi = true;
 	 }
-	 else 
-	    cout<<"DLL Creation Failed"<<endl;
       }
       else 
 	 dll_path = (char *)file_path;
@@ -79,8 +78,18 @@ namespace neweraHPC
       if(nrv == NHPC_SUCCESS)
       {
 	 char *dll_path_new;
+
+	 if(have_nxi)
+	 {
+	    nrv = copy_filetogrid(file_path, &base_dir, &dll_path_new);
+	    
+	    cout<<file_path<<" "<<base_dir<<" "<<dll_path_new<<endl;
+	    
+	    if(nrv == NHPC_FAIL)
+	       return nrv;
+	 }
 	 
-	 nrv = copy_filetogrid(dll_path, NULL, &dll_path_new);
+	 nrv = copy_filetogrid(dll_path, &base_dir, &dll_path_new);
 	 if(nrv == NHPC_FAIL)
 	    return nrv;
       }
@@ -90,10 +99,10 @@ namespace neweraHPC
    
    nhpc_status_t plugin_manager_t::install_plugin_dll(const char *dll_path)
    {
-      
+      return NHPC_SUCCESS;
    }
    
-   nhpc_status_t plugin_manager_t::copy_filetogrid(const char *file_path, const char *base_dir, char **file_path_new)
+   nhpc_status_t plugin_manager_t::copy_filetogrid(const char *file_path, const char **base_dir, char **file_path_new)
    {  
       *file_path_new = NULL;
       
@@ -103,10 +112,9 @@ namespace neweraHPC
       {
 	 string_t *string = nhpc_substr(file_path, '/');
 	 
-	 char *grid_dir = nhpc_random_string(7);
-	 char *tmp_dir = nhpc_strconcat(grid_directory, grid_dir);
-	 delete[] grid_dir;
-	 grid_dir = tmp_dir;
+	 *base_dir = nhpc_random_string(7);
+	 
+	 char *grid_dir = nhpc_strconcat(grid_directory, *base_dir);
 	 
 	 if(mkdir(grid_dir, 0777) == -1)
 	 {

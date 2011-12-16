@@ -20,8 +20,6 @@
 #include <iostream>
 
 #include <include/grid.h>
-//#include <include/grid_scheduler.h>
-//#include <include/grid_data.h>
 
 using namespace std;
 

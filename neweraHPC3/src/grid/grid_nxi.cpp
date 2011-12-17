@@ -56,6 +56,13 @@ namespace neweraHPC
       FILE *fp_exec = fopen(exec_file, "w+");
       chmod(exec_file, S_IRWXU | S_IRWXG | S_IRWXO);
       
+      const char *script_type = "#!/bin/bash\n\n";
+      fwrite(script_type, 1, strlen(script_type), fp_exec);
+      
+      fwrite("cd ", 1, 3, fp_exec);
+      fwrite(directory, 1, strlen(directory), fp_exec);
+      fwrite("\n", 1, 1, fp_exec);
+      
       ifstream fp_nxi(file_path, ios::in);
       string line;
       

@@ -78,6 +78,7 @@ namespace neweraHPC
       plugin_details_t *new_plugin;
       
       nrv = install_plugin_dll(dll_path, &new_plugin);
+      
       if(nrv == NHPC_SUCCESS)
       {
 	 if(have_nxi)
@@ -94,7 +95,7 @@ namespace neweraHPC
 	       return nrv;
 	    }
 	    
-	    nhpc_strcpy(&new_plugin->path_nxi, dll_path_new);
+	    nhpc_strcpy(&(new_plugin->path_nxi), dll_path_new);
 	    delete[] dll_path_new;
 	 }
 	 
@@ -111,23 +112,24 @@ namespace neweraHPC
 	    return nrv;
 	 }
 	 
-	 nhpc_strcpy(&new_plugin->path_plugin, dll_path_new);
+	 nhpc_strcpy(&(new_plugin->path_plugin), dll_path_new);
 	 delete[] dll_path_new;
+
+	 cout<<"New plugin details:"<<endl;
+	 cout<<"\t"<<new_plugin->plugin_name<<endl;
+	 cout<<"\t"<<new_plugin->path_nxi<<endl;
+	 cout<<"\t"<<new_plugin->path_plugin<<endl;
       }
-      
-      cout<<"New plugin details:"<<endl;
-      cout<<"\t"<<new_plugin->plugin_name<<endl;
-      cout<<"\t"<<new_plugin->path_nxi<<endl;
-      cout<<"\t"<<new_plugin->path_plugin<<endl;
       
       return nrv;
    }
    
    nhpc_status_t plugin_manager_t::install_plugin_dll(const char *dll_path, plugin_details_t **plugin_details)
    {
-      void *dll = dlopen(dll_path, RTLD_GLOBAL);
+      void *dll = dlopen(dll_path, RTLD_NOW);
       if(!dll)
       {
+	 dlerror();
 	 return NHPC_FAIL;
       }
       
@@ -163,7 +165,7 @@ namespace neweraHPC
       {
 	 delete (*plugin_details);
 	 dlclose(dll);
-	 return nrv;
+	 return NHPC_FAIL;
       }
       
       nhpc_strcpy(&((*plugin_details)->plugin_name), plugin_name);

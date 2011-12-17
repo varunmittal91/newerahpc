@@ -35,9 +35,23 @@ namespace neweraHPC
       root = new rb_root;
       
       root->rb_node = NULL;
-      
       last_assigned_key = 0;
       count = 0;
+      num_mode = true;
+   }
+   
+   rbtree_t::rbtree_t(int mode)
+   {
+      root = new rb_root;
+      
+      root->rb_node = NULL;
+      last_assigned_key = 0;
+      count = 0;
+
+      if(mode == NHPC_RBTREE_STR)
+	 num_mode = false;
+      else 
+	 num_mode = true;
    }
    
    rbtree_t::~rbtree_t()
@@ -50,6 +64,11 @@ namespace neweraHPC
       {
 	 rbtree_t::node *data = rb_entry(node, rbtree_t::node, node_next);
 	 rb_erase(&data->node_next,root);
+	 if(!num_mode)
+	 {
+	    delete[] data->node_key_str;
+	 }
+
 	 delete data;
       }
 
@@ -58,6 +77,9 @@ namespace neweraHPC
    
    void *rbtree_t::search(int key)
    {
+      if(!num_mode) 
+	 return NULL;
+      
       struct rb_node *node = root->rb_node;
       
       while (node) 
@@ -77,16 +99,10 @@ namespace neweraHPC
 	 }
 	 if (result < 0)
 	 {
-#ifdef debug
-	    cout<<"curr:"<<key<<" searching at left node"<<endl;
-#endif
 	    node = node->rb_left;
 	 }
 	 else if (result > 0)
 	 {
-#ifdef debug
-	    cout<<"curr:"<<key<<" searching at right node"<<endl;
-#endif
 	    node = node->rb_right;
 	 }
 	 else
@@ -97,6 +113,9 @@ namespace neweraHPC
    
    rbtree_t::node *rbtree_t::search_node(int key)
    {
+      if(!num_mode)
+	 return NULL;
+      
       struct rb_node *node = root->rb_node;
       
       while (node) 
@@ -115,16 +134,10 @@ namespace neweraHPC
 	 }
 	 if (result < 0)
 	 {
-#ifdef debug
-	    cout<<"curr:"<<key<<" searching at left node"<<endl;
-#endif
 	    node = node->rb_left;
 	 }
 	 else if (result > 0)
 	 {
-#ifdef debug
-	    cout<<"curr:"<<key<<" searching at right node"<<endl;
-#endif
 	    node = node->rb_right;
 	 }
 	 else
@@ -135,6 +148,9 @@ namespace neweraHPC
    
    int rbtree_t::insert(void *in_data)
    {
+      if(!num_mode)
+	 return false;
+      
       /* Create a new rbtree_t::node type and initialize values */
       rbtree_t::node *data = new rbtree_t::node;
       data->node_data = in_data;
@@ -156,16 +172,10 @@ namespace neweraHPC
 	 parent = *new_node;
 	 if (result < 0)
 	 {
-#ifdef debug
-	    cout<<"curr:"<<this_node->key<<" inserting at left node"<<endl;
-#endif
 	    new_node = &((*new_node)->rb_left);
 	 }
 	 else if (result > 0)
 	 {
-#ifdef debug
-	    cout<<"curr:"<<this_node->key<<" inserting at right node"<<endl;
-#endif
 	    new_node = &((*new_node)->rb_right);
 	 }
 	 else
@@ -182,6 +192,9 @@ namespace neweraHPC
    
    int rbtree_t::insert(void *in_data, int key)
    {      
+      if(!num_mode)
+	 return false;
+      
       /* Create a new rbtree_t::node type and initialize values */
       rbtree_t::node *data = new rbtree_t::node;
       data->node_data = in_data;
@@ -205,16 +218,10 @@ namespace neweraHPC
 	 parent = *new_node;
 	 if (result < 0)
 	 {
-#ifdef debug
-	    cout<<"curr:"<<this_node->key<<" inserting at left node"<<endl;
-#endif
 	    new_node = &((*new_node)->rb_left);
 	 }
 	 else if (result > 0)
 	 {
-#ifdef debug
-	    cout<<"curr:"<<this_node->key<<" inserting at right node"<<endl;
-#endif
 	    new_node = &((*new_node)->rb_right);
 	 }
 	 else
@@ -231,6 +238,9 @@ namespace neweraHPC
    
    int rbtree_t::erase(int key)
    {
+      if(!num_mode)
+	 return false;
+      
       rbtree_t::node *data = rbtree_t::search_node(key);
       if(data){
 	 rb_erase(&data->node_next,root);
@@ -244,6 +254,9 @@ namespace neweraHPC
    
    int rbtree_t::update(int key, void *new_in_data)
    {
+      if(!num_mode)
+	 return false;
+      
       rbtree_t::node *data = search_node(key);
       if(data)
       {
@@ -258,6 +271,114 @@ namespace neweraHPC
    {
       return count;
    }
+   
+   /* Experimental Code for adding string keys to rbtree */
+   void *rbtree_t::search(const char *key_str)
+   {
+      if(num_mode) 
+	 return NULL;
+      
+      struct rb_node *node = root->rb_node;
+      
+      while (node) 
+      {
+	 int result = 0;
+	 
+	 rbtree_t::node *data = container_of(node, rbtree_t::node, node_next);
+	 if(data == NULL)
+	    return NULL;
+	 
+	 int key = strcmp(key_str, data->node_key_str);
+	 
+	 if(key < 0)
+	 {
+	    node = node->rb_left;
+	 }
+	 else if(key > 0)
+	 {
+	    node = node->rb_right;
+	 }
+	 else
+	    return data->node_data;
+      }
+      return NULL;
+   }
+   
+   rbtree_t::node *rbtree_t::search_node(const char *key_str)
+   {
+      if(num_mode)
+	 return NULL;
+      
+      struct rb_node *node = root->rb_node;
+      
+      while (node) 
+      {
+	 int result = 0;
+	 
+	 rbtree_t::node *data = container_of(node, rbtree_t::node, node_next);
+	 if(data == NULL)
+	    return NULL;
+	 
+	 int key = strcmp(key_str, data->node_key_str);
+	 
+	 if(key < 0)
+	 {
+	    node = node->rb_left;
+	 }
+	 else if(key > 0)
+	 {
+	    node = node->rb_right;
+	 }
+	 else
+	    return data;
+      }
+      return NULL;
+   }  
+   
+   int rbtree_t::insert(void *in_data, const char *key_str)
+   {      
+      if(num_mode)
+	 return false;
+      
+      /* Create a new rbtree_t::node type and initialize values */
+      rbtree_t::node *data = new rbtree_t::node;
+      data->node_data = in_data;
+      nhpc_strcpy(&(data->node_key_str), key_str);
+      
+      struct rb_node **new_node = &(root->rb_node), *parent = NULL;
+      /* Figure out where to put new node */
+      while (*new_node) 
+      {
+	 node *this_node = container_of(*new_node, node, node_next);
+	 if(this_node == NULL)
+	    return false;
+	 
+	 int key = strcmp(key_str, this_node->node_key_str);
+	 
+	 parent = *new_node;
+	 if(key < 0)
+	 {
+	    new_node = &((*new_node)->rb_left);
+	 }
+	 else if(key > 0)
+	 {
+	    new_node = &((*new_node)->rb_right);
+	 }
+	 else 
+	 {
+	    delete data;
+	    delete[] data->node_key_str;
+	    return false;
+	 }
+      }
+      
+      /* Add new node and rebalance tree. */
+      rb_link_node(&data->node_next, parent, new_node);
+      rb_insert_color(&data->node_next, root);
+      count++;
+      
+      return NHPC_SUCCESS;
+   }      
 };
 
 static void __rb_rotate_left(struct rb_node *node, struct rb_root *root)

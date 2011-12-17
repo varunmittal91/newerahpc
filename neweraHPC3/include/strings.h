@@ -35,7 +35,7 @@ namespace neweraHPC{
       int count;
    };
    
-   char *nhpc_strcpy(char *dst, const char *src, size_t dst_len);
+   nhpc_status_t nhpc_strcpy(char **dst, const char *src);
    
    /* nhpc_strcmp and nhpc_strcmpi takes two strings as input.
       First string is the subject and the second string is 

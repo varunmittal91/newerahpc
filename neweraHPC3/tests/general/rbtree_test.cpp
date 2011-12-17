@@ -200,6 +200,24 @@ int main()
    delete[] c; 
    delete[] d;
    
+   test_tree = new rbtree_t(NHPC_RBTREE_STR);
+   cout<<endl;
+   cout<<test_tree->insert(a, "1")<<endl;
+   cout<<test_tree->insert(b, "2")<<endl;
+   cout<<test_tree->insert(c, "3")<<endl;
+   cout<<test_tree->insert(d, "4")<<endl;
+   
+   int *temp = (int *)test_tree->search("1");
+   cout<<temp<<endl;
+   temp = (int *)test_tree->search("2");
+   cout<<temp<<endl;
+   temp = (int *)test_tree->search("3");
+   cout<<temp<<endl;
+   temp = (int *)test_tree->search("4");
+   cout<<temp<<endl;
+   
+   delete test_tree;
+   
    cout<<"All tree structures and data have been deleted there should not be any trace of memory still remaining\n";
    cout<<"If there is still some memory left that is not deallocated, we have a problem"<<endl;
    

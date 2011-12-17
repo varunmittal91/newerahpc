@@ -28,29 +28,15 @@
 using namespace std;
 
 namespace neweraHPC{
-   char *nhpc_strcpy(char *dst, const char *src, size_t dst_len)
+   nhpc_status_t nhpc_strcpy(char **dst, const char *src)
    {
-      char *d, *end;
+      nhpc_size_t len = strlen(src);
       
-      if(dst_len == 0) 
-      {
-	 return (dst);
-      }
-      
-      d = dst;
-      end = dst + dst_len - 1;
-      
-      for(; d < end; ++d, ++src)
-      {
-	 if(!(*d = *src)) 
-	 {
-	    return (d);
-	 }
-      }
-      
-      *d = '\0';
-      
-      return (d);
+      *dst = new char [len + 1];
+      memcpy(*dst, src, len);
+      (*dst)[len] = '\0';
+
+      return NHPC_SUCCESS;
    }
    
    nhpc_status_t nhpc_strcmp(const char *s1, const char *s2)

@@ -30,6 +30,9 @@
 #include <cstddef>
 #include <pthread.h>
 
+#include "strings.h"
+#include "constants.h"
+
 #define container_of(ptr, type, member) ({            \
 const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
 (type *)( (char *)__mptr - offsetof(type,member) );})
@@ -105,8 +108,8 @@ static inline void rb_link_node(struct rb_node * node, struct rb_node * parent,	
    *rb_link = node;
 }
 
-#define RBTREE_NUM  0
-#define RBTREE_VOID 1
+#define NHPC_RBTREE_NUM 0
+#define NHPC_RBTREE_STR 1
 
 namespace neweraHPC
 {
@@ -119,18 +122,25 @@ namespace neweraHPC
 	 struct rb_node node_next;
 	 void *node_data;
 	 int  node_key;
+	 char *node_key_str;
       };
       int last_assigned_key;
-      node *search_node(int);
+      node *search_node(int node_key);
+      node *search_node(const char *node_key_str);
       int count;
+      bool num_mode;
       
    public:
       rbtree_t();
+      rbtree_t(int mode);
       ~rbtree_t();
-      void *search(int);
+      void *search(int key);
+      void *search(const char *key_str);
       int insert(void *);
-      int insert(void *, int);
-      int erase(int);
+      int insert(void *, int key);
+      int insert(void *, const char *key_str);
+      int erase(int key);
+      int erase(const char *key_str);
       int update(int, void *);
       int ret_count();
    };

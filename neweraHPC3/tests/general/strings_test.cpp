@@ -121,5 +121,11 @@ int main()
    {
       cout<<nhpc_random_string(5)<<endl;
    }
+   
+   cout<<"Testing strcpy"<<endl;
+   char *test_cpy;
+   nhpc_strcpy(&test_cpy, "hi my name is varun");
+   cout<<test_cpy<<" len: "<<strlen(test_cpy)<<endl;
+   
    return 0;
 }

@@ -378,7 +378,23 @@ namespace neweraHPC
       count++;
       
       return NHPC_SUCCESS;
-   }      
+   }   
+   
+   int rbtree_t::erase(const char *key_str)
+   {
+      if(num_mode)
+	 return NHPC_FAIL;
+      
+      rbtree_t::node *data = rbtree_t::search_node(key_str);
+      if(data){
+	 rb_erase(&data->node_next,root);
+	 delete data;
+	 count--;
+	 return NHPC_SUCCESS;
+      }
+      else
+	 return NHPC_FAIL;
+   }   
 };
 
 static void __rb_rotate_left(struct rb_node *node, struct rb_root *root)

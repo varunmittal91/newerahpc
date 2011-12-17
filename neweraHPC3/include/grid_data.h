@@ -23,23 +23,27 @@
 /* Grid configuration file which will contain peer list */
 #define grid_conf_file "/etc/grid.conf"
 
-typedef void *(fnc_ptr)(void *);
+typedef void *(*fnc_ptr_t)(void *);
 
 namespace neweraHPC
 {
    /* Plugin details for the modules that are added to be run in a grid */
    struct plugin_details_t
    {
+      char *plugin_name;
+      
       /* Address of the base plugin function that server will run*/
-      fnc_ptr ptr_exec;
+      fnc_ptr_t fnc_init;
       
       /* Address of the plugin function that client will run 
        for assembly of data and other purposes */
-      fnc_ptr ptr_client;
+      fnc_ptr_t fnc_client_exec;
+      
+      fnc_ptr_t fnc_exec;
 
       /* Address of processing function for actual implementation 
        of the algorith in plugin */
-      fnc_ptr ptr_processor;
+      fnc_ptr_t fnc_processor;
       
       /* Path of plugin on the server */
       char *path_plugin;

@@ -22,6 +22,7 @@
 
 #include <pthread.h>
 #include <stdlib.h>
+#include <dlfcn.h>
 
 #include "rbtree.h"
 #include "thread.h"
@@ -39,7 +40,7 @@ namespace neweraHPC
       thread_manager_t *thread_manager;
       pthread_mutex_t *mutex;
       const char *grid_directory;
-      nhpc_status_t install_plugin_dll(const char *dll_path);
+      nhpc_status_t install_plugin_dll(const char *dll_path, plugin_details_t **plugin_details);
       nhpc_status_t copy_filetogrid(const char *file_path, const char **base_dir, char **file_path_new);
       
    public:

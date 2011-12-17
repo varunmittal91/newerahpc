@@ -19,7 +19,8 @@ build-command:make
 //along with newerahpc.  If not, see <http://www.gnu.org/licenses/>.
 
 extern "C"{
-	void *plugin_init(){
+	char *plugin_init(void *data){
+		return "test_plugin";
 	}
 	void *plugin_exec(){
 	}
@@ -31,7 +32,7 @@ extern "C"{
 <<file:over>>
 <<file:Makefile>>
 all:
-	g++ plugin.cpp -o bin/plugin.o -c
-	g++ -o bin/libplugin.so -shared -ldl -dynamiclib -rdynamic -fPIC -shared 
+	g++ plugin.cpp -o bin/plugin.o -c 
+	g++ bin/*.o -o bin/libplugin.so -shared -ldl -dynamiclib -rdynamic -fPIC -shared 
 <<file:over>>
 

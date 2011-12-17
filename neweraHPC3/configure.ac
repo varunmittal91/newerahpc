@@ -17,6 +17,7 @@ AC_CHECK_LIB([pthread],[pthread_create],[],[AC_MSG_ERROR([libpthread not found])
 
 # Checks for header files.
 AC_CHECK_HEADERS([pthread.h])
+AC_CHECK_HEADERS([dlfcn.h])
 
 # Add HAVE_header-files to project build
 AC_CONFIG_HEADERS([config.h])

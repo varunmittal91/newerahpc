@@ -25,16 +25,18 @@
 
 namespace neweraHPC
 {
-   struct queue_t{
+   typedef struct queue_t{
+	  int peer_id; 
       int front;
       int rear;
       int task_total;
       int task_completed;
-   };
+   }queue_t;
    
    class grid_scheduler_t
    {
-   private:
+	private:
+      int nodes;
       int node_count;
       int client_count;
       queue_t *q;
@@ -46,7 +48,7 @@ namespace neweraHPC
       int find_min(int);
       bool send(peer_details_t *client, plugin_details_t *task);
       bool get(peer_details_t *client);
-      void dispatcherThread(struct peer_details_t *client);
+      void dispatcher(struct peer_details_t *client);
       
    public:
       grid_scheduler_t();

@@ -15225,7 +15225,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/general/Makefile src/network/Makefile src/network/web_server/Makefile src/internal/Makefile src/poll/Makefile src/ai/Makefile src/grid/Makefile tests/Makefile tests/general/Makefile tests/network/Makefile tests/grid/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/general/Makefile src/network/Makefile src/network/web_server/Makefile src/poll/Makefile src/ai/Makefile src/grid/Makefile tests/Makefile tests/general/Makefile tests/network/Makefile tests/grid/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -16349,7 +16349,6 @@ do
     "src/general/Makefile") CONFIG_FILES="$CONFIG_FILES src/general/Makefile" ;;
     "src/network/Makefile") CONFIG_FILES="$CONFIG_FILES src/network/Makefile" ;;
     "src/network/web_server/Makefile") CONFIG_FILES="$CONFIG_FILES src/network/web_server/Makefile" ;;
-    "src/internal/Makefile") CONFIG_FILES="$CONFIG_FILES src/internal/Makefile" ;;
     "src/poll/Makefile") CONFIG_FILES="$CONFIG_FILES src/poll/Makefile" ;;
     "src/ai/Makefile") CONFIG_FILES="$CONFIG_FILES src/ai/Makefile" ;;
     "src/grid/Makefile") CONFIG_FILES="$CONFIG_FILES src/grid/Makefile" ;;

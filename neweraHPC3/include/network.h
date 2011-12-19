@@ -41,6 +41,7 @@
 #include "sockopts.h"
 #include "communication.h"
 #include "http.h"
+#include "grid.h"
 
 namespace neweraHPC
 {   
@@ -54,7 +55,7 @@ namespace neweraHPC
    
    void *get_in_addr(struct sockaddr *sa);
    
-   class network_t
+   class network_t : public nhpc_grid_server_t
    {
    private:
       int  host_port_network_byte;

@@ -28,6 +28,14 @@
 
 namespace neweraHPC 
 {
+   class nhpc_grid_server_t : public plugin_manager_t
+   {
+   private:
+   public:
+      nhpc_grid_server_t();
+      ~nhpc_grid_server_t();
+   };
+   
    void grid_init(nhpc_socket_t *sock);
    
    nhpc_status_t nhpc_register_to_server(const char *host_addr, const char *host_port);

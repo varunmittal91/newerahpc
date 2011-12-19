@@ -31,6 +31,9 @@ typedef size_t nhpc_size_t;
 #define NHPC_ON  1
 #define NHPC_OFF 0
 
+#define NHPC_MODE_NORMAL 0
+#define NHPC_MODE_SERVER 1
+
 /* Network specific constants */
 #define NHPC_BUFFER_SIZE 1000
 

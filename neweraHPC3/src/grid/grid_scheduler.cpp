@@ -19,7 +19,7 @@
 
 #include <iostream>
 
-#include <include/grid.h>
+#include <include/network.h>
 
 using namespace std;
 

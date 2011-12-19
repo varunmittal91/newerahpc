@@ -25,6 +25,7 @@
 #include "grid_scheduler.h"
 #include "grid_plugin.h"
 #include "grid_instruction_set.h"
+#include "grid_client.h"
 
 namespace neweraHPC 
 {
@@ -32,8 +33,10 @@ namespace neweraHPC
    {
    private:
    public:
-      nhpc_grid_server_t();
+      nhpc_grid_server_t(thread_manager_t **in_thread_manager);
       ~nhpc_grid_server_t();
+      void grid_server_init();
+      void grid_request_init(nhpc_socket_t *sock);
    };
    
    void grid_init(nhpc_socket_t *sock);

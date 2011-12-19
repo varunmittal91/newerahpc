@@ -28,11 +28,14 @@
 
 namespace neweraHPC
 {
+   class network_t;
+   
    struct nhpc_server_details_t
    {
-      pthread_mutex_t *mutex;
-      rbtree_t        *client_socks;
+      pthread_mutex_t  *mutex;
+      rbtree_t         *client_socks;
       thread_manager_t *thread_manager;
+      network_t        *main_network;
    };
 
    struct nhpc_socket_t

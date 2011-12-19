@@ -28,7 +28,7 @@
 #include "thread.h"
 #include "constants.h"
 #include "strings.h"
-#include "http.h"
+//#include "http.h"
 
 namespace neweraHPC 
 {
@@ -37,15 +37,16 @@ namespace neweraHPC
    private:
       rbtree_t *plugins_installed;
       rbtree_t *plugins_requested;
-      thread_manager_t *thread_manager;
+      thread_manager_t **thread_manager;
       pthread_mutex_t *mutex;
       const char *grid_directory;
       nhpc_status_t install_plugin_dll(const char *dll_path, plugin_details_t **plugin_details);
       nhpc_status_t copy_filetogrid(const char *file_path, const char **base_dir, char **file_path_new);
       
    public:
-      plugin_manager_t(thread_manager_t *in_thread_manager);
+      plugin_manager_t(thread_manager_t **in_thread_manager);
       ~plugin_manager_t();
+      void plugin_manager_init();
       void lock();
       void unlock();
       int request_plugin(int peer_id, int remote_plugin_id);

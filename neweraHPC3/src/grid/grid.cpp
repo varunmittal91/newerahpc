@@ -19,28 +19,37 @@
 
 #include <iostream>
 
+#include <include/grid.h>
 #include <include/network.h>
+#include <include/thread.h>
 
 using namespace std;
 
 namespace neweraHPC
 {
+   class thread_manager_t;
+   
    void grid_init(nhpc_socket_t *sock)
    {
       cout<<"GRID Request Encountered"<<endl;
    }
    
-   nhpc_status_t nhpc_register_to_server(const char *host_addr, const char *host_port)
+   nhpc_grid_server_t::nhpc_grid_server_t(thread_manager_t **in_thread_manager) : plugin_manager_t(in_thread_manager)
    {
-      nhpc_socket_t *sock;
+   }
+   
+   void nhpc_grid_server_t::grid_server_init()
+   {
+      plugin_manager_init();
+   }
+   
+   nhpc_grid_server_t::~nhpc_grid_server_t()
+   {
       
-      nhpc_status_t nrv = socket_connect(&sock, host_addr, host_port, AF_INET, SOCK_STREAM, 0);
-      
-      if(nrv != NHPC_SUCCESS)
-      {
-	 return NHPC_FAIL;
-      }
-      
-      return NHPC_SUCCESS;
+   }
+   
+   void nhpc_grid_server_t::grid_request_init(nhpc_socket_t *sock)
+   {
+      cout<<"GRID Request Encountered"<<endl;
    }
 };

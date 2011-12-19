@@ -20,13 +20,14 @@
 #include <errno.h>
 #include <iostream>
 
+#include <include/grid.h>
 #include <include/network.h>
 
 using namespace std;
 
 namespace neweraHPC
 {
-   network_t::network_t()
+   network_t::network_t() : nhpc_grid_server_t(&thread_manager)
    {
       external_thread_manager = false;
       thread_manager = new thread_manager_t;
@@ -36,7 +37,7 @@ namespace neweraHPC
       server_sock = NULL;
    }
    
-   network_t::network_t(thread_manager_t *in_thread_manager)
+   network_t::network_t(thread_manager_t *in_thread_manager) : nhpc_grid_server_t(&thread_manager)
    {
       external_thread_manager = true;
       thread_manager = in_thread_manager;
@@ -200,6 +201,7 @@ namespace neweraHPC
       server_details->mutex        = &mutex;
       server_details->client_socks = client_socks;
       server_details->thread_manager = thread_manager;
+      server_details->main_network = main_thread->network;
       
       int *server_sockfd = &(main_thread->sock->sockfd);
       

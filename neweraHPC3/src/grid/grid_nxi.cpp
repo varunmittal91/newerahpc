@@ -20,6 +20,7 @@
 #include <iostream>
 #include <fstream>
 
+#include <include/grid.h>
 #include <include/network.h>
 #include <include/file.h>
 

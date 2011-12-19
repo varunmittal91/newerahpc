@@ -49,10 +49,13 @@ namespace neweraHPC
       header_t *header = (header_t *)sock->headers->search(1);
       if(header != NULL)
       {
+	 network_t *network = sock->server_details->main_network;
+	 
 	 if(nhpc_strcmp(header->string, "*HTTP*") == NHPC_SUCCESS)
 	    http_init(sock);
 	 else if(nhpc_strcmp(header->string, "*GRID*") == NHPC_SUCCESS)
-	    grid_init(sock);
+	    network->grid_request_init(sock);
+	    //grid_init(sock);
       }
       
       nhpc_socket_cleanup(sock);

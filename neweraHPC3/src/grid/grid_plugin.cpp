@@ -19,6 +19,7 @@
 
 #include <iostream>
 
+#include <include/grid.h>
 #include <include/network.h>
 #include <include/file.h>
 
@@ -26,7 +27,7 @@ using namespace std;
 
 namespace neweraHPC
 {
-   plugin_manager_t::plugin_manager_t(thread_manager_t *in_thread_manager)
+   plugin_manager_t::plugin_manager_t(thread_manager_t **in_thread_manager)
    {
       thread_manager = in_thread_manager;
       plugins_installed = new rbtree_t(NHPC_RBTREE_STR);
@@ -35,12 +36,17 @@ namespace neweraHPC
       pthread_mutex_init(mutex, NULL);
       grid_directory = nhpc_strconcat(HTTP_ROOT, "/grid/");
       
-      thread_manager->create_thread(NULL, (void* (*)(void*))nhpc_plugin_request_thread, this, NHPC_THREAD_DEFAULT);
+      //(*thread_manager)->create_thread(NULL, (void* (*)(void*))nhpc_plugin_request_thread, this, NHPC_THREAD_DEFAULT);
    }
    
    plugin_manager_t::~plugin_manager_t()
    {
       
+   }
+   
+   void plugin_manager_t::plugin_manager_init()
+   {
+      (*thread_manager)->create_thread(NULL, (void* (*)(void*))nhpc_plugin_request_thread, this, NHPC_THREAD_DEFAULT);
    }
    
    void plugin_manager_t::lock()

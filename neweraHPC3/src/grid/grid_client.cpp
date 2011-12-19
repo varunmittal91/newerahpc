@@ -17,29 +17,26 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdlib.h>
 #include <iostream>
 
-#include <include/neweraHPC.h>
+#include <include/grid.h>
+#include <include/network.h>
 
 using namespace std;
-using namespace neweraHPC;
 
-int main(int argc,char **argv)
+namespace neweraHPC
 {
-   if(argc < 3)
+   nhpc_status_t nhpc_register_to_server(const char *host_addr, const char *host_port)
    {
-      cout<<"Usage: server 'hostname' 'port number'"<<endl;
-      exit(0);
+      nhpc_socket_t *sock;
+      
+      nhpc_status_t nrv = socket_connect(&sock, host_addr, host_port, AF_INET, SOCK_STREAM, 0);
+      
+      if(nrv != NHPC_SUCCESS)
+      {
+	 return NHPC_FAIL;
+      }
+      
+      return NHPC_SUCCESS;
    }
-   
-   network_t network;
-   nhpc_status_t nrv = network.create_server(argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
-   if(nrv != NHPC_SUCCESS)
-   {
-      perror("error at creating server");
-      exit(1);
-   }
-
-   return 0;
-}
+};

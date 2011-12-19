@@ -44,10 +44,13 @@
 #include "grid.h"
 
 namespace neweraHPC
-{   
+{  
+   class network_t;
+   class nhpc_grid_server_t;
+   
    struct nhpc_thread_details_t
    {
-      void             *network;
+      network_t        *network;
       thread_manager_t *thread_manager;
       nhpc_socket_t    *sock;
       rbtree_t         *client_socks;
@@ -67,6 +70,7 @@ namespace neweraHPC
       pthread_mutex_t *mutex;
       nhpc_socket_t *server_sock;
       static void *accept_connection(nhpc_thread_details_t *main_thread);
+      nhpc_grid_server_t *grid_server;
       
    public:
       network_t();

@@ -1,8 +1,8 @@
-SUBDIRS = network general internal poll ai grid
+SUBDIRS = network general poll ai grid
 
 lib_LTLIBRARIES         = libneweraHPC.la
 libneweraHPC_la_SOURCES = 
-libneweraHPC_la_LIBADD  = network/libnetwork.la general/libgeneral.la internal/libinternal.la poll/libpoll.la ai/libai.la grid/libgrid.la
+libneweraHPC_la_LIBADD  = network/libnetwork.la general/libgeneral.la poll/libpoll.la ai/libai.la grid/libgrid.la
 libneweraHPC_la_LDFLAGS = -version-info 2:90 -ldl
 libneweraHPC_la_CFLAGS  = CFLAGS
 

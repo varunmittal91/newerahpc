@@ -20,7 +20,7 @@
 #include <iostream>
 
 #include <include/grid.h>
-#include <include/network_data.h>
+#include <include/network.h>
 
 using namespace std;
 
@@ -29,5 +29,19 @@ namespace neweraHPC
    void grid_init(nhpc_socket_t *sock)
    {
       cout<<"GRID Request Encountered"<<endl;
+   }
+   
+   nhpc_status_t nhpc_register_to_server(const char *host_addr, const char *host_port)
+   {
+      nhpc_socket_t *sock;
+      
+      nhpc_status_t nrv = socket_connect(&sock, host_addr, host_port, AF_INET, SOCK_STREAM, 0);
+      
+      if(nrv != NHPC_SUCCESS)
+      {
+	 return NHPC_FAIL;
+      }
+      
+      return NHPC_SUCCESS;
    }
 };

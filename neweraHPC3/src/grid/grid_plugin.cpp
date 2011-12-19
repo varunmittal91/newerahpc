@@ -124,6 +124,8 @@ namespace neweraHPC
       return nrv;
    }
    
+   extern "C"
+   {
    nhpc_status_t plugin_manager_t::install_plugin_dll(const char *dll_path, plugin_details_t **plugin_details)
    {
       void *dll = dlopen(dll_path, RTLD_NOW);
@@ -171,6 +173,7 @@ namespace neweraHPC
       nhpc_strcpy(&((*plugin_details)->plugin_name), plugin_name);
       
       return NHPC_SUCCESS;
+   }
    }
    
    nhpc_status_t plugin_manager_t::copy_filetogrid(const char *file_path, const char **base_dir, char **file_path_new)

@@ -1,3 +1,3 @@
-SUBDIRS = general network
+SUBDIRS = general network grid
 
 

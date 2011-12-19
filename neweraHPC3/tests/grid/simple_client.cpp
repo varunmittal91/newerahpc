@@ -17,20 +17,33 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GRID_H_
-#define _GRID_H_
+#include <stdlib.h>
+#include <iostream>
 
-#include "network_data.h"
-#include "grid_data.h"
-#include "grid_scheduler.h"
-#include "grid_plugin.h"
-#include "grid_instruction_set.h"
+#include <include/neweraHPC.h>
 
-namespace neweraHPC 
+using namespace std;
+using namespace neweraHPC;
+
+int main(int argc, char **argv)
 {
-   void grid_init(nhpc_socket_t *sock);
+   if(argc < 3)
+   {
+      cout<<"Usage: ./simple_client server_host server_port\n";
+      return 1;
+   }
    
-   nhpc_status_t nhpc_register_to_server(const char *host_addr, const char *host_port);
-};
-
-#endif
+   nhpc_status_t nrv = nhpc_register_to_server("localhost", "8080");
+   
+   if(nrv != NHPC_SUCCESS)
+   {
+      cout<<"Registration failed with server\n";
+      return 1;
+   }
+   else 
+   {
+      cout<<"Registration done\n";
+   }
+   
+   return 0;
+}

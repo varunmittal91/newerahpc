@@ -88,14 +88,18 @@ namespace neweraHPC
       nrv = socket_getaddrinfo(sock, host_addr, host_port, family, type, protocol);
       if(nrv != NHPC_SUCCESS)
       {
+	 freeaddrinfo((*sock)->hints);
 	 delete *sock;
+	 *sock = NULL;
 	 return nrv;
       }
       
       nrv = socket_create(sock);     
       if(nrv != NHPC_SUCCESS)
       {
+	 freeaddrinfo((*sock)->hints);
 	 delete *sock;
+	 *sock = NULL;
 	 return nrv;
       }   
       
@@ -104,11 +108,13 @@ namespace neweraHPC
       nrv = socket_connect(*sock);
       if(nrv != NHPC_SUCCESS)
       {
+	 freeaddrinfo((*sock)->hints);
 	 delete *sock;
+	 *sock = NULL;
 	 return nrv;
       }      
       
-      (*sock)->headers = new rbtree_t;
+      (*sock)->headers = NULL;
       return NHPC_SUCCESS;      
    }
      
@@ -175,11 +181,23 @@ namespace neweraHPC
    
    nhpc_status_t socket_delete(nhpc_socket_t *sock)
    {
-      freeaddrinfo(sock->hints);
-
-      if(sock->headers != NULL)
-	 delete sock->headers;
-      delete sock;
+      if(sock)
+      {
+	 freeaddrinfo(sock->hints);
+	 
+	 if(sock->headers != NULL)
+	    delete sock->headers;
+      
+	 delete sock;
+      }
+      
+      return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t socket_close(nhpc_socket_t *sock)
+   {
+      shutdown(sock->sockfd, SHUT_RDWR);
+      close(sock->sockfd);
       
       return NHPC_SUCCESS;
    }

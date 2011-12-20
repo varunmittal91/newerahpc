@@ -32,11 +32,22 @@ namespace neweraHPC
    class nhpc_grid_server_t : public plugin_manager_t
    {
    private:
+      struct functions_t
+      {
+	 fnc_ptr_t client_registration;
+      };
+      
+      rbtree_t *functions_rbtree;
+      functions_t *functions;
+      fnc_ptr_t ptr;
+      
    public:
       nhpc_grid_server_t(thread_manager_t **in_thread_manager);
       ~nhpc_grid_server_t();
       void grid_server_init();
       void grid_request_init(nhpc_socket_t *sock);
+      
+      static nhpc_status_t *grid_client_registration(nhpc_grid_server_t *grid_server);
    };
    
    void grid_init(nhpc_socket_t *sock);

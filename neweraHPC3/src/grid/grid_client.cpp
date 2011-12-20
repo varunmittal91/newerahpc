@@ -34,8 +34,24 @@ namespace neweraHPC
       
       if(nrv != NHPC_SUCCESS)
       {
+	 socket_delete(sock);
+	 
 	 return NHPC_FAIL;
       }
+      
+      const char *mssg = "GRID CLIENT_REGISTRATION 2.90\r\n";
+      size_t size = strlen(mssg);
+      nrv = socket_send(sock, (char *)mssg, &size);
+      if(nrv == NHPC_FAIL)
+      {
+	 socket_close(sock);
+	 socket_delete(sock);
+	 
+	 return NHPC_FAIL;
+      }
+      
+      socket_close(sock);
+      socket_delete(sock);
       
       return NHPC_SUCCESS;
    }

@@ -55,8 +55,6 @@ namespace neweraHPC
       }
       else 
       {
-	 nhpc_display_headers(sock);
-	 
 	 char *file_path = nhpc_strconcat(HTTP_ROOT, request->strings[1]);
 	 
 	 nhpc_size_t file_size;

@@ -30,6 +30,7 @@ namespace neweraHPC
    nhpc_status_t socket_create(nhpc_socket_t **sock, int family, int type, int protocol);
    
    nhpc_status_t socket_delete(nhpc_socket_t *sock);
+   nhpc_status_t socket_close(nhpc_socket_t *sock);
    
    nhpc_status_t socket_connect(nhpc_socket_t *sock);
    nhpc_status_t socket_connect(nhpc_socket_t **sock, const char *host_addr, const char *host_port,

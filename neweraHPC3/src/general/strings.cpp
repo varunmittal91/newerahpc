@@ -229,6 +229,14 @@ namespace neweraHPC{
 	 }
       }
       
+      if(string == NULL)
+      {
+	 string = new string_t;
+	 string->count = 1;
+	 string->strings = new char *;
+	 nhpc_strcpy(&(string->strings[0]), s1);
+      }
+      
       return string;
    }
    

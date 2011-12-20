@@ -35,6 +35,8 @@ namespace neweraHPC
       client_connections = new rbtree_t;
       mutex = new pthread_mutex_t;
       server_sock = NULL;
+      
+      grid_server_init();
    }
    
    network_t::network_t(thread_manager_t *in_thread_manager) : nhpc_grid_server_t(&thread_manager)
@@ -169,6 +171,7 @@ namespace neweraHPC
       accept_thread->sock           = server_sock;
       accept_thread->thread_manager = thread_manager;
       accept_thread->client_socks   = new rbtree_t;
+      accept_thread->network        = this;
       (*thread_manager).create_thread(NULL, (void * (*)(void *))network_t::accept_connection, (void *)accept_thread, NHPC_THREAD_JOIN);
       
       return NHPC_SUCCESS;      

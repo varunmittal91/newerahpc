@@ -46,6 +46,10 @@ namespace neweraHPC
 	    break;
       }
       
+      cout<<"Message from: "<<sock->host<<":"<<sock->port<<endl;
+      nhpc_display_headers(sock);
+      cout<<endl;
+      
       header_t *header = (header_t *)sock->headers->search(1);
       if(header != NULL)
       {
@@ -55,7 +59,6 @@ namespace neweraHPC
 	    http_init(sock);
 	 else if(nhpc_strcmp(header->string, "*GRID*") == NHPC_SUCCESS)
 	    network->grid_request_init(sock);
-	    //grid_init(sock);
       }
       
       nhpc_socket_cleanup(sock);

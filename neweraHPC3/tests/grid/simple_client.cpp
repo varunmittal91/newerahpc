@@ -33,7 +33,7 @@ int main(int argc, char **argv)
       return 1;
    }
    
-   nhpc_status_t nrv = nhpc_register_to_server("localhost", "8080");
+   nhpc_status_t nrv = nhpc_register_to_server(argv[1], argv[2]);
    
    if(nrv != NHPC_SUCCESS)
    {

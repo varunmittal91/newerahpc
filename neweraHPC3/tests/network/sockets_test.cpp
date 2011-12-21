@@ -46,57 +46,19 @@ int main(int argc, char *argv[]){
 	 exit(0);
       }
       
-      ofstream fp("datafile.html");
-      
       nrv = network.connect(&sock, argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
       if(nrv != NHPC_SUCCESS)
       {
+	 cout<<"connection failed"<<endl;
 	 nhpc_perror(nrv, "connect");
 	 exit(0);
       }
       
-      const char *mssg = "GET ";
-      size_t size = strlen(mssg);
-      nrv = socket_send(sock, (char *)mssg, &size);
-      if(nrv == -1)perror("write");
+      int rv;
+      const char *file_name;
+      http_get_file(&file_name, sock, argv[4], argv[1]);
       
-      mssg = argv[4];
-      size = strlen(mssg);
-      nrv = socket_send(sock, (char *)mssg, &size);
-      if(nrv == -1)perror("write");            
-      
-      mssg = " HTTP/1.1\r\nHost: localhost\r\n\r\n";
-      size = strlen(mssg);
-      nrv = socket_send(sock, (char *)mssg, &size);
-      if(nrv == -1)perror("write");      
-      
-      char *buffer = new char [1000];
-      size = 1000;
-      int rv = 0;
-      
-      nhpc_size_t total_size = 0;
-      
-      while(rv != NHPC_EOF && size != 0)
-      {
-	 size = 1000;
-	 
-	 bzero(buffer, 1000);
-	 rv = socket_recv(sock, buffer, &size);
-	 
-	 nhpc_size_t data_size;
-
-	 nhpc_analyze_stream(sock, buffer, &size, &data_size);
-
-	 char *tmp_buffer = buffer + (size - data_size);
-	 fp.write(tmp_buffer, data_size);
-	 total_size += data_size;
-	 
-	 if(size == 0)
-	    continue;
-      }
-      cout<<endl;
-      
-      nhpc_display_headers(sock);
+      cout<<file_name<<endl;
       
       if(rv == -1)
 	 perror("read:");

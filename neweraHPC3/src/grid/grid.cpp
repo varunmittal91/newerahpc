@@ -22,6 +22,7 @@
 #include <include/grid.h>
 #include <include/network.h>
 #include <include/thread.h>
+#include <include/file.h>
 
 using namespace std;
 
@@ -36,16 +37,14 @@ namespace neweraHPC
    
    nhpc_grid_server_t::nhpc_grid_server_t(thread_manager_t **in_thread_manager) : plugin_manager_t(in_thread_manager)
    {
-      functions_rbtree = new rbtree_t(NHPC_RBTREE_STR);
-      functions = new functions_t;
+      clients = new rbtree_t(NHPC_RBTREE_STR);
    }
    
    void nhpc_grid_server_t::grid_server_init()
    {
       plugin_manager_init();
-      
-      functions->client_registration = (fnc_ptr_t)neweraHPC::nhpc_grid_server_t::grid_client_registration;
-      functions_rbtree->insert(&(functions->client_registration), "CLIENT_REGISTRATION");
+            
+      mkdir("/tmp/neweraHPC", 0777);
    }
    
    nhpc_grid_server_t::~nhpc_grid_server_t()
@@ -69,25 +68,75 @@ namespace neweraHPC
 	 return;
       }
       
-      fnc_ptr_t *ptr = (fnc_ptr_t *)functions_rbtree->search(string->strings[1]);
-      if(ptr == NULL)
-      {
-	 nhpc_string_delete(string);
-	 return;
-      }
-
-      cout<<"executing function requested"<<endl;
-      nhpc_status_t *nrv = (nhpc_status_t *)(*ptr)(NULL);
-      delete nrv;
+      nhpc_status_t nrv;
+      const char *fnc_str = string->strings[1];
+      
+      if(nhpc_strcmp(fnc_str, "CLIENT_REGISTRATION") == NHPC_SUCCESS)
+	 nrv = grid_client_registration(sock);
+      else if(nhpc_strcmp(fnc_str, "FILE_EXCHANGE") == NHPC_SUCCESS)
+	 nrv = nhpc_grid_file_download(sock, NULL);
+      
+      cout<<"Executed function"<<endl;
       
       nhpc_string_delete(string);
    }
    
-   nhpc_status_t *nhpc_grid_server_t::grid_client_registration(nhpc_grid_server_t *grid_server)
+   nhpc_status_t nhpc_grid_server_t::grid_client_registration(nhpc_socket_t *sock)
    {
-      nhpc_status_t *nrv = new nhpc_status_t;
-      *nrv = NHPC_FAIL;
-            
+      nhpc_status_t nrv;
+      nrv = NHPC_FAIL;
+      
+      const char *uid;
+      nrv = grid_client_gen_uid(sock->host, &uid);
+      
+      nhpc_size_t size = strlen(uid);
+      nrv = socket_send(sock, uid, &size);
+      
       return nrv;      
+   }
+   
+   nhpc_status_t nhpc_grid_server_t::grid_client_gen_uid(const char *client_addr, const char **uid)
+   {
+      const char *tmp_client_addr;
+      char *random_string = NULL;
+      
+      do 
+      {
+	 if(random_string != NULL)
+	    delete[] random_string;
+	 
+	 random_string = nhpc_random_string(8);
+	 
+	 tmp_client_addr = (const char *)clients->search(random_string);
+      }while(tmp_client_addr != NULL);
+
+      *uid = random_string;
+      
+      return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t nhpc_grid_file_download(nhpc_socket_t *sock, const char **file_path)
+   {
+      int header_count = sock->headers->ret_count();
+      
+      if(header_count < 3)
+	 return NHPC_FAIL;
+      
+      header_t *header = (header_t *)sock->headers->search(2);
+      if(nhpc_strcmp(header->string, "File-Type: *") != NHPC_SUCCESS)
+	 return NHPC_FAIL;
+      
+      string_t *string = nhpc_substr(header->string, ' ');
+      if(string->count == 1)
+      {
+	 nhpc_string_delete(string);
+	 return NHPC_FAIL;
+      }
+      
+      const char *file_type;
+      nhpc_strcpy((char **)&file_type, string->strings[1]);
+      nhpc_string_delete(string);
+      
+      return NHPC_SUCCESS;
    }
 };

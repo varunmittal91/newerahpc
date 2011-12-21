@@ -33,7 +33,9 @@ int main(int argc, char **argv)
       return 1;
    }
    
-   nhpc_status_t nrv = nhpc_register_to_server(argv[1], argv[2]);
+   const char *grid_uid;
+   
+   nhpc_status_t nrv = nhpc_register_to_server(&grid_uid, argv[1], argv[2]);
    
    if(nrv != NHPC_SUCCESS)
    {
@@ -42,8 +44,11 @@ int main(int argc, char **argv)
    }
    else 
    {
+      cout<<"Grid registration uid: "<<grid_uid<<endl;
       cout<<"Registration done\n";
    }
+   
+   delete[] grid_uid;
    
    return 0;
 }

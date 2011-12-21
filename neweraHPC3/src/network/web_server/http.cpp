@@ -101,6 +101,82 @@ namespace neweraHPC
       }
    }
    
+   nhpc_status_t http_get_file(const char **file_path, nhpc_socket_t *sock, const char *target_file, const char *host_addr)
+   {
+      nhpc_status_t nrv;
+      
+      nhpc_create_tmp_file_or_dir(file_path, "neweraHPC", NHPC_FILE);
+      
+      const char *mssg = "GET /";
+      size_t size = strlen(mssg);
+      nrv = socket_send(sock, (char *)mssg, &size);
+      if(nrv == NHPC_FAIL)
+	 return nrv;
+      
+      mssg = target_file;
+      size = strlen(mssg);
+      nrv = socket_send(sock, (char *)mssg, &size);
+      if(nrv == NHPC_FAIL)
+	 return nrv;
+      
+      mssg = " HTTP/1.1\r\nUser-Agent: newera\r\n";
+      size = strlen(mssg);
+      nrv = socket_send(sock, (char *)mssg, &size);
+      if(nrv == NHPC_FAIL)
+	 return nrv;
+      
+      mssg = "Host: ";
+      size = strlen(mssg);
+      nrv = socket_send(sock, (char *)mssg, &size);
+      if(nrv == NHPC_FAIL)
+	 return nrv;
+
+      mssg = host_addr;
+      size = strlen(mssg);
+      nrv = socket_send(sock, (char *)mssg, &size);
+      if(nrv == NHPC_FAIL)
+	 return nrv;
+
+      mssg = "\r\n\r\n";
+      size = strlen(mssg);
+      nrv = socket_send(sock, (char *)mssg, &size);
+      if(nrv == NHPC_FAIL)
+	 return nrv;
+
+      FILE *fp = fopen(*file_path, "w+");
+      char *buffer = new char [1000];
+      size = 1000;
+      int rv = 0;
+      
+      nhpc_size_t total_size = 0;
+      nhpc_size_t file_size = -1;
+      
+      while((rv != NHPC_EOF && size != 0) && file_size != total_size)
+      {
+	 size = 1000;
+	 
+	 bzero(buffer, 1000);
+	 rv = socket_recv(sock, buffer, &size);
+	 
+	 nhpc_size_t data_size;
+	 
+	 nrv = nhpc_analyze_stream(sock, buffer, &size, &data_size);
+	 if(nrv == NHPC_SUCCESS)
+	    http_content_length(sock->headers, &file_size);
+	 
+	 char *tmp_buffer = buffer + (size - data_size);
+	 fwrite(tmp_buffer, 1, data_size, fp);
+	 total_size += data_size;
+	 
+	 if(size == 0)
+	    continue;
+      }
+
+      fclose(fp);
+      
+      return nrv;
+   }
+   
    void http_response(nhpc_socket_t *sock)
    {
       

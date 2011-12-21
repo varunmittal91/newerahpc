@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <math.h>
 #ifdef linux
 #include <stdlib.h>
 #endif
@@ -311,6 +312,25 @@ namespace neweraHPC{
       }      
 
       return string;
+   }
+   
+   int nhpc_strtoi(const char *str)
+   {
+      const char *tmp_str = str;
+      int size = strlen(str);
+      int num = 0;
+      
+      int tmp_num = 0;
+      while(*tmp_str != '\0')
+      {
+	 tmp_num = (int)(*tmp_str) - 48;
+	 num += tmp_num * pow(10 ,(size - 1));
+	 
+	 size--;
+	 tmp_str++;
+      }
+      
+      return num;
    }
    
    char *nhpc_random_string(nhpc_size_t len)

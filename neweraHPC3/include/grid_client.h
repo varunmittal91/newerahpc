@@ -22,7 +22,7 @@
 
 namespace neweraHPC 
 {
-   nhpc_status_t nhpc_register_to_server(const char *host_addr, const char *host_port);
+   nhpc_status_t nhpc_register_to_server(const char **grid_uid, const char *host_addr, const char *host_port);
 };
 
 #endif

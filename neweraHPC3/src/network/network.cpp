@@ -119,7 +119,7 @@ namespace neweraHPC
 					  int family, int type, int protocol)
    {            
       int rv, nrv;
-      int connection_queue = 0;
+      int connection_queue = 1000;
       
       int enable_opts = 1;
       
@@ -307,7 +307,7 @@ namespace neweraHPC
 	 *header_size = *len;
       
       if(sock->have_headers == true)
-	 return NHPC_SUCCESS;
+	 return NHPC_FAIL;
       
       int line_len = 0;
       int old_pos = 0;

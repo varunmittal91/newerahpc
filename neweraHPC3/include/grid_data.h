@@ -24,6 +24,9 @@
 #define grid_conf_file "/etc/grid.conf"
 
 typedef void *(*fnc_ptr_t)(void *);
+typedef void *(*fnc_ptr_two_t)(void *, void *);
+typedef nhpc_status_t (*fnc_ptr_nhpc_t)(void *);
+typedef nhpc_status_t (*fnc_ptr_nhpc_two_t)(void *, void *);
 
 namespace neweraHPC
 {

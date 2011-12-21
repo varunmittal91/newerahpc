@@ -51,6 +51,8 @@ namespace neweraHPC{
    
    char *nhpc_itostr(int num);
    
+   int nhpc_strtoi(const char *str);
+   
    char *nhpc_random_string(nhpc_size_t len);
    
    void nhpc_string_delete(string_t *string);

@@ -26,7 +26,7 @@ using namespace std;
 
 namespace neweraHPC
 {
-   nhpc_status_t nhpc_register_to_server(const char *host_addr, const char *host_port)
+   nhpc_status_t nhpc_register_to_server(const char **grid_uid, const char *host_addr, const char *host_port)
    {
       nhpc_socket_t *sock;
       
@@ -39,7 +39,7 @@ namespace neweraHPC
 	 return NHPC_FAIL;
       }
       
-      const char *mssg = "GRID CLIENT_REGISTRATION 2.90\r\n";
+      const char *mssg = "GRID CLIENT_REGISTRATION 2.90\r\n\r\n";
       size_t size = strlen(mssg);
       nrv = socket_send(sock, (char *)mssg, &size);
       if(nrv == NHPC_FAIL)
@@ -50,9 +50,28 @@ namespace neweraHPC
 	 return NHPC_FAIL;
       }
       
+      size = 1000;
+      char buffer[1000];
+      
+      nrv = 0;
+      
+      nrv = socket_recv(sock, buffer, &size);
+      if(nrv == NHPC_SUCCESS)
+      {
+	 nhpc_strcpy((char **)grid_uid, buffer);
+      }
+      else 
+	 nrv = NHPC_FAIL;
+      
       socket_close(sock);
       socket_delete(sock);
       
-      return NHPC_SUCCESS;
+      return nrv;
+   }
+   
+   nhpc_status_t nhpc_send_plugin(const char *plugin_path)
+   {
+      const char *mssg = "GRID FILE_UPLOAD 2.90\r\n\r\n";
+      size_t size = strlen(mssg);
    }
 };

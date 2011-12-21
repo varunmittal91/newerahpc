@@ -38,6 +38,10 @@ namespace neweraHPC
    void http_init(nhpc_socket_t *sock);
    void http_request(nhpc_socket_t *sock);
    void http_response(nhpc_socket_t *sock);
+   
+   nhpc_status_t http_get_file(const char **file_path, nhpc_socket_t *sock, const char *target_file, const char *host_addr);
+
+   nhpc_status_t http_content_length(rbtree_t *headers, nhpc_size_t *size);
 };
 
 #endif

@@ -127,5 +127,7 @@ int main()
    nhpc_strcpy(&test_cpy, "hi my name is varun");
    cout<<test_cpy<<" len: "<<strlen(test_cpy)<<endl;
    
+   cout<<nhpc_strtoi("12390")<<endl;
+   
    return 0;
 }

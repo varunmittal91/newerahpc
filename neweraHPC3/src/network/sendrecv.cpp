@@ -77,7 +77,7 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
-   nhpc_status_t socket_send(nhpc_socket_t *sock, char *buffer, nhpc_size_t *length)
+   nhpc_status_t socket_send(nhpc_socket_t *sock, const char *buffer, nhpc_size_t *length)
    {
       int rv;
       int nrv;

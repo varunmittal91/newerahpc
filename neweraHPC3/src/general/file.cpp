@@ -97,7 +97,8 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
-   nhpc_status_t nhpc_create_tmp_file_or_dir(const char **new_file_dir, const char *target_dir, int target_type)
+   nhpc_status_t nhpc_create_tmp_file_or_dir(const char **new_file_dir, const char *target_dir, 
+					     int target_type, const char *extn)
    {
       *new_file_dir = NULL;
       
@@ -178,7 +179,7 @@ namespace neweraHPC
 	 FILE *fp = fopen(target_name, "w+");
 	 fclose(fp);
       }
-	 
+      
       *new_file_dir = target_name;
       return NHPC_SUCCESS;
    }

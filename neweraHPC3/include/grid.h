@@ -34,12 +34,15 @@ namespace neweraHPC
    private:
       struct functions_t
       {
-	 fnc_ptr_t client_registration;
+	 fnc_ptr_nhpc_two_t  client_registration;
+	 fnc_ptr_nhpc_t      file_download;
       };
       
       rbtree_t *functions_rbtree;
+      rbtree_t *clients;
       functions_t *functions;
       fnc_ptr_t ptr;
+      nhpc_status_t grid_client_gen_uid(const char *client_addr, const char **uid);
       
    public:
       nhpc_grid_server_t(thread_manager_t **in_thread_manager);
@@ -47,12 +50,12 @@ namespace neweraHPC
       void grid_server_init();
       void grid_request_init(nhpc_socket_t *sock);
       
-      static nhpc_status_t *grid_client_registration(nhpc_grid_server_t *grid_server);
+      nhpc_status_t grid_client_registration(nhpc_socket_t *sock);
    };
    
-   void grid_init(nhpc_socket_t *sock);
+   void grid_init(nhpc_socket_t *sock);   
    
-   nhpc_status_t nhpc_register_to_server(const char *host_addr, const char *host_port);
+   nhpc_status_t nhpc_grid_file_download(nhpc_socket_t *sock, const char **file_path);
 };
 
 #endif

@@ -71,6 +71,9 @@ namespace neweraHPC
 	    network->grid_request_init(sock);
       }
       
+      if(sock->partial_content != NULL)
+	 delete[] sock->partial_content;
+      
       nhpc_socket_cleanup(sock);
    }
 };

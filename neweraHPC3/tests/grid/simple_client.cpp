@@ -51,10 +51,10 @@ int main(int argc, char **argv)
    nrv = nhpc_send_plugin(grid_uid, argv[1], argv[2], "../../samples/plugin.nxi");
    if(nrv != NHPC_SUCCESS)
    {
-      cout<<"Plugin Upload Failed";
+      cout<<"Plugin Upload Failed"<<endl;
       return 1;
    }
-   
+      
    cout<<"Plugin Uploaded"<<endl;
    
    delete[] grid_uid;

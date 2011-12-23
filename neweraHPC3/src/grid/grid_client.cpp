@@ -22,6 +22,7 @@
 #include <include/grid.h>
 #include <include/network.h>
 #include <include/file.h>
+#include <include/headers.h>
 
 using namespace std;
 
@@ -89,31 +90,23 @@ namespace neweraHPC
       nhpc_size_t file_len;
       nhpc_file_size(plugin_path, &file_len);
       
-      header_t headers[5];
+      nhpc_headers_t *headers = new nhpc_headers_t;
+      headers->insert("GRID FILE_EXCHANGE 2.90");
+      headers->insert("Grid-Uid", grid_uid);
+      headers->insert("File-Type: plugin");
+      headers->insert("File-Name", string->strings[string->count - 1]);
+      headers->insert("Content-Length", nhpc_itostr(file_len));
+      nrv = headers->write(sock);
       
-      char *arg_grid_uid = nhpc_strconcat("Grid-Uid: ", grid_uid);
-      char *arg_file_name = nhpc_strconcat("File-Name: ", string->strings[string->count - 1]);
-      char *arg_content_len = nhpc_strconcat("Content-Length: ", nhpc_itostr(file_len));
+      delete headers;
       
-      nhpc_strcpy(&(headers[0].string), "GRID FILE_EXCHANGE 2.90\r\n");
-      headers[1].string = nhpc_strconcat(arg_grid_uid, "\r\n");
-      nhpc_strcpy(&(headers[2].string), "File-Type: plugin\r\n");
-      headers[3].string = nhpc_strconcat(arg_file_name, "\r\n");
-      headers[4].string = nhpc_strconcat(arg_content_len, "\r\n\r\n");
-      
-      delete[] arg_grid_uid;
-      delete[] arg_file_name;
-      delete[] arg_content_len;
-      
-      for(int i = 0; i < 5; i++)
+      nhpc_string_delete(string);
+
+      if(nrv != NHPC_SUCCESS)
       {
-	 size = strlen(headers[i].string);
-	 nrv = socket_send(sock, headers[i].string, &size);
-	 delete[] (headers[i].string);
-	 if(nrv != NHPC_SUCCESS)
-	    return nrv;
+	 return NHPC_FAIL;
       }
-      
+            
       FILE *fp = fopen(plugin_path, "r");
       nhpc_size_t len;
       char buffer[1000];

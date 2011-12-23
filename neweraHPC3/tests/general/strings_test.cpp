@@ -20,6 +20,7 @@
 #include <iostream>
 
 #include <include/strings.h>
+#include <include/headers.h>
 
 using namespace std;
 using namespace neweraHPC;

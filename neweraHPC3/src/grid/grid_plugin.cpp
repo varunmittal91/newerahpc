@@ -35,8 +35,6 @@ namespace neweraHPC
       mutex = new pthread_mutex_t;
       pthread_mutex_init(mutex, NULL);
       grid_directory = nhpc_strconcat(HTTP_ROOT, "/grid/");
-      
-      //(*thread_manager)->create_thread(NULL, (void* (*)(void*))nhpc_plugin_request_thread, this, NHPC_THREAD_DEFAULT);
    }
    
    plugin_manager_t::~plugin_manager_t()

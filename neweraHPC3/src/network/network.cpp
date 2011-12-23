@@ -296,7 +296,7 @@ namespace neweraHPC
 	 pthread_mutex_unlock(mutex);
 	 
 	 thread_manager->delete_thread_data(client_sock->thread_id);
-	 delete client_sock->port;
+	 delete[] client_sock->port;
 	 delete client_sock;
       }
    }

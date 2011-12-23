@@ -23,15 +23,22 @@
 #define _NETWORK_HEADERS_H_
 
 #include "containers.h"
+#include "network_data.h"
 
 namespace neweraHPC
 {
-   /* Http like headers definition */
-   struct nhpc_headers_t
+   class nhpc_headers_t
    {
-      char **headers;
-      nhpc_size_t lines_count;
-      nhpc_size_t len;
+   private:
+      rbtree_t *headers;
+   public:
+      nhpc_headers_t();
+      ~nhpc_headers_t();
+      void insert(const char *line);
+      void insert(const char *property, const char *argument);
+      const char *operator[](int id);
+      int count();
+      nhpc_status_t write(nhpc_socket_t *sock);
    };
 }
 

@@ -32,7 +32,6 @@ namespace neweraHPC
       nhpc_socket_t *sock;
       
       nhpc_status_t nrv = socket_connect(&sock, host_addr, host_port, AF_INET, SOCK_STREAM, 0);
-      cout<<sock->sockfd<<endl;
       
       if(nrv != NHPC_SUCCESS)
       {
@@ -77,7 +76,6 @@ namespace neweraHPC
       nhpc_socket_t *sock;
       
       nhpc_status_t nrv = socket_connect(&sock, host_addr, host_port, AF_INET, SOCK_STREAM, 0);
-      cout<<sock->sockfd<<endl;
       nhpc_size_t size;
       
       if(nrv != NHPC_SUCCESS)
@@ -135,11 +133,10 @@ namespace neweraHPC
 	 nrv = socket_recv(sock, buffer, &len);
       }while(nrv != NHPC_SUCCESS && nrv != NHPC_EOF);
       nrv = nhpc_strtoi(buffer);
-      cout<<nrv<<endl;
       
       socket_close(sock);
       socket_delete(sock);
       
-      return NHPC_SUCCESS;
+      return nrv;
    }
 };

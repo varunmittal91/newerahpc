@@ -59,9 +59,6 @@ namespace neweraHPC
       header_t *header = (header_t *)sock->headers->search(1);
       string_t *string = nhpc_substr(header->string, ' ');
       
-      for(int i = 0; i < string->count; i++)
-	 cout<<string->strings[i]<<endl;
-      
       if(string->count < 3)
       {
 	 cout<<"Invalid Request"<<endl;
@@ -73,10 +70,29 @@ namespace neweraHPC
       
       if(nhpc_strcmp(fnc_str, "CLIENT_REGISTRATION") == NHPC_SUCCESS)
 	 nrv = grid_client_registration(sock);
-      else if(nhpc_strcmp(fnc_str, "FILE_EXCHANGE") == NHPC_SUCCESS)
-	 nrv = nhpc_grid_file_download(sock, NULL);
+      else 
+      {
+	 header_t *header = (header_t *)sock->headers->search(2);
+	 const char *uid;
+	 
+	 if(sock->headers->ret_count() < 2 || grid_client_verify_uid(header, &uid) != NHPC_SUCCESS)
+	 {
+	    cout<<"GRID UID Not Supplied"<<endl;
+	    nhpc_string_delete(string);
+	    return;
+	 }
+	 
+	 else if(nhpc_strcmp(fnc_str, "FILE_EXCHANGE") == NHPC_SUCCESS)
+	 {
+	    nrv = grid_file_download(sock, &uid);
+	 }
+	 
+	 char *response = nhpc_itostr(nrv);
+	 nhpc_size_t size = strlen(response);
+	 socket_send(sock, response, &size);
+      }
       
-      cout<<"Executed function"<<endl;
+      cout<<"Executed function with status: "<<nrv<<endl;
       
       nhpc_string_delete(string);
    }
@@ -91,6 +107,10 @@ namespace neweraHPC
       
       nhpc_size_t size = strlen(uid);
       nrv = socket_send(sock, uid, &size);
+      
+      const char *dir = nhpc_strconcat(grid_directory, uid);
+      mkdir(dir, 0777);
+      delete[] dir;
       
       return nrv;      
    }
@@ -111,20 +131,49 @@ namespace neweraHPC
       }while(tmp_client_addr != NULL);
 
       *uid = random_string;
+      clients->insert((void *)client_addr, random_string);
       
       return NHPC_SUCCESS;
    }
    
-   nhpc_status_t nhpc_grid_file_download(nhpc_socket_t *sock, const char **file_path)
+   nhpc_status_t nhpc_grid_server_t::grid_client_verify_uid(header_t *header, const char **uid)
+   {
+      if(nhpc_strcmp(header->string, "Grid-Uid: *") != NHPC_SUCCESS)
+      {	 
+	 return NHPC_FAIL;
+      }
+      
+      string_t *string = nhpc_substr(header->string, ' ');
+      if(string->count == 1)
+      {
+	 nhpc_string_delete(string);
+	 return NHPC_FAIL;
+      }
+      
+      if(clients->search(string->strings[1]) == NULL)
+      {
+	 nhpc_string_delete(string);
+	 return NHPC_FAIL;
+      }
+      
+      nhpc_strcpy((char **)uid, string->strings[1]);
+      nhpc_string_delete(string);
+      
+      return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t nhpc_grid_server_t::grid_file_download(nhpc_socket_t *sock, const char **grid_uid)
    {
       int header_count = sock->headers->ret_count();
       
-      if(header_count < 3)
+      if(header_count < 4)
 	 return NHPC_FAIL;
       
-      header_t *header = (header_t *)sock->headers->search(2);
+      header_t *header = (header_t *)sock->headers->search(3);
       if(nhpc_strcmp(header->string, "File-Type: *") != NHPC_SUCCESS)
+      {	 
 	 return NHPC_FAIL;
+      }
       
       string_t *string = nhpc_substr(header->string, ' ');
       if(string->count == 1)
@@ -136,6 +185,77 @@ namespace neweraHPC
       const char *file_type;
       nhpc_strcpy((char **)&file_type, string->strings[1]);
       nhpc_string_delete(string);
+      
+      header = (header_t *)sock->headers->search(4);
+      if(nhpc_strcmp(header->string, "File-Name: *") != NHPC_SUCCESS)
+	 return NHPC_FAIL;
+      
+      string = nhpc_substr(header->string, ' ');
+      if(string->count == 1)
+      {
+	 nhpc_string_delete(string);
+	 return NHPC_FAIL;
+      }
+      
+      const char *file_name;
+      nhpc_strcpy((char **)&file_name, string->strings[1]);
+      nhpc_string_delete(string);
+      
+      header = (header_t *)sock->headers->search(5);
+      if(nhpc_strcmp(header->string, "Content-Length: *") != NHPC_SUCCESS)
+	 return NHPC_FAIL;
+      
+      string = nhpc_substr(header->string, ' ');
+      if(string->count == 1)
+      {
+	 nhpc_string_delete(string);
+	 return NHPC_FAIL;
+      }
+      
+      nhpc_size_t file_size = nhpc_strtoi((const char *)(string->strings[1]));
+      nhpc_string_delete(string);      
+      if(file_size == 0)
+	 return NHPC_FAIL;
+      
+      cout<<"File Name: "<<file_name<<endl;
+      cout<<"File Type: "<<file_type<<endl;
+      cout<<"File Size: "<<file_size<<endl;
+      
+      nhpc_size_t size_downloaded = 0;
+      char buffer[1000];
+      nhpc_status_t nrv;
+      nhpc_size_t size;
+      
+      const char *grid_path = nhpc_strconcat("/www/grid/", *grid_uid);
+      const char *tmp_path = nhpc_strconcat(grid_path, "/");
+      const char *final_path = nhpc_strconcat(tmp_path, file_name);
+
+      FILE *fp = fopen(final_path, "w+");
+
+      delete[] grid_path;
+      delete[] tmp_path;
+      
+      do 
+      {
+	 bzero(buffer, 1000);
+	 size = 1000;
+	 nrv = socket_recv(sock, buffer, &size); 
+	 fwrite(buffer, 1, size, fp);	 
+	 size_downloaded += size;
+      }while((nrv != NHPC_EOF && size != 0) && file_size != size_downloaded);
+      
+      fclose(fp);
+      
+      if(nhpc_strcmp(file_type, "plugin") == NHPC_SUCCESS)
+      {
+	 nrv = install_plugin(final_path, *grid_uid);
+	 if(nrv != NHPC_SUCCESS)
+	    return NHPC_FAIL;
+      }
+      
+      delete[] file_name;
+      delete[] file_type;
+      delete[] final_path;
       
       return NHPC_SUCCESS;
    }

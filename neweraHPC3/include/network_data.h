@@ -55,6 +55,12 @@ namespace neweraHPC
       char *partial_content;
       int thread_id;
    };
+   
+   struct header_t
+   {
+      char *string;
+      size_t len;
+   };
 };
 
 #endif

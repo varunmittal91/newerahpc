@@ -59,10 +59,9 @@ namespace neweraHPC
       pthread_mutex_unlock(mutex);
    }
    
-   nhpc_status_t plugin_manager_t::install_plugin(const char *file_path)
+   nhpc_status_t plugin_manager_t::install_plugin(const char *file_path, const char *base_dir)
    {
       const char *dll_path;
-      const char *base_dir = NULL;
       char *dll_path_new;
       bool have_nxi = false;
       
@@ -101,8 +100,13 @@ namespace neweraHPC
 	       return nrv;
 	    }
 	    
-	    nhpc_strcpy(&(new_plugin->path_nxi), dll_path_new);
-	    delete[] dll_path_new;
+	    if(dll_path_new != NULL)
+	    {
+	       nhpc_strcpy(&(new_plugin->path_nxi), dll_path_new);
+	       delete[] dll_path_new;
+	    }
+	    else 
+	       nhpc_strcpy(&(new_plugin->path_nxi), file_path);
 	 }
 	 
 	 nrv = copy_filetogrid(dll_path, &base_dir, &dll_path_new);
@@ -118,8 +122,13 @@ namespace neweraHPC
 	    return nrv;
 	 }
 	 
-	 nhpc_strcpy(&(new_plugin->path_plugin), dll_path_new);
-	 delete[] dll_path_new;
+	 if(dll_path_new != NULL)
+	 {
+	    nhpc_strcpy(&(new_plugin->path_plugin), dll_path_new);
+	    delete[] dll_path_new;
+	 }
+	 else 
+	    nhpc_strcpy(&(new_plugin->path_nxi), dll_path);
 
 	 cout<<"New plugin details:"<<endl;
 	 cout<<"\t"<<new_plugin->plugin_name<<endl;
@@ -164,6 +173,16 @@ namespace neweraHPC
 	 delete (*plugin_details);
 	 dlclose(dll);
 	 return NHPC_FAIL;
+      }
+      
+      void *test_installed = plugins_installed->search(plugin_name);
+      {
+	 if(test_installed != NULL)
+	 {
+	    dlclose(dll);
+	    delete (*plugin_details);
+	    return NHPC_FAIL;
+	 }
       }
       
       lock();

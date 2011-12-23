@@ -149,4 +149,9 @@ namespace neweraHPC
       
       return NHPC_SUCCESS;
    }   
+   
+   nhpc_status_t socket_send_file(nhpc_socket_t *sock)
+   {
+      
+   }
 };

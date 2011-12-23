@@ -26,7 +26,7 @@
 namespace neweraHPC
 {
    typedef struct queue_t{
-	  int peer_id; 
+      int peer_id; 
       int front;
       int rear;
       int task_total;
@@ -35,7 +35,7 @@ namespace neweraHPC
    
    class grid_scheduler_t
    {
-	private:
+   private:
       int nodes;
       int node_count;
       int client_count;
@@ -57,7 +57,6 @@ namespace neweraHPC
       bool removeClient(struct peer_details_t *client);
       struct peer_details_t* addTask(struct plugin_details_t *task);
       bool dispatch();
-      
    };
 };
 

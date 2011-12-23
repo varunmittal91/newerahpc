@@ -291,6 +291,14 @@ namespace neweraHPC{
       int tmp_num = num;
       int count = 0;
       
+      if(num <= 0)
+      {
+	 char *string = new char[2];
+	 string[0] = '0';
+	 string[1] = '\0';
+	 return string;
+      }
+      
       while(tmp_num != 0)
       {
 	 int digit = tmp_num % 10;

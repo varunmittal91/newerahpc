@@ -43,12 +43,13 @@ namespace neweraHPC
       functions_t *functions;
       fnc_ptr_t ptr;
       nhpc_status_t grid_client_gen_uid(const char *client_addr, const char **uid);
-      
+      nhpc_status_t grid_client_verify_uid(header_t *header, const char **uid);
    public:
       nhpc_grid_server_t(thread_manager_t **in_thread_manager);
       ~nhpc_grid_server_t();
       void grid_server_init();
       void grid_request_init(nhpc_socket_t *sock);
+      nhpc_status_t grid_file_download(nhpc_socket_t *sock, const char **grid_uid);
       
       nhpc_status_t grid_client_registration(nhpc_socket_t *sock);
    };

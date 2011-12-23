@@ -29,7 +29,7 @@ namespace neweraHPC
 {	
    grid_scheduler_t::grid_scheduler_t()
    {
-	  node_count = 0;
+      node_count = 0;
       nodes = 5;
       client_count = -1;
       q = new queue_t[nodes];
@@ -39,7 +39,7 @@ namespace neweraHPC
    
    grid_scheduler_t::grid_scheduler_t(int nodes_)
    {
-	  node_count = 0; 
+      node_count = 0; 
       nodes = nodes_;
       client_count = -1;
       q = new queue_t[nodes];
@@ -97,51 +97,51 @@ namespace neweraHPC
          }
       return pos;
    }
-
+   
    bool grid_scheduler_t::addClient(struct peer_details_t *client)
    {
-	   client_count++;
-       clientList[client_count] = *client;
-	   q[node_count].peer_id = client->	id;
-	   q[node_count].rear = q[node_count].front = -1;
-	   q[node_count].task_total = q[node_count].task_completed = 0;
-	   return true;
+      client_count++;
+      clientList[client_count] = *client;
+      q[node_count].peer_id = client->	id;
+      q[node_count].rear = q[node_count].front = -1;
+      q[node_count].task_total = q[node_count].task_completed = 0;
+      return true;
    }
    
    bool grid_scheduler_t::removeClient(struct peer_details_t *client)
    {
-	   if(client_count == -1)
-		   return false;
-	   else
-	   {
-		   int i, j, cntr = 0;
-		   for(i = 0; i < client_count; i++)
-		   {   
-			   if(q[cntr].peer_id == client->id)
-			   {
-				   for(j = i; j < node_count - 1; j++)	   
-				      q[j] = q[j+1];
-				   node_count--;
-			   }
-				   
-		   }
-		   for(i = 0; i < client_count; i++)
-			   if(clientList[i].id == client->id)
-				   break;
-			for(j = i; j < client_count - 1; j++)	   
-				clientList[j] = clientList[j+1];
-			client_count--;
-			
-	   }	   
+      if(client_count == -1)
+	 return false;
+      else
+      {
+	 int i, j, cntr = 0;
+	 for(i = 0; i < client_count; i++)
+	 {   
+	    if(q[cntr].peer_id == client->id)
+	    {
+	       for(j = i; j < node_count - 1; j++)	   
+		  q[j] = q[j+1];
+	       node_count--;
+	    }
+	    
+	 }
+	 for(i = 0; i < client_count; i++)
+	    if(clientList[i].id == client->id)
+	       break;
+	 for(j = i; j < client_count - 1; j++)	   
+	    clientList[j] = clientList[j+1];
+	 client_count--;
+	 
+      }	   
    }
    
    bool grid_scheduler_t::dispatch()
    {
-	   pthread_t threads[50];
-	   int i;
-	   for(i = 0; i < node_count; i++ )
-	   {
-		   //pthread_create(&thread[i], NULL, dispatcher, )
-	   }
+      pthread_t threads[50];
+      int i;
+      for(i = 0; i < node_count; i++ )
+      {
+	 //pthread_create(&thread[i], NULL, dispatcher, )
+      }
    }
 };

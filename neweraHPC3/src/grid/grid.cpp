@@ -235,6 +235,12 @@ namespace neweraHPC
       delete[] grid_path;
       delete[] tmp_path;
       
+      if(sock->partial_content != NULL)
+      {
+	 fwrite(sock->partial_content, 1, sock->partial_content_len, fp);
+	 size_downloaded += sock->partial_content_len;
+      }
+      
       do 
       {
 	 bzero(buffer, 1000);
@@ -242,8 +248,6 @@ namespace neweraHPC
 	 nrv = socket_recv(sock, buffer, &size); 
 	 fwrite(buffer, 1, size, fp);	 
 	 size_downloaded += size;
-	 cout<<buffer<<endl;
-	 cout<<file_size<<" "<<size_downloaded<<" "<<nrv<<" "<<size<<endl;
       }while((nrv != NHPC_EOF) && file_size != size_downloaded);
       
       fclose(fp);

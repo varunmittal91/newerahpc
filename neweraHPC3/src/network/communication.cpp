@@ -32,6 +32,7 @@ namespace neweraHPC
       
       char buffer[1000];
       nhpc_size_t size = 1000;
+      nhpc_size_t content_size = 0;
       nhpc_status_t nrv = 0;
       
       while(sock->have_headers != true)
@@ -40,11 +41,20 @@ namespace neweraHPC
 	 bzero(buffer, size);
 	 
 	 nrv = socket_recv(sock, buffer, &size);
-	 nhpc_analyze_stream(sock, buffer, &size, NULL);
+	 nhpc_analyze_stream(sock, buffer, &size, &content_size);
 	 
 	 if(nrv == NHPC_EOF)
 	    break;
       }
+      
+      if(content_size != 0)
+      {
+	 sock->partial_content_len = content_size;
+	 sock->partial_content = new char [content_size];
+	 memcpy(sock->partial_content, (buffer + sizeof(buffer) - content_size), content_size);
+      }
+      else 
+	 sock->partial_content = NULL;
       
       cout<<"Message from: "<<sock->host<<":"<<sock->port<<endl;
       nhpc_display_headers(sock);

@@ -32,10 +32,10 @@ namespace neweraHPC
    {
       (*sock)->sockfd = socket(family, type, protocol);
       if((*sock)->sockfd == -1)
+      {
 	 perror("error at creating sockets");
-      
-      if (((*sock)->sockfd) == -1)
 	 return errno;
+      }
       
       return NHPC_SUCCESS;
    }
@@ -67,7 +67,8 @@ namespace neweraHPC
       if(rv == -1 && (errno == EINPROGRESS || errno == EALREADY) && sock->timeout > 0)
       {
 	 rv = nhpc_wait_for_io_or_timeout(sock, 0);
-	 if(rv != NHPC_SUCCESS)return rv;
+	 if(rv != NHPC_SUCCESS)
+	    return rv;
 	 else if(rv == NHPC_SUCCESS)
 	    rv = connect(sock->sockfd, hints->ai_addr, hints->ai_addrlen);
       }

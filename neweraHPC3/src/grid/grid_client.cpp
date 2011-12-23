@@ -91,7 +91,7 @@ namespace neweraHPC
       nhpc_size_t file_len;
       nhpc_file_size(plugin_path, &file_len);
       
-      header_t headers[4];
+      header_t headers[5];
       
       char *arg_grid_uid = nhpc_strconcat("Grid-Uid: ", grid_uid);
       char *arg_file_name = nhpc_strconcat("File-Name: ", string->strings[string->count - 1]);

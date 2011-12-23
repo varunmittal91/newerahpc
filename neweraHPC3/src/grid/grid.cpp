@@ -242,7 +242,9 @@ namespace neweraHPC
 	 nrv = socket_recv(sock, buffer, &size); 
 	 fwrite(buffer, 1, size, fp);	 
 	 size_downloaded += size;
-      }while((nrv != NHPC_EOF && size != 0) && file_size != size_downloaded);
+	 cout<<buffer<<endl;
+	 cout<<file_size<<" "<<size_downloaded<<" "<<nrv<<" "<<size<<endl;
+      }while((nrv != NHPC_EOF) && file_size != size_downloaded);
       
       fclose(fp);
       

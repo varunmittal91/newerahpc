@@ -32,48 +32,28 @@ namespace neweraHPC
       
       bzero(buffer, *length);
       
-      if(sock->incomplete_operation == NHPC_INCOMPLETE)
-	 goto do_select;
-      
-      do 
+      nrv = nhpc_wait_for_io_or_timeout(sock, 1);
+      if(nrv != NHPC_SUCCESS)
       {
-	 rv = read(sock->sockfd, buffer, (*length));
-      }while(rv == -1 && errno == EINTR);    
-      
-      while ((rv == -1) && (errno == EAGAIN || errno == EWOULDBLOCK) && (sock->timeout > 0)) 
-      {
-      do_select:
-	 nrv = nhpc_wait_for_io_or_timeout(sock, 1);
-	 if (nrv != NHPC_SUCCESS) 
-	 {
-            *length = 0;
-            return nrv;
-	 }
-	 else {
-            do {
-	       rv = read(sock->sockfd, buffer, (*length));
-
-	       if(rv == -1)
-		  perror("error at read");
-            } while (rv == -1 && errno == EINTR);
-	 }	 
-      }
-      
-      if (rv == -1) {
-	 (*length) = 0;
+	 *length = 0;
 	 return errno;
       }
-      if((sock->timeout > 0) && (rv < *length)){
-	 sock->incomplete_operation = NHPC_INCOMPLETE;
+      rv = read(sock->sockfd, buffer, *length);
+	
+      if(rv == -1)
+      {
+	 *length = 0;
+	 return errno;
       }
       
-      (*length) = rv;
-      
-      if(rv == 0){
-	 sock->incomplete_operation = 0;
+      if(rv == 0)
+      {
+	 *length = 0;
 	 return NHPC_EOF;
       }
-            
+      
+      *length = rv;
+      
       return NHPC_SUCCESS;
    }
    
@@ -82,70 +62,21 @@ namespace neweraHPC
       int rv;
       int nrv;
       
-      if(sock->incomplete_operation == NHPC_INCOMPLETE)
-	 goto do_select;
+      nhpc_size_t data_sent = 0;
       
       do 
       {
-	 rv = send(sock->sockfd, buffer, (*length), 0);
-	 if(errno == EPIPE)
-	 {
-	    *length = 0;
-	    return EPIPE;
-	 }
-      } while(rv == -1 && errno == EINTR);      
-      
-      while ((rv == -1) && (errno == EAGAIN || errno == EWOULDBLOCK) && (sock->timeout > 0)) 
-      {
-      do_select:
 	 nrv = nhpc_wait_for_io_or_timeout(sock, 0);
-	 if (nrv != NHPC_SUCCESS) 
-	 {
-            *length = 0;
-            return nrv;
-	 }
-	 else 
-	 {
-	    nhpc_size_t offset = 0;
-	    nhpc_size_t data_sent = 0;
-	    
-            do 
-	    {
-	       rv = send(sock->sockfd, (buffer + data_sent), ((*length) - data_sent), 0);
-	       
-	       if(rv > 0)
-	       {
-		  data_sent += rv;
-		  offset = *length - data_sent;
-		  rv = data_sent;
-	       }
-	       else 
-	       {
-		  if(errno == EAGAIN)
-		  { 
-		     nrv = nhpc_wait_for_io_or_timeout(sock, 0);
-		     if (nrv != NHPC_SUCCESS) 
-		     {
-			*length = 0;
-			return nrv;
-		     }
-		  }
-	       }
-            }while (((rv == -1 && errno == EINTR) || data_sent < *length) && errno != EPIPE);   
-	 }
-      }
-      
+	 rv = write(sock->sockfd, (buffer + data_sent), (*length - data_sent));
+	 
+	 data_sent += rv;
+      }while(data_sent != *length && errno != EPIPE);
+	     
       if(rv == -1)
       {
 	 *length = 0;
 	 return errno;
       }
-      
-      if((sock->timeout > 0) && (rv < *length)) {
-	 sock->incomplete_operation = NHPC_INCOMPLETE;
-      }
-      
-      *length = rv;
       
       return NHPC_SUCCESS;
    }   

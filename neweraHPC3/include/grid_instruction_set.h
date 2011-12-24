@@ -20,19 +20,14 @@
 #ifndef _GRID_INSTRUCTION_SET_H_
 #define _GRID_INSTRUCTION_SET_H_
 
+#include "grid_data.h"
+
 namespace neweraHPC
 {
-   struct nhpc_instruction_set_t
-   {
-      char *plugin_name;
-      void *data;
-      nhpc_size_t data_len;
-      int peer_id;
-   };
-   
-   nhpc_status_t nhpc_create_instruction(nhpc_instruction_set_t **instruct_set, const char *plugin_name);
-   
+   nhpc_status_t nhpc_create_instruction(nhpc_instruction_set_t **instruct_set, const char *plugin_name);   
    nhpc_status_t nhpc_delete_instruction(nhpc_instruction_set_t *instruct_set);
+   nhpc_status_t nhpc_add_argument(nhpc_instruction_set_t *instruction, enum GRID_ARG_TYPE option, 
+				   const void *arg1, const void *arg2 = NULL);
 }
 
 #endif

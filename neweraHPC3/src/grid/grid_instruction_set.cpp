@@ -17,8 +17,12 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
+
 #include <include/grid.h>
 #include <include/network.h>
+
+using namespace std;
 
 namespace neweraHPC
 {
@@ -28,6 +32,7 @@ namespace neweraHPC
 	 return NHPC_FAIL;
       
       *instruct_set = new nhpc_instruction_set_t;
+      (*instruct_set)->arguments = new rbtree_t;
       
       (*instruct_set)->data = NULL;
       (*instruct_set)->data_len = 0;
@@ -38,7 +43,85 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_delete_instruction(nhpc_instruction_set_t *instruct_set)
    {
+      if(instruct_set->arguments)
+	 delete (instruct_set->arguments);
+      
       delete[] instruct_set->plugin_name;
       delete instruct_set;
+   }
+   
+   nhpc_status_t nhpc_add_argument(nhpc_instruction_set_t *instruction, enum GRID_ARG_TYPE option, 
+				   const void *arg1, const void *arg2)
+   {
+      char *tmp_str1;
+      char *tmp_str2;
+      char *tmp_str3;
+      char *argument;
+      
+      int *arg1_n;
+      int *arg2_n;
+      
+      char *arg1_str;
+      char *arg2_str;
+      
+      switch(option)
+      {
+	 case RANGE:
+	    if(!arg1 || !arg2)
+	       return NHPC_FAIL;
+	    arg1_n = (int *)arg1;
+	    arg2_n = (int *)arg2;
+
+	    tmp_str1 = nhpc_strconcat(nhpc_itostr(RANGE), ",");
+	    tmp_str2 = nhpc_strconcat(nhpc_itostr(*arg1_n), ",");
+	    tmp_str3 = nhpc_strconcat(tmp_str1, tmp_str2);
+	    argument = nhpc_strconcat(tmp_str3, nhpc_itostr(*arg2_n));
+	    
+	    instruction->arguments->insert(argument);
+	    
+	    delete[] tmp_str1;
+	    delete[] tmp_str2;
+	    delete[] tmp_str3;    
+	    break;
+	    
+	 case LITERAL:
+	    if(!arg1)
+	       return NHPC_FAIL;
+
+	    arg1_str = (char *)arg1;
+	    tmp_str1 = nhpc_strconcat(nhpc_itostr(LITERAL), ",");
+	    argument = nhpc_strconcat(tmp_str1, arg1_str);
+	    
+	    instruction->arguments->insert(argument);
+	    
+	    delete[] tmp_str1;
+	    break;
+	    
+	 case COMMAND:
+	    if(!arg1)
+	       return NHPC_FAIL;
+	    
+	    arg1_str = (char *)arg1;
+	    tmp_str1 = nhpc_strconcat(nhpc_itostr(COMMAND), ",");
+	    argument = nhpc_strconcat(tmp_str1, (char *)arg1_str);
+	    
+	    instruction->arguments->insert(argument);
+	    
+	    delete[] tmp_str1;
+	    break;	    
+	    
+	 case GRID_FILE:
+	    if(!arg1)
+	       return NHPC_FAIL;
+	    
+	    arg1_str = (char *)arg1;
+	    tmp_str1 = nhpc_strconcat(nhpc_itostr(GRID_FILE), ",");
+	    argument = nhpc_strconcat(tmp_str1, (char *)arg1_str);
+	    
+	    instruction->arguments->insert(argument);
+	    
+	    delete[] tmp_str1;
+	    break;	    	    
+      };
    }
 };

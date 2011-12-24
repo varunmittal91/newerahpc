@@ -1,4 +1,4 @@
-SOURCES = grid.cpp grid_scheduler.cpp grid_plugin.cpp grid_nxi.cpp grid_instruction_set.cpp grid_client.cpp
+SOURCES = grid.cpp grid_scheduler.cpp grid_plugin.cpp grid_nxi.cpp grid_instruction_set.cpp grid_client.cpp grid_execute.cpp
 
 noinst_LTLIBRARIES = libgrid.la
 libgrid_la_SOURCES = $(SOURCES)

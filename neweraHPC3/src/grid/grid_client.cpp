@@ -146,4 +146,54 @@ namespace neweraHPC
       
       return nrv;
    }
+   
+   nhpc_status_t nhpc_send_instruction(const char *grid_uid, const char *host_addr, const char *host_port, 
+				       nhpc_instruction_set_t *instruction_set)
+   {
+      nhpc_socket_t *sock;
+      
+      nhpc_status_t nrv = socket_connect(&sock, host_addr, host_port, AF_INET, SOCK_STREAM, 0);
+      
+      if(nrv != NHPC_SUCCESS)
+      {
+	 socket_delete(sock);
+	 
+	 return NHPC_FAIL;
+      }
+      
+      nhpc_headers_t *headers = new nhpc_headers_t;
+      int argument_count = instruction_set->arguments->ret_count();
+      
+      headers->insert("GRID INSTRUCTION 2.90");
+      headers->insert("Grid-Uid", grid_uid);
+      headers->insert("Plugin", instruction_set->plugin_name);
+      headers->insert("Argument-Count", nhpc_itostr(argument_count));
+      
+      for(int i = 1; i <= argument_count; i++)
+      {
+	 char *tmp_str = nhpc_strconcat("Argument", nhpc_itostr(i));
+	 char *argument = (char *)instruction_set->arguments->search(i);
+	 
+	 headers->insert(tmp_str, argument);
+	 delete[] tmp_str;
+      }
+      
+      headers->write(sock);
+      
+      delete headers;
+      
+      char buffer[5];
+      bzero(buffer, 5);
+      nhpc_size_t len = 5;
+      do 
+      {
+	 nrv = socket_recv(sock, buffer, &len);
+      }while(nrv != NHPC_SUCCESS && nrv != NHPC_EOF);
+      nrv = nhpc_strtoi(buffer);
+      
+      socket_close(sock);
+      socket_delete(sock);
+      
+      return nrv;      
+   }
 };

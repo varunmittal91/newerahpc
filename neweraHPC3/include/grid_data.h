@@ -22,6 +22,16 @@
 
 /* Grid configuration file which will contain peer list */
 #define grid_conf_file "/etc/grid.conf"
+#define GRID_RANGE_PLUGIN "nhpc_plugin_range"
+
+enum GRID_ARG_TYPE
+{
+   RANGE,
+   VALUE,
+   LITERAL,
+   COMMAND,
+   GRID_FILE
+};
 
 typedef void *(*fnc_ptr_t)(void *);
 typedef void *(*fnc_ptr_two_t)(void *, void *);
@@ -84,6 +94,15 @@ namespace neweraHPC
       int remote_plugin_id;
       bool status;
    };   
+   
+   struct nhpc_instruction_set_t
+   {
+      char *plugin_name;
+      void *data;
+      nhpc_size_t data_len;
+      int peer_id;
+      rbtree_t *arguments;
+   };
 };
 
 #endif

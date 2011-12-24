@@ -65,7 +65,7 @@ namespace neweraHPC
 	 return;
       }
       
-      nhpc_status_t nrv;
+      nhpc_status_t nrv = NHPC_FAIL;
       const char *fnc_str = string->strings[1];
       
       if(nhpc_strcmp(fnc_str, "CLIENT_REGISTRATION") == NHPC_SUCCESS)
@@ -82,9 +82,9 @@ namespace neweraHPC
 	 }
 	 
 	 else if(nhpc_strcmp(fnc_str, "FILE_EXCHANGE") == NHPC_SUCCESS)
-	 {
 	    nrv = grid_file_download(sock, &uid);
-	 }
+	 else if(nhpc_strcmp(fnc_str, "INSTRUCTION") == NHPC_SUCCESS)
+	    nrv = grid_execute(sock, &uid);
 	 
 	 char *response = nhpc_itostr(nrv);
 	 nhpc_size_t size = strlen(response);

@@ -29,7 +29,7 @@
 
 namespace neweraHPC 
 {
-   class nhpc_grid_server_t : public plugin_manager_t
+   class nhpc_grid_server_t : public plugin_manager_t, public grid_scheduler_t
    {
    private:
       struct functions_t
@@ -50,6 +50,7 @@ namespace neweraHPC
       void grid_server_init();
       void grid_request_init(nhpc_socket_t *sock);
       nhpc_status_t grid_file_download(nhpc_socket_t *sock, const char **grid_uid);
+      nhpc_status_t grid_execute(nhpc_socket_t *sock, const char **grid_uid);
       
       nhpc_status_t grid_client_registration(nhpc_socket_t *sock);
    };

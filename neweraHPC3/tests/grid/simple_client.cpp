@@ -48,16 +48,27 @@ int main(int argc, char **argv)
       cout<<"Registration done\n";
    }
    
-   nrv = nhpc_send_file(grid_uid, argv[1], argv[2], "../../samples/plugin.nxi");
+   nrv = nhpc_send_file(grid_uid, argv[1], argv[2], "../../samples/timeline.blend");
    if(nrv != NHPC_SUCCESS)
    {
       cout<<"File Upload Failed"<<endl;
    }
-      
-   nrv = nhpc_send_file(grid_uid, argv[1], argv[2], "../../server.cpp");
+   
+   nhpc_instruction_set_t *instruction_set;
+   nhpc_create_instruction(&instruction_set, GRID_RANGE_PLUGIN);
+   
+   int start = 1, end = 200;
+   
+   nhpc_add_argument(instruction_set, COMMAND, "blender");
+   nhpc_add_argument(instruction_set, GRID_FILE, "timeline.blend");
+   nhpc_add_argument(instruction_set, LITERAL, "-b");
+   nhpc_add_argument(instruction_set, LITERAL, "-f");
+   nhpc_add_argument(instruction_set, RANGE, &start, &end);
+   
+   nrv = nhpc_send_instruction(grid_uid, argv[1], argv[2], instruction_set);
    if(nrv != NHPC_SUCCESS)
    {
-      cout<<"File Upload Failed"<<endl;
+      cout<<"Instruction failed"<<endl;
    }
 
    cout<<"Plugin Uploaded"<<endl;

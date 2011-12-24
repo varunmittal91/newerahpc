@@ -32,11 +32,11 @@ namespace neweraHPC
    
    void http_init(nhpc_socket_t *sock)
    {
-      header_t *header = (header_t *)sock->headers->search(1);
+      char *command = (char *)sock->headers->search("command");
       
-      if(nhpc_strcmp(header->string, "GET*") == NHPC_SUCCESS)
+      if(nhpc_strcmp(command, "GET*") == NHPC_SUCCESS)
 	 http_request(sock);
-      else if(nhpc_strcmp(header->string, "HTTP*") == NHPC_SUCCESS)
+      else if(nhpc_strcmp(command, "HTTP*") == NHPC_SUCCESS)
 	 cout<<"HTTP Response"<<endl;
       else 
 	 cout<<"Invalid HTTP Header"<<endl;
@@ -44,8 +44,8 @@ namespace neweraHPC
    
    void http_request(nhpc_socket_t *sock)
    {
-      header_t *header = (header_t *)sock->headers->search(1);
-      string_t *request = nhpc_substr(header->string, ' ');
+      char *command = (char *)sock->headers->search("command");
+      string_t *request = nhpc_substr(command, ' ');
       
       if(request->count < 3)
       {

@@ -28,7 +28,9 @@ namespace neweraHPC
 {
    void read_communication(nhpc_socket_t *sock)
    {
-      sock->headers = new rbtree_t;
+      cout<<"Message from: "<<sock->host<<":"<<sock->port<<endl;
+      
+      sock->headers = new rbtree_t(NHPC_RBTREE_STR);
       
       char buffer[1000];
       nhpc_size_t size = 1000;
@@ -56,18 +58,17 @@ namespace neweraHPC
       else 
 	 sock->partial_content = NULL;
       
-      cout<<"Message from: "<<sock->host<<":"<<sock->port<<endl;
       nhpc_display_headers(sock);
       cout<<endl;
-      
-      header_t *header = (header_t *)sock->headers->search(1);
-      if(header != NULL)
+            
+      char *command = (char *)sock->headers->search("command");
+      if(command != NULL)
       {
 	 network_t *network = sock->server_details->main_network;
 	 
-	 if(nhpc_strcmp(header->string, "*HTTP*") == NHPC_SUCCESS)
+	 if(nhpc_strcmp(command, "*HTTP*") == NHPC_SUCCESS)
 	    http_init(sock);
-	 else if(nhpc_strcmp(header->string, "*GRID*") == NHPC_SUCCESS)
+	 else if(nhpc_strcmp(command, "*GRID*") == NHPC_SUCCESS)
 	    network->grid_request_init(sock);
       }
       
@@ -75,5 +76,76 @@ namespace neweraHPC
 	 delete[] sock->partial_content;
       
       nhpc_socket_cleanup(sock);
+   }
+   
+   nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *data, nhpc_size_t *len, nhpc_size_t *header_size)
+   {
+      if(header_size != NULL)
+	 *header_size = *len;
+      
+      if(sock->have_headers == true)
+	 return NHPC_FAIL;
+      
+      int line_len = 0;
+      int old_pos = 0;
+      rbtree_t *headers = sock->headers;
+      
+      for(int cntr = 0; cntr < *len; cntr++)
+      {
+	 if(data[cntr] == '\r')
+	 {
+	    line_len = cntr - old_pos;
+	    if(line_len != 0)
+	    {
+	       char *line = new char [line_len + 1];
+	       memcpy(line, (data + old_pos), (line_len));
+	       line[line_len] = '\0';
+	       
+	       nhpc_headers_insert_param(headers, (const char *)line);
+	       delete[] line;
+	    }
+	    else 
+	    {
+	       if(header_size != NULL)
+	       {
+		  (*header_size) = (*len) - (cntr + 1);
+		  if(data[cntr + 1] == '\n')
+		     (*header_size)--;
+	       }
+	       
+	       sock->have_headers = true;
+	       return NHPC_SUCCESS;
+	    }
+	    
+	    line_len = 0;
+	 }
+	 else if(data[cntr] == '\n')
+	 {
+	    old_pos = cntr + 1;
+	 }
+      }
+      return NHPC_FAIL;
+   }
+   
+   void nhpc_display_headers(nhpc_socket_t *sock)
+   {
+      rbtree_t *headers = sock->headers;
+      
+      if(headers == NULL)
+	 return;
+      
+      const char *string;
+      key_pair_t *key_pair;
+      
+      cout<<"Headers found in the message:"<<(*headers).ret_count()<<endl;
+      for(int cntr = 1; cntr <= (*headers).ret_count(); cntr++)
+      {
+	 key_pair = (key_pair_t *)(*headers).search_str(cntr);
+	 if(key_pair != NULL)
+	 {
+	    cout<<" "<<key_pair->key<<"\t"<<(char *)(key_pair->data)<<endl;
+	    delete key_pair;
+	 }
+      }
    }
 };

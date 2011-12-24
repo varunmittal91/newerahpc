@@ -71,12 +71,26 @@ namespace neweraHPC
       return nrv;
    }
    
-   nhpc_status_t nhpc_send_plugin(const char *grid_uid, const char *host_addr, 
-				  const char *host_port, const char *plugin_path)
+   nhpc_status_t nhpc_send_file(const char *grid_uid, const char *host_addr, 
+				const char *host_port, const char *file_path)
    {
       nhpc_socket_t *sock;
       
-      nhpc_status_t nrv = socket_connect(&sock, host_addr, host_port, AF_INET, SOCK_STREAM, 0);
+      nhpc_status_t nrv;
+      
+      nrv = nhpc_fileordirectory(file_path);
+      if(nrv != NHPC_FILE)
+      {
+	 return NHPC_FAIL;
+      }
+      
+      const char *file_type;
+      if((nhpc_strcmp(file_path, "*.so") == NHPC_SUCCESS) || (nhpc_strcmp(file_path, "*.nxi") == NHPC_SUCCESS))
+	 file_type = "plugin";
+      else 
+	 file_type = "regular";
+      
+      nrv = socket_connect(&sock, host_addr, host_port, AF_INET, SOCK_STREAM, 0);
       nhpc_size_t size;
       
       if(nrv != NHPC_SUCCESS)
@@ -86,14 +100,14 @@ namespace neweraHPC
 	 return NHPC_FAIL;
       }      
       
-      string_t *string = nhpc_substr(plugin_path, '/');
+      string_t *string = nhpc_substr(file_path, '/');
       nhpc_size_t file_len;
-      nhpc_file_size(plugin_path, &file_len);
+      nhpc_file_size(file_path, &file_len);
       
       nhpc_headers_t *headers = new nhpc_headers_t;
       headers->insert("GRID FILE_EXCHANGE 2.90");
       headers->insert("Grid-Uid", grid_uid);
-      headers->insert("File-Type: plugin");
+      headers->insert("File-Type", file_type);
       headers->insert("File-Name", string->strings[string->count - 1]);
       headers->insert("Content-Length", nhpc_itostr(file_len));
       nrv = headers->write(sock);
@@ -107,7 +121,7 @@ namespace neweraHPC
 	 return NHPC_FAIL;
       }
             
-      FILE *fp = fopen(plugin_path, "r");
+      FILE *fp = fopen(file_path, "r");
       nhpc_size_t len;
       char buffer[1000];
       

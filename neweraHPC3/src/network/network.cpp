@@ -280,16 +280,7 @@ namespace neweraHPC
 	 
 	 if(client_sock->headers != NULL)
 	 {
-	    int count = client_sock->headers->ret_count();
-	    for(int i = 1; i <= count; i++)
-	    {	
-	       header_t *header = (header_t *)client_sock->headers->search(i);
-	       delete[] header->string;
-	       delete header;
-	       client_sock->headers->erase(i);
-	    }
-	    
-	    delete client_sock->headers;
+	    nhpc_delete_headers(client_sock->headers);
 	 }
 	 pthread_mutex_lock(mutex);
 	 client_socks->erase(client_sock->sockfd);
@@ -300,72 +291,4 @@ namespace neweraHPC
 	 delete client_sock;
       }
    }
-   
-   nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *data, nhpc_size_t *len, nhpc_size_t *header_size)
-   {
-      if(header_size != NULL)
-	 *header_size = *len;
-      
-      if(sock->have_headers == true)
-	 return NHPC_FAIL;
-      
-      int line_len = 0;
-      int old_pos = 0;
-      rbtree_t *headers = sock->headers;
-      
-      for(int cntr = 0; cntr < *len; cntr++)
-      {
-	 if(data[cntr] == '\r')
-	 {
-	    line_len = cntr - old_pos;
-	    if(line_len != 0)
-	    {
-	       char *line = new char [line_len + 1];
-	       memcpy(line, (data + old_pos), (line_len));
-	       line[line_len] = '\0';
-	       
-	       header_t *header = new header_t;
-	       header->string = line;
-	       header->len    = line_len;
-	       headers->insert(header);
-	    }
-	    else 
-	    {
-	       if(header_size != NULL)
-	       {
-		  (*header_size) = (*len) - (cntr + 1);
-		  if(data[cntr + 1] == '\n')
-		     (*header_size)--;
-	       }
-	       
-	       sock->have_headers = true;
-	       return NHPC_SUCCESS;
-	    }
-	    
-	    line_len = 0;
-	 }
-	 else if(data[cntr] == '\n')
-	 {
-	    old_pos = cntr + 1;
-	 }
-      }
-      return NHPC_FAIL;
-   }
-   
-   void nhpc_display_headers(nhpc_socket_t *sock)
-   {
-      rbtree_t *headers = sock->headers;
-      
-      if(headers == NULL)return;
-      
-      header_t *tmp_header;
-      
-      cout<<"Headers found in the message:"<<(*headers).ret_count()<<endl;
-      for(int cntr = 1; cntr <= (*headers).ret_count(); cntr++)
-      {
-	 tmp_header = (header_t *)(*headers).search(cntr);
-	 cout<<"\t"<<tmp_header->string<<endl;
-      }
-   }
-   
 };

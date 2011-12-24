@@ -43,7 +43,7 @@ namespace neweraHPC
       functions_t *functions;
       fnc_ptr_t ptr;
       nhpc_status_t grid_client_gen_uid(const char *client_addr, const char **uid);
-      nhpc_status_t grid_client_verify_uid(header_t *header, const char **uid);
+      nhpc_status_t grid_client_verify_uid(const char *uid);
    public:
       nhpc_grid_server_t(thread_manager_t **in_thread_manager);
       ~nhpc_grid_server_t();

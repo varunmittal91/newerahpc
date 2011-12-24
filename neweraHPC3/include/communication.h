@@ -21,6 +21,7 @@
 #define _COMMUNICATION_H_
 
 #include "network.h"
+#include "headers.h"
 
 namespace neweraHPC
 {
@@ -30,6 +31,9 @@ namespace neweraHPC
    };
    
    void read_communication(nhpc_socket_t *sock);
+   
+   nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *buffer, nhpc_size_t *len, nhpc_size_t *header_size);
+   void nhpc_display_headers(nhpc_socket_t *sock);
 };
 
 #endif

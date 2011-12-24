@@ -95,4 +95,76 @@ namespace neweraHPC
       
       return NHPC_SUCCESS;
    }
+   
+   nhpc_status_t nhpc_headers_insert_param(rbtree_t *headers, const char *str)
+   {
+      char *argument;
+      
+      if(headers->ret_count() == 0)
+      {
+	 nhpc_strcpy(&argument, str);
+	 headers->insert(argument, "command");
+	 return NHPC_SUCCESS;
+      }
+      
+      if(nhpc_strcmp(str, "*: *") == NHPC_FAIL)
+	 return NHPC_FAIL;
+      
+      string_t *string = nhpc_substr(str, ':');
+      if((string->count == 1) || (strlen(string->strings[1]) == 1) || string->strings[1][1] == ' ')
+      {
+	 nhpc_string_delete(string);
+	 return NHPC_FAIL;
+      }
+      
+      if(string->count > 2)
+      {
+	 char *tmp_str;
+	 nhpc_strcpy(&tmp_str, string->strings[1]);
+	 delete[] (string->strings[1]);
+	 int count = string->count;
+	 
+	 for(int i = 2; i < count; i++)
+	 {
+	    char *tmp_str_2 = nhpc_strconcat(tmp_str, ":");
+	    delete[] tmp_str;
+	    tmp_str = nhpc_strconcat(tmp_str_2, string->strings[i]);
+	    delete[] tmp_str_2;
+	    delete[] (string->strings[i]);
+	    (string->count)--;
+	 }
+	 
+	 string->strings[1] = tmp_str;
+      }
+
+      argument = string->strings[1] + 1;
+      
+      char *data;
+      nhpc_strcpy(&data, argument);
+      
+      headers->insert(data, string->strings[0]);
+      const char *tmp_str = (const char *)headers->search(string->strings[0]);
+      
+      nhpc_string_delete(string);
+      
+      return NHPC_SUCCESS;
+   }
+   
+   void nhpc_delete_headers(rbtree_t *headers)
+   {
+      key_pair_t *key_pair;
+      
+      for(int i = 0; i < headers->ret_count(); i++)
+      {
+	 key_pair = headers->search_str(i);
+	 if(key_pair != NULL)
+	 {
+	    char *string = (char *)key_pair->data;
+	    delete[] string;
+	    delete key_pair;
+	 }
+      }
+      
+      delete headers;
+   }
 }

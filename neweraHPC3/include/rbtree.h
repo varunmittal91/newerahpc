@@ -113,6 +113,12 @@ static inline void rb_link_node(struct rb_node * node, struct rb_node * parent,	
 
 namespace neweraHPC
 {
+   struct key_pair_t
+   {
+      char *key;
+      void *data;
+   };
+   
    class rbtree_t
    {
    private:
@@ -136,6 +142,7 @@ namespace neweraHPC
       ~rbtree_t();
       void *search(int key);
       void *search(const char *key_str);
+      key_pair_t *search_str(int key);
       int insert(void *);
       int insert(void *, int key);
       int insert(void *, const char *key_str);

@@ -40,6 +40,9 @@ namespace neweraHPC
       int count();
       nhpc_status_t write(nhpc_socket_t *sock);
    };
+   
+   nhpc_status_t nhpc_headers_insert_param(rbtree_t *headers, const char *str);
+   void nhpc_delete_headers(rbtree_t *headers);
 }
 
 #endif

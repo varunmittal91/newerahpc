@@ -56,8 +56,8 @@ namespace neweraHPC
    {
       cout<<"GRID Request Encountered"<<endl;      
       
-      header_t *header = (header_t *)sock->headers->search(1);
-      string_t *string = nhpc_substr(header->string, ' ');
+      char *command = (char *)sock->headers->search("command");
+      string_t *string = nhpc_substr(command, ' ');
       
       if(string->count < 3)
       {
@@ -72,10 +72,9 @@ namespace neweraHPC
 	 nrv = grid_client_registration(sock);
       else 
       {
-	 header_t *header = (header_t *)sock->headers->search(2);
-	 const char *uid;
+	 const char *uid = (char *)sock->headers->search("Grid-Uid");
 	 
-	 if(sock->headers->ret_count() < 2 || grid_client_verify_uid(header, &uid) != NHPC_SUCCESS)
+	 if(uid == NULL || grid_client_verify_uid(uid) != NHPC_SUCCESS)
 	 {
 	    cout<<"GRID UID Not Supplied"<<endl;
 	    nhpc_string_delete(string);
@@ -136,90 +135,24 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
-   nhpc_status_t nhpc_grid_server_t::grid_client_verify_uid(header_t *header, const char **uid)
-   {
-      if(nhpc_strcmp(header->string, "Grid-Uid: *") != NHPC_SUCCESS)
-      {	 
+   nhpc_status_t nhpc_grid_server_t::grid_client_verify_uid(const char *uid)
+   {      
+      if(clients->search(uid) == NULL)
 	 return NHPC_FAIL;
-      }
-      
-      string_t *string = nhpc_substr(header->string, ' ');
-      if(string->count == 1)
-      {
-	 nhpc_string_delete(string);
-	 return NHPC_FAIL;
-      }
-      
-      if(clients->search(string->strings[1]) == NULL)
-      {
-	 nhpc_string_delete(string);
-	 return NHPC_FAIL;
-      }
-      
-      nhpc_strcpy((char **)uid, string->strings[1]);
-      nhpc_string_delete(string);
       
       return NHPC_SUCCESS;
    }
    
    nhpc_status_t nhpc_grid_server_t::grid_file_download(nhpc_socket_t *sock, const char **grid_uid)
    {
-      int header_count = sock->headers->ret_count();
-      
-      if(header_count < 4)
+      char *file_name     = (char *)sock->headers->search("File-Name");
+      char *file_type     = (char *)sock->headers->search("File-Type");
+      char *file_size_str = (char *)sock->headers->search("Content-Length");
+
+      if(!file_name || !file_type || !file_size_str)
 	 return NHPC_FAIL;
       
-      header_t *header = (header_t *)sock->headers->search(3);
-      if(nhpc_strcmp(header->string, "File-Type: *") != NHPC_SUCCESS)
-      {	 
-	 return NHPC_FAIL;
-      }
-      
-      string_t *string = nhpc_substr(header->string, ' ');
-      if(string->count == 1)
-      {
-	 nhpc_string_delete(string);
-	 return NHPC_FAIL;
-      }
-      
-      const char *file_type;
-      nhpc_strcpy((char **)&file_type, string->strings[1]);
-      nhpc_string_delete(string);
-      
-      header = (header_t *)sock->headers->search(4);
-      if(nhpc_strcmp(header->string, "File-Name: *") != NHPC_SUCCESS)
-	 return NHPC_FAIL;
-      
-      string = nhpc_substr(header->string, ' ');
-      if(string->count == 1)
-      {
-	 nhpc_string_delete(string);
-	 return NHPC_FAIL;
-      }
-      
-      const char *file_name;
-      nhpc_strcpy((char **)&file_name, string->strings[1]);
-      nhpc_string_delete(string);
-      
-      header = (header_t *)sock->headers->search(5);
-      if(nhpc_strcmp(header->string, "Content-Length: *") != NHPC_SUCCESS)
-	 return NHPC_FAIL;
-      
-      string = nhpc_substr(header->string, ' ');
-      if(string->count == 1)
-      {
-	 nhpc_string_delete(string);
-	 return NHPC_FAIL;
-      }
-      
-      nhpc_size_t file_size = nhpc_strtoi((const char *)(string->strings[1]));
-      nhpc_string_delete(string);      
-      if(file_size == 0)
-	 return NHPC_FAIL;
-      
-      cout<<"File Name: "<<file_name<<endl;
-      cout<<"File Type: "<<file_type<<endl;
-      cout<<"File Size: "<<file_size<<endl;
+      nhpc_size_t file_size = nhpc_strtoi(file_size_str);
       
       nhpc_size_t size_downloaded = 0;
       char buffer[1000];
@@ -259,8 +192,6 @@ namespace neweraHPC
 	    return NHPC_FAIL;
       }
       
-      delete[] file_name;
-      delete[] file_type;
       delete[] final_path;
       
       return NHPC_SUCCESS;

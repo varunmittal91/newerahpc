@@ -71,15 +71,15 @@ namespace neweraHPC
 
 	 delete data;
       }
-
+      
       delete root;
    }
    
    void *rbtree_t::search(int key)
    {
-      if(!num_mode) 
+      if(!num_mode)
 	 return NULL;
-      
+
       struct rb_node *node = root->rb_node;
       
       while (node) 
@@ -273,6 +273,31 @@ namespace neweraHPC
    }
    
    /* Experimental Code for adding string keys to rbtree */
+   
+   key_pair_t *rbtree_t::search_str(int key)
+   {
+      struct rb_node *node;
+      
+      node = rb_first(root);
+      key_pair_t *key_pair = NULL;
+      int count = 1;
+      
+      for (node = rb_first(root); node; node = rb_next(node), count++)
+      {
+	 rbtree_t::node *data = rb_entry(node, rbtree_t::node, node_next);
+	 if(count == key)
+	 {
+	    key_pair = new key_pair_t;
+	    key_pair->key = data->node_key_str;
+	    key_pair->data = data->node_data;
+	    
+	    break;
+	 }
+      }      
+      
+      return key_pair;
+   }
+   
    void *rbtree_t::search(const char *key_str)
    {
       if(num_mode) 
@@ -344,6 +369,8 @@ namespace neweraHPC
       rbtree_t::node *data = new rbtree_t::node;
       data->node_data = in_data;
       nhpc_strcpy(&(data->node_key_str), key_str);
+      last_assigned_key++;
+      data->node_key = last_assigned_key;
       
       struct rb_node **new_node = &(root->rb_node), *parent = NULL;
       /* Figure out where to put new node */

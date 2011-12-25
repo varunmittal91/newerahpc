@@ -130,8 +130,6 @@ namespace neweraHPC
 	 	 
 	 if(!execute)
 	 {
-	    cout<<"redistributing execute"<<endl;
-	    
 	    for(int i = start; i <= end; i++)
 	    {
 	       nhpc_instruction_set_t *instruction_set;
@@ -156,22 +154,15 @@ namespace neweraHPC
 	 }
 	 else 
 	 {
-	    cout<<exec<<endl;
-
-	    cout<<"executed ";
 	    int rv = system(exec);
 
 	    int peer_id = nhpc_strtoi(peer_id_str);
-	    cout<<"Peer: completed "<<peer_id<<endl;	    
 	    free_peer(peer_id);
 	    
 	    if(rv == 0)
 	    {
-	       cout<<"with success"<<endl;
 	       return NHPC_SUCCESS;
 	    }
-	    else 
-	       cout<<"with fail"<<endl;
 	 }
       }
       

@@ -30,12 +30,8 @@ namespace neweraHPC
 {
    class thread_manager_t;
    
-   void grid_init(nhpc_socket_t *sock)
-   {
-      cout<<"GRID Request Encountered"<<endl;
-   }
-   
-   nhpc_grid_server_t::nhpc_grid_server_t(thread_manager_t **in_thread_manager) : plugin_manager_t(in_thread_manager)
+   nhpc_grid_server_t::nhpc_grid_server_t(thread_manager_t **in_thread_manager) 
+   : plugin_manager_t(in_thread_manager) , grid_scheduler_t(in_thread_manager)
    {
       clients = new rbtree_t(NHPC_RBTREE_STR);
    }
@@ -54,14 +50,11 @@ namespace neweraHPC
    
    void nhpc_grid_server_t::grid_request_init(nhpc_socket_t *sock)
    {
-      cout<<"GRID Request Encountered"<<endl;      
-      
       char *command = (char *)sock->headers->search("command");
       string_t *string = nhpc_substr(command, ' ');
       
       if(string->count < 3)
       {
-	 cout<<"Invalid Request"<<endl;
 	 return;
       }
       
@@ -76,7 +69,6 @@ namespace neweraHPC
 	 
 	 if(uid == NULL || grid_client_verify_uid(uid) != NHPC_SUCCESS)
 	 {
-	    cout<<"GRID UID Not Supplied"<<endl;
 	    nhpc_string_delete(string);
 	    return;
 	 }

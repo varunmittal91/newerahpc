@@ -33,15 +33,23 @@ namespace neweraHPC
       int task_completed;
    }queue_t;
    
+   struct scheduler_thread_data_t
+   {
+      peer_details_t *peer_details;
+      const char *host_grid_uid;
+      nhpc_instruction_set_t *instruction_set;
+   };
+   
    class grid_scheduler_t
    {
    private:
       rbtree_t *peers;
       rbtree_t *jobs;
       pthread_mutex_t *mutex;
+      thread_manager_t **thread_manager;
       
    public:
-      grid_scheduler_t();
+      grid_scheduler_t(thread_manager_t **_thread_manager);
       ~grid_scheduler_t();
       void add_peer(const char *host, const char *port, int processors);
       peer_details_t *schedule();
@@ -49,6 +57,8 @@ namespace neweraHPC
       nhpc_status_t queue_job(nhpc_instruction_set_t *instruction_set, const char *host_grid_uid);
       void lock();
       void unlock();
+      
+      static void *scheduler_thread(scheduler_thread_data_t *data);
    };
 };
 

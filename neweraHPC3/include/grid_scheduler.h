@@ -31,6 +31,7 @@ namespace neweraHPC
       int rear;
       int task_total;
       int task_completed;
+      int thread_id;
    }queue_t;
    
    struct scheduler_thread_data_t

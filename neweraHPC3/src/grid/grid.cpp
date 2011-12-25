@@ -160,6 +160,9 @@ namespace neweraHPC
       delete[] grid_path;
       delete[] tmp_path;
       
+      if(!fp)
+	 return NHPC_FAIL;
+      
       if(sock->partial_content != NULL)
       {
 	 fwrite(sock->partial_content, 1, sock->partial_content_len, fp);

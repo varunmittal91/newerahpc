@@ -149,7 +149,7 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_send_instruction(const char *grid_uid, const char *host_addr, const char *host_port, 
 				       nhpc_instruction_set_t *instruction_set, const char *extra_param1,
-				       const char *extra_param2)
+				       const char *extra_param2, const char *extra_param3)
    {
       nhpc_socket_t *sock;
       
@@ -173,6 +173,8 @@ namespace neweraHPC
 	 headers->insert(extra_param1);
       if(extra_param2)
 	 headers->insert(extra_param2);
+      if(extra_param3)
+	 headers->insert(extra_param3);
       
       for(int i = 1; i <= argument_count; i++)
       {

@@ -29,7 +29,7 @@ namespace neweraHPC
 				const char *host_port, const char *file_path);
    nhpc_status_t nhpc_send_instruction(const char *grid_uid, const char *host_addr, const char *host_port, 
 				       nhpc_instruction_set_t *instruction_set, const char *extra_param1 = NULL,
-				       const char *extra_param2 = NULL);
+				       const char *extra_param2 = NULL, const char *extra_param3 = NULL);
 };
 
 #endif

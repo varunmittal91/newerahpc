@@ -77,6 +77,11 @@ namespace neweraHPC
 	    nrv = grid_file_download(sock, &uid);
 	 else if(nhpc_strcmp(fnc_str, "INSTRUCTION") == NHPC_SUCCESS)
 	    nrv = grid_execute(sock, &uid);
+	 else if(nhpc_strcmp(fnc_str, "SUBMISSION") == NHPC_SUCCESS)
+	 {
+	    char *peer_id = (char *)sock->headers->search("Peer");
+	    free_peer(nhpc_strtoi(peer_id));
+	 }
 	 
 	 char *response = nhpc_itostr(nrv);
 	 nhpc_size_t size = strlen(response);

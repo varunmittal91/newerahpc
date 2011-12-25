@@ -20,6 +20,8 @@
 #include <iostream>
 
 #include <include/grid.h>
+#include <include/headers.h>
+#include <include/network.h>
 
 using namespace std;
 
@@ -154,16 +156,27 @@ namespace neweraHPC
 	 }
 	 else 
 	 {
-	    //int rv = 0;
 	    int rv = system(exec);
-
-	    int peer_id = nhpc_strtoi(peer_id_str);
-	    free_peer(peer_id);
+	    char *host_uid = (char *)headers->search("Host-Grid-Uid");
+	    char *peer_id = (char *)headers->search("Peer");
+   
+	    nhpc_socket_t *new_sock;
 	    
-	    if(rv == 0)
+	    nhpc_status_t nrv = socket_connect(&new_sock, sock->host, "8080", AF_INET, SOCK_STREAM, 0);
+	    
+	    if(nrv != NHPC_SUCCESS)
 	    {
-	       return NHPC_SUCCESS;
+	       socket_delete(new_sock);
+	       
+	       return NHPC_FAIL;
 	    }
+	    
+	    nhpc_headers_t *headers = new nhpc_headers_t;
+	    headers->insert("GRID SUBMISSION 2.90");
+	    headers->insert("Grid-Uid", host_uid);
+	    headers->insert("Peer", peer_id);
+	    cout<<sock->host<<endl;
+	    headers->write(new_sock);
 	 }
       }
       

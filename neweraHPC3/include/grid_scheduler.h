@@ -38,13 +38,17 @@ namespace neweraHPC
    private:
       rbtree_t *peers;
       rbtree_t *jobs;
+      pthread_mutex_t *mutex;
       
    public:
       grid_scheduler_t();
       ~grid_scheduler_t();
       void add_peer(const char *host, const char *port, int processors);
       peer_details_t *schedule();
+      void free_peer(int id);
       nhpc_status_t queue_job(nhpc_instruction_set_t *instruction_set, const char *host_grid_uid);
+      void lock();
+      void unlock();
    };
 };
 

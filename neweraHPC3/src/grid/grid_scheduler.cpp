@@ -31,6 +31,9 @@ namespace neweraHPC
    {
       peers = new rbtree_t;
       jobs = new rbtree_t(NHPC_RBTREE_STR);
+      
+      mutex = new pthread_mutex_t;
+      pthread_mutex_init(mutex, NULL);
    }
    
    grid_scheduler_t::~grid_scheduler_t()
@@ -45,8 +48,7 @@ namespace neweraHPC
       nhpc_strcpy(&(peer_details->port), port);
       peer_details->processors = processors;
       
-      peers->insert(peer_details);
-      peer_details_t *schedule();
+      peer_details->id = peers->insert(peer_details);
    }
    
    peer_details_t *grid_scheduler_t::schedule()
@@ -58,7 +60,9 @@ namespace neweraHPC
 	 peer_details = (peer_details_t *)peers->search(i);
 	 if(peer_details->weight < peer_details->processors)
 	 {
+	    lock();
 	    peer_details->weight++;
+	    unlock();
 	    return peer_details;
 	 }
       }
@@ -113,15 +117,40 @@ namespace neweraHPC
 	 delete[] search_value;
       }
       
+      char *peer_id = nhpc_strconcat("Peer: ", nhpc_itostr(peer_details->id));
       nrv = nhpc_send_instruction(grid_uid, host_addr, host_port, instruction_set,
-				  "Execution-State: Ready");
+				  "Execution-State: Ready", peer_id);
       
       if(nrv != NHPC_SUCCESS)
 	 return NHPC_FAIL;
       
       cout<<"done"<<endl;
       delete[] base_dir;
+      delete[] peer_id;
       
       return NHPC_SUCCESS;
+   }
+   
+   void grid_scheduler_t::free_peer(int id)
+   {
+      lock();
+      
+      peer_details_t *peer_details = (peer_details_t *)peers->search(id);
+      if(peer_details)
+      {
+	 peer_details->weight--;
+      }
+      
+      unlock();
+   }
+   
+   void grid_scheduler_t::lock()
+   {
+      pthread_mutex_lock(mutex);
+   }
+   
+   void grid_scheduler_t::unlock()
+   {
+      pthread_mutex_unlock(mutex);      
    }
 };

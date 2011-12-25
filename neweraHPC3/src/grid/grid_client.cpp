@@ -148,7 +148,8 @@ namespace neweraHPC
    }
    
    nhpc_status_t nhpc_send_instruction(const char *grid_uid, const char *host_addr, const char *host_port, 
-				       nhpc_instruction_set_t *instruction_set, const char *extra_param)
+				       nhpc_instruction_set_t *instruction_set, const char *extra_param1,
+				       const char *extra_param2)
    {
       nhpc_socket_t *sock;
       
@@ -168,8 +169,10 @@ namespace neweraHPC
       headers->insert("Grid-Uid", grid_uid);
       headers->insert("Plugin", instruction_set->plugin_name);
       headers->insert("Argument-Count", nhpc_itostr(argument_count));
-      if(extra_param)
-	 headers->insert(extra_param);
+      if(extra_param1)
+	 headers->insert(extra_param1);
+      if(extra_param2)
+	 headers->insert(extra_param2);
       
       for(int i = 1; i <= argument_count; i++)
       {

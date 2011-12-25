@@ -33,6 +33,8 @@ namespace neweraHPC
       char *argument_count_str = (char *)headers->search("Argument-Count");
       int argument_count = nhpc_strtoi(argument_count_str);
       char *execution_state = (char *)headers->search("Execution-State");
+      char *peer_id_str = (char *)headers->search("Peer");
+      
       bool execute;
       if(execution_state)
 	 execute = true;
@@ -155,8 +157,14 @@ namespace neweraHPC
 	 else 
 	 {
 	    cout<<exec<<endl;
+
 	    cout<<"executed ";
 	    int rv = system(exec);
+
+	    int peer_id = nhpc_strtoi(peer_id_str);
+	    cout<<"Peer: completed "<<peer_id<<endl;	    
+	    free_peer(peer_id);
+	    
 	    if(rv == 0)
 	    {
 	       cout<<"with success"<<endl;

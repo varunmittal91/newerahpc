@@ -154,7 +154,8 @@ namespace neweraHPC
 	 }
 	 else 
 	 {
-	    int rv = system(exec);
+	    int rv = 0;
+	    //int rv = system(exec);
 
 	    int peer_id = nhpc_strtoi(peer_id_str);
 	    free_peer(peer_id);

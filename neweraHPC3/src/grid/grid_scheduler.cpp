@@ -56,6 +56,7 @@ namespace neweraHPC
    
    peer_details_t *grid_scheduler_t::schedule()
    {
+      lock();
       peer_details_t *peer_details = NULL;
       
       for(int i = 1; i <= peers->ret_count(); i++)
@@ -66,13 +67,13 @@ namespace neweraHPC
 	 
 	 if(peer_details->weight < peer_details->processors)
 	 {
-	    lock();
 	    peer_details->weight++;
 	    unlock();
 	    return peer_details;
 	 }
       }
       
+      unlock();
       return NULL;
    }
    

@@ -33,6 +33,12 @@ enum GRID_ARG_TYPE
    GRID_FILE
 };
 
+#define ARG_RANGE "0"
+#define ARG_VALUE "1"
+#define ARG_LITERAL "2"
+#define ARG_COMMAND "3"
+#define ARG_GRID_FILE "4"
+
 typedef void *(*fnc_ptr_t)(void *);
 typedef void *(*fnc_ptr_two_t)(void *, void *);
 typedef nhpc_status_t (*fnc_ptr_nhpc_t)(void *);
@@ -72,7 +78,7 @@ namespace neweraHPC
       int id;
       
       /* Port for peer server */
-      int port;
+      char *port;
       
       /* Address for peer server */
       char *host;

@@ -20,8 +20,8 @@
 #include <iostream>
 
 #include <include/grid.h>
-
 #include <include/network.h>
+#include <include/grid_client.h>
 
 using namespace std;
 
@@ -29,119 +29,99 @@ namespace neweraHPC
 {	
    grid_scheduler_t::grid_scheduler_t()
    {
-      node_count = 0;
-      nodes = 5;
-      client_count = -1;
-      q = new queue_t[nodes];
-      tree = new rbtree_t[nodes];
-      clientList = new struct peer_details_t[nodes];
+      peers = new rbtree_t;
+      jobs = new rbtree_t(NHPC_RBTREE_STR);
    }
    
-   grid_scheduler_t::grid_scheduler_t(int nodes_)
+   grid_scheduler_t::~grid_scheduler_t()
    {
-      node_count = 0; 
-      nodes = nodes_;
-      client_count = -1;
-      q = new queue_t[nodes];
-      tree = new rbtree_t[nodes];
-      clientList = new struct peer_details_t[nodes];
+      
    }
    
-   bool grid_scheduler_t::enqueue(int value, int id)
+   void grid_scheduler_t::add_peer(const char *host, const char *port, int processors)
    {
-      int status = -1;
-      if(q[id].front == q[id].rear && q[id].front == -1)
+      peer_details_t *peer_details = new peer_details_t;
+      nhpc_strcpy(&(peer_details->host), host);
+      nhpc_strcpy(&(peer_details->port), port);
+      peer_details->processors = processors;
+      
+      peers->insert(peer_details);
+      peer_details_t *schedule();
+   }
+   
+   peer_details_t *grid_scheduler_t::schedule()
+   {
+      peer_details_t *peer_details = NULL;
+      
+      for(int i = 1; i <= peers->ret_count(); i++)
       {
-         q[id].front = q[id].rear = 1;
-      }
-      else
-      {
-         q[id].rear++;
-      }
-      q[id].task_total++;
-      status = tree[id].insert(&value, q[id].rear);
-      if(status > -1)
-         return true;
-      return false;
-   }
-   
-   int grid_scheduler_t::dequeue(int id)
-   {
-      int *value, status = -1;
-      if(q[id].front == q[id].rear && q[id].front == -1)
-      {
-         return -9999;
-      }
-      else
-      {
-         value = (int*)tree[id].search(q[id].front);
-         status = tree[id].erase(q[id].front);
-         if(status != 1)
-            return -9999;
-         q[id].front++;
-         q[id].task_completed++;
-         return *value;
-      }
-   }
-   
-   int grid_scheduler_t::find_min(int length)
-   {
-      int min = tree[0].ret_count();
-      int pos = 0;
-      int i;
-      for(i=1; i<length; i++)
-         if(tree[i].ret_count() < min)
-         {
-	    min = tree[i].ret_count();
-	    pos = i;
-         }
-      return pos;
-   }
-   
-   bool grid_scheduler_t::addClient(struct peer_details_t *client)
-   {
-      client_count++;
-      clientList[client_count] = *client;
-      q[node_count].peer_id = client->	id;
-      q[node_count].rear = q[node_count].front = -1;
-      q[node_count].task_total = q[node_count].task_completed = 0;
-      return true;
-   }
-   
-   bool grid_scheduler_t::removeClient(struct peer_details_t *client)
-   {
-      if(client_count == -1)
-	 return false;
-      else
-      {
-	 int i, j, cntr = 0;
-	 for(i = 0; i < client_count; i++)
-	 {   
-	    if(q[cntr].peer_id == client->id)
-	    {
-	       for(j = i; j < node_count - 1; j++)	   
-		  q[j] = q[j+1];
-	       node_count--;
-	    }
-	    
+	 peer_details = (peer_details_t *)peers->search(i);
+	 if(peer_details->weight < peer_details->processors)
+	 {
+	    peer_details->weight++;
+	    return peer_details;
 	 }
-	 for(i = 0; i < client_count; i++)
-	    if(clientList[i].id == client->id)
-	       break;
-	 for(j = i; j < client_count - 1; j++)	   
-	    clientList[j] = clientList[j+1];
-	 client_count--;
-	 
-      }	   
+      }
+      
+      return NULL;
    }
    
-   bool grid_scheduler_t::dispatch()
+   nhpc_status_t grid_scheduler_t::queue_job(nhpc_instruction_set_t *instruction_set, const char *host_grid_uid)
    {
-      pthread_t threads[50];
-      int i;
-      for(i = 0; i < node_count; i++ )
+      peer_details_t *peer_details;
+      
+      do
       {
-	 //pthread_create(&thread[i], NULL, dispatcher, )
+	 peer_details = schedule();
+	 if(!peer_details)
+	    sleep(1);
+      }while(peer_details == NULL);
+      
+      const char *host_addr = (const char *)peer_details->host;
+      const char *host_port = (const char *)peer_details->port;
+      const char *grid_uid;
+      
+      nhpc_status_t nrv;
+      
+      nrv = nhpc_register_to_server(&grid_uid, host_addr, host_port);
+      if(nrv != NHPC_SUCCESS)
+	 return NHPC_FAIL;
+      
+      cout<<"Reserved Grid-Uid: "<<grid_uid<<endl;
+      const char *base_dir = nhpc_strconcat("/www/grid/", host_grid_uid, "/");
+      
+      for(int i = 1; i < instruction_set->arguments->ret_count(); i++)
+      {
+	 char *argument = (char *)instruction_set->arguments->search(i);
+	 char *search_value = nhpc_strconcat(nhpc_itostr(GRID_FILE), "*");
+	 if(nhpc_strcmp(argument, search_value) == NHPC_SUCCESS)
+	 {
+	    cout<<base_dir<<endl;
+	    string_t *string = nhpc_substr(argument, ',');
+	    char *file_path = nhpc_strconcat(base_dir, string->strings[1]);
+	    cout<<file_path<<endl;
+	    
+	    nrv = nhpc_send_file(grid_uid, host_addr, host_port, file_path);
+	    
+	    delete[] file_path;
+	    nhpc_string_delete(string);
+	    
+	    if(nrv != NHPC_SUCCESS)
+	       return NHPC_FAIL;
+	 }
+
+	 delete[] search_value;
       }
+      
+      nrv = nhpc_send_instruction(grid_uid, host_addr, host_port, instruction_set,
+				  "Execution-State: Ready");
+      
+      if(nrv != NHPC_SUCCESS)
+	 return NHPC_FAIL;
+      
+      cout<<"done"<<endl;
+      delete[] base_dir;
+      
+      return NHPC_SUCCESS;
    }
 };

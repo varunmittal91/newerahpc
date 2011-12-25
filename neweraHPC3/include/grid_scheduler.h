@@ -36,27 +36,15 @@ namespace neweraHPC
    class grid_scheduler_t
    {
    private:
-      int nodes;
-      int node_count;
-      int client_count;
-      queue_t *q;
-      rbtree_t *tree;
-      struct peer_details_t *clientList;
-      bool enqueue(int, int);
-      int dequeue(int);
-      bool isIdle(int);
-      int find_min(int);
-      bool send(peer_details_t *client, plugin_details_t *task);
-      bool get(peer_details_t *client);
-      void dispatcher(struct peer_details_t *client);
+      rbtree_t *peers;
+      rbtree_t *jobs;
       
    public:
       grid_scheduler_t();
-      grid_scheduler_t(int nodes);
-      bool addClient(struct peer_details_t *client);
-      bool removeClient(struct peer_details_t *client);
-      struct peer_details_t* addTask(struct plugin_details_t *task);
-      bool dispatch();
+      ~grid_scheduler_t();
+      void add_peer(const char *host, const char *port, int processors);
+      peer_details_t *schedule();
+      nhpc_status_t queue_job(nhpc_instruction_set_t *instruction_set, const char *host_grid_uid);
    };
 };
 

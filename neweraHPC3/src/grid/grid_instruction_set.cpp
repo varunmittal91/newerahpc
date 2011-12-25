@@ -66,6 +66,19 @@ namespace neweraHPC
       
       switch(option)
       {
+	 case VALUE:
+	    if(!arg1)
+	       return NHPC_FAIL;
+	    arg1_n = (int *)arg1;
+	    
+	    tmp_str1 = nhpc_strconcat(nhpc_itostr(VALUE), ",");
+	    argument = nhpc_strconcat(tmp_str1, nhpc_itostr(*arg1_n));
+	    
+	    instruction->arguments->insert(argument);
+	    
+	    delete[] tmp_str1;
+	    break;
+	    
 	 case RANGE:
 	    if(!arg1 || !arg2)
 	       return NHPC_FAIL;

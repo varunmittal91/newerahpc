@@ -286,6 +286,31 @@ namespace neweraHPC{
       return string;
    }
    
+   char *nhpc_strconcat(const char *s1, const char *s2, const char *s3)
+   {
+      char *string = NULL;
+      
+      if(s1 == NULL || s2 == NULL || s3 == NULL)
+	 return NULL;
+      
+      nhpc_size_t len_s1 = strlen(s1);
+      nhpc_size_t len_s2 = strlen(s2);
+      nhpc_size_t len_s3 = strlen(s3);
+      
+      if((len_s1 == 0) && (len_s2 == 0) && (len_s3 == 0))
+	 return NULL;
+
+      nhpc_size_t len = strlen(s1) + strlen(s2) + strlen(s3);
+	 
+      string = new char [len + 1];
+      memcpy(string, s1, len_s1);
+      memcpy(string + len_s1, s2, len_s2);
+      memcpy(string + (len_s1 + len_s2), s3, len_s3);
+      string[len] = '\0';
+      
+      return string;
+   }
+
    char *nhpc_itostr(int num)
    {
       int tmp_num = num;

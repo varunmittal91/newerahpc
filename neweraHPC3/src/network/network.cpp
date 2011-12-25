@@ -167,6 +167,8 @@ namespace neweraHPC
 	 return errno;
       }
       
+      add_peer(host_addr, host_port, 2);
+      
       nhpc_thread_details_t *accept_thread = new nhpc_thread_details_t;
       accept_thread->sock           = server_sock;
       accept_thread->thread_manager = thread_manager;

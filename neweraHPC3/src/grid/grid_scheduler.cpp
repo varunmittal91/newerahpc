@@ -56,7 +56,6 @@ namespace neweraHPC
    
    peer_details_t *grid_scheduler_t::schedule()
    {
-      lock();
       peer_details_t *peer_details = NULL;
       
       for(int i = 1; i <= peers->ret_count(); i++)
@@ -67,13 +66,13 @@ namespace neweraHPC
 	 
 	 if(peer_details->weight < peer_details->processors)
 	 {
+	    lock();
 	    peer_details->weight++;
 	    unlock();
 	    return peer_details;
 	 }
       }
       
-      unlock();
       return NULL;
    }
    
@@ -155,7 +154,9 @@ namespace neweraHPC
 	    nhpc_string_delete(string);
 	    
 	    if(nrv != NHPC_SUCCESS)
+	    {  
 	       return NHPC_FAIL;
+	    }
 	 }
 	 
 	 delete[] search_value;
@@ -167,7 +168,9 @@ namespace neweraHPC
 				  "Execution-State: Ready", peer_id, host_uid);
       
       if(nrv != NHPC_SUCCESS)
+      {
 	 return NHPC_FAIL;
+      }
       
       delete[] base_dir;
       delete[] peer_id;

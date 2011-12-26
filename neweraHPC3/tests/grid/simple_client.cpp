@@ -27,9 +27,9 @@ using namespace neweraHPC;
 
 int main(int argc, char **argv)
 {
-   if(argc < 3)
+   if(argc < 5)
    {
-      cout<<"Usage: ./simple_client server_host server_port\n";
+      cout<<"Usage: ./simple_client server_host server_port file.blend max_frame\n";
       return 1;
    }
    
@@ -48,28 +48,37 @@ int main(int argc, char **argv)
       cout<<"Registration done\n";
    }
    
-   nrv = nhpc_send_file(grid_uid, argv[1], argv[2], "../../samples/timeline.blend");
+   nrv = nhpc_send_file(grid_uid, argv[1], argv[2], argv[3]);
    if(nrv != NHPC_SUCCESS)
    {
       cout<<"File Upload Failed"<<endl;
+      cout<<argv[3]<<endl;
+      exit(1);
    }
    
    nhpc_instruction_set_t *instruction_set;
    nhpc_create_instruction(&instruction_set, GRID_RANGE_PLUGIN);
    
-   int start = 1, end = 200;
+   int start = 1, end = nhpc_strtoi(argv[4]);
+   
+   string_t *string = nhpc_substr((const char *)argv[3], '/');
    
    nhpc_add_argument(instruction_set, COMMAND, "blender");
-   nhpc_add_argument(instruction_set, GRID_FILE, "timeline.blend");
+   nhpc_add_argument(instruction_set, GRID_FILE, string->strings[string->count - 1]);
    nhpc_add_argument(instruction_set, LITERAL, "-b");
    nhpc_add_argument(instruction_set, LITERAL, "-f");
    nhpc_add_argument(instruction_set, RANGE, &start, &end);
    
-   nrv = nhpc_send_instruction(grid_uid, argv[1], argv[2], instruction_set);
+   time_t *tm;
+   time(tm);
+   cout<<"Starting Job at "<<ctime(tm)<<endl;
+   //nrv = nhpc_send_instruction(grid_uid, argv[1], argv[2], instruction_set);
    if(nrv != NHPC_SUCCESS)
    {
       cout<<"Instruction failed"<<endl;
    }
+   time(tm);
+   cout<<"Finishing Job at "<<ctime(tm)<<endl;
 
    cout<<"Plugin Uploaded"<<endl;
    

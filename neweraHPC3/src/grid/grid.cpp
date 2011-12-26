@@ -80,7 +80,11 @@ namespace neweraHPC
 	 else if(nhpc_strcmp(fnc_str, "SUBMISSION") == NHPC_SUCCESS)
 	 {
 	    char *peer_id = (char *)sock->headers->search("Peer");
+	    int peer_id_n = nhpc_strtoi(peer_id);
 	    free_peer(nhpc_strtoi(peer_id));
+	    if(peer_id_n == 1)
+	       cout<<"freeing localhost"<<endl<<endl<<endl<<endl<<endl;
+	    nrv = NHPC_SUCCESS;
 	 }
 	 
 	 char *response = nhpc_itostr(nrv);

@@ -31,6 +31,7 @@ namespace neweraHPC
       cout<<"Message from: "<<sock->host<<":"<<sock->port<<endl;
       
       sock->headers = new rbtree_t(NHPC_RBTREE_STR);
+      sock->partial_content = NULL;
       
       char buffer[1000];
       nhpc_size_t size = 1000;
@@ -52,8 +53,12 @@ namespace neweraHPC
       if(content_size != 0)
       {
 	 sock->partial_content_len = content_size;
+	 cout<<content_size<<endl;
 	 sock->partial_content = new char [content_size];
-	 memcpy(sock->partial_content, (buffer + sizeof(buffer) - content_size), content_size);
+	 char *temp;
+	 memcpy(temp, (buffer), size - content_size);
+	 cout<<temp<<endl;
+	 memcpy(sock->partial_content, (buffer + size - content_size), content_size);
       }
       else 
 	 sock->partial_content = NULL;

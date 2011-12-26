@@ -159,6 +159,8 @@ namespace neweraHPC
       {
 	 socket_delete(sock);
 	 
+	 cout<<"socket creation failed"<<endl;
+	 
 	 return NHPC_FAIL;
       }
       
@@ -201,6 +203,6 @@ namespace neweraHPC
       socket_close(sock);
       socket_delete(sock);
       
-      return nrv;      
+      return NHPC_SUCCESS;      
    }
 };

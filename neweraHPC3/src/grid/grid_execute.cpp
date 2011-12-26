@@ -159,14 +159,29 @@ namespace neweraHPC
 	    int rv = system(exec);
 	    char *host_uid = (char *)headers->search("Host-Grid-Uid");
 	    char *peer_id = (char *)headers->search("Peer");
+	    int peer_id_n = nhpc_strtoi(peer_id);
    
+	    if(peer_id_n == 1)
+	    {
+	       free_peer(1);
+	       return NHPC_SUCCESS;
+	    }
+	    
 	    nhpc_socket_t *new_sock;
 	    
 	    nhpc_status_t nrv = socket_connect(&new_sock, sock->host, "8080", AF_INET, SOCK_STREAM, 0);
 	    
+	    if(peer_id_n == 1)
+	    {
+	       cout<<sock->host<<endl;
+	    }
+	    
 	    if(nrv != NHPC_SUCCESS)
 	    {
 	       socket_delete(new_sock);
+	       
+	       if(peer_id_n == 1)
+		  exit(1);
 	       
 	       return NHPC_FAIL;
 	    }
@@ -176,7 +191,10 @@ namespace neweraHPC
 	    headers->insert("Grid-Uid", host_uid);
 	    headers->insert("Peer", peer_id);
 	    cout<<sock->host<<endl;
-	    headers->write(new_sock);
+	    nrv = headers->write(new_sock);
+	    if(nrv != NHPC_SUCCESS)
+	    
+	    return NHPC_SUCCESS;
 	 }
       }
       

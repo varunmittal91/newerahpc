@@ -25,9 +25,4 @@
 #include "constants.h"
 #include "network.h"
 
-namespace neweraHPC
-{
-   nhpc_status_t nhpc_wait_for_io_or_timeout(struct nhpc_socket_t *sock);
-}
-
 #endif

@@ -84,8 +84,11 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *data, nhpc_size_t *len, nhpc_size_t *header_size)
    {
+      if(!(sock->headers))
+	 sock->headers = new rbtree_t(NHPC_RBTREE_STR);
+      
       if(header_size != NULL)
-	 *header_size = *len;
+	 *header_size = 0;
       
       if(sock->have_headers == true)
 	 return NHPC_FAIL;
@@ -98,7 +101,6 @@ namespace neweraHPC
       {
 	 if(data[cntr] == '\r')
 	 {
-	    cout<<"r";
 	    line_len = cntr - old_pos;
 	    if(line_len != 0)
 	    {
@@ -107,16 +109,15 @@ namespace neweraHPC
 	       line[line_len] = '\0';
 	       
 	       nhpc_headers_insert_param(headers, (const char *)line);
-	       cout<<line<<endl;
 	       delete[] line;
 	    }
 	    else 
 	    {
 	       if(header_size != NULL)
 	       {
-		  (*header_size) = (*len) - (cntr + 1);
+		  (*header_size) = (cntr + 1);
 		  if(data[cntr + 1] == '\n')
-		     (*header_size)--;
+		     (*header_size)++;
 	       }
 	       
 	       sock->have_headers = true;

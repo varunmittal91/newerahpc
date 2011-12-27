@@ -105,75 +105,54 @@ namespace neweraHPC
    
    nhpc_status_t http_get_file(const char **file_path, nhpc_socket_t *sock, const char *target_file, const char *host_addr)
    {
-      nhpc_status_t nrv;
-      
       nhpc_create_tmp_file_or_dir(file_path, "neweraHPC", NHPC_FILE);
       
-      const char *mssg = "GET /";
-      size_t size = strlen(mssg);
-      nrv = socket_send(sock, (char *)mssg, &size);
-      if(nrv == NHPC_FAIL)
-	 return nrv;
+      const char *command = nhpc_strconcat("GET /", target_file, " HTTP/1.1");
+      nhpc_headers_t *headers = new nhpc_headers_t;
+      headers->insert(command);
+      headers->insert("User-Agent: neweraHPC");
+      headers->insert("Host", host_addr);
+      headers->write(sock);
+      delete headers;
+      delete[] command;
       
-      mssg = target_file;
-      size = strlen(mssg);
-      nrv = socket_send(sock, (char *)mssg, &size);
-      if(nrv == NHPC_FAIL)
-	 return nrv;
-      
-      mssg = " HTTP/1.1\r\nUser-Agent: newera\r\n";
-      size = strlen(mssg);
-      nrv = socket_send(sock, (char *)mssg, &size);
-      if(nrv == NHPC_FAIL)
-	 return nrv;
-      
-      mssg = "Host: ";
-      size = strlen(mssg);
-      nrv = socket_send(sock, (char *)mssg, &size);
-      if(nrv == NHPC_FAIL)
-	 return nrv;
-
-      mssg = host_addr;
-      size = strlen(mssg);
-      nrv = socket_send(sock, (char *)mssg, &size);
-      if(nrv == NHPC_FAIL)
-	 return nrv;
-
-      mssg = "\r\n\r\n";
-      size = strlen(mssg);
-      nrv = socket_send(sock, (char *)mssg, &size);
-      if(nrv == NHPC_FAIL)
-	 return nrv;
-
       FILE *fp = fopen(*file_path, "w+");
-      char *buffer = new char [1000];
-      size = 1000;
-      int rv = 0;
+      nhpc_status_t nrv;
+      nhpc_size_t size;
+      nhpc_size_t size_downloaded = 0;
+      nhpc_size_t file_size;
       
-      nhpc_size_t total_size = 0;
-      nhpc_size_t file_size = -1;
+      char buffer[10000];
+      nhpc_size_t header_size = 0;
       
-      while((rv != NHPC_EOF && size != 0) && file_size != total_size)
+      do 
       {
-	 size = 1000;
+	 bzero(buffer, sizeof(buffer));
+	 size = sizeof(buffer);
+	 header_size = 0;
 	 
-	 bzero(buffer, 1000);
-	 rv = socket_recv(sock, buffer, &size);
+	 do 
+	 {
+	    nrv = socket_recv(sock, buffer, &size);
+	 }while(nrv != NHPC_SUCCESS && nrv != NHPC_EOF);
 	 
-	 nhpc_size_t data_size;
+	 if(sock->have_headers == false)
+	 {
+	    nrv = nhpc_analyze_stream(sock, buffer, &size, &header_size);
+	    if(nrv == NHPC_SUCCESS)
+	    {
+	       http_content_length(sock->headers, &file_size);
+	       nhpc_display_headers(sock);
+	    }
+	 }
 	 
-	 nrv = nhpc_analyze_stream(sock, buffer, &size, &data_size);
-	 if(nrv == NHPC_SUCCESS)
-	    http_content_length(sock->headers, &file_size);
+	 fwrite((buffer + header_size), 1, (size - header_size), fp); 
 	 
-	 char *tmp_buffer = buffer + (size - data_size);
-	 fwrite(tmp_buffer, 1, data_size, fp);
-	 total_size += data_size;
-	 
-	 if(size == 0)
-	    continue;
-      }
-
+	 size_downloaded += (size - header_size);
+      }while(nrv != NHPC_EOF && size_downloaded != file_size);
+      
+      cout<<"Size Downloaded: "<<size_downloaded<<endl;
+      
       fclose(fp);
       
       return nrv;

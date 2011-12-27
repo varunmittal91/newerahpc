@@ -23,6 +23,7 @@
 #include <iostream>
 
 #include <include/network.h>
+#include <include/sockets.h>
 
 using namespace std;
 
@@ -62,7 +63,7 @@ namespace neweraHPC
       do 
       {
 	 rv = connect(sock->sockfd, hints->ai_addr, hints->ai_addrlen);
-      } while (rv == -1 && errno == EINTR);
+      }while (rv == -1 && errno == EINTR);
       
       if(rv == -1 && (errno == EINPROGRESS || errno == EALREADY) && sock->timeout > 0)
       {
@@ -79,12 +80,23 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
+   nhpc_status_t socket_init(nhpc_socket_t **sock)
+   {
+      (*sock) = new nhpc_socket_t;
+      (*sock)->partial_content = NULL;
+      (*sock)->partial_content_len = 0;
+      (*sock)->headers = NULL;
+      (*sock)->have_headers = false;
+
+      return NHPC_SUCCESS;
+   }
+   
    nhpc_status_t socket_connect(nhpc_socket_t **sock, const char *host_addr, const char *host_port,
 				int family, int type, int protocol)
    {
       nhpc_status_t nrv;
       
-      *sock = new nhpc_socket_t;
+      socket_init(sock);
       
       nrv = socket_getaddrinfo(sock, host_addr, host_port, family, type, protocol);
       if(nrv != NHPC_SUCCESS)
@@ -106,7 +118,11 @@ namespace neweraHPC
       
       socket_options_set(*sock, NHPC_NONBLOCK, 1);
       
-      nrv = socket_connect(*sock);
+      do 
+      {
+	 nrv = socket_connect(*sock);
+      }while(nrv != NHPC_SUCCESS && (errno == EINPROGRESS || errno == EALREADY));
+      
       if(nrv != NHPC_SUCCESS)
       {
 	 freeaddrinfo((*sock)->hints);
@@ -114,8 +130,7 @@ namespace neweraHPC
 	 *sock = NULL;
 	 return nrv;
       }      
-      
-      (*sock)->headers = NULL;
+
       return NHPC_SUCCESS;      
    }
      
@@ -161,6 +176,8 @@ namespace neweraHPC
       (*hints)->ai_family   = family;
       (*hints)->ai_socktype = type;
       (*hints)->ai_protocol = protocol;
+      
+      nhpc_status_t nrv = nhpc_wait_for_io_or_timeout(*sock, 0);
       
       rv = getaddrinfo(host_addr, host_port, *hints, res);
       if (rv == -1 || *hints == 0)

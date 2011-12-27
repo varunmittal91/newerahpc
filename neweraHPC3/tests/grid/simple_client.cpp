@@ -49,6 +49,7 @@ int main(int argc, char **argv)
    }
    
    nrv = nhpc_send_file(grid_uid, argv[1], argv[2], argv[3]);
+   cout<<nrv<<endl;
    if(nrv != NHPC_SUCCESS)
    {
       cout<<"File Upload Failed"<<endl;

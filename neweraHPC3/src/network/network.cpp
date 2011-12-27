@@ -85,32 +85,14 @@ namespace neweraHPC
    {
       nhpc_status_t nrv;
       
-      *sock = new nhpc_socket_t;
-      
-      nrv = socket_getaddrinfo(sock, host_addr, host_port, family, type, protocol);
+      nrv = socket_connect(sock, host_addr, host_port, family, type, protocol);
       if(nrv != NHPC_SUCCESS)
       {
-	 delete *sock;
-	 return nrv;
-      }
-      
-      nrv = socket_create(sock);     
-      if(nrv != NHPC_SUCCESS)
-      {
-	 delete *sock;
-	 return nrv;
-      }   
-      
-      socket_options_set(*sock, NHPC_NONBLOCK, 1);
-      
-      nrv = socket_connect(*sock);
-      if(nrv != NHPC_SUCCESS)
-      {
+	 perror("connects");
 	 delete *sock;
 	 return nrv;
       }      
       
-      (*sock)->headers = new rbtree_t;
       add_client_connection(*sock, (*sock)->sockfd);
       return NHPC_SUCCESS;
    }

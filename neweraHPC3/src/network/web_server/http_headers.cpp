@@ -33,20 +33,14 @@ namespace neweraHPC
    
    nhpc_status_t http_content_length(rbtree_t *headers, nhpc_size_t *size)
    {
-      for(int i = 1; i <= headers->ret_count(); i++)
+      char *file_size_str = (char *)headers->search("Content-Length");
+      if(file_size_str)
       {
-	 header_t *header = (header_t *)headers->search(i);
-
-	 if(nhpc_strcmp(header->string, "Content-Length:*") == NHPC_SUCCESS)
-	 {
-	    string_t *string = nhpc_substr(header->string, ' ');
-	    *size = nhpc_strtoi(string->strings[1]);
-	    nhpc_string_delete(string);
-	    
-	    return NHPC_SUCCESS;
-	 }
+	 (*size) = nhpc_strtoi(file_size_str);
+	 return NHPC_SUCCESS;
       }
-
+      
+      (*size) = -1;
       return NHPC_FAIL;
    }
 };

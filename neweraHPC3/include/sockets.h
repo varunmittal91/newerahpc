@@ -26,6 +26,8 @@
 
 namespace neweraHPC
 {
+   nhpc_status_t socket_init(nhpc_socket_t **sock);
+   
    nhpc_status_t socket_create(nhpc_socket_t **sock);
    nhpc_status_t socket_create(nhpc_socket_t **sock, int family, int type, int protocol);
    

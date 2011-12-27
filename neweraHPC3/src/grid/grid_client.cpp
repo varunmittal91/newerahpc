@@ -144,13 +144,12 @@ namespace neweraHPC
       do 
       {
 	 nrv = socket_recv(sock, buffer, &len);
-      }while(nrv != NHPC_SUCCESS && nrv != NHPC_EOF);
-      nrv = nhpc_strtoi(buffer);
+      }while(nrv != NHPC_EOF);
       
       socket_close(sock);
       socket_delete(sock);
       
-      return nrv;
+      return NHPC_SUCCESS;
    }
    
    nhpc_status_t nhpc_send_instruction(const char *grid_uid, const char *host_addr, const char *host_port, 

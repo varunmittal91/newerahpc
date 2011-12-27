@@ -151,50 +151,61 @@ namespace neweraHPC
 		  }
 	       }
 	       
+	       cout<<"queueing a job"<<endl<<endl;
+	       
 	       queue_job(instruction_set, *grid_uid);
 	    }
 	 }
 	 else 
 	 {
-	    int rv = system(exec);
+	    int rv, pid;
+	    nhpc_status_t nrv;
+	    nhpc_socket_t *new_sock;
+	    
 	    char *host_uid = (char *)headers->search("Host-Grid-Uid");
 	    char *peer_id = (char *)headers->search("Peer");
 	    int peer_id_n = nhpc_strtoi(peer_id);
    
-	    if(peer_id_n == 1)
+	    nhpc_headers_t *headers = new nhpc_headers_t;
+	    
+	    pid = fork();
+	    if(pid == 0)
+	       rv = system(exec);
+	    else 
 	    {
-	       free_peer(1);
-	       return NHPC_SUCCESS;
+	       nrv = NHPC_SUCCESS;
+	       goto exit_state;
 	    }
 	    
-	    nhpc_socket_t *new_sock;
-	    
-	    nhpc_status_t nrv = socket_connect(&new_sock, sock->host, "8080", AF_INET, SOCK_STREAM, 0);
-	    
-	    if(peer_id_n == 1)
-	    {
-	       cout<<sock->host<<endl;
-	    }
+	    nrv = socket_connect(&new_sock, sock->host, "8080", AF_INET, SOCK_STREAM, 0);
 	    
 	    if(nrv != NHPC_SUCCESS)
 	    {
 	       socket_delete(new_sock);
-	       
-	       if(peer_id_n == 1)
-		  exit(1);
-	       
-	       return NHPC_FAIL;
+	       nrv = NHPC_FAIL;
+	       goto exit_state;
 	    }
 	    
-	    nhpc_headers_t *headers = new nhpc_headers_t;
 	    headers->insert("GRID SUBMISSION 2.90");
 	    headers->insert("Grid-Uid", host_uid);
 	    headers->insert("Peer", peer_id);
-	    cout<<sock->host<<endl;
 	    nrv = headers->write(new_sock);
-	    if(nrv != NHPC_SUCCESS)
 	    
-	    return NHPC_SUCCESS;
+	    if(nrv != NHPC_SUCCESS)
+	    {
+	       nrv = NHPC_FAIL;
+	       goto exit_state;
+	    }
+	    
+	    nrv = NHPC_SUCCESS;
+	    	    
+	 exit_state:
+	    
+	    if(pid == 0)
+	       exit(1);
+	    else 
+	       cout<<"exit"<<endl;
+	    return nrv;
 	 }
       }
       

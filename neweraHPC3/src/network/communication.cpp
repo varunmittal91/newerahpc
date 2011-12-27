@@ -32,6 +32,7 @@ namespace neweraHPC
       
       sock->headers = new rbtree_t(NHPC_RBTREE_STR);
       sock->partial_content = NULL;
+      sock->partial_content_len = 0;
       
       char buffer[1000];
       nhpc_size_t size = 1000;
@@ -45,6 +46,7 @@ namespace neweraHPC
 	 
 	 nrv = socket_recv(sock, buffer, &size);
 	 nhpc_analyze_stream(sock, buffer, &size, &content_size);
+	 cout<<buffer<<endl;
 	 
 	 if(nrv == NHPC_EOF)
 	    break;
@@ -55,9 +57,6 @@ namespace neweraHPC
 	 sock->partial_content_len = content_size;
 	 cout<<content_size<<endl;
 	 sock->partial_content = new char [content_size];
-	 char *temp;
-	 memcpy(temp, (buffer), size - content_size);
-	 cout<<temp<<endl;
 	 memcpy(sock->partial_content, (buffer + size - content_size), content_size);
       }
       else 
@@ -99,6 +98,7 @@ namespace neweraHPC
       {
 	 if(data[cntr] == '\r')
 	 {
+	    cout<<"r";
 	    line_len = cntr - old_pos;
 	    if(line_len != 0)
 	    {
@@ -107,6 +107,7 @@ namespace neweraHPC
 	       line[line_len] = '\0';
 	       
 	       nhpc_headers_insert_param(headers, (const char *)line);
+	       cout<<line<<endl;
 	       delete[] line;
 	    }
 	    else 

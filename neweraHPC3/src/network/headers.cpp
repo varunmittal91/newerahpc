@@ -82,16 +82,14 @@ namespace neweraHPC
 	 char *str = (char *)headers->search(i);
 	 size = strlen(str);
 	 
-	 nrv = socket_send(sock, str, &size);
-	 if(nrv != NHPC_SUCCESS)
-	    return NHPC_FAIL;
+	 nrv = socket_sendmsg(sock, str, &size);
 	 
 	 delete[] str;
 	 headers->erase(i);
       }
       
       size = 2;
-      nrv = socket_send(sock, "\r\n", &size);
+      nrv = socket_sendmsg(sock, "\r\n", &size);
       
       return NHPC_SUCCESS;
    }

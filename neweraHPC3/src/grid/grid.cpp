@@ -89,7 +89,7 @@ namespace neweraHPC
 	 
 	 char *response = nhpc_itostr(nrv);
 	 nhpc_size_t size = strlen(response);
-	 socket_send(sock, response, &size);
+	 socket_sendmsg(sock, response, &size);
       }
       
       cout<<"Executed function with status: "<<nrv<<endl;
@@ -106,7 +106,7 @@ namespace neweraHPC
       nrv = grid_client_gen_uid(sock->host, &uid);
       
       nhpc_size_t size = strlen(uid);
-      nrv = socket_send(sock, uid, &size);
+      nrv = socket_sendmsg(sock, uid, &size);
       
       const char *dir = nhpc_strconcat(grid_directory, uid);
       mkdir(dir, 0777);
@@ -176,6 +176,7 @@ namespace neweraHPC
       {
 	 fwrite(sock->partial_content, 1, sock->partial_content_len, fp);
 	 size_downloaded += sock->partial_content_len;
+	 cout<<sock->partial_content_len<<endl;
       }
       
       do 

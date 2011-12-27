@@ -225,7 +225,10 @@ namespace neweraHPC
 	    new_node = &((*new_node)->rb_right);
 	 }
 	 else
+	 {  
+	    delete data;
 	    return false;
+	 }
       }
       
       /* Add new node and rebalance tree. */
@@ -393,8 +396,8 @@ namespace neweraHPC
 	 }
 	 else 
 	 {
-	    delete data;
 	    delete[] data->node_key_str;
+	    delete data;
 	    return false;
 	 }
       }
@@ -414,7 +417,7 @@ namespace neweraHPC
       
       rbtree_t::node *data = rbtree_t::search_node(key_str);
       if(data){
-	 rb_erase(&data->node_next,root);
+	 rb_erase(&(data->node_next), root);
 	 delete data;
 	 count--;
 	 return NHPC_SUCCESS;

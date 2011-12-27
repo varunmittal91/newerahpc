@@ -38,7 +38,13 @@ namespace neweraHPC
 	 *length = 0;
 	 return errno;
       }
-      rv = read(sock->sockfd, buffer, *length);
+      else 
+      {
+	 do 
+	 {
+	    rv = read(sock->sockfd, buffer, *length);
+	 }while(rv == -1 && errno == EINTR);
+      }
 	
       if(rv == -1)
       {
@@ -60,17 +66,21 @@ namespace neweraHPC
    nhpc_status_t socket_send(nhpc_socket_t *sock, const char *buffer, nhpc_size_t *length)
    {
       int rv;
-      int nrv;
+      nhpc_status_t nrv;
       
-      nhpc_size_t data_sent = 0;
-      
-      do 
+      nrv = nhpc_wait_for_io_or_timeout(sock, 0);
+      if(nrv != NHPC_SUCCESS)
       {
-	 nrv = nhpc_wait_for_io_or_timeout(sock, 0);
-	 rv = write(sock->sockfd, (buffer + data_sent), (*length - data_sent));
-	 
-	 data_sent += rv;
-      }while(data_sent != *length && errno != EPIPE);
+	 *length = 0;
+	 return nrv;
+      }
+      else 
+      {
+	 do
+	 {
+	    rv = write(sock->sockfd, buffer, *length);
+	 }while(rv == -1 && errno == EINTR);
+      }
 	     
       if(rv == -1)
       {
@@ -78,8 +88,31 @@ namespace neweraHPC
 	 return errno;
       }
       
+      *length = rv;
+      
       return NHPC_SUCCESS;
    }   
+   
+   nhpc_status_t socket_sendmsg(nhpc_socket_t *sock, const char *buffer, nhpc_size_t *length)
+   {
+      nhpc_size_t data_sent = 0;
+      nhpc_size_t size = 0;
+      nhpc_status_t nrv;
+      
+      do 
+      {
+	 size = *length - data_sent;
+	 nrv = socket_send(sock, (buffer + data_sent), &size);
+	 data_sent += size;
+      }while(data_sent != *length && errno != EPIPE);
+      
+      if(errno == EPIPE)
+      {
+	 return NHPC_FAIL;
+      }
+      
+      return NHPC_SUCCESS;
+   }
    
    nhpc_status_t socket_send_file(nhpc_socket_t *sock)
    {

@@ -72,7 +72,7 @@ int main(int argc, char **argv)
    time_t *tm;
    time(tm);
    cout<<"Starting Job at "<<ctime(tm)<<endl;
-   //nrv = nhpc_send_instruction(grid_uid, argv[1], argv[2], instruction_set);
+   nrv = nhpc_send_instruction(grid_uid, argv[1], argv[2], instruction_set);
    if(nrv != NHPC_SUCCESS)
    {
       cout<<"Instruction failed"<<endl;

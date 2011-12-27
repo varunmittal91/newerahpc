@@ -43,7 +43,7 @@ namespace neweraHPC
       
       const char *mssg = "GRID CLIENT_REGISTRATION 2.90\r\n\r\n";
       size_t size = strlen(mssg);
-      nrv = socket_send(sock, (char *)mssg, &size);
+      nrv = socket_sendmsg(sock, (char *)mssg, &size);
       if(nrv == NHPC_FAIL)
       {
 	 socket_close(sock);
@@ -125,12 +125,18 @@ namespace neweraHPC
       nhpc_size_t len;
       char buffer[1000];
       
+      int bytes_writen = 0;
+      
       do
       {
 	 len = fread(buffer, 1, sizeof(buffer), fp);
-	 nrv = socket_send(sock, buffer, &len);	
-      }while(nrv != EPIPE && len != 0);      
+	 nrv = socket_sendmsg(sock, buffer, &len);
+	 bytes_writen += len;
+	 cout<<len<<" "<<nrv<<endl;
+      }while(nrv != EPIPE && !feof(fp));      
             
+      cout<<bytes_writen<<endl;
+      
       fclose(fp);
       
       bzero(buffer, 1000);

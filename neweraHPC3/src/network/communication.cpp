@@ -46,7 +46,6 @@ namespace neweraHPC
 	 
 	 nrv = socket_recv(sock, buffer, &size);
 	 nhpc_analyze_stream(sock, buffer, &size, &content_size);
-	 cout<<buffer<<endl;
 	 
 	 if(nrv == NHPC_EOF)
 	    break;
@@ -55,7 +54,6 @@ namespace neweraHPC
       if(content_size != 0)
       {
 	 sock->partial_content_len = content_size;
-	 cout<<content_size<<endl;
 	 sock->partial_content = new char [content_size];
 	 memcpy(sock->partial_content, (buffer + size - content_size), content_size);
       }

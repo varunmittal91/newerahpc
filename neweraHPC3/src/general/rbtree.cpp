@@ -59,17 +59,22 @@ namespace neweraHPC
       struct rb_node *node;
       
       node = rb_first(root);
+      rbtree_t::node *data_prev = NULL;
        
-      for (node = rb_first(root); node; node = rb_next(node))
+      for (node = rb_first(root); ; node = rb_next(node))
       {
-	 rbtree_t::node *data = rb_entry(node, rbtree_t::node, node_next);
-	 rb_erase(&data->node_next,root);
-	 if(!num_mode)
-	 {
-	    delete[] data->node_key_str;
-	 }
+	 if(data_prev)
+            delete data_prev;
 
-	 delete data;
+         if(!node)
+            break;
+
+	 rbtree_t::node *data = rb_entry(node, rbtree_t::node, node_next);
+	 rb_erase(&data->node_next, root);
+	 if(!num_mode)
+	    delete[] data->node_key_str;
+
+         data_prev = data;
       }
       
       delete root;

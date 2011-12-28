@@ -106,7 +106,7 @@ namespace neweraHPC
       int enable_opts = 1;
       
       if(server_sock == NULL)
-	 server_sock = new nhpc_socket_t;
+	 socket_init(&server_sock);
       
       nrv = socket_getaddrinfo(&server_sock, host_addr, host_port, family, type, protocol);
       if(nrv != NHPC_SUCCESS)

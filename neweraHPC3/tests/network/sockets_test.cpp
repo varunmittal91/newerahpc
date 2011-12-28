@@ -62,7 +62,7 @@ int main(int argc, char *argv[]){
       
       if(rv == -1)
 	 perror("read:");
-      
+
       socket_delete(sock);
    }
    if(strcmp(argv[3],"2") == 0)

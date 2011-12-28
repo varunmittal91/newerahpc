@@ -204,7 +204,9 @@ namespace neweraHPC
 	 freeaddrinfo(sock->hints);
 	 
 	 if(sock->headers != NULL)
-	    delete sock->headers;
+         {
+	    delete (sock->headers);
+         }
       
 	 delete sock;
       }

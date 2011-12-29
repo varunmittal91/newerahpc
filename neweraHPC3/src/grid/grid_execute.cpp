@@ -137,7 +137,7 @@ namespace neweraHPC
 	    for(int i = start; i <= end; i++)
 	    {
 	       nhpc_instruction_set_t *instruction_set;
-	       nhpc_create_instruction(&instruction_set, GRID_RANGE_PLUGIN);
+	       nhpc_create_instruction(&instruction_set, GRID_RANGE_PLUGIN, *grid_uid);
 	       
 	       for(int j = 1; j <= argument_count; j++)
 	       {
@@ -149,13 +149,16 @@ namespace neweraHPC
 		     nhpc_add_argument(instruction_set, VALUE, &i);
 		  else 
 		  {
-		     instruction_set->arguments->insert(argument_value);
+		     char *tmp_str1;
+		     nhpc_strcpy(&tmp_str1, argument_value);
+		     
+		     instruction_set->arguments->insert(tmp_str1);
 		  }
 	       }
 	       
 	       cout<<"queueing a job"<<endl<<endl;
 	       
-	       queue_job(instruction_set, *grid_uid);
+	       queue_job(instruction_set);
 	    }
 
             cout<<"sent all the jobs"<<endl;

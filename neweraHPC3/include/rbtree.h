@@ -142,6 +142,8 @@ namespace neweraHPC
       ~rbtree_t();
       void *search(int key);
       void *search(const char *key_str);
+      void *search_first(int *key);
+      void *search_first(const char *key);
       key_pair_t *search_str(int key);
       int insert(void *);
       int insert(void *, int key);

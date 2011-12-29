@@ -26,7 +26,8 @@ using namespace std;
 
 namespace neweraHPC
 {
-   nhpc_status_t nhpc_create_instruction(nhpc_instruction_set_t **instruct_set, const char *plugin_name)
+   nhpc_status_t nhpc_create_instruction(nhpc_instruction_set_t **instruct_set, const char *plugin_name,
+					 const char *host_grid_uid)
    {
       if(plugin_name == NULL)
 	 return NHPC_FAIL;
@@ -36,6 +37,14 @@ namespace neweraHPC
       
       (*instruct_set)->data = NULL;
       (*instruct_set)->data_len = 0;
+      
+      if(host_grid_uid)
+      {
+	 nhpc_strcpy(&((*instruct_set)->host_grid_uid), host_grid_uid);
+      }
+      else 
+	 (*instruct_set)->host_grid_uid = NULL;
+      
       nhpc_strcpy(&((*instruct_set)->plugin_name), plugin_name);
       
       return NHPC_SUCCESS;

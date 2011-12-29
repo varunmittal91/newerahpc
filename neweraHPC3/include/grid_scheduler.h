@@ -38,6 +38,7 @@ namespace neweraHPC
    {
       peer_details_t *peer_details;
       const char *host_grid_uid;
+      const char *grid_uid;
       nhpc_instruction_set_t *instruction_set;
    };
    
@@ -46,6 +47,7 @@ namespace neweraHPC
    private:
       rbtree_t *peers;
       rbtree_t *jobs;
+      rbtree_t *queued_instructions;
       pthread_mutex_t *mutex;
       thread_manager_t **thread_manager;
       
@@ -55,7 +57,8 @@ namespace neweraHPC
       void add_peer(const char *host, const char *port, int processors);
       peer_details_t *schedule();
       void free_peer(int id);
-      nhpc_status_t queue_job(nhpc_instruction_set_t *instruction_set, const char *host_grid_uid);
+      nhpc_status_t queue_job(nhpc_instruction_set_t *instruction_set);
+      nhpc_status_t push_jobs();
       void lock();
       void unlock();
       

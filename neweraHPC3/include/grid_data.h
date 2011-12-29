@@ -108,6 +108,7 @@ namespace neweraHPC
       nhpc_size_t data_len;
       int peer_id;
       rbtree_t *arguments;
+      char *host_grid_uid;
    };
 };
 

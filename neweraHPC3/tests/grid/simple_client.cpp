@@ -69,7 +69,6 @@ int main(int argc, char **argv)
    nhpc_add_argument(instruction_set, LITERAL, "-b");
    nhpc_add_argument(instruction_set, LITERAL, "-f");
    nhpc_add_argument(instruction_set, RANGE, &start, &end);
-   nhpc_add_argument(instruction_set, LITERAL, "> /dev/null");
    
    time_t *tm;
    time(tm);

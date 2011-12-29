@@ -89,7 +89,7 @@ namespace neweraHPC
       
       scheduler_thread_data_t *data = new scheduler_thread_data_t;
       data->peer_details = peer_details;
-      data->host_grid_uid = host_grid_uid;
+      nhpc_strcpy((char **)&(data->host_grid_uid), host_grid_uid);
       data->instruction_set = instruction_set;
       
       (*thread_manager)->create_thread(NULL, (void* (*)(void*))scheduler_thread, data, NHPC_THREAD_DEFAULT);      

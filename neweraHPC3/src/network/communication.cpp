@@ -36,7 +36,7 @@ namespace neweraHPC
       
       char buffer[1000];
       nhpc_size_t size = 1000;
-      nhpc_size_t content_size = 0;
+      nhpc_size_t header_size = 0;
       nhpc_status_t nrv = 0;
       
       while(sock->have_headers != true)
@@ -45,17 +45,17 @@ namespace neweraHPC
 	 bzero(buffer, size);
 	 
 	 nrv = socket_recv(sock, buffer, &size);
-	 nhpc_analyze_stream(sock, buffer, &size, &content_size);
+	 nhpc_analyze_stream(sock, buffer, &size, &header_size);
 	 
 	 if(nrv == NHPC_EOF)
 	    break;
       }
       
-      if(content_size != 0)
+      if(header_size != 0)
       {
-	 sock->partial_content_len = content_size;
-	 sock->partial_content = new char [content_size];
-	 memcpy(sock->partial_content, (buffer + size - content_size), content_size);
+	 sock->partial_content_len = size - header_size;
+	 sock->partial_content = new char [size - header_size];
+	 memcpy(sock->partial_content, (buffer + header_size), (size - header_size));
       }
       else 
 	 sock->partial_content = NULL;

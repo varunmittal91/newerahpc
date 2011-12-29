@@ -82,8 +82,6 @@ namespace neweraHPC
 	    char *peer_id = (char *)sock->headers->search("Peer");
 	    int peer_id_n = nhpc_strtoi(peer_id);
 	    free_peer(nhpc_strtoi(peer_id));
-	    if(peer_id_n == 1)
-	       cout<<"freeing localhost"<<endl<<endl<<endl<<endl<<endl;
 	    nrv = NHPC_SUCCESS;
 	 }
 	 
@@ -176,7 +174,6 @@ namespace neweraHPC
       {
 	 fwrite(sock->partial_content, 1, sock->partial_content_len, fp);
 	 size_downloaded += sock->partial_content_len;
-	 cout<<sock->partial_content_len<<endl;
       }
       
       do 

@@ -121,8 +121,10 @@ namespace neweraHPC
 		  if(exec)
 		  {
 		     tmp_str1 = nhpc_strconcat(exec, " ", string->strings[1]);
+                     tmp_str2 = nhpc_strconcat(tmp_str1, " ");
+                     delete[] tmp_str1;
 		     delete[] exec;
-		     exec = tmp_str1;
+		     exec = tmp_str2;
 		  }
 		  break;
 	    };
@@ -155,6 +157,9 @@ namespace neweraHPC
 	       
 	       queue_job(instruction_set, *grid_uid);
 	    }
+
+            cout<<"sent all the jobs"<<endl;
+            return NHPC_SUCCESS;
 	 }
 	 else 
 	 {
@@ -167,14 +172,14 @@ namespace neweraHPC
 	    int peer_id_n = nhpc_strtoi(peer_id);
    
 	    nhpc_headers_t *headers = new nhpc_headers_t;
-	    
+
 	    pid = fork();
 	    if(pid == 0)
 	       rv = system(exec);
 	    else 
 	    {
 	       nrv = NHPC_SUCCESS;
-	       goto exit_state;
+	       return nrv;
 	    }
 	    
 	    nrv = socket_connect(&new_sock, sock->host, "8080", AF_INET, SOCK_STREAM, 0);
@@ -183,7 +188,7 @@ namespace neweraHPC
 	    {
 	       socket_delete(new_sock);
 	       nrv = NHPC_FAIL;
-	       goto exit_state;
+               return nrv;
 	    }
 	    
 	    headers->insert("GRID SUBMISSION 2.90");
@@ -194,18 +199,15 @@ namespace neweraHPC
 	    if(nrv != NHPC_SUCCESS)
 	    {
 	       nrv = NHPC_FAIL;
-	       goto exit_state;
+	       return nrv;
 	    }
 	    
-	    nrv = NHPC_SUCCESS;
-	    	    
-	 exit_state:
-	    
+	    nrv = NHPC_SUCCESS;	    	    
+
 	    if(pid == 0)
-	       exit(1);
-	    else 
-	       cout<<"exit"<<endl;
-	    return nrv;
+ 	       exit(1);
+
+   	    return nrv;
 	 }
       }
       

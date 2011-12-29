@@ -132,11 +132,8 @@ namespace neweraHPC
 	 len = fread(buffer, 1, sizeof(buffer), fp);
 	 nrv = socket_sendmsg(sock, buffer, &len);
 	 bytes_writen += len;
-	 cout<<len<<" "<<nrv<<endl;
       }while(nrv != EPIPE && !feof(fp));      
             
-      cout<<bytes_writen<<endl;
-      
       fclose(fp);
       
       bzero(buffer, 1000);
@@ -163,8 +160,6 @@ namespace neweraHPC
       if(nrv != NHPC_SUCCESS)
       {
 	 socket_delete(sock);
-	 
-	 cout<<"socket creation failed"<<endl;
 	 
 	 return NHPC_FAIL;
       }

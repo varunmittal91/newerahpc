@@ -87,8 +87,6 @@ namespace neweraHPC
 	    sleep(1);
       }while(peer_details == NULL);
       
-      cout<<peer_details->weight<<endl<<endl<<endl<<endl<<endl;
-      
       scheduler_thread_data_t *data = new scheduler_thread_data_t;
       data->peer_details = peer_details;
       data->host_grid_uid = host_grid_uid;
@@ -135,7 +133,6 @@ namespace neweraHPC
       nrv = nhpc_register_to_server(&grid_uid, host_addr, host_port);
       if(nrv != NHPC_SUCCESS)
       {	 
-	 cout<<"failed"<<endl;
 	 return NHPC_FAIL;
       }
       

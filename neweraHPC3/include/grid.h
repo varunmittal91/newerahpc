@@ -20,6 +20,9 @@
 #ifndef _GRID_H_
 #define _GRID_H_
 
+#include <unistd.h>
+#include <sys/wait.h>
+
 #include "network_data.h"
 #include "grid_data.h"
 #include "grid_scheduler.h"

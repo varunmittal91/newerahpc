@@ -154,7 +154,7 @@ namespace neweraHPC
       nhpc_size_t file_size = nhpc_strtoi(file_size_str);
       
       nhpc_size_t size_downloaded = 0;
-      char buffer[1000];
+      char buffer[10000];
       nhpc_status_t nrv;
       nhpc_size_t size;
       
@@ -178,8 +178,8 @@ namespace neweraHPC
       
       do 
       {
-	 bzero(buffer, 1000);
-	 size = 1000;
+	 bzero(buffer, sizeof(buffer));
+	 size = sizeof(buffer);
 	 nrv = socket_recv(sock, buffer, &size); 
 	 fwrite(buffer, 1, size, fp);	 
 	 size_downloaded += size;

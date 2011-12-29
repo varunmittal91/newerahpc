@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 {
    if(argc < 5)
    {
-      cout<<"Usage: ./simple_client server_host server_port file.blend max_frame\n";
+      cout<<"Usage: ./simple_client server_host server_port file.blend start_frame max_frame\n";
       return 1;
    }
    
@@ -60,7 +60,7 @@ int main(int argc, char **argv)
    nhpc_instruction_set_t *instruction_set;
    nhpc_create_instruction(&instruction_set, GRID_RANGE_PLUGIN);
    
-   int start = 1, end = nhpc_strtoi(argv[4]);
+   int start = nhpc_strtoi(argv[4]), end = nhpc_strtoi(argv[5]);
    
    string_t *string = nhpc_substr((const char *)argv[3], '/');
    

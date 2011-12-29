@@ -207,9 +207,13 @@ namespace neweraHPC
 	    
 	    nrv = NHPC_SUCCESS;	    	    
 
+	    int status;
+	    
 	    if(pid == 0)
  	       exit(1);
-
+	    else 
+	       waitpid (pid, &status, 0);
+	    
    	    return nrv;
 	 }
       }

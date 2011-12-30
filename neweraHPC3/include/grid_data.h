@@ -106,7 +106,7 @@ namespace neweraHPC
       char *plugin_name;
       void *data;
       nhpc_size_t data_len;
-      int peer_id;
+      int host_peer_id;
       rbtree_t *arguments;
       char *host_grid_uid;
    };

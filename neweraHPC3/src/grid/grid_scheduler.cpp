@@ -149,7 +149,7 @@ namespace neweraHPC
 	 
 	 return NHPC_FAIL;
       }
-      
+
       for(int i = 1; i < instruction_set->arguments->ret_count(); i++)
       {
 	 char *argument = (char *)instruction_set->arguments->search(i);
@@ -180,6 +180,7 @@ namespace neweraHPC
       
       char *peer_id = nhpc_strconcat("Peer: ", nhpc_itostr(peer_details->id));
       char *host_uid = nhpc_strconcat("Host-Grid-Uid: ", host_grid_uid);
+      
       nrv = nhpc_send_instruction(grid_uid, host_addr, host_port, instruction_set,
 				  "Execution-State: Ready", peer_id, host_uid);
       

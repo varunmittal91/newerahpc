@@ -170,6 +170,8 @@ namespace neweraHPC
       headers->insert("GRID INSTRUCTION 2.90");
       headers->insert("Grid-Uid", grid_uid);
       headers->insert("Plugin", instruction_set->plugin_name);
+      headers->insert("Peer-Host", host_addr);
+      headers->insert("Peer-Port", host_port);
       headers->insert("Argument-Count", nhpc_itostr(argument_count));
       if(extra_param1)
 	 headers->insert(extra_param1);

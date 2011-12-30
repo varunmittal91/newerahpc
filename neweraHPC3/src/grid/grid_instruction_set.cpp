@@ -72,6 +72,12 @@ namespace neweraHPC
       delete instruct_set;
    }
    
+   nhpc_status_t nhpc_generate_instruction(nhpc_instruction_set_t **instruction_set, nhpc_headers_t *headers)
+   {
+      char *host_grid_uid = (char *)headers->search();
+      nhpc_create_instruction(instruction_set);
+   } 
+
    nhpc_status_t nhpc_add_argument(nhpc_instruction_set_t *instruction, enum GRID_ARG_TYPE option, 
 				   const void *arg1, const void *arg2)
    {

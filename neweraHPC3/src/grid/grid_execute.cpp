@@ -36,6 +36,10 @@ namespace neweraHPC
       int argument_count = nhpc_strtoi(argument_count_str);
       char *execution_state = (char *)headers->search("Execution-State");
       char *peer_id_str = (char *)headers->search("Peer");
+      char *peer_host = (char *)headers->search("Peer-Host");
+      char *peer_port = (char *)headers->search("Peer-Port");
+      if(!peer_port)
+         peer_port = (char *)"8080";
       
       bool execute;
       if(execution_state)
@@ -177,14 +181,22 @@ namespace neweraHPC
 	    if(pid == 0)
             {
 	       rv = system(exec);
-               exit(0);
+               _exit(0);
             }
 	    else 
 	    {
-	       waitpid (pid, NULL, 0);
-            }	    
-	    
-	    nrv = socket_connect(&new_sock, sock->host, "8080", AF_INET, SOCK_STREAM, 0);
+               struct sigaction sa;
+               sa.sa_handler = SIG_IGN;
+#ifdef SA_NOCLDWAIT
+               sa.sa_flags = SA_NOCLDWAIT;
+#else
+               sa.sa_flags = 0;
+#endif
+               sigemptyset(&sa.sa_mask);
+               sigaction(SIGCHLD, &sa, NULL);
+            }
+
+	    nrv = socket_connect(&new_sock, sock->host, peer_port, AF_INET, SOCK_STREAM, 0);
 	    
 	    if(nrv != NHPC_SUCCESS)
 	    {

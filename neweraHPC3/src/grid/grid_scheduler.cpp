@@ -63,8 +63,6 @@ namespace neweraHPC
       {
 	 peer_details = (peer_details_t *)peers->search(i);	 
 	 
-	 cout<<peer_details->host<<" "<<peer_details->weight<<" "<<peer_details->processors<<endl;
-	 
 	 if(peer_details->weight < peer_details->processors)
 	 {
 	    lock();
@@ -80,37 +78,87 @@ namespace neweraHPC
    nhpc_status_t grid_scheduler_t::queue_job(nhpc_instruction_set_t *instruction_set)
    {
       peer_details_t *peer_details;
+      const char *host_addr;
+      const char *host_port;
       char *host_grid_uid = instruction_set->host_grid_uid;
+      const char *grid_uid;
+      const char *base_dir = nhpc_strconcat("/www/grid/", host_grid_uid, "/");
       
       if(!(instruction_set->host_grid_uid))
-      {
+      {	 
 	 return NHPC_FAIL;
       }
       
       peer_details = schedule();
       if(!peer_details)
       {
+	 lock();
 	 queued_instructions->insert(instruction_set);
+	 unlock();
 	 
 	 return NHPC_FAIL;
       }
+      
+      host_addr = (const char *)peer_details->host;
+      host_port = (const char *)peer_details->port;
 	 
-      const char *grid_uid;
       nhpc_status_t nrv = nhpc_register_to_server(&grid_uid, peer_details->host, peer_details->port);
       if(nrv != NHPC_SUCCESS)
       {
 	 free_peer(peer_details->id);
+	 lock();
+	 queued_instructions->insert(instruction_set);
+	 unlock();
 	 
 	 return NHPC_FAIL;
       }
       
-      scheduler_thread_data_t *data = new scheduler_thread_data_t;
-      data->peer_details = peer_details;
-      nhpc_strcpy((char **)&(data->host_grid_uid), host_grid_uid);
-      data->instruction_set = instruction_set;
-      data->grid_uid = grid_uid;
+      for(int i = 1; i < instruction_set->arguments->ret_count(); i++)
+      {
+	 char *argument = (char *)instruction_set->arguments->search(i);
+	 char *search_value = nhpc_strconcat(nhpc_itostr(GRID_FILE), "*");
+	 if(nhpc_strcmp(argument, search_value) == NHPC_SUCCESS)
+	 {
+	    string_t *string = nhpc_substr(argument, ',');
+	    char *file_path = nhpc_strconcat(base_dir, string->strings[1]);
+	    
+	    nrv = nhpc_send_file(grid_uid, host_addr, host_port, file_path);
+	    
+	    delete[] file_path;
+	    nhpc_string_delete(string);
+	    
+	    if(nrv != NHPC_SUCCESS)
+	    {  
+	       free_peer(peer_details->id);
+	       lock();
+	       queued_instructions->insert(instruction_set);
+	       unlock();
+	       
+	       return NHPC_FAIL;
+	    }
+	 }
+	 
+	 delete[] search_value;
+      }
       
-      (*thread_manager)->create_thread(NULL, (void* (*)(void*))scheduler_thread, data, NHPC_THREAD_DEFAULT);      
+      char *peer_id = nhpc_strconcat("Peer: ", nhpc_itostr(peer_details->id));
+      char *host_uid = nhpc_strconcat("Host-Grid-Uid: ", host_grid_uid);
+      nrv = nhpc_send_instruction(grid_uid, host_addr, host_port, instruction_set,
+				  "Execution-State: Ready", peer_id, host_uid);
+      
+      if(nrv != NHPC_SUCCESS)
+      {
+	 lock();
+	 queued_instructions->insert(instruction_set);
+	 unlock();	 
+	 
+	 return NHPC_FAIL;
+      }
+      
+      delete[] base_dir;
+      delete[] peer_id;      
+      
+      return nrv;
    }
    
    void grid_scheduler_t::free_peer(int id)
@@ -150,10 +198,10 @@ namespace neweraHPC
 
       if(instruction_set && (instruction_set->host_grid_uid))
       {
-	 nrv = queue_job(instruction_set);
 	 lock();
 	 queued_instructions->erase(id);
 	 unlock();
+	 nrv = queue_job(instruction_set);
       }
       
       return nrv;

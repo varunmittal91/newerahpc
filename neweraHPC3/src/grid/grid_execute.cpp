@@ -156,12 +156,9 @@ namespace neweraHPC
 		  }
 	       }
 	       
-	       cout<<"queueing a job"<<endl<<endl;
-	       
 	       queue_job(instruction_set);
 	    }
 
-            cout<<"sent all the jobs"<<endl;
             return NHPC_SUCCESS;
 	 }
 	 else 

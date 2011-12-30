@@ -150,7 +150,7 @@ namespace neweraHPC
       }
       
       add_peer(host_addr, host_port, 2);
-      add_peer("10.0.0.5", "8080", 10);
+      add_peer("10.0.0.5", "8080", 2);
       
       nhpc_thread_details_t *accept_thread = new nhpc_thread_details_t;
       accept_thread->sock           = server_sock;

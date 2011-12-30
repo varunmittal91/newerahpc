@@ -175,12 +175,14 @@ namespace neweraHPC
 
 	    pid = fork();
 	    if(pid == 0)
+            {
 	       rv = system(exec);
+               exit(0);
+            }
 	    else 
 	    {
-	       nrv = NHPC_SUCCESS;
-	       return nrv;
-	    }
+	       waitpid (pid, NULL, 0);
+            }	    
 	    
 	    nrv = socket_connect(&new_sock, sock->host, "8080", AF_INET, SOCK_STREAM, 0);
 	    
@@ -202,16 +204,7 @@ namespace neweraHPC
 	       return nrv;
 	    }
 	    
-	    nrv = NHPC_SUCCESS;	    	    
-
-	    int status;
-	    
-	    if(pid == 0)
- 	       exit(1);
-	    else 
-	       waitpid (pid, &status, 0);
-	    
-   	    return nrv;
+   	    return NHPC_SUCCESS;
 	 }
       }
       

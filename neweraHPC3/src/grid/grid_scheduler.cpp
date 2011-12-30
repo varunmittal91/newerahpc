@@ -49,6 +49,21 @@ namespace neweraHPC
       (*thread_manager)->create_thread(NULL, (void* (*)(void*))grid_scheduler_t::monitor_jobs_pending, this, NHPC_THREAD_DEFAULT);
    }   
    
+   int grid_scheduler_t::cores()
+   {
+      lock();
+      int count = peers->ret_count();
+      int cores = 0;
+      for(int i = 1; i <= count; i++)
+      {
+         peer_details_t *peer_details = (peer_details_t *)peers->search(i);
+         cores+= (peer_details->processors - peer_details->weight);
+      }
+      unlock();
+
+      return cores;
+   }
+
    void grid_scheduler_t::add_peer(const char *host, const char *port, int processors)
    {
       peer_details_t *peer_details = new peer_details_t;
@@ -126,6 +141,11 @@ namespace neweraHPC
 	 {
 	    remove_peer(peer_details->id);
 	 }
+         else 
+         {
+            perror("");
+            exit(1);
+         }
 	 
 	 return NHPC_FAIL;
       }
@@ -235,16 +255,15 @@ namespace neweraHPC
       
       while(1)
       {
-	 grid_scheduler->lock();
-	 
 	 int id;
-	 
+
+	 grid_scheduler->lock();
 	 nhpc_instruction_set_t *instruction_set = (nhpc_instruction_set_t *)queued_instructions->search_first(&id);
 	 grid_scheduler->unlock();
 	 
 	 if(instruction_set)
 	 {
-	    cout<<"Instruction Pending: "<<grid_scheduler->peers->ret_count()<<endl;
+	    cout<<"Instruction Pending: "<<grid_scheduler->cores()<<endl;
 	 }
 	 
 	 sleep(1);

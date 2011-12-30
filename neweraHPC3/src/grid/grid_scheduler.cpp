@@ -122,7 +122,10 @@ namespace neweraHPC
 	 queued_instructions->insert(instruction_set);
 	 unlock();
 	 
-	 remove_peer(peer_details->id);
+	 if(nrv == ECONNREFUSED)
+	 {
+	    remove_peer(peer_details->id);
+	 }
 	 
 	 return NHPC_FAIL;
       }

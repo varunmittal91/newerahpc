@@ -38,7 +38,7 @@ namespace neweraHPC
       {
 	 socket_delete(sock);
 	 
-	 return NHPC_FAIL;
+	 return errno;
       }
       
       const char *mssg = "GRID CLIENT_REGISTRATION 2.90\r\n\r\n";

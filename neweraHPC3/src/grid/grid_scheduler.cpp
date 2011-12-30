@@ -244,7 +244,7 @@ namespace neweraHPC
 	 
 	 if(instruction_set)
 	 {
-	    cout<<"Instruction Pending"<<endl;
+	    cout<<"Instruction Pending: "<<grid_scheduler->peers->ret_count()<<endl;
 	 }
 	 
 	 sleep(1);

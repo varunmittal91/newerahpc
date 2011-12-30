@@ -54,7 +54,9 @@ namespace neweraHPC
    public:
       grid_scheduler_t(thread_manager_t **_thread_manager);
       ~grid_scheduler_t();
+      void grid_scheduler_init();
       void add_peer(const char *host, const char *port, int processors);
+      void remove_peer(int peer_id);
       peer_details_t *schedule();
       void free_peer(int id);
       nhpc_status_t queue_job(nhpc_instruction_set_t *instruction_set);
@@ -62,7 +64,7 @@ namespace neweraHPC
       void lock();
       void unlock();
       
-      static void *scheduler_thread(scheduler_thread_data_t *data);
+      static void monitor_jobs_pending(grid_scheduler_t *grid_scheduler);
    };
 };
 

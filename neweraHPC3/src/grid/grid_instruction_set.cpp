@@ -53,7 +53,20 @@ namespace neweraHPC
    nhpc_status_t nhpc_delete_instruction(nhpc_instruction_set_t *instruct_set)
    {
       if(instruct_set->arguments)
+      {
+	 int count = instruct_set->arguments->ret_count();
+	 
+	 for(int i = 1; i <= count; i++)
+	 {
+	    char *argument_value = (char *)instruct_set->arguments->search(i);
+	    delete[] argument_value;
+	 }
+	 
 	 delete (instruct_set->arguments);
+      }
+      
+      if(instruct_set->host_grid_uid)
+	 delete[] (instruct_set->host_grid_uid);
       
       delete[] instruct_set->plugin_name;
       delete instruct_set;

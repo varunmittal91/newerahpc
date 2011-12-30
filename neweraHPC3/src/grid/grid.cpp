@@ -39,6 +39,7 @@ namespace neweraHPC
    void nhpc_grid_server_t::grid_server_init()
    {
       plugin_manager_init();
+      grid_scheduler_init();
             
       mkdir("/tmp/neweraHPC", 0777);
    }

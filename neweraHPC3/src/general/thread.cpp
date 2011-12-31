@@ -102,5 +102,5 @@ namespace neweraHPC
       }
       else 
 	 return -1;
-   }   
+   }      
 };

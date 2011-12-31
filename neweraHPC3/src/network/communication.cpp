@@ -78,6 +78,7 @@ namespace neweraHPC
 	 delete[] sock->partial_content;
       
       nhpc_socket_cleanup(sock);
+      pthread_exit(NULL);
    }
    
    nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *data, nhpc_size_t *len, nhpc_size_t *header_size)

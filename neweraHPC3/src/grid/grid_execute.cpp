@@ -199,6 +199,8 @@ namespace neweraHPC
 #endif
                sigemptyset(&sa.sa_mask);
                sigaction(SIGCHLD, &sa, NULL);
+
+               nhpc_delete_instruction(instruction_set);
             }
 	    	    
    	    return NHPC_SUCCESS;

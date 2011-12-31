@@ -54,6 +54,8 @@ namespace neweraHPC
       void grid_request_init(nhpc_socket_t *sock);
       nhpc_status_t grid_file_download(nhpc_socket_t *sock, const char **grid_uid);
       nhpc_status_t grid_execute(nhpc_socket_t *sock, const char **grid_uid);
+      nhpc_status_t grid_execute(nhpc_instruction_set_t *instruction_set, 
+				 nhpc_socket_t *sock, const char **grid_uid);
       
       nhpc_status_t grid_client_registration(nhpc_socket_t *sock);
    };

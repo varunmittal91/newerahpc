@@ -38,6 +38,8 @@ namespace neweraHPC
       (*instruct_set)->data = NULL;
       (*instruct_set)->data_len = 0;
       
+      (*instruct_set)->execute = false;
+      
       if(host_grid_uid)
       {
 	 nhpc_strcpy(&((*instruct_set)->host_grid_uid), host_grid_uid);
@@ -72,10 +74,50 @@ namespace neweraHPC
       delete instruct_set;
    }
    
-   nhpc_status_t nhpc_generate_instruction(nhpc_instruction_set_t **instruction_set, nhpc_headers_t *headers)
+   nhpc_status_t nhpc_generate_instruction(nhpc_instruction_set_t **instruction_set, rbtree_t *headers)
    {
-      char *host_grid_uid = (char *)headers->search();
-      nhpc_create_instruction(instruction_set);
+      nhpc_status_t nrv = NHPC_SUCCESS;
+      
+      char *plugin_name = (char *)headers->search("Plugin");
+      char *host_grid_uid = (char *)headers->search("Host-Grid-Uid");
+      char *grid_uid = (char *)headers->search("Grid-Uid");
+
+      nhpc_create_instruction(instruction_set, plugin_name);
+      if(host_grid_uid)
+	 nhpc_strcpy(&((*instruction_set)->host_grid_uid), host_grid_uid);
+      else 
+	 nhpc_strcpy(&((*instruction_set)->host_grid_uid), grid_uid);
+
+      char *arg_count_str = (char *)headers->search("Argument-Count");
+      int arg_count = nhpc_strtoi(arg_count_str);
+      (*instruction_set)->argument_count = arg_count;
+      for(int i = 1; i <= arg_count; i++)
+      {
+	 char *search_string = nhpc_strconcat("Argument", nhpc_itostr(i));
+	 char *arg_value = (char *)headers->search(search_string);
+	 if(!arg_value)
+	    nrv = NHPC_FAIL;
+	 
+	 char *tmp_str;
+	 nhpc_strcpy(&tmp_str, arg_value);
+	 
+	 (*instruction_set)->arguments->insert(tmp_str);
+	 delete[] search_string;
+      }
+      
+      char *peer_addr = (char *)headers->search("Peer-Host");
+      char *peer_port = (char *)headers->search("Peer-Port");
+      nhpc_strcpy(&((*instruction_set)->host_peer_addr), peer_addr);
+      nhpc_strcpy(&((*instruction_set)->host_peer_port), peer_port);
+      
+      char *execution_state = (char *)headers->search("Execution-State");
+      if(execution_state)
+	 (*instruction_set)->execute = true;
+      else 
+	 (*instruction_set)->execute = false;      
+      
+      if(nrv != NHPC_SUCCESS)
+	 return nrv;
    } 
 
    nhpc_status_t nhpc_add_argument(nhpc_instruction_set_t *instruction, enum GRID_ARG_TYPE option, 

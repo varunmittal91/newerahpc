@@ -140,6 +140,7 @@ namespace neweraHPC
       rbtree_t();
       rbtree_t(int mode);
       ~rbtree_t();
+      rbtree_t *clone(rbtree_t *in_tree);
       void *search(int key);
       void *search(const char *key_str);
       void *search_first(int *key);

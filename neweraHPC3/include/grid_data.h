@@ -108,7 +108,11 @@ namespace neweraHPC
       nhpc_size_t data_len;
       int host_peer_id;
       rbtree_t *arguments;
+      int argument_count;
       char *host_grid_uid;
+      char *host_peer_addr;
+      char *host_peer_port;
+      bool execute;
    };
 };
 

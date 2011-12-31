@@ -78,8 +78,15 @@ namespace neweraHPC
    void grid_scheduler_t::remove_peer(int peer_id)
    {
       lock();
+      peer_details_t* peer_details = (peer_details_t *)peers->search(peer_id);
       peers->erase(peer_id);
       unlock();
+      if(peer_details)
+      {
+	 delete[] peer_details->host;
+	 delete[] peer_details->port;
+	 delete peer_details;
+      }
    }
    
    peer_details_t *grid_scheduler_t::schedule()
@@ -153,7 +160,9 @@ namespace neweraHPC
       for(int i = 1; i < instruction_set->arguments->ret_count(); i++)
       {
 	 char *argument = (char *)instruction_set->arguments->search(i);
-	 char *search_value = nhpc_strconcat(nhpc_itostr(GRID_FILE), "*");
+	 char *grid_file_str = nhpc_itostr(GRID_FILE);
+	 char *search_value = nhpc_strconcat(grid_file_str, "*");
+	 delete[] grid_file_str;
 	 if(nhpc_strcmp(argument, search_value) == NHPC_SUCCESS)
 	 {
 	    string_t *string = nhpc_substr(argument, ',');
@@ -178,11 +187,15 @@ namespace neweraHPC
 	 delete[] search_value;
       }
       
-      char *peer_id = nhpc_strconcat("Peer: ", nhpc_itostr(peer_details->id));
+      char *peer_id_str = nhpc_itostr(peer_details->id);
+      char *peer_id = nhpc_strconcat("Peer: ", peer_id_str);
       char *host_uid = nhpc_strconcat("Host-Grid-Uid: ", host_grid_uid);
+      delete[] peer_id_str;
       
       nrv = nhpc_send_instruction(grid_uid, host_addr, host_port, instruction_set,
 				  "Execution-State: Ready", peer_id, host_uid);
+      delete[] host_uid;
+      delete[] peer_id;
       
       if(nrv != NHPC_SUCCESS)
       {
@@ -194,7 +207,7 @@ namespace neweraHPC
       }
       
       delete[] base_dir;
-      delete[] peer_id;      
+      delete[] grid_uid;
       
       if(nrv == NHPC_SUCCESS)
       {

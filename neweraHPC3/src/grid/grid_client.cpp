@@ -104,14 +104,16 @@ namespace neweraHPC
       nhpc_size_t file_len;
       nhpc_file_size(file_path, &file_len);
       
+      char *content_len_str = nhpc_itostr(file_len);
       nhpc_headers_t *headers = new nhpc_headers_t;
       headers->insert("GRID FILE_EXCHANGE 2.90");
       headers->insert("Grid-Uid", grid_uid);
       headers->insert("File-Type", file_type);
       headers->insert("File-Name", string->strings[string->count - 1]);
-      headers->insert("Content-Length", nhpc_itostr(file_len));
+      headers->insert("Content-Length", content_len_str);
       nrv = headers->write(sock);
       
+      delete[] content_len_str;
       delete headers;
       
       nhpc_string_delete(string);
@@ -167,12 +169,13 @@ namespace neweraHPC
       nhpc_headers_t *headers = new nhpc_headers_t;
       int argument_count = instruction_set->arguments->ret_count();
       
+      char *argument_count_str = nhpc_itostr(argument_count);
       headers->insert("GRID INSTRUCTION 2.90");
       headers->insert("Grid-Uid", grid_uid);
       headers->insert("Plugin", instruction_set->plugin_name);
       headers->insert("Peer-Host", host_addr);
       headers->insert("Peer-Port", host_port);
-      headers->insert("Argument-Count", nhpc_itostr(argument_count));
+      headers->insert("Argument-Count", argument_count_str);
       if(extra_param1)
 	 headers->insert(extra_param1);
       if(extra_param2)
@@ -182,8 +185,10 @@ namespace neweraHPC
       
       for(int i = 1; i <= argument_count; i++)
       {
-	 char *tmp_str = nhpc_strconcat("Argument", nhpc_itostr(i));
+	 char *i_str = nhpc_itostr(i);
+	 char *tmp_str = nhpc_strconcat("Argument", i_str);
 	 char *argument = (char *)instruction_set->arguments->search(i);
+	 delete[] i_str;
 	 
 	 headers->insert(tmp_str, argument);
 	 delete[] tmp_str;
@@ -191,6 +196,7 @@ namespace neweraHPC
       
       headers->write(sock);
       
+      delete[] argument_count_str;
       delete headers;
       
       char buffer[5];

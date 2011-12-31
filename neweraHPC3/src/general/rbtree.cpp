@@ -90,14 +90,14 @@ namespace neweraHPC
       rbtree_t::node *data = container_of(node, rbtree_t::node, node_next);
       
       if(data)
-	 *key = data->node_key;
+	 (*key) = data->node_key;
       else 
 	 return NULL;
       
       return data->node_data;
    }
    
-   void *rbtree_t::search_first(const char *key_str)
+   void *rbtree_t::search_first(const char **key_str)
    {
       if(num_mode)
 	 return NULL;
@@ -107,7 +107,7 @@ namespace neweraHPC
       rbtree_t::node *data = container_of(node, rbtree_t::node, node_next);
       
       if(data)
-	 key_str = data->node_key_str;
+	 (*key_str) = data->node_key_str;
       else 
 	 return NULL;
       
@@ -457,6 +457,7 @@ namespace neweraHPC
       rbtree_t::node *data = rbtree_t::search_node(key_str);
       if(data){
 	 rb_erase(&(data->node_next), root);
+	 delete[] data->node_key_str;
 	 delete data;
 	 count--;
 	 return NHPC_SUCCESS;

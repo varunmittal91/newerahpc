@@ -75,14 +75,16 @@ namespace neweraHPC
 	 else 
 	 {
 	    FILE *fp = fopen(file_path, "r");
-
-	    const char *mssg = "HTTP/1.1 200 OK\r\nContent-Length: ";
 	    char *file_size_str = nhpc_itostr(file_size);
-	    mssg = nhpc_strconcat(mssg, file_size_str);
-	    mssg = nhpc_strconcat(mssg, "\r\n\r\n");
-	    nhpc_size_t size = strlen(mssg);
-	    socket_send(sock, (char *)mssg, &size);
 
+	    nhpc_headers_t *headers = new nhpc_headers_t;
+	    headers->insert("HTTP/1.1 200 OK");
+	    headers->insert("Content-Length", file_size_str);
+	    headers->write(sock);
+	    
+	    delete headers;
+	    delete[] file_size_str;
+	    
 	    nhpc_status_t nrv;
 	    
 	    char buffer[10000];	    
@@ -93,14 +95,16 @@ namespace neweraHPC
 	       bzero(buffer, sizeof(buffer));
 	       len = fread(buffer, 1, sizeof(buffer), fp);
 	       
-	       int cntr = 0;
-	       
 	       nrv = socket_sendmsg(sock, buffer, &len);	
 	    }while(!feof(fp) && errno != EPIPE);
 		   
 	    fclose(fp);
 	 }
+	 
+	 delete[] file_path;
       }
+      
+      nhpc_string_delete(request);
    }
    
    nhpc_status_t http_get_file(const char **file_path, nhpc_socket_t *sock, const char *target_file, const char *host_addr)

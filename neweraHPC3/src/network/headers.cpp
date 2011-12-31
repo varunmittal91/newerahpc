@@ -56,6 +56,7 @@ namespace neweraHPC
       char *new_str = nhpc_strconcat(tmp_property, argument);
       delete[] tmp_property;
       insert(new_str);
+      delete[] new_str;
    }
    
    const char *nhpc_headers_t::operator[](int id)
@@ -141,7 +142,6 @@ namespace neweraHPC
       nhpc_strcpy(&data, argument);
       
       headers->insert(data, string->strings[0]);
-      const char *tmp_str = (const char *)headers->search(string->strings[0]);
       
       nhpc_string_delete(string);
       
@@ -150,19 +150,19 @@ namespace neweraHPC
    
    void nhpc_delete_headers(rbtree_t *headers)
    {
-      key_pair_t *key_pair;
+      const char *key;
+      char *string;
       
-      for(int i = 0; i < headers->ret_count(); i++)
+      do 
       {
-	 key_pair = headers->search_str(i);
-	 if(key_pair != NULL)
+	 string = (char *)headers->search_first(&key);
+	 if(string)
 	 {
-	    char *string = (char *)key_pair->data;
 	    delete[] string;
-	    delete key_pair;
+	    headers->erase(key);
 	 }
-      }
-      
+      }while(string);
+       
       delete headers;
    }
 }

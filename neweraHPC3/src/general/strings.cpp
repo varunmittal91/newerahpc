@@ -238,15 +238,21 @@ namespace neweraHPC{
 	 nhpc_strcpy(&(string->strings[0]), s1);
       }
       
+      char **tmp_strings = new char* [string->count + 1];
+      memcpy(tmp_strings, string->strings, sizeof(char*)*(string->count));
+      delete string->strings;
+      string->strings = tmp_strings;
+      string->strings[string->count] = NULL;
+      
       return string;
    }
    
    void nhpc_string_delete(string_t *string)
    {
       for(int i = 0; i < string->count; i++)
-	 delete[] string->strings[i];
+	 delete[] (string->strings[i]);
       
-      delete[] string->strings;
+      delete[] (string->strings);
    }
    
    char *nhpc_strconcat(const char *s1, const char *s2)

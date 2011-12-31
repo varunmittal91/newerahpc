@@ -40,6 +40,9 @@ namespace neweraHPC
       
       (*instruct_set)->execute = false;
       
+      (*instruct_set)->host_peer_addr = NULL;
+      (*instruct_set)->host_peer_port = NULL;
+      
       if(host_grid_uid)
       {
 	 nhpc_strcpy(&((*instruct_set)->host_grid_uid), host_grid_uid);
@@ -69,6 +72,10 @@ namespace neweraHPC
       
       if(instruct_set->host_grid_uid)
 	 delete[] (instruct_set->host_grid_uid);
+      if(instruct_set->host_peer_port)
+	 delete[] (instruct_set->host_peer_port);
+      if(instruct_set->host_peer_addr)
+	 delete[] (instruct_set->host_peer_addr);
       
       delete[] instruct_set->plugin_name;
       delete instruct_set;
@@ -83,17 +90,22 @@ namespace neweraHPC
       char *grid_uid = (char *)headers->search("Grid-Uid");
 
       nhpc_create_instruction(instruction_set, plugin_name);
-      if(host_grid_uid)
-	 nhpc_strcpy(&((*instruction_set)->host_grid_uid), host_grid_uid);
-      else 
-	 nhpc_strcpy(&((*instruction_set)->host_grid_uid), grid_uid);
+      if(!(*instruction_set)->host_grid_uid)
+      {
+	 if(host_grid_uid)
+	    nhpc_strcpy(&((*instruction_set)->host_grid_uid), host_grid_uid);
+	 else 
+	    nhpc_strcpy(&((*instruction_set)->host_grid_uid), grid_uid);
+      }
 
       char *arg_count_str = (char *)headers->search("Argument-Count");
       int arg_count = nhpc_strtoi(arg_count_str);
       (*instruction_set)->argument_count = arg_count;
       for(int i = 1; i <= arg_count; i++)
       {
-	 char *search_string = nhpc_strconcat("Argument", nhpc_itostr(i));
+	 char *i_str = nhpc_itostr(i);
+	 char *search_string = nhpc_strconcat("Argument", i_str);
+	 delete[] i_str;
 	 char *arg_value = (char *)headers->search(search_string);
 	 if(!arg_value)
 	    nrv = NHPC_FAIL;
@@ -127,9 +139,12 @@ namespace neweraHPC
       char *tmp_str2;
       char *tmp_str3;
       char *argument;
+      char *option_str = nhpc_itostr(option);
       
       int *arg1_n;
       int *arg2_n;
+      char *arg1_n_str;
+      char *arg2_n_str;
       
       char *arg1_str;
       char *arg2_str;
@@ -140,9 +155,11 @@ namespace neweraHPC
 	    if(!arg1)
 	       return NHPC_FAIL;
 	    arg1_n = (int *)arg1;
+	    arg1_n_str = nhpc_itostr(*arg1_n);
 	    
-	    tmp_str1 = nhpc_strconcat(nhpc_itostr(VALUE), ",");
-	    argument = nhpc_strconcat(tmp_str1, nhpc_itostr(*arg1_n));
+	    tmp_str1 = nhpc_strconcat(option_str, ",");
+	    argument = nhpc_strconcat(tmp_str1, arg1_n_str);
+	    delete[] arg1_n_str;
 	    
 	    instruction->arguments->insert(argument);
 	    
@@ -154,17 +171,22 @@ namespace neweraHPC
 	       return NHPC_FAIL;
 	    arg1_n = (int *)arg1;
 	    arg2_n = (int *)arg2;
+	    arg1_n_str = nhpc_itostr(*arg1_n);
+	    arg2_n_str = nhpc_itostr(*arg2_n);
 
-	    tmp_str1 = nhpc_strconcat(nhpc_itostr(RANGE), ",");
-	    tmp_str2 = nhpc_strconcat(nhpc_itostr(*arg1_n), ",");
+	    tmp_str1 = nhpc_strconcat(option_str, ",");
+	    tmp_str2 = nhpc_strconcat(arg1_n_str, ",");
 	    tmp_str3 = nhpc_strconcat(tmp_str1, tmp_str2);
-	    argument = nhpc_strconcat(tmp_str3, nhpc_itostr(*arg2_n));
+	    argument = nhpc_strconcat(tmp_str3, arg2_n_str);
 	    
 	    instruction->arguments->insert(argument);
 	    
 	    delete[] tmp_str1;
 	    delete[] tmp_str2;
 	    delete[] tmp_str3;    
+	    delete[] arg1_n_str;
+	    delete[] arg2_n_str;
+	    
 	    break;
 	    
 	 case LITERAL:
@@ -172,7 +194,7 @@ namespace neweraHPC
 	       return NHPC_FAIL;
 
 	    arg1_str = (char *)arg1;
-	    tmp_str1 = nhpc_strconcat(nhpc_itostr(LITERAL), ",");
+	    tmp_str1 = nhpc_strconcat(option_str, ",");
 	    argument = nhpc_strconcat(tmp_str1, arg1_str);
 	    
 	    instruction->arguments->insert(argument);
@@ -185,7 +207,7 @@ namespace neweraHPC
 	       return NHPC_FAIL;
 	    
 	    arg1_str = (char *)arg1;
-	    tmp_str1 = nhpc_strconcat(nhpc_itostr(COMMAND), ",");
+	    tmp_str1 = nhpc_strconcat(option_str, ",");
 	    argument = nhpc_strconcat(tmp_str1, (char *)arg1_str);
 	    
 	    instruction->arguments->insert(argument);
@@ -198,7 +220,7 @@ namespace neweraHPC
 	       return NHPC_FAIL;
 	    
 	    arg1_str = (char *)arg1;
-	    tmp_str1 = nhpc_strconcat(nhpc_itostr(GRID_FILE), ",");
+	    tmp_str1 = nhpc_strconcat(option_str, ",");
 	    argument = nhpc_strconcat(tmp_str1, (char *)arg1_str);
 	    
 	    instruction->arguments->insert(argument);
@@ -206,5 +228,7 @@ namespace neweraHPC
 	    delete[] tmp_str1;
 	    break;	    	    
       };
+      
+      delete[] option_str;
    }
 };

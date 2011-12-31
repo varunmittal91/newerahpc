@@ -82,12 +82,9 @@ namespace neweraHPC
    
    nhpc_status_t socket_init(nhpc_socket_t **sock)
    {
-      (*sock) = new nhpc_socket_t;
-      (*sock)->partial_content = NULL;
-      (*sock)->partial_content_len = 0;
-      (*sock)->headers = NULL;
-      (*sock)->have_headers = false;
-
+      *sock = new nhpc_socket_t;
+      memset(*sock, 0, sizeof(nhpc_socket_t));
+      
       return NHPC_SUCCESS;
    }
    
@@ -163,9 +160,7 @@ namespace neweraHPC
       
       addrinfo **hints, **res, *p;
       
-      (*sock) = new nhpc_socket_t;
       memset((*sock), 0, sizeof(nhpc_socket_t));
-      (*sock)->hints = new addrinfo;
       
       hints = &((*sock)->hints);
       res   = &((*sock)->hints);
@@ -201,13 +196,17 @@ namespace neweraHPC
    {
       if(sock)
       {
-	 freeaddrinfo(sock->hints);
-	 
-	 if(sock->headers != NULL)
-         {
-	    delete (sock->headers);
-         }
-      
+	 if(sock->hints)
+	    freeaddrinfo(sock->hints);
+	 if(sock->headers)
+	    nhpc_delete_headers(sock->headers);
+	 if(sock->host)
+	    delete[] sock->host;
+	 if(sock->port)
+	    delete[] (sock->port);
+	 if(sock->partial_content)
+	    delete[] sock->partial_content;
+
 	 delete sock;
       }
       

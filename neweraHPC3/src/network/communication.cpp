@@ -51,9 +51,9 @@ namespace neweraHPC
 	    break;
       }
       
-      if(header_size != 0)
+      if((size - header_size) != 0)
       {
-	 sock->partial_content_len = size - header_size;
+	 sock->partial_content_len = (size - header_size);
 	 sock->partial_content = new char [size - header_size];
 	 memcpy(sock->partial_content, (buffer + header_size), (size - header_size));
       }
@@ -73,9 +73,6 @@ namespace neweraHPC
 	 else if(nhpc_strcmp(command, "*GRID*") == NHPC_SUCCESS)
 	    network->grid_request_init(sock);
       }
-      
-      if(sock->partial_content != NULL)
-	 delete[] sock->partial_content;
       
       nhpc_socket_cleanup(sock);
       pthread_exit(NULL);

@@ -155,7 +155,7 @@ namespace neweraHPC
       nhpc_thread_details_t *accept_thread = new nhpc_thread_details_t;
       accept_thread->sock           = server_sock;
       accept_thread->thread_manager = thread_manager;
-      accept_thread->client_socks   = new rbtree_t;
+      accept_thread->client_socks   = client_connections;
       accept_thread->network        = this;
       (*thread_manager).create_thread(NULL, (void * (*)(void *))network_t::accept_connection, (void *)accept_thread, NHPC_THREAD_JOIN);
       return NHPC_SUCCESS;      
@@ -178,7 +178,6 @@ namespace neweraHPC
       
       thread_manager_t *thread_manager = main_thread->thread_manager;
       nhpc_socket_t *server_sock = main_thread->sock;
-      main_thread->client_socks = new rbtree_t;
       rbtree_t *client_socks = main_thread->client_socks;
       
       struct pollfd *fds = new pollfd;
@@ -230,13 +229,14 @@ namespace neweraHPC
 	       break;
 	    }
 	    
-	    nhpc_socket_t *client_sock = new nhpc_socket_t;
+	    nhpc_socket_t *client_sock;
+	    socket_init(&client_sock);
 	    client_sock->sockfd = new_sd;
 	    client_sock->headers = NULL;
 	    client_sock->have_headers = false;
 	    client_sock->server_details = server_details;
 	    client_sock->timeout = 3 * 60 * 60;
-	    client_sock->host = inet_ntoa(client_sockaddr->sin_addr);
+	    nhpc_strcpy((char **)&(client_sock->host), inet_ntoa(client_sockaddr->sin_addr));
 	    client_sock->port = nhpc_itostr(ntohs(client_sockaddr->sin_port));
 	    
 	    delete client_sockaddr;
@@ -246,7 +246,7 @@ namespace neweraHPC
 	    pthread_mutex_unlock(&mutex);
 	    
             client_sock->thread_id = thread_manager->create_thread(NULL, (void* (*)(void*))read_communication, 
-	    								      client_sock, NHPC_THREAD_DEFAULT);	
+								   client_sock, NHPC_THREAD_DEFAULT);	
 	 }while(new_sd != -1);
       }while(true);
    }
@@ -259,20 +259,14 @@ namespace neweraHPC
 	 pthread_mutex_t *mutex = client_sock->server_details->mutex;
 	 thread_manager_t *thread_manager = client_sock->server_details->thread_manager;
 	 
-	 shutdown(client_sock->sockfd, SHUT_RDWR);
-	 close(client_sock->sockfd);
-	 
-	 if(client_sock->headers != NULL)
-	 {
-	    nhpc_delete_headers(client_sock->headers);
-	 }
 	 pthread_mutex_lock(mutex);
 	 client_socks->erase(client_sock->sockfd);
 	 pthread_mutex_unlock(mutex);
 	 
 	 thread_manager->delete_thread_data(client_sock->thread_id);
-	 delete[] client_sock->port;
-	 delete client_sock;
+
+	 socket_close(client_sock);
+	 socket_delete(client_sock);
       }
    }
 };

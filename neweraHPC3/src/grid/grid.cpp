@@ -93,6 +93,7 @@ namespace neweraHPC
 	 char *response = nhpc_itostr(nrv);
 	 nhpc_size_t size = strlen(response);
 	 socket_sendmsg(sock, response, &size);
+	 delete[] response;
       }
       
       cout<<"Executed function with status: "<<nrv<<endl;
@@ -114,6 +115,7 @@ namespace neweraHPC
       const char *dir = nhpc_strconcat(grid_directory, uid);
       mkdir(dir, 0777);
       delete[] dir;
+      delete[] uid;
       
       return nrv;      
    }

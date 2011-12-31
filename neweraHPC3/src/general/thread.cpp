@@ -52,7 +52,7 @@ namespace neweraHPC
    }
    
    int thread_manager_t::create_thread(const pthread_attr_t *attr, 
-		     void *(*start_routine)(void*), void *arg, int thread_state)
+				       void *(*start_routine)(void*), void *arg, int thread_state)
    {
       pthread_t *thread_new = new pthread_t;
       int status_new = pthread_create(thread_new, attr, start_routine, arg);

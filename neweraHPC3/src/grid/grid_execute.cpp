@@ -159,8 +159,6 @@ namespace neweraHPC
 	    char *peer_id = (char *)headers->search("Peer");
 	    int peer_id_n = nhpc_strtoi(peer_id);
 	    
-	    nhpc_headers_t *headers = new nhpc_headers_t;
-	    
 	    pid = fork();
 	    if(pid == 0)
             {
@@ -175,10 +173,13 @@ namespace neweraHPC
 		  return nrv;
 	       }
 	       
+	       nhpc_headers_t *headers = new nhpc_headers_t;
+	       
 	       headers->insert("GRID SUBMISSION 2.90");
 	       headers->insert("Grid-Uid", host_uid);
 	       headers->insert("Peer", peer_id);
-	       nrv = headers->write(new_sock);
+	       nrv = headers->write(new_sock);	       
+	       delete headers;
 	       
 	       if(nrv != NHPC_SUCCESS)
 	       {
@@ -186,7 +187,7 @@ namespace neweraHPC
 		  return nrv;
 	       }	       
 	       
-               _exit(0);
+               exit(0);
             }
 	    else 
 	    {

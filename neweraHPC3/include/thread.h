@@ -50,6 +50,7 @@ namespace neweraHPC
       /* Needs working not yet functional */
       int cancel_thread(int rbtree_t_id);
       int kill_thread(int rbtrr_id);
+      int exit_thread();
    };
 };
 

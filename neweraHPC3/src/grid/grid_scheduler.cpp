@@ -200,6 +200,10 @@ namespace neweraHPC
       {
 	 nhpc_delete_instruction(instruction_set);
       }
+      else 
+      {
+	 queued_instructions->insert(instruction_set);
+      }
       
       return nrv;
    }

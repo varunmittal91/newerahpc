@@ -189,7 +189,10 @@ namespace neweraHPC{
 	       {
 		  char **tmp_strings = new char* [string->count + 1];
 		  memcpy(tmp_strings, string->strings, sizeof(char*)*(string->count));
-		  delete[] (string->strings);
+                  if(string->count == 1)
+                     delete (string->strings);
+                  else 
+		     delete[] (string->strings);
 		  string->strings = tmp_strings;
 		  string->strings[string->count] = tmp_string;
 		  (string->count)++;
@@ -218,7 +221,10 @@ namespace neweraHPC{
 	 {
 	    char **tmp_strings = new char* [string->count + 1];
 	    memcpy(tmp_strings, string->strings, sizeof(char*)*(string->count));
-	    delete[] string->strings;
+            if(string->count == 1)
+               delete (string->strings);
+            else 
+	       delete[] (string->strings);
 	    string->strings = tmp_strings;
 	    string->strings[string->count] = new char [len + 1];
 	    char *tmp_string = string->strings[string->count];
@@ -239,7 +245,10 @@ namespace neweraHPC{
       
       char **tmp_strings = new char* [string->count + 1];
       memcpy(tmp_strings, string->strings, sizeof(char*)*(string->count));
-      delete[] (string->strings);
+      if(string->count == 1)
+         delete (string->strings);
+      else
+         delete[] (string->strings);
       string->strings = tmp_strings;
       string->strings[string->count] = NULL;
       

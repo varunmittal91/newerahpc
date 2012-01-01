@@ -73,7 +73,6 @@ namespace neweraHPC
       else if(thread_state == NHPC_THREAD_DETACH)
       {
 	 status_new = pthread_detach(*thread_new);
-	 cout<<"detacking thread"<<endl;
 	 if(status_new!=0)perror("Error at detaching thread");
       }
       

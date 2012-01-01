@@ -247,7 +247,7 @@ namespace neweraHPC
 	    pthread_mutex_unlock(&mutex);
 	    
             client_sock->thread_id = thread_manager->create_thread(NULL, (void* (*)(void*))read_communication, 
-								   client_sock, NHPC_THREAD_DEFAULT);	
+								   client_sock, NHPC_THREAD_DETACH);	
 	 }while(new_sd != -1);
       }while(true);
    }

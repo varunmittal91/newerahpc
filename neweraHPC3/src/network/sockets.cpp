@@ -213,8 +213,8 @@ namespace neweraHPC
    
    nhpc_status_t socket_close(nhpc_socket_t *sock)
    {
-      shutdown(sock->sockfd, SHUT_RDWR);
       close(sock->sockfd);
+      shutdown(sock->sockfd, SHUT_RDWR);
       
       return NHPC_SUCCESS;
    }

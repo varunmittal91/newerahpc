@@ -43,9 +43,9 @@ namespace neweraHPC
    
    nhpc_status_t socket_create(nhpc_socket_t **sock)
    {
-      addrinfo **hints = &((*sock)->hints);
+      addrinfo **hints_res = &((*sock)->hints_res);
       
-      int rv = socket_create(sock, (*hints)->ai_family, (*hints)->ai_socktype, (*hints)->ai_protocol);
+      int rv = socket_create(sock, (*hints_res)->ai_family, (*hints_res)->ai_socktype, (*hints_res)->ai_protocol);
       return rv;
    }
    
@@ -53,16 +53,16 @@ namespace neweraHPC
    {
       int rv;
       
-      if (!(sock->hints))
+      if (!(sock->hints_res))
       {
 	 return 0;
       }
       
-      addrinfo *hints = sock->hints;
+      addrinfo *hints_res = sock->hints_res;
       
       do 
       {
-	 rv = connect(sock->sockfd, hints->ai_addr, hints->ai_addrlen);
+	 rv = connect(sock->sockfd, hints_res->ai_addr, hints_res->ai_addrlen);
       }while (rv == -1 && errno == EINTR);
       
       if(rv == -1 && (errno == EINPROGRESS || errno == EALREADY) && sock->timeout > 0)
@@ -71,7 +71,7 @@ namespace neweraHPC
 	 if(rv != NHPC_SUCCESS)
 	    return rv;
 	 else if(rv == NHPC_SUCCESS)
-	    rv = connect(sock->sockfd, hints->ai_addr, hints->ai_addrlen);
+	    rv = connect(sock->sockfd, hints_res->ai_addr, hints_res->ai_addrlen);
       }
 	 
       if(rv == -1 && errno != EISCONN)
@@ -98,18 +98,14 @@ namespace neweraHPC
       nrv = socket_getaddrinfo(sock, host_addr, host_port, family, type, protocol);
       if(nrv != NHPC_SUCCESS)
       {
-	 freeaddrinfo((*sock)->hints);
-	 delete *sock;
-	 *sock = NULL;
+	 socket_delete(*sock);
 	 return nrv;
       }
       
       nrv = socket_create(sock);     
       if(nrv != NHPC_SUCCESS)
       {
-	 freeaddrinfo((*sock)->hints);
-	 delete *sock;
-	 *sock = NULL;
+	 socket_delete(*sock);
 	 return nrv;
       }   
       
@@ -122,9 +118,7 @@ namespace neweraHPC
       
       if(nrv != NHPC_SUCCESS)
       {
-	 freeaddrinfo((*sock)->hints);
-	 delete *sock;
-	 *sock = NULL;
+	 socket_delete(*sock);
 	 return nrv;
       }      
 
@@ -134,7 +128,7 @@ namespace neweraHPC
    nhpc_status_t socket_bind(nhpc_socket_t *sock)
    {
       int rv;
-      rv = bind(sock->sockfd, sock->hints->ai_addr, sock->hints->ai_addrlen);
+      rv = bind(sock->sockfd, sock->hints_res->ai_addr, sock->hints_res->ai_addrlen);
       
       if(rv == -1)
 	 return errno;
@@ -160,10 +154,8 @@ namespace neweraHPC
       
       addrinfo **hints, **res, *p;
       
-      memset((*sock), 0, sizeof(nhpc_socket_t));
-      
       hints = &((*sock)->hints);
-      res   = &((*sock)->hints);
+      res   = &((*sock)->hints_res);
       
       (*hints) = new addrinfo;
       memset(*hints, 0, sizeof(addrinfo));
@@ -175,8 +167,11 @@ namespace neweraHPC
       nhpc_status_t nrv = nhpc_wait_for_io_or_timeout(*sock, 0);
       
       rv = getaddrinfo(host_addr, host_port, *hints, res);
-      if (rv == -1 || *hints == 0)
+      if (rv == -1 || *res == 0)
       {
+	 delete (*hints);
+	 (*hints) = NULL;
+	 (*res) = NULL;
 	 return rv;
       }
       
@@ -196,8 +191,10 @@ namespace neweraHPC
    {
       if(sock)
       {
+	 if(sock->hints_res)
+	    freeaddrinfo(sock->hints_res);
 	 if(sock->hints)
-	    freeaddrinfo(sock->hints);
+	    delete sock->hints;
 	 if(sock->headers)
 	    nhpc_delete_headers(sock->headers);
 	 if(sock->host)
@@ -208,6 +205,7 @@ namespace neweraHPC
 	    delete[] sock->partial_content;
 
 	 delete sock;
+	 sock = NULL;
       }
       
       return NHPC_SUCCESS;

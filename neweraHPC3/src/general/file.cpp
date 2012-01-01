@@ -155,20 +155,24 @@ namespace neweraHPC
 	 target_name = nhpc_strconcat(final_target, unique_name);
 	 if(nhpc_fileordirectory(target_name) != NHPC_FILE_NOT_FOUND)
 	 {
-	    delete[] unique_name;
 	    delete[] target_name;
 	 }
 	 else 
 	 {
 	    unique_found = true;
 	 }
+	 
+	 delete[] unique_name;
       }
       
       if(target_type == NHPC_DIRECTORY)
       {
-	 int rv = mkdir(target_name, 0777);
+	 int rv = mkdir(target_name, 0777);	 
 	 if(rv == -1)
+	 {
+	    delete[] target_name;
 	    return NHPC_FAIL;
+	 }
 	 
 	 const char *tmp_str = nhpc_strconcat(target_name, "/");
 	 delete[] target_name;

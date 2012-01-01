@@ -174,27 +174,26 @@ namespace neweraHPC{
 	    char *tmp_string;
 	    if(len != 0)
 	    {
+	       tmp_string = new char[len + 1];
+	       memcpy(tmp_string, (tmp_s1 - len), len);
+	       tmp_string[len] = '\0';
+	       
 	       if(string == NULL)
 	       {
 		  string = new string_t;
 		  string->strings = new char*;
-		  string->strings[0] = new char [len + 1];
-		  tmp_string = string->strings[0];
+		  string->strings[0] = tmp_string;
 		  string->count = 1;
 	       }
 	       else 
 	       {
 		  char **tmp_strings = new char* [string->count + 1];
 		  memcpy(tmp_strings, string->strings, sizeof(char*)*(string->count));
-		  delete string->strings;
+		  delete[] (string->strings);
 		  string->strings = tmp_strings;
-		  string->strings[string->count] = new char [len + 1];
-		  tmp_string = string->strings[string->count];
+		  string->strings[string->count] = tmp_string;
 		  (string->count)++;
 	       }
-	       
-	       memcpy(tmp_string, (tmp_s1 - len), len);
-	       tmp_string[len] = '\0';
 	    }
 	    
 	    old_pos = current_pos;
@@ -219,7 +218,7 @@ namespace neweraHPC{
 	 {
 	    char **tmp_strings = new char* [string->count + 1];
 	    memcpy(tmp_strings, string->strings, sizeof(char*)*(string->count));
-	    delete string->strings;
+	    delete[] string->strings;
 	    string->strings = tmp_strings;
 	    string->strings[string->count] = new char [len + 1];
 	    char *tmp_string = string->strings[string->count];
@@ -240,7 +239,7 @@ namespace neweraHPC{
       
       char **tmp_strings = new char* [string->count + 1];
       memcpy(tmp_strings, string->strings, sizeof(char*)*(string->count));
-      delete string->strings;
+      delete[] (string->strings);
       string->strings = tmp_strings;
       string->strings[string->count] = NULL;
       
@@ -249,10 +248,16 @@ namespace neweraHPC{
    
    void nhpc_string_delete(string_t *string)
    {
+      char **tmp_strings = string->strings;
+      
       for(int i = 0; i < string->count; i++)
+      {
 	 delete[] (string->strings[i]);
+      }
       
       delete[] (string->strings);
+
+      delete string;
    }
    
    char *nhpc_strconcat(const char *s1, const char *s2)

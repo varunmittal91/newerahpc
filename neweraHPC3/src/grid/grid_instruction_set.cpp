@@ -33,16 +33,9 @@ namespace neweraHPC
 	 return NHPC_FAIL;
       
       *instruct_set = new nhpc_instruction_set_t;
+      memset((*instruct_set), 0, sizeof(nhpc_instruction_set_t));
       (*instruct_set)->arguments = new rbtree_t;
-      
-      (*instruct_set)->data = NULL;
-      (*instruct_set)->data_len = 0;
-      
-      (*instruct_set)->execute = false;
-      
-      (*instruct_set)->host_peer_addr = NULL;
-      (*instruct_set)->host_peer_port = NULL;
-      
+            
       if(host_grid_uid)
       {
 	 nhpc_strcpy(&((*instruct_set)->host_grid_uid), host_grid_uid);
@@ -105,7 +98,6 @@ namespace neweraHPC
       {
 	 char *i_str = nhpc_itostr(i);
 	 char *search_string = nhpc_strconcat("Argument", i_str);
-	 delete[] i_str;
 	 char *arg_value = (char *)headers->search(search_string);
 	 if(!arg_value)
 	    nrv = NHPC_FAIL;
@@ -115,6 +107,7 @@ namespace neweraHPC
 	 
 	 (*instruction_set)->arguments->insert(tmp_str);
 	 delete[] search_string;
+	 delete[] i_str;
       }
       
       char *peer_addr = (char *)headers->search("Peer-Host");

@@ -170,6 +170,7 @@ namespace neweraHPC
    void *network_t::accept_connection(nhpc_thread_details_t *main_thread)
    {
       signal(SIGPIPE, SIG_IGN);
+      signal(SIGCHLD,SIG_IGN);
       
       nhpc_size_t rv;
       nhpc_status_t nrv;
@@ -221,6 +222,8 @@ namespace neweraHPC
 
 	    if(new_sd < 0)
 	    {
+	       delete client_sockaddr;  
+	       
 	       if(errno != EWOULDBLOCK)
 	       {
 		  end_server = true;
@@ -232,8 +235,6 @@ namespace neweraHPC
 	    nhpc_socket_t *client_sock;
 	    socket_init(&client_sock);
 	    client_sock->sockfd = new_sd;
-	    client_sock->headers = NULL;
-	    client_sock->have_headers = false;
 	    client_sock->server_details = server_details;
 	    client_sock->timeout = 3 * 60 * 60;
 	    nhpc_strcpy((char **)&(client_sock->host), inet_ntoa(client_sockaddr->sin_addr));

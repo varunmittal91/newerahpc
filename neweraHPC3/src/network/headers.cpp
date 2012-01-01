@@ -52,11 +52,9 @@ namespace neweraHPC
    
    void nhpc_headers_t::insert(const char *property, const char *argument)
    {
-      char *tmp_property = nhpc_strconcat(property, ": ");
-      char *new_str = nhpc_strconcat(tmp_property, argument);
+      char *tmp_property = nhpc_strconcat(property, ": ", argument);
+      insert(tmp_property);
       delete[] tmp_property;
-      insert(new_str);
-      delete[] new_str;
    }
    
    const char *nhpc_headers_t::operator[](int id)
@@ -120,28 +118,22 @@ namespace neweraHPC
       {
 	 char *tmp_str;
 	 nhpc_strcpy(&tmp_str, string->strings[1]);
-	 delete[] (string->strings[1]);
 	 int count = string->count;
 	 
 	 for(int i = 2; i < count; i++)
 	 {
-	    char *tmp_str_2 = nhpc_strconcat(tmp_str, ":");
+	    char *tmp_str_2 = nhpc_strconcat(tmp_str, ":", string->strings[i]);
 	    delete[] tmp_str;
-	    tmp_str = nhpc_strconcat(tmp_str_2, string->strings[i]);
-	    delete[] tmp_str_2;
-	    delete[] (string->strings[i]);
-	    (string->count)--;
+	    tmp_str = tmp_str_2;
 	 }
 	 
-	 string->strings[1] = tmp_str;
+	 nhpc_strcpy(&argument, (tmp_str + 1));
+	 delete[] tmp_str;
       }
-
-      argument = string->strings[1] + 1;
+      else 
+	 nhpc_strcpy(&argument, (string->strings[1] + 1));
       
-      char *data;
-      nhpc_strcpy(&data, argument);
-      
-      headers->insert(data, string->strings[0]);
+      headers->insert(argument, string->strings[0]);
       
       nhpc_string_delete(string);
       

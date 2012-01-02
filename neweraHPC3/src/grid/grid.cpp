@@ -169,13 +169,28 @@ namespace neweraHPC
       const char *tmp_path = nhpc_strconcat(grid_path, "/");
       const char *final_path = nhpc_strconcat(tmp_path, file_name);
 
-      FILE *fp = fopen(final_path, "w+");
-
       delete[] grid_path;
       delete[] tmp_path;
       
+      int fd = -1;
+      fd = open (final_path, O_WRONLY | O_CREAT | O_NONBLOCK | O_NOCTTY,
+		 S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+      if(fd == -1 && close(fd) < 0)
+      {
+	 cout<<"file creation failed"<<endl;
+	 exit(1);
+      }
+      
+      FILE *fp = fopen(final_path, "wb");
+
       if(!fp)
+      {
+	 delete[] final_path;
+	 cout<<final_path<<" "<<fp<<endl;
+	 perror("file creation failed");
+	 exit(1);
 	 return NHPC_FAIL;
+      }
       
       if(sock->partial_content != NULL)
       {
@@ -198,7 +213,10 @@ namespace neweraHPC
       {
 	 nrv = install_plugin(final_path, *grid_uid);
 	 if(nrv != NHPC_SUCCESS)
+	 {
+	    delete[] final_path;
 	    return NHPC_FAIL;
+	 }
       }
       
       delete[] final_path;

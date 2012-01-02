@@ -108,50 +108,132 @@ static inline void rb_link_node(struct rb_node * node, struct rb_node * parent,	
    *rb_link = node;
 }
 
+//! Operate rbtree with numeric keys
 #define NHPC_RBTREE_NUM 0
+//! Operate rbtree with string keys
 #define NHPC_RBTREE_STR 1
 
 namespace neweraHPC
 {
+   //! Key pair structure
+   /*
+    Contains key and data if rbtree is in string mode
+    \sa NHPC_RBTREE_STR
+    */
    struct key_pair_t
    {
       char *key;
       void *data;
    };
    
+   //! rbtree
    class rbtree_t
    {
    private:
+      //! rb_root structure define in Linux kernel
       rb_root *root;
+      
+      //! node structure 
+      /*!
+	 Structure for storing elements of rbtree
+       */
       struct node
       {
 	 struct rb_node node_next;
 	 void *node_data;
 	 int  node_key;
 	 char *node_key_str;
+	 key_pair_t *key_pair;
       };
+      
+      //! Last numeric key assigned to data element
       int last_assigned_key;
+      
+      //! Function to return node with given numeric key
       node *search_node(int node_key);
+
+      //! Function to return node with given string key
       node *search_node(const char *node_key_str);
+      
+      //! Count of rbtree nodes present
       int count;
+      
+      //! Mode of operation of rbtree
       bool num_mode;
       
    public:
+      //! default rbtree constructor
+      /*! Create rbtree with numeric mode 
+       \sa NHPC_RBTREE_NUM
+       */
       rbtree_t();
+      
+      //! rbtree constructor
+      /*! Create rbtree with desired mode, numeric or string keys
+       \sa NHPC_RBTREE_NUM
+       \sa NHPC_RBTREE_STR
+       */
       rbtree_t(int mode);
+      
+      //! rbtree destructer
       ~rbtree_t();
+      
+      //! rbtree clone routine, not functional as of now
       rbtree_t *clone(rbtree_t *in_tree);
+      
+      //! search data stored in rbtree with numeric key
+      /*!
+       \warning shall return NULL if key is 0 or a string
+       */
       void *search(int key);
+
+      //! search data stored in rbtree with string key
+      /*!
+       \warning shall return NULL if key is 0 or a key
+       */      
       void *search(const char *key_str);
+      
+      //! search first data element stored in rbtree
+      /*!
+       \param key as integer pointer for storing key of element returned
+       */      
       void *search_first(int *key);
+
+      //! search first data element stored in rbtree
+      /*!
+       \param key as string pointer for storing key of element returned
+       */      
       void *search_first(const char **key);
+
+      //! search element
+      /*!
+       \param key as integer for searching element at the give position
+       \warning key_pair should be deleted but not the data
+       */
       key_pair_t *search_str(int key);
+      
+      //! insert element with default numeric mode
       int insert(void *);
+      
+      //! insert element with custome numerc key
+      /*!
+       \warning key should not be used earlier
+      */
       int insert(void *, int key);
+      
+      //! insert key with string key
       int insert(void *, const char *key_str);
+      
+      //! erase element with numeric key
       int erase(int key);
+      
+      //! erase element with string key
       int erase(const char *key_str);
+      
+      //! update element with key
       int update(int, void *);
+      
+      //! return count of elements in rbtree
       int ret_count();
    };
 };

@@ -72,7 +72,11 @@ namespace neweraHPC
 	 rbtree_t::node *data = rb_entry(node, rbtree_t::node, node_next);
 	 rb_erase(&data->node_next, root);
 	 if(!num_mode)
+	 {
+	    if(data->key_pair)
+	       delete[] data->key_pair;
 	    delete[] data->node_key_str;
+	 }
 
          data_prev = data;
       }
@@ -329,7 +333,9 @@ namespace neweraHPC
 	 rbtree_t::node *data = rb_entry(node, rbtree_t::node, node_next);
 	 if(count == key)
 	 {
-	    key_pair = new key_pair_t;
+	    if(!(data->key_pair))
+	       data->key_pair = new key_pair_t;
+	    key_pair = data->key_pair;
 	    key_pair->key = data->node_key_str;
 	    key_pair->data = data->node_data;
 	    
@@ -413,6 +419,7 @@ namespace neweraHPC
       nhpc_strcpy(&(data->node_key_str), key_str);
       last_assigned_key++;
       data->node_key = last_assigned_key;
+      data->key_pair = NULL;
       
       struct rb_node **new_node = &(root->rb_node), *parent = NULL;
       /* Figure out where to put new node */
@@ -458,6 +465,8 @@ namespace neweraHPC
       if(data){
 	 rb_erase(&(data->node_next), root);
 	 delete[] data->node_key_str;
+	 if(data->key_pair)
+	    delete data->key_pair;
 	 delete data;
 	 count--;
 	 return NHPC_SUCCESS;

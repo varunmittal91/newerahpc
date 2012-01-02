@@ -145,7 +145,6 @@ namespace neweraHPC
 	 if(key_pair != NULL)
 	 {
 	    cout<<" "<<key_pair->key<<"\t"<<(char *)(key_pair->data)<<endl;
-	    delete key_pair;
 	 }
       }
    }

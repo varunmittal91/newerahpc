@@ -24,33 +24,72 @@
 
 #include "rbtree.h"
 
+//! Create thread with default state
 #define NHPC_THREAD_DEFAULT 0
+//! Create thread and wait for termination
 #define NHPC_THREAD_JOIN    1
+//! Create thread and reclaim resources of thread after it dies
 #define NHPC_THREAD_DETACH  2
 
 namespace neweraHPC
 {
+   //! Thread Manager
+   /*!
+    Class for managing threads. All thread creation and management should be done through this class.
+    */   
    class thread_manager_t
    {
    private:
+      //! Active threads
+      /*! RBTree data type keeping information of running threads 
+       \sa rbtree_t
+       */
       rbtree_t *active_threads;
+      
+      //! Mutex varibale
       pthread_mutex_t *mutex;
-      struct sigaction act;
    public:  
       thread_manager_t();
       ~thread_manager_t();
+      
       static void exit_handler(int sig);
-      /* Lock and unlock pthread_mutex on request. */
+      
+      //! Mutex lock routine
       inline void lock();
+      
+      //! Mutex unlock routine
       inline void unlock();
-      /* Create new thread on request. 'thread_state' to tell whether to join thread or dettach or do nothing. */
+      
+      //! Thread data creation & initiation
+      /*! Create & initialize thread data 
+       \param thread_id as integer pointer must for thread_id
+       \param thread as pthread_t pointer optional
+       */
       nhpc_status_t init_thread(int *thread_id, pthread_t **thread);
+      
+      //! Thread creation & initiation
+      /*! Create new thread on request. 'thread_state' to tell whether to join thread or dettach or do nothing. 
+       \param thread_id an integer pointer must
+       \param attr as pthread_attr_t optional
+       \param start_routine must
+       \param thread_state can be NHPC_THREAD_DEFAULT, NHPC_THREAD_JOIN, NHPC_THREAD_DETACH
+       \sa NHPC_THREAD_DEFAULT
+       \sa NHPC_THREAD_JOIN
+       \sa NHPC_THREAD_DETACH
+       */
       nhpc_status_t create_thread(int *thread_id, const pthread_attr_t *attr, 
 				  void *(*start_routine)(void*), void *arg, int thread_state);
+      //! Thread data deletion
+      /*! Delete any data allocated for the thread */
       void delete_thread_data(int rbtree_t_id);
-      /* Needs working not yet functional */
+
+      //! Thread cancelation routine
       int cancel_thread(int rbtree_t_id);
+
+      //! Thread kill
       int kill_thread(int rbtrr_id);
+      
+      //! Check for thread exit
       int exit_thread();
    };
 };

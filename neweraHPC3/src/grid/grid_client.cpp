@@ -35,9 +35,7 @@ namespace neweraHPC
       nhpc_status_t nrv = socket_connect(&sock, host_addr, host_port, AF_INET, SOCK_STREAM, 0);
       
       if(nrv != NHPC_SUCCESS)
-      {
-	 socket_delete(sock);
-	 
+      {	 
 	 return errno;
       }
       
@@ -95,8 +93,6 @@ namespace neweraHPC
       
       if(nrv != NHPC_SUCCESS)
       {
-	 socket_delete(sock);
-	 
 	 return NHPC_FAIL;
       }      
       
@@ -161,8 +157,6 @@ namespace neweraHPC
       
       if(nrv != NHPC_SUCCESS)
       {
-	 socket_delete(sock);
-	 
 	 return NHPC_FAIL;
       }
       

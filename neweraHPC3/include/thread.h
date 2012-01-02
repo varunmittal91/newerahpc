@@ -44,8 +44,9 @@ namespace neweraHPC
       inline void lock();
       inline void unlock();
       /* Create new thread on request. 'thread_state' to tell whether to join thread or dettach or do nothing. */
-      int create_thread(const pthread_attr_t *attr, 
-			void *(*start_routine)(void*), void *arg, int thread_state);
+      nhpc_status_t init_thread(int *thread_id, pthread_t **thread);
+      nhpc_status_t create_thread(int *thread_id, const pthread_attr_t *attr, 
+				  void *(*start_routine)(void*), void *arg, int thread_state);
       void delete_thread_data(int rbtree_t_id);
       /* Needs working not yet functional */
       int cancel_thread(int rbtree_t_id);

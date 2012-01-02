@@ -44,7 +44,10 @@ namespace neweraHPC
    
    void plugin_manager_t::plugin_manager_init()
    {
-      (*thread_manager)->create_thread(NULL, (void* (*)(void*))nhpc_plugin_request_thread, this, NHPC_THREAD_DEFAULT);
+      int thread_id;
+      (*thread_manager)->init_thread(&thread_id, NULL);
+      (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))nhpc_plugin_request_thread, 
+				       this, NHPC_THREAD_DEFAULT);
    }
    
    void plugin_manager_t::lock()

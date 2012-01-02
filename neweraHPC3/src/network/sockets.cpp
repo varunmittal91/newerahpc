@@ -167,7 +167,7 @@ namespace neweraHPC
       nhpc_status_t nrv = nhpc_wait_for_io_or_timeout(*sock, 0);
       
       rv = getaddrinfo(host_addr, host_port, *hints, res);
-      if (rv == -1 || *res == 0)
+      if (rv != 0)
       {
 	 delete (*hints);
 	 (*hints) = NULL;
@@ -192,7 +192,9 @@ namespace neweraHPC
       if(sock)
       {
 	 if(sock->hints_res)
+	 {
 	    freeaddrinfo(sock->hints_res);
+	 }
 	 if(sock->hints)
 	    delete sock->hints;
 	 if(sock->headers)
@@ -214,7 +216,6 @@ namespace neweraHPC
    nhpc_status_t socket_close(nhpc_socket_t *sock)
    {
       close(sock->sockfd);
-      shutdown(sock->sockfd, SHUT_RDWR);
       
       return NHPC_SUCCESS;
    }

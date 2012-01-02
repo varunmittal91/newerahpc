@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <errno.h>
 
 #include <include/thread.h>
 
@@ -51,32 +52,55 @@ namespace neweraHPC
 	 pthread_mutex_unlock(mutex);
    }
    
-   int thread_manager_t::create_thread(const pthread_attr_t *attr, 
-				       void *(*start_routine)(void*), void *arg, int thread_state)
+   nhpc_status_t thread_manager_t::init_thread(int *thread_id, pthread_t **thread)
    {
       pthread_t *thread_new = new pthread_t;
-      int status_new = pthread_create(thread_new, attr, start_routine, arg);
-      if(status_new!=0){
-	 perror("Thread creation failed");
-	 return 0;
+      memset(thread_new, 0, sizeof(pthread_t));
+      lock();
+      (*thread_id) = (*active_threads).insert((void *)thread_new);
+      unlock();
+      
+      if(thread)
+	 (*thread) = thread_new;
+      
+      return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t thread_manager_t::create_thread(int *thread_id, const pthread_attr_t *attr, 
+						 void *(*start_routine)(void*), void *arg, int thread_state)
+   {
+      int rv;
+      pthread_t *thread = (pthread_t *)(*active_threads).search(*thread_id);
+      if(!thread)
+	 return NHPC_FAIL;
+
+      rv = pthread_create(thread, attr, start_routine, arg);
+      if(rv != 0)
+      {
+	 perror("Thread Creation Failed");
+	 return errno;
       }
       
-      lock();
-      int rbtree_t_id = (*active_threads).insert((void *)thread_new);
-      unlock();
-     
       if(thread_state == NHPC_THREAD_JOIN)
       {
-	 status_new = pthread_join(*thread_new,NULL); 
-	 if(status_new!=0)perror("Error at joing thread");
+	 rv = pthread_join(*thread, NULL); 
+	 if(rv != 0)
+	 {
+	    perror("Thread Creation Failed");
+	    return errno;
+	 }
       }
       else if(thread_state == NHPC_THREAD_DETACH)
       {
-	 status_new = pthread_detach(*thread_new);
-	 if(status_new!=0)perror("Error at detaching thread");
-      }
+	 rv = pthread_detach(*thread);
+	 if(rv != 0)
+	 {
+	    perror("Thread Creation Failed");
+	    return errno;
+	 }
+      }      
       
-      return rbtree_t_id;
+      return NHPC_SUCCESS;
    }
    
    void thread_manager_t::delete_thread_data(int rbtree_t_id)

@@ -144,7 +144,8 @@ namespace neweraHPC
 	    }
 	    
 	    nhpc_delete_instruction(instruction_set);
-	    delete[] exec;
+	    if(exec)
+	       delete[] exec;
             return NHPC_SUCCESS;
 	 }
 	 else 
@@ -165,7 +166,6 @@ namespace neweraHPC
 	       
 	       if(nrv != NHPC_SUCCESS)
 	       {
-		  socket_delete(new_sock);
 		  nrv = NHPC_FAIL;
 		  exit(1);
 	       }

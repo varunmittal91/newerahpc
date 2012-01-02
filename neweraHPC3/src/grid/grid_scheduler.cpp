@@ -46,7 +46,10 @@ namespace neweraHPC
    
    void grid_scheduler_t::grid_scheduler_init()
    {
-      (*thread_manager)->create_thread(NULL, (void* (*)(void*))grid_scheduler_t::monitor_jobs_pending, this, NHPC_THREAD_DEFAULT);
+      int thread_id;
+      (*thread_manager)->init_thread(&thread_id, NULL);
+      (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))grid_scheduler_t::monitor_jobs_pending, 
+				       this, NHPC_THREAD_DEFAULT);
    }   
    
    int grid_scheduler_t::cores()
@@ -116,7 +119,6 @@ namespace neweraHPC
       const char *host_port;
       char *host_grid_uid = instruction_set->host_grid_uid;
       const char *grid_uid;
-      const char *base_dir = nhpc_strconcat("/www/grid/", host_grid_uid, "/");
       
       if(!(instruction_set->host_grid_uid))
       {	 
@@ -157,6 +159,8 @@ namespace neweraHPC
 	 return NHPC_FAIL;
       }
 
+      const char *base_dir = nhpc_strconcat("/www/grid/", host_grid_uid, "/");
+      
       for(int i = 1; i < instruction_set->arguments->ret_count(); i++)
       {
 	 char *argument = (char *)instruction_set->arguments->search(i);
@@ -167,6 +171,7 @@ namespace neweraHPC
 	 {
 	    string_t *string = nhpc_substr(argument, ',');
 	    char *file_path = nhpc_strconcat(base_dir, string->strings[1]);
+	    delete[] base_dir;
 	    
 	    nrv = nhpc_send_file(grid_uid, host_addr, host_port, file_path);
 	    
@@ -186,7 +191,7 @@ namespace neweraHPC
 	 
 	 delete[] search_value;
       }
-      
+            
       char *peer_id_str = nhpc_itostr(peer_details->id);
       char *peer_id = nhpc_strconcat("Peer: ", peer_id_str);
       char *host_uid = nhpc_strconcat("Host-Grid-Uid: ", host_grid_uid);
@@ -206,7 +211,6 @@ namespace neweraHPC
 	 return NHPC_FAIL;
       }
       
-      delete[] base_dir;
       delete[] grid_uid;
       
       if(nrv == NHPC_SUCCESS)

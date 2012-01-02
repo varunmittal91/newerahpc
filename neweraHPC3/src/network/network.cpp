@@ -89,7 +89,6 @@ namespace neweraHPC
       if(nrv != NHPC_SUCCESS)
       {
 	 perror("connects");
-	 delete *sock;
 	 return nrv;
       }      
       
@@ -150,14 +149,17 @@ namespace neweraHPC
       }
       
       add_peer(host_addr, host_port, 2);
-      //add_peer("10.0.0.2", "8080", 2);
+      add_peer("10.0.0.5", "8080", 2);
       
       nhpc_thread_details_t *accept_thread = new nhpc_thread_details_t;
       accept_thread->sock           = server_sock;
       accept_thread->thread_manager = thread_manager;
       accept_thread->client_socks   = client_connections;
       accept_thread->network        = this;
-      (*thread_manager).create_thread(NULL, (void * (*)(void *))network_t::accept_connection, (void *)accept_thread, NHPC_THREAD_JOIN);
+      int thread_id;
+      (*thread_manager).init_thread(&thread_id, NULL);
+      (*thread_manager).create_thread(&thread_id, NULL, (void * (*)(void *))network_t::accept_connection, 
+				      (void *)accept_thread, NHPC_THREAD_JOIN);
       return NHPC_SUCCESS;      
    }
    
@@ -246,8 +248,9 @@ namespace neweraHPC
 	    client_socks->insert(client_sock, new_sd);
 	    pthread_mutex_unlock(&mutex);
 	    
-            client_sock->thread_id = thread_manager->create_thread(NULL, (void* (*)(void*))read_communication, 
-								   client_sock, NHPC_THREAD_DETACH);	
+	    (*thread_manager).init_thread(&(client_sock->thread_id), NULL);
+            (*thread_manager).create_thread(&(client_sock->thread_id), NULL, (void* (*)(void*))read_communication, 
+					    client_sock, NHPC_THREAD_DEFAULT);	
 	 }while(new_sd != -1);
       }while(true);
    }

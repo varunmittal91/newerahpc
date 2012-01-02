@@ -149,7 +149,7 @@ namespace neweraHPC
       }
       
       add_peer(host_addr, host_port, 2);
-      add_peer("10.0.0.5", "8080", 2);
+      add_peer("10.0.0.2", "8080", 2);
       
       nhpc_thread_details_t *accept_thread = new nhpc_thread_details_t;
       accept_thread->sock           = server_sock;
@@ -250,7 +250,7 @@ namespace neweraHPC
 	    
 	    (*thread_manager).init_thread(&(client_sock->thread_id), NULL);
             (*thread_manager).create_thread(&(client_sock->thread_id), NULL, (void* (*)(void*))read_communication, 
-					    client_sock, NHPC_THREAD_DEFAULT);	
+					    client_sock, NHPC_THREAD_DETACH);	
 	 }while(new_sd != -1);
       }while(true);
    }

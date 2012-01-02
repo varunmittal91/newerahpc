@@ -116,7 +116,7 @@ namespace neweraHPC
 
    void *rbtree_t::search(int key)
    {
-      if(!num_mode)
+      if(!num_mode || key == 0)
 	 return NULL;
 
       struct rb_node *node = root->rb_node;

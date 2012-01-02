@@ -36,7 +36,9 @@ int main()
 {
    thread_manager_t thread_manager;
 
-   int thread_id = thread_manager.create_thread(NULL,test,NULL,0);
+   int thread_id;
+   thread_manager.init_thread(&thread_id, NULL);
+   thread_manager.create_thread(&thread_id, NULL, test, NULL, 0);
    if(thread_id==0)
       cout<<"Thread create failed"<<endl;
    thread_manager.cancel_thread(thread_id);

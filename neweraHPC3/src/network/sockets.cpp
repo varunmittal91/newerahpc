@@ -65,7 +65,7 @@ namespace neweraHPC
 	 rv = connect(sock->sockfd, hints_res->ai_addr, hints_res->ai_addrlen);
       }while (rv == -1 && errno == EINTR);
       
-      if(rv == -1 && (errno == EINPROGRESS || errno == EALREADY) && sock->timeout > 0)
+      if(rv == -1 && (errno == EINPROGRESS || errno == EALREADY))
       {
 	 rv = nhpc_wait_for_io_or_timeout(sock, 0);
 	 if(rv != NHPC_SUCCESS)

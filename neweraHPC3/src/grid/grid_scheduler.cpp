@@ -293,6 +293,7 @@ namespace neweraHPC
 	 
 	 if(status != 0)
 	 {
+	    free_peer(instruction_set->host_peer_id);
 	    queue_job(instruction_set);
 	    continue;
 	 }
@@ -351,6 +352,9 @@ namespace neweraHPC
 	 
 	 if(instruction_set)
 	 {
+	    int core_count = grid_scheduler->cores();
+	    if(core_count > 0)
+	       grid_scheduler->push_jobs();
 	    cout<<"Instruction Pending: "<<grid_scheduler->cores()<<endl;
 	 }
 	 

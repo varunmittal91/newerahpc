@@ -140,6 +140,7 @@ namespace neweraHPC
 		  }
 	       }
 	       
+	       new_instruction_set->execute = true;
 	       queue_job(new_instruction_set);
 	    }
 	    

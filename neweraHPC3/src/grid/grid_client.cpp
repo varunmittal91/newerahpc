@@ -210,19 +210,16 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_send_general_instruction(nhpc_instruction_set_t *instruction_set)
    {
-      cout<<"sending"<<endl;
-      
       char *grid_uid = instruction_set->grid_uid;
       char *plugin_name = instruction_set->plugin_name;
       char *host_grid_uid = instruction_set->host_grid_uid;
       char *host_addr = instruction_set->host_peer_addr;
       char *host_port = instruction_set->host_peer_port;
       int argument_count = instruction_set->arguments->ret_count();
+      bool *execute = &(instruction_set->execute);
+
       char *peer_id_str = nhpc_itostr(instruction_set->host_peer_id);
       char *argument_count_str = nhpc_itostr(instruction_set->arguments->ret_count());
-      
-      cout<<"sending"<<endl;
-      cout<<host_addr<<" "<<host_port<<endl;
       
       nhpc_socket_t *sock;
       
@@ -246,6 +243,8 @@ namespace neweraHPC
       headers->insert("Argument-Count", argument_count_str);
       if(host_grid_uid)
 	 headers->insert("Host-Grid-Uid", host_grid_uid);
+      if(*execute)
+	 headers->insert("Execution-State: Ready");
       
       for(int i = 1; i <= argument_count; i++)
       {

@@ -201,8 +201,21 @@ namespace neweraHPC
             
       instruction_set->host_peer_id = peer_details->id;
       
-      nrv = nhpc_send_general_instruction(instruction_set);
+      /* Temprory fix for relocation, need a relocation register in future*/
+      if(instruction_set->host_peer_addr)
+      {
+	 delete[] (instruction_set->host_peer_addr);
+	 nhpc_strcpy(&(instruction_set->host_peer_addr), peer_details->host);
+      }
+      if(instruction_set->host_peer_port)
+      {
+	 delete[] (instruction_set->host_peer_port);
+	 nhpc_strcpy(&(instruction_set->host_peer_port), peer_details->port); 
+      }
+      /* Temprory fix over */
       
+      nrv = nhpc_send_general_instruction(instruction_set);
+
       if(nrv != NHPC_SUCCESS)
       {
 	 instruction_set->host_peer_id = 0;

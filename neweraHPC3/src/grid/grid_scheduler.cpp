@@ -204,7 +204,7 @@ namespace neweraHPC
 	 delete[] (instruction_set->grid_uid);
       nhpc_strcpy(&(instruction_set->grid_uid), grid_uid);
       
-      nrv = nhpc_send_general_instruction(instruction_set);
+      nrv = nhpc_send_general_instruction(instruction_set, host_addr, host_port);
 
       delete[] grid_uid;
       

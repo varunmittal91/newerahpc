@@ -208,15 +208,16 @@ namespace neweraHPC
       return NHPC_SUCCESS;      
    }
    
-   nhpc_status_t nhpc_send_general_instruction(nhpc_instruction_set_t *instruction_set)
+   nhpc_status_t nhpc_send_general_instruction(nhpc_instruction_set_t *instruction_set, const char *host_addr,
+					       const char *host_port)
    {
       char *grid_uid = instruction_set->grid_uid;
       char *plugin_name = instruction_set->plugin_name;
       char *host_grid_uid = instruction_set->host_grid_uid;
-      char *host_addr = instruction_set->host_peer_addr;
-      char *host_port = instruction_set->host_peer_port;
       int argument_count = instruction_set->arguments->ret_count();
       bool *execute = &(instruction_set->execute);
+      char *host_peer_addr = instruction_set->host_peer_addr;
+      char *host_peer_port = instruction_set->host_peer_port;
 
       char *peer_id_str = nhpc_itostr(instruction_set->host_peer_id);
       char *argument_count_str = nhpc_itostr(instruction_set->arguments->ret_count());
@@ -237,8 +238,8 @@ namespace neweraHPC
       headers->insert("GRID INSTRUCTION 2.90");
       headers->insert("Plugin", instruction_set->plugin_name);
       headers->insert("Peer", peer_id_str);
-      headers->insert("Peer-Host", host_addr);
-      headers->insert("Peer-Port", host_port);
+      headers->insert("Peer-Host", host_peer_addr);
+      headers->insert("Peer-Port", host_peer_port);
       headers->insert("Argument-Count", argument_count_str);
       if(grid_uid)
 	 headers->insert("Grid-Uid", grid_uid);

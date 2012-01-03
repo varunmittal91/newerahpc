@@ -129,7 +129,7 @@ namespace neweraHPC
 	 nhpc_strcpy(&((*instruction_set)->host_grid_uid), grid_uid);
       
       if(grid_uid)
-	 nhpc_strcpy(&((*instruction_set)->grid_uid, grid_uid);
+	 nhpc_strcpy(&((*instruction_set)->grid_uid), grid_uid);
       
       if(peer_id_str)
       {

@@ -124,15 +124,14 @@ namespace neweraHPC
 	 return NULL;
       
       struct rb_node *node;
-      rbtree_t::node *data;
+      rbtree_t::node *data = NULL;
       
-      node = rb_first(root);
       int pos_count = 1;
       
-      for (node = rb_first(root); node; node = rb_next(node), count++)
+      for (node = rb_first(root); node; node = rb_next(node), pos_count++)
       {
 	 data = rb_entry(node, rbtree_t::node, node_next);
-	 if(pos_count == position)
+	 if(pos_count == (position))
 	 {
 	    break;
 	 }
@@ -352,12 +351,12 @@ namespace neweraHPC
       
       node = rb_first(root);
       key_pair_t *key_pair = NULL;
-      int count = 1;
+      int pos_count = 1;
       
-      for (node = rb_first(root); node; node = rb_next(node), count++)
+      for (node = rb_first(root); node; node = rb_next(node), pos_count++)
       {
 	 rbtree_t::node *data = rb_entry(node, rbtree_t::node, node_next);
-	 if(count == key)
+	 if(pos_count == key)
 	 {
 	    if(!(data->key_pair))
 	       data->key_pair = new key_pair_t;

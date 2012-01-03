@@ -218,13 +218,34 @@ int main()
    
    delete test_tree;
    
+   cout<<"\n\ntesting [] operator"<<endl;
+   test_tree = new rbtree_t;
+
+   cout<<a<<endl; 
+   cout<<b<<endl;
+   cout<<c<<endl;
+   cout<<d<<endl;
+   
+   (*test_tree).insert(a);
+   (*test_tree).insert(b);
+   (*test_tree).insert(c);
+   (*test_tree).insert(d);
+   
+   (*test_tree).erase(2);
+   
+   int count = (*test_tree).ret_count();
+   for(int i = 1; i <= count; i++)
+   {
+      a = (int *)(*test_tree)[i];
+      cout<<i<<" "<<a<<endl;
+   }
+   
+   delete test_tree;
+   
    cout<<"All tree structures and data have been deleted there should not be any trace of memory still remaining\n";
    cout<<"If there is still some memory left that is not deallocated, we have a problem"<<endl;
    
-   atexit(func_sleep);
-   
-   //rbmulti_test();
-   rbqueue();
+   atexit(func_sleep);   
     
    return 0;
 }

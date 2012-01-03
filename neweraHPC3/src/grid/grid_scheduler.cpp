@@ -200,22 +200,14 @@ namespace neweraHPC
       }
             
       instruction_set->host_peer_id = peer_details->id;
-      
-      /* Temprory fix for relocation, need a relocation register in future*/
-      if(instruction_set->host_peer_addr)
-      {
-	 delete[] (instruction_set->host_peer_addr);
-	 nhpc_strcpy(&(instruction_set->host_peer_addr), peer_details->host);
-      }
-      if(instruction_set->host_peer_port)
-      {
-	 delete[] (instruction_set->host_peer_port);
-	 nhpc_strcpy(&(instruction_set->host_peer_port), peer_details->port); 
-      }
-      /* Temprory fix over */
+      if(instruction_set->grid_uid)
+	 delete[] (instruction_set->grid_uid);
+      nhpc_strcpy(&(instruction_set->grid_uid), grid_uid);
       
       nrv = nhpc_send_general_instruction(instruction_set);
 
+      delete[] grid_uid;
+      
       if(nrv != NHPC_SUCCESS)
       {
 	 instruction_set->host_peer_id = 0;
@@ -225,8 +217,6 @@ namespace neweraHPC
 	 
 	 return NHPC_FAIL;
       }
-      
-      delete[] grid_uid;
       
       nhpc_delete_instruction(instruction_set);
       

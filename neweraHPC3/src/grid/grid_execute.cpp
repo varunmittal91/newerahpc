@@ -65,7 +65,7 @@ namespace neweraHPC
 	       case RANGE:
 		  start = nhpc_strtoi(string->strings[1]);
 		  end   = nhpc_strtoi(string->strings[2]);
-		  execute = false;
+		  *execute = false;
 		  range_pos = i;
 		  break;
 		  
@@ -114,7 +114,7 @@ namespace neweraHPC
 	    nhpc_string_delete(string);
 	 }
 	 
-	 if(!execute)
+	 if(!(*execute))
 	 {
 	    for(int i = start; i <= end; i++)
 	    {

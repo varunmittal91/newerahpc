@@ -235,12 +235,13 @@ namespace neweraHPC
       
       nhpc_headers_t *headers = new nhpc_headers_t;
       headers->insert("GRID INSTRUCTION 2.90");
-      headers->insert("Grid-Uid", grid_uid);
       headers->insert("Plugin", instruction_set->plugin_name);
       headers->insert("Peer", peer_id_str);
       headers->insert("Peer-Host", host_addr);
       headers->insert("Peer-Port", host_port);
       headers->insert("Argument-Count", argument_count_str);
+      if(grid_uid)
+	 headers->insert("Grid-Uid", grid_uid);
       if(host_grid_uid)
 	 headers->insert("Host-Grid-Uid", host_grid_uid);
       if(*execute)

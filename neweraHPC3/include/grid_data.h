@@ -109,6 +109,7 @@ namespace neweraHPC
       int host_peer_id;
       rbtree_t *arguments;
       int argument_count;
+      char *grid_uid;
       char *host_grid_uid;
       char *host_peer_addr;
       char *host_peer_port;

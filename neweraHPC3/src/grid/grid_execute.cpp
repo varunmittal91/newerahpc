@@ -119,7 +119,7 @@ namespace neweraHPC
 	    for(int i = start; i <= end; i++)
 	    {
 	       nhpc_instruction_set_t *new_instruction_set;
-	       nhpc_create_instruction(&new_instruction_set, GRID_RANGE_PLUGIN, *grid_uid);
+	       nhpc_generate_general_instruction(&new_instruction_set, headers);
 	       
 	       for(int j = 1; j <= *argument_count; j++)
 	       {
@@ -161,36 +161,21 @@ namespace neweraHPC
 	    pid = fork();
 	    if(pid == 0)
             {
-	       system(exec);
-	       nrv = socket_connect(&new_sock, sock->host, peer_port, AF_INET, SOCK_STREAM, 0);
+	       string_t *exec_args = nhpc_substr(exec, ' ');
+	       string_t *exec_path = nhpc_substr(exec_args->strings[0], '/');
 	       
-	       if(nrv != NHPC_SUCCESS)
-	       {
-		  nrv = NHPC_FAIL;
-		  exit(1);
-	       }
+	       char **args = new char *[exec_args->count];
+	       memcpy((args + 1), (exec_args->strings + 1), (sizeof(char**) * (exec_args->count - 1)));
+	       args[0] = exec_path->strings[exec_path->count - 1];
+	       args[exec_args->count] = NULL;
 	       
-	       nhpc_headers_t *headers = new nhpc_headers_t;
+	       execv(exec_args->strings[0], args);
 	       
-	       headers->insert("GRID SUBMISSION 2.90");
-	       headers->insert("Grid-Uid", host_uid);
-	       headers->insert("Peer", peer_id);
-	       nrv = headers->write(new_sock);	       
-	       delete headers;
-	       
-	       if(nrv != NHPC_SUCCESS)
-	       {
-		  socket_close(new_sock);
-		  socket_delete(new_sock);
-		  nrv = NHPC_FAIL;
-		  exit(1);
-	       }	       
-	       
-               exit(0);
+	       exit(EXIT_FAILURE);
             }
 	    else 
 	    {
-               nhpc_delete_instruction(instruction_set);
+	       add_child_process(instruction_set, &pid);
             }
 	    
 	    if(exec)

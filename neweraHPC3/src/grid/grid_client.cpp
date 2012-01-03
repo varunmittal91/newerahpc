@@ -113,12 +113,12 @@ namespace neweraHPC
       delete headers;
       
       nhpc_string_delete(string);
-
+      
       if(nrv != NHPC_SUCCESS)
       {
 	 return NHPC_FAIL;
       }
-            
+      
       FILE *fp = fopen(file_path, "r");
       nhpc_size_t len;
       char buffer[1000];
@@ -131,7 +131,7 @@ namespace neweraHPC
 	 nrv = socket_sendmsg(sock, buffer, &len);
 	 bytes_writen += len;
       }while(nrv != EPIPE && !feof(fp));      
-            
+      
       fclose(fp);
       
       bzero(buffer, 1000);
@@ -206,5 +206,67 @@ namespace neweraHPC
       socket_delete(sock);
       
       return NHPC_SUCCESS;      
+   }
+   
+   nhpc_status_t nhpc_send_general_instruction(nhpc_instruction_set_t *instruction_set)
+   {
+      cout<<"sending"<<endl;
+      
+      char *grid_uid = instruction_set->grid_uid;
+      char *plugin_name = instruction_set->plugin_name;
+      char *host_grid_uid = instruction_set->host_grid_uid;
+      char *host_addr = instruction_set->host_peer_addr;
+      char *host_port = instruction_set->host_peer_port;
+      int argument_count = instruction_set->arguments->ret_count();
+      char *peer_id_str = nhpc_itostr(instruction_set->host_peer_id);
+      char *argument_count_str = nhpc_itostr(instruction_set->arguments->ret_count());
+      
+      cout<<"sending"<<endl;
+      cout<<host_addr<<" "<<host_port<<endl;
+      
+      nhpc_socket_t *sock;
+      
+      nhpc_status_t nrv = socket_connect(&sock, host_addr, host_port, AF_INET, SOCK_STREAM, 0);
+      
+      if(nrv != NHPC_SUCCESS)
+      {
+	 delete[] argument_count_str;
+	 delete[] peer_id_str;
+
+	 return NHPC_FAIL;
+      }      
+      
+      nhpc_headers_t *headers = new nhpc_headers_t;
+      headers->insert("GRID INSTRUCTION 2.90");
+      headers->insert("Grid-Uid", grid_uid);
+      headers->insert("Plugin", instruction_set->plugin_name);
+      headers->insert("Peer", peer_id_str);
+      headers->insert("Peer-Host", host_addr);
+      headers->insert("Peer-Port", host_port);
+      headers->insert("Argument-Count", argument_count_str);
+      if(host_grid_uid)
+	 headers->insert("Host-Grid-Uid", host_grid_uid);
+      
+      for(int i = 1; i <= argument_count; i++)
+      {
+	 char *i_str = nhpc_itostr(i);
+	 char *tmp_str = nhpc_strconcat("Argument", i_str);
+	 char *argument = (char *)instruction_set->arguments->search(i);
+	 delete[] i_str;
+	 
+	 headers->insert(tmp_str, argument);
+	 delete[] tmp_str;
+      }
+      
+      headers->write(sock);
+      
+      delete[] argument_count_str;
+      delete[] peer_id_str;
+      delete headers; 
+      
+      socket_close(sock);
+      socket_delete(sock);
+      
+      return NHPC_SUCCESS;
    }
 };

@@ -48,8 +48,12 @@ namespace neweraHPC
       rbtree_t *peers;
       rbtree_t *jobs;
       rbtree_t *queued_instructions;
+      rbtree_t *child_processes;
       pthread_mutex_t *mutex;
       thread_manager_t **thread_manager;
+      pthread_mutex_t *mutex_child_processes;
+      
+      nhpc_status_t free_child_process();
       
    public:
       grid_scheduler_t(thread_manager_t **_thread_manager);
@@ -65,7 +69,10 @@ namespace neweraHPC
       void lock();
       void unlock();
       
+      nhpc_status_t add_child_process(nhpc_instruction_set_t *instruction_set, pid_t *pid);
+
       static void monitor_jobs_pending(grid_scheduler_t *grid_scheduler);
+      static void child_handler(int signum);
    };
 };
 

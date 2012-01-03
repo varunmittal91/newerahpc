@@ -27,16 +27,22 @@ using namespace std;
 
 namespace neweraHPC
 {	
+   grid_scheduler_t *scheduler;
+   
    grid_scheduler_t::grid_scheduler_t(thread_manager_t **_thread_manager)
    {
       peers = new rbtree_t;
       jobs = new rbtree_t(NHPC_RBTREE_STR);
       queued_instructions = new rbtree_t;
+      child_processes = new rbtree_t;
       
       mutex = new pthread_mutex_t;
+      mutex_child_processes = new pthread_mutex_t;
       pthread_mutex_init(mutex, NULL);
+      pthread_mutex_init(mutex_child_processes, NULL);      
       
       thread_manager = _thread_manager;
+      scheduler = this;
    }
    
    grid_scheduler_t::~grid_scheduler_t()
@@ -50,6 +56,7 @@ namespace neweraHPC
       (*thread_manager)->init_thread(&thread_id, NULL);
       (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))grid_scheduler_t::monitor_jobs_pending, 
 				       this, NHPC_THREAD_DEFAULT);
+      signal(SIGCHLD, grid_scheduler_t::child_handler);
    }   
    
    int grid_scheduler_t::cores()
@@ -117,8 +124,8 @@ namespace neweraHPC
       peer_details_t *peer_details;
       const char *host_addr;
       const char *host_port;
-      char *host_grid_uid = instruction_set->host_grid_uid;
       const char *grid_uid;
+      char *host_grid_uid = instruction_set->host_grid_uid;
       
       if(!(instruction_set->host_grid_uid))
       {	 
@@ -192,18 +199,13 @@ namespace neweraHPC
 	 delete[] search_value;
       }
             
-      char *peer_id_str = nhpc_itostr(peer_details->id);
-      char *peer_id = nhpc_strconcat("Peer: ", peer_id_str);
-      char *host_uid = nhpc_strconcat("Host-Grid-Uid: ", host_grid_uid);
-      delete[] peer_id_str;
+      instruction_set->host_peer_id = peer_details->id;
       
-      nrv = nhpc_send_instruction(grid_uid, host_addr, host_port, instruction_set,
-				  "Execution-State: Ready", peer_id, host_uid);
-      delete[] host_uid;
-      delete[] peer_id;
+      nrv = nhpc_send_general_instruction(instruction_set);
       
       if(nrv != NHPC_SUCCESS)
       {
+	 instruction_set->host_peer_id = 0;
 	 lock();
 	 queued_instructions->insert(instruction_set);
 	 unlock();	 
@@ -213,14 +215,7 @@ namespace neweraHPC
       
       delete[] grid_uid;
       
-      if(nrv == NHPC_SUCCESS)
-      {
-	 nhpc_delete_instruction(instruction_set);
-      }
-      else 
-      {
-	 queued_instructions->insert(instruction_set);
-      }
+      nhpc_delete_instruction(instruction_set);
       
       return nrv;
    }
@@ -271,6 +266,74 @@ namespace neweraHPC
       return nrv;
    }
    
+   nhpc_status_t grid_scheduler_t::add_child_process(nhpc_instruction_set_t *instruction_set, pid_t *pid)
+   {
+      pthread_mutex_lock(mutex_child_processes);
+      (*child_processes).insert(instruction_set, *pid);
+      pthread_mutex_unlock(mutex_child_processes);
+   }
+   
+   nhpc_status_t grid_scheduler_t::free_child_process()
+   {
+      pid_t pid;
+      int status;
+      
+      while(1)
+      {
+	 pid = waitpid(-1, &status, WUNTRACED);
+	 if(pid == -1)
+	    break;
+	 
+	 nhpc_instruction_set_t *instruction_set = (nhpc_instruction_set_t *)(*child_processes).search(pid);
+	 if(!instruction_set)
+	    continue;
+	 
+	 if(status != 0)
+	 {
+	    queue_job(instruction_set);
+	    continue;
+	 }
+	 
+	 nhpc_status_t nrv;
+	 
+	 char *peer_host = instruction_set->host_peer_addr;
+	 char *peer_port = instruction_set->host_peer_port;
+	 char *peer_id   = nhpc_itostr(instruction_set->host_peer_id);
+	 char *host_uid  = instruction_set->host_grid_uid;
+	 
+	 nhpc_socket_t *sock;
+	 nrv = socket_connect(&sock, peer_host, peer_port, AF_INET, SOCK_STREAM, 0);
+	 
+	 if(nrv != NHPC_SUCCESS)
+	 {
+	    delete[] peer_id;
+	    
+	    return nrv;
+	 }
+	 
+	 nhpc_headers_t *headers = new nhpc_headers_t;
+	 
+	 headers->insert("GRID SUBMISSION 2.90");
+	 headers->insert("Grid-Uid", host_uid);
+	 headers->insert("Peer", peer_id);
+	 nrv = headers->write(sock);	       
+	 delete headers;
+	 
+	 delete[] peer_id;
+	 
+	 socket_close(sock);
+	 socket_delete(sock);
+	 
+	 nhpc_delete_instruction(instruction_set);
+	 
+	 pthread_mutex_lock(mutex_child_processes);
+	 child_processes->erase(pid);
+	 pthread_mutex_unlock(mutex_child_processes);
+      }
+      
+      return NHPC_SUCCESS;
+   }
+   
    void grid_scheduler_t::monitor_jobs_pending(grid_scheduler_t *grid_scheduler)
    {
       rbtree_t *queued_instructions = grid_scheduler->queued_instructions;
@@ -290,5 +353,13 @@ namespace neweraHPC
 	 
 	 sleep(1);
       }
+   }
+   
+   void grid_scheduler_t::child_handler(int signum)
+   {
+      if(signum != SIGCHLD)
+	 return;
+      
+      scheduler->free_child_process();
    }
 };

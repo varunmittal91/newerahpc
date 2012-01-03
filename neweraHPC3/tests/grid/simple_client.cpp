@@ -64,7 +64,7 @@ int main(int argc, char **argv)
    
    string_t *string = nhpc_substr((const char *)argv[3], '/');
    
-   nhpc_add_argument(instruction_set, COMMAND, "blender");
+   nhpc_add_argument(instruction_set, COMMAND, "/usr/bin/blender");
    nhpc_add_argument(instruction_set, GRID_FILE, string->strings[string->count - 1]);
    nhpc_add_argument(instruction_set, LITERAL, "-b");
    nhpc_add_argument(instruction_set, LITERAL, "-f");

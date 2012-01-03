@@ -63,6 +63,8 @@ namespace neweraHPC
 	 delete (instruct_set->arguments);
       }
       
+      if(instruct_set->grid_uid)
+	 delete[] (instruct_set->grid_uid);
       if(instruct_set->host_grid_uid)
 	 delete[] (instruct_set->host_grid_uid);
       if(instruct_set->host_peer_port)
@@ -77,20 +79,9 @@ namespace neweraHPC
    nhpc_status_t nhpc_generate_instruction(nhpc_instruction_set_t **instruction_set, rbtree_t *headers)
    {
       nhpc_status_t nrv = NHPC_SUCCESS;
+            
+      nrv = nhpc_generate_general_instruction(instruction_set, headers);
       
-      char *plugin_name = (char *)headers->search("Plugin");
-      char *host_grid_uid = (char *)headers->search("Host-Grid-Uid");
-      char *grid_uid = (char *)headers->search("Grid-Uid");
-
-      nhpc_create_instruction(instruction_set, plugin_name);
-      if(!(*instruction_set)->host_grid_uid)
-      {
-	 if(host_grid_uid)
-	    nhpc_strcpy(&((*instruction_set)->host_grid_uid), host_grid_uid);
-	 else 
-	    nhpc_strcpy(&((*instruction_set)->host_grid_uid), grid_uid);
-      }
-
       char *arg_count_str = (char *)headers->search("Argument-Count");
       int arg_count = nhpc_strtoi(arg_count_str);
       (*instruction_set)->argument_count = arg_count;
@@ -110,20 +101,56 @@ namespace neweraHPC
 	 delete[] i_str;
       }
       
+      if(nrv != NHPC_SUCCESS)
+	 return nrv;
+      
+      return NHPC_SUCCESS;
+   } 
+   
+   nhpc_status_t nhpc_generate_general_instruction(nhpc_instruction_set_t **instruction_set,
+						   rbtree_t *headers)
+   {
+      nhpc_status_t nrv = NHPC_SUCCESS;
+      
+      char *plugin_name = (char *)headers->search("Plugin");
+      char *host_grid_uid = (char *)headers->search("Host-Grid-Uid");
+      char *grid_uid = (char *)headers->search("Grid-Uid");      
+      char *peer_id_str = (char *)headers->search("Peer");
+      int peer_id;
       char *peer_addr = (char *)headers->search("Peer-Host");
       char *peer_port = (char *)headers->search("Peer-Port");
+      char *execution_state = (char *)headers->search("Execution-State");
+
+      nhpc_create_instruction(instruction_set, plugin_name);
+
+      if(host_grid_uid)
+	 nhpc_strcpy(&((*instruction_set)->host_grid_uid), host_grid_uid);
+      else 
+	 nhpc_strcpy(&((*instruction_set)->host_grid_uid), grid_uid);
+      
+      if(grid_uid)
+	 nhpc_strcpy(&((*instruction_set)->grid_uid), grid_uid);
+      
+      if(peer_id_str)
+      {
+	 peer_id = nhpc_strtoi(peer_id_str);
+	 if(peer_id > 0)
+	    (*instruction_set)->host_peer_id = peer_id;
+      }
+      
       nhpc_strcpy(&((*instruction_set)->host_peer_addr), peer_addr);
       nhpc_strcpy(&((*instruction_set)->host_peer_port), peer_port);
       
-      char *execution_state = (char *)headers->search("Execution-State");
       if(execution_state)
 	 (*instruction_set)->execute = true;
       else 
-	 (*instruction_set)->execute = false;      
+	 (*instruction_set)->execute = false;  
       
       if(nrv != NHPC_SUCCESS)
 	 return nrv;
-   } 
+      
+      return NHPC_SUCCESS;
+   }
 
    nhpc_status_t nhpc_add_argument(nhpc_instruction_set_t *instruction, enum GRID_ARG_TYPE option, 
 				   const void *arg1, const void *arg2)

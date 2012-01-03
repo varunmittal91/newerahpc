@@ -59,7 +59,7 @@ namespace neweraHPC
       int cores = 0;
       for(int i = 1; i <= count; i++)
       {
-         peer_details_t *peer_details = (peer_details_t *)peers->search(i);
+         peer_details_t *peer_details = (peer_details_t *)(*peers)[i];
          cores+= (peer_details->processors - peer_details->weight);
       }
       unlock();

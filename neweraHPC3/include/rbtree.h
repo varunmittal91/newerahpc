@@ -193,6 +193,13 @@ namespace neweraHPC
        */      
       void *search(const char *key_str);
       
+      //! return element at specific position
+      /*!
+       \param integer position
+       \warning position should be minimum 1
+       */
+      void *operator[](int position);
+      
       //! search first data element stored in rbtree
       /*!
        \param key as integer pointer for storing key of element returned

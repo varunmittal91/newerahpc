@@ -117,6 +117,32 @@ namespace neweraHPC
       
       return data->node_data;
    }
+   
+   void *rbtree_t::operator[](int position)
+   {
+      if(position == 0 || position > count)
+	 return NULL;
+      
+      struct rb_node *node;
+      rbtree_t::node *data;
+      
+      node = rb_first(root);
+      int pos_count = 1;
+      
+      for (node = rb_first(root); node; node = rb_next(node), count++)
+      {
+	 data = rb_entry(node, rbtree_t::node, node_next);
+	 if(pos_count == position)
+	 {
+	    break;
+	 }
+      }      
+      
+      if(data)
+	 return data->node_data;
+      else 
+	 return NULL;
+   }
 
    void *rbtree_t::search(int key)
    {

@@ -52,8 +52,6 @@ namespace neweraHPC
       thread_manager_t();
       ~thread_manager_t();
       
-      static void exit_handler(int sig);
-      
       //! Mutex lock routine
       inline void lock();
       
@@ -82,9 +80,12 @@ namespace neweraHPC
       //! Thread data deletion
       /*! Delete any data allocated for the thread */
       void delete_thread_data(int rbtree_t_id);
+      
+      nhpc_status_t join_thread(int thread_id);
+      nhpc_status_t detach_thread(int thread_id);
 
       //! Thread cancelation routine
-      int cancel_thread(int rbtree_t_id);
+      nhpc_status_t cancel_thread(int rbtree_t_id);
 
       //! Thread kill
       int kill_thread(int rbtrr_id);

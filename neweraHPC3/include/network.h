@@ -61,21 +61,21 @@ namespace neweraHPC
    class network_t : public nhpc_grid_server_t
    {
    private:
-      int  host_port_network_byte;
-      bool connection_stat;
-      thread_manager_t *thread_manager;
+      struct nhpc_thrad_details_t *server_thread_details;      
       bool external_thread_manager;
-      struct nhpc_thrad_details_t *server_thread_details;
-      rbtree_t *client_connections;
       pthread_mutex_t *mutex;
+      rbtree_t *client_connections;
+      thread_manager_t *thread_manager;
       nhpc_socket_t *server_sock;
+      int accept_thread_id;
       static void *accept_connection(nhpc_thread_details_t *main_thread);
-      nhpc_grid_server_t *grid_server;
       
    public:
       network_t();
       network_t(thread_manager_t *in_thread_manager);
       ~network_t();
+      void network_init();
+      void network_quit();
       inline void lock();
       inline void unlock();
       int add_client_connection(nhpc_socket_t *sock, int sockfd);

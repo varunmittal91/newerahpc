@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <iomanip>
 
 #include <include/grid.h>
 #include <include/network.h>
@@ -47,7 +48,46 @@ namespace neweraHPC
    
    grid_scheduler_t::~grid_scheduler_t()
    {
+      cout<<"Shuting down grid scheduler";
       
+      peer_details_t *peer;
+      int key;
+      while(1)
+      {
+	 lock();
+	 peer = (peer_details_t *)(*peers).search_first(&key);
+	 unlock();
+	 
+	 if(!peer)
+	    break;
+	 
+	 remove_peer(key);
+      }
+      delete peers;
+      
+      delete jobs;
+      delete child_processes;
+      
+      nhpc_instruction_set_t *instruction_set;
+      while(1)
+      {
+	 lock();
+	 instruction_set = (nhpc_instruction_set_t *)(*queued_instructions).search_first(&key);
+	 unlock();
+	 
+	 if(!instruction_set)
+	    break;
+	 
+	 lock();
+	 (*queued_instructions).erase(key);
+	 nhpc_delete_instruction(instruction_set);
+	 unlock();
+      }
+      
+      delete mutex;
+      delete mutex_child_processes;
+
+      cout<<setw(50)<<"\tOK"<<endl;
    }
    
    void grid_scheduler_t::grid_scheduler_init()

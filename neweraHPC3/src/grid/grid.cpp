@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <iomanip>
 
 #include <include/grid.h>
 #include <include/network.h>
@@ -46,7 +47,22 @@ namespace neweraHPC
    
    nhpc_grid_server_t::~nhpc_grid_server_t()
    {
+      char *tmp_host_addr;
+      const char *key_str;
+      cout<<"Deleting grid client details";
+      while(1)
+      {
+	 tmp_host_addr = (char *)(*clients).search_first(&key_str);
+	 
+	 if(!tmp_host_addr)
+	    break;
+	 
+	 delete[] tmp_host_addr;
+	 (*clients).erase(key_str);
+      }
       
+      delete clients;
+      cout<<setw(50)<<"\tOK"<<endl;
    }
    
    void nhpc_grid_server_t::grid_request_init(nhpc_socket_t *sock)
@@ -122,7 +138,7 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_grid_server_t::grid_client_gen_uid(const char *client_addr, const char **uid)
    {
-      const char *tmp_client_addr;
+      char *tmp_client_addr;
       char *random_string = NULL;
       
       do 
@@ -132,11 +148,12 @@ namespace neweraHPC
 	 
 	 random_string = nhpc_random_string(8);
 	 
-	 tmp_client_addr = (const char *)clients->search(random_string);
+	 tmp_client_addr = (char *)clients->search(random_string);
       }while(tmp_client_addr != NULL);
 
       *uid = random_string;
-      clients->insert((void *)client_addr, random_string);
+      nhpc_strcpy(&tmp_client_addr, client_addr);
+      clients->insert((void *)tmp_client_addr, random_string);
       
       return NHPC_SUCCESS;
    }

@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <iomanip>
 
 #include <include/grid.h>
 #include <include/network.h>
@@ -39,7 +40,13 @@ namespace neweraHPC
    
    plugin_manager_t::~plugin_manager_t()
    {
+      cout<<"Shuting down plugin manager";
+      delete plugins_requested;
+      delete plugins_installed;
       
+      delete mutex;
+      delete[] grid_directory;
+      cout<<setw(50)<<"\tOK"<<endl;
    }
    
    void plugin_manager_t::plugin_manager_init()

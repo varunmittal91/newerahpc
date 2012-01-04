@@ -35,9 +35,23 @@ namespace neweraHPC
    
    thread_manager_t::~thread_manager_t()
    {
+      pthread_t *thread;
+      int thread_id;      
+      while(1)
+      {
+	 lock();
+	 thread = (pthread_t *)(*active_threads).search_first(&thread_id);
+	 unlock();
+	 
+	 if(!thread)
+	    break;
+	 
+	 cancel_thread(thread_id);
+	 delete_thread_data(thread_id);
+      }
+      
       delete active_threads;
       delete mutex;
-      pthread_mutex_destroy(mutex);
    }
    
    inline void thread_manager_t::lock()
@@ -103,6 +117,42 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
+   nhpc_status_t thread_manager_t::join_thread(int thread_id)
+   {
+      nhpc_status_t nrv;
+      pthread_t *thread;
+      
+      lock();
+      thread = (pthread_t *)(*active_threads).search(thread_id);
+      unlock();
+      if(!thread)
+	 return NHPC_FAIL;
+      
+      nrv = pthread_detach(*thread);
+      if(nrv != 0)
+	 return errno;
+      
+      return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t thread_manager_t::detach_thread(int thread_id)
+   {
+      nhpc_status_t nrv;
+      pthread_t *thread;
+      
+      lock();
+      thread = (pthread_t *)(*active_threads).search(thread_id);
+      unlock();
+      if(!thread)
+	 return NHPC_FAIL;
+      
+      nrv = pthread_join(*thread, NULL);
+      if(nrv != 0)
+	 return errno;
+      
+      return NHPC_SUCCESS;      
+   }
+   
    void thread_manager_t::delete_thread_data(int rbtree_t_id)
    {
       lock();
@@ -114,16 +164,20 @@ namespace neweraHPC
       unlock();
    }
    
-   int thread_manager_t::cancel_thread(int rbtree_t_id)
+   nhpc_status_t thread_manager_t::cancel_thread(int rbtree_t_id)
    {
+      nhpc_status_t nrv;
+      
       lock();
       pthread_t *thread = (pthread_t *)(*active_threads).search(rbtree_t_id);
       unlock();
-      if(thread){
-	 int status = pthread_cancel(*thread);
-	 return status;
-      }
-      else 
-	 return -1;
+      if(!thread)
+	 return NHPC_FAIL;
+      
+      nrv = pthread_cancel(*thread);
+      if(nrv != 0)
+	 return errno;
+      
+      return NHPC_SUCCESS;
    }      
 };

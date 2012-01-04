@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <iomanip>
 
 #include <include/network.h>
 #include <include/grid.h>
@@ -142,9 +143,10 @@ namespace neweraHPC
       for(int cntr = 1; cntr <= (*headers).ret_count(); cntr++)
       {
 	 key_pair = (key_pair_t *)(*headers).search_str(cntr);
+	 int width = strlen((char *)key_pair->data);
 	 if(key_pair != NULL)
 	 {
-	    cout<<" "<<key_pair->key<<"\t"<<(char *)(key_pair->data)<<endl;
+	    cout<<setw(20)<<key_pair->key<<setw(10)<<"\t"<<(char *)(key_pair->data)<<endl;
 	 }
       }
    }

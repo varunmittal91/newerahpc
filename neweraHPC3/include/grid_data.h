@@ -43,6 +43,7 @@ typedef void *(*fnc_ptr_t)(void *);
 typedef void *(*fnc_ptr_two_t)(void *, void *);
 typedef nhpc_status_t (*fnc_ptr_nhpc_t)(void *);
 typedef nhpc_status_t (*fnc_ptr_nhpc_two_t)(void *, void *);
+typedef nhpc_status_t (*fnc_ptr_nhpc_plugin_t)(void *, void *, void **);
 
 namespace neweraHPC
 {
@@ -52,17 +53,17 @@ namespace neweraHPC
       char *plugin_name;
       
       /* Address of the base plugin function that server will run*/
-      fnc_ptr_t fnc_init;
+      fnc_ptr_nhpc_plugin_t fnc_init;
       
       /* Address of the plugin function that client will run 
        for assembly of data and other purposes */
-      fnc_ptr_t fnc_client_exec;
+      fnc_ptr_nhpc_plugin_t fnc_client_exec;
       
-      fnc_ptr_t fnc_exec;
+      fnc_ptr_nhpc_plugin_t fnc_exec;
 
       /* Address of processing function for actual implementation 
        of the algorith in plugin */
-      fnc_ptr_t fnc_processor;
+      fnc_ptr_nhpc_plugin_t fnc_processor;
       
       /* Path of plugin on the server */
       char *path_plugin;
@@ -92,6 +93,8 @@ namespace neweraHPC
       
       /* Status of peer server, wether busy or available */
       bool status;
+      
+      bool dynamic;
    };
    
    struct plugin_request_t

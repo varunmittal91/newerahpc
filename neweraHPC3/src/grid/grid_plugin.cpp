@@ -55,6 +55,10 @@ namespace neweraHPC
       (*thread_manager)->init_thread(&thread_id, NULL);
       (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))nhpc_plugin_request_thread, 
 				       this, NHPC_THREAD_DEFAULT);
+      
+      plugin_details_t *nhpc_plugin;
+      nhpc_grid_range_plugin_init(&nhpc_plugin);
+      (*plugins_installed).insert(nhpc_plugin, nhpc_plugin->plugin_name);
    }
    
    void plugin_manager_t::lock()
@@ -65,6 +69,18 @@ namespace neweraHPC
    void plugin_manager_t::unlock()
    {
       pthread_mutex_unlock(mutex);
+   }
+   
+   nhpc_status_t plugin_manager_t::search_plugin(const char *plugin_name, plugin_details_t **plugin_details)
+   {
+      lock();
+      (*plugin_details) = (plugin_details_t *)(*plugins_installed).search((char *)plugin_name);
+      unlock();
+      
+      if(!(*plugin_details))
+	 return NHPC_FAIL;
+      
+      return NHPC_SUCCESS;
    }
    
    nhpc_status_t plugin_manager_t::install_plugin(const char *file_path, const char *base_dir)
@@ -147,8 +163,6 @@ namespace neweraHPC
       return nrv;
    }
    
-   extern "C"
-   {
    nhpc_status_t plugin_manager_t::install_plugin_dll(const char *dll_path, plugin_details_t **plugin_details)
    {
       void *dll = dlopen(dll_path, RTLD_NOW);
@@ -160,10 +174,10 @@ namespace neweraHPC
       
       *plugin_details = new plugin_details_t;
       
-      (*plugin_details)->fnc_init        = (fnc_ptr_t)dlsym(dll, "plugin_init");      
-      (*plugin_details)->fnc_exec        = (fnc_ptr_t)dlsym(dll, "plugin_exec");
-      (*plugin_details)->fnc_client_exec = (fnc_ptr_t)dlsym(dll, "plugin_exec_client");
-      (*plugin_details)->fnc_processor   = (fnc_ptr_t)dlsym(dll, "plugin_processor");
+      (*plugin_details)->fnc_init        = (fnc_ptr_nhpc_plugin_t)dlsym(dll, "plugin_init");      
+      (*plugin_details)->fnc_exec        = (fnc_ptr_nhpc_plugin_t)dlsym(dll, "plugin_exec");
+      (*plugin_details)->fnc_client_exec = (fnc_ptr_nhpc_plugin_t)dlsym(dll, "plugin_exec_client");
+      (*plugin_details)->fnc_processor   = (fnc_ptr_nhpc_plugin_t)dlsym(dll, "plugin_processor");
       
       if(!(*plugin_details)->fnc_init && !(*plugin_details)->fnc_exec 
 	 && !(*plugin_details)->fnc_client_exec && !(*plugin_details)->fnc_processor)
@@ -174,7 +188,7 @@ namespace neweraHPC
 	 return NHPC_FAIL;
       }
       
-      char *plugin_name = (char *)(*plugin_details)->fnc_init(NULL);
+      char *plugin_name = (char *)(*plugin_details)->fnc_init(NULL, NULL, NULL);
       if(!plugin_name)
       {
 	 dlerror();
@@ -206,7 +220,6 @@ namespace neweraHPC
       nhpc_strcpy(&((*plugin_details)->plugin_name), plugin_name);
       
       return NHPC_SUCCESS;
-   }
    }
    
    nhpc_status_t plugin_manager_t::copy_filetogrid(const char *file_path, const char **base_dir, char **file_path_new)

@@ -25,26 +25,19 @@
 
 namespace neweraHPC
 {
-   typedef struct queue_t{
-      int peer_id; 
-      int front;
-      int rear;
-      int task_total;
-      int task_completed;
-      int thread_id;
-   }queue_t;
-   
-   struct scheduler_thread_data_t
-   {
-      peer_details_t *peer_details;
-      const char *host_grid_uid;
-      const char *grid_uid;
-      nhpc_instruction_set_t *instruction_set;
-   };
+   class grid_scheduler_t;
    
    class grid_scheduler_t
    {
    private:
+      struct scheduler_thread_data_t
+      {
+	 grid_scheduler_t *scheduler;
+	 nhpc_instruction_set_t *instruction_set;
+	 thread_manager_t *thread_manager;
+	 int thread_id;
+      };
+      
       rbtree_t *peers;
       rbtree_t *jobs;
       rbtree_t *queued_instructions;
@@ -53,7 +46,12 @@ namespace neweraHPC
       thread_manager_t **thread_manager;
       pthread_mutex_t *mutex_child_processes;
       
+      void lock_child_processes();
+      void unlock_child_processes();
+      
       nhpc_status_t free_child_process();
+      
+      static void *job_dispatcher(scheduler_thread_data_t *data);
       
    public:
       grid_scheduler_t(thread_manager_t **_thread_manager);
@@ -65,6 +63,7 @@ namespace neweraHPC
       peer_details_t *schedule();
       void free_peer(int id);
       nhpc_status_t queue_job(nhpc_instruction_set_t *instruction_set);
+      nhpc_status_t dispatch_job(nhpc_instruction_set_t *instruction_set);
       nhpc_status_t push_jobs();
       void lock();
       void unlock();
@@ -73,7 +72,7 @@ namespace neweraHPC
 
       static void monitor_jobs_pending(grid_scheduler_t *grid_scheduler);
       static void child_handler(int signum);
-   };
+   };   
 };
 
 #endif

@@ -28,7 +28,6 @@
 #include "thread.h"
 #include "constants.h"
 #include "strings.h"
-//#include "http.h"
 
 namespace neweraHPC 
 {
@@ -50,6 +49,7 @@ namespace neweraHPC
       void plugin_manager_init();
       void lock();
       void unlock();
+      nhpc_status_t search_plugin(const char *plugin_name, plugin_details_t **plugin_details);
       int request_plugin(int peer_id, int remote_plugin_id);
       nhpc_status_t install_plugin(const char *file_path, const char *base_dir = NULL);
    };
@@ -58,6 +58,15 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_check_nxi(const char *file_path);
    nhpc_status_t nhpc_nxitodll(const char **dll_path, const char *file_path);
+   
+   nhpc_status_t nhpc_grid_range_plugin_init(plugin_details_t **plugin_details);
+   static nhpc_status_t nhpc_grid_range_plugin_exec(nhpc_instruction_set_t *instruction_set, 
+						    nhpc_socket_t *sock, char **grid_uid);
+   static nhpc_status_t nhpc_grid_range_plugin_client_exec(nhpc_instruction_set_t *instruction_set, 
+							   nhpc_socket_t *sock, char **grid_uid);
+   static nhpc_status_t nhpc_grid_range_plugin_processor(nhpc_instruction_set_t *instruction_set, 
+							      nhpc_socket_t *sock, char **grid_uid);
+   
 };
 
 #endif

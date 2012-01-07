@@ -61,7 +61,7 @@ namespace neweraHPC
    
    void network_t::network_quit()
    {
-      cout<<"Initiating Server Shutdown"<<endl;
+      cout<<"\n\nInitiating Server Shutdown"<<endl;
       (*thread_manager).cancel_thread(accept_thread_id);
    }
    
@@ -198,7 +198,6 @@ namespace neweraHPC
       }
       
       add_peer(host_addr, host_port, 2);
-      add_peer("10.0.0.5", "8080", 2);
       
       nhpc_thread_details_t *accept_thread = new nhpc_thread_details_t;
       accept_thread->sock           = server_sock;
@@ -220,11 +219,6 @@ namespace neweraHPC
    void *network_t::accept_connection(nhpc_thread_details_t *main_thread)
    {
       signal(SIGPIPE, SIG_IGN);
-      /*
-      signal(SIGTERM, exit_handler);
-      signal(SIGTSTP, exit_handler);
-      signal(SIGKILL, exit_handler);
-       */
       signal(SIGINT, exit_handler);
 
       nhpc_size_t rv;

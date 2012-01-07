@@ -71,7 +71,9 @@ namespace neweraHPC
 	 if(rv != NHPC_SUCCESS)
 	    return rv;
 	 else if(rv == NHPC_SUCCESS)
+	 {
 	    rv = connect(sock->sockfd, hints_res->ai_addr, hints_res->ai_addrlen);
+	 }
       }
 	 
       if(rv == -1 && errno != EISCONN)
@@ -114,10 +116,11 @@ namespace neweraHPC
       do 
       {
 	 nrv = socket_connect(*sock);
-      }while(nrv != NHPC_SUCCESS && (errno == EINPROGRESS || errno == EALREADY));
+      }while(nrv != NHPC_TIMEUP && (errno == EINPROGRESS || errno == EALREADY));
       
       if(nrv != NHPC_SUCCESS)
       {
+	 socket_close(*sock);
 	 socket_delete(*sock);
 	 return nrv;
       }      

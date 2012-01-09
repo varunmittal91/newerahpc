@@ -177,7 +177,7 @@ namespace neweraHPC
       if(!node_addr || !node_port || !node_cores)
 	 return NHPC_FAIL;
       
-      add_peer(node_addr, node_port, nhpc_strtoi(node_cores));
+      add_peer(sock->host, node_port, nhpc_strtoi(node_cores));
       
       return NHPC_SUCCESS;
    }

@@ -32,7 +32,7 @@ namespace neweraHPC
       
       if(nrv != NHPC_SUCCESS)
       {
-	 socket_delete(sock);
+	 //socket_delete(sock);
 	 return errno;
       }      
       

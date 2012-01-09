@@ -21,7 +21,6 @@
 #include <iomanip>
 
 #include <include/network.h>
-#include <include/grid.h>
 
 using namespace std;
 
@@ -68,7 +67,14 @@ namespace neweraHPC
 	 if(nhpc_strcmp(command, "*HTTP*") == NHPC_SUCCESS)
 	    http_init(sock);
 	 else if(nhpc_strcmp(command, "*GRID*") == NHPC_SUCCESS)
-	    network->grid_request_init(sock);
+	 {
+	    fnc_ptr_t *grid_request_init = (fnc_ptr_t *)network->network_addons->search("GRID");
+	    if(!grid_request_init)
+	    {
+	       return;
+	    }
+	    (*grid_request_init)((nhpc_socket_t *)sock);
+	 }
       }
       
       nhpc_socket_cleanup(sock);

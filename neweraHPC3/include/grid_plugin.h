@@ -60,11 +60,11 @@ namespace neweraHPC
    nhpc_status_t nhpc_nxitodll(const char **dll_path, const char *file_path);
    
    nhpc_status_t nhpc_grid_range_plugin_init(plugin_details_t **plugin_details);
-   static nhpc_status_t nhpc_grid_range_plugin_exec(nhpc_instruction_set_t *instruction_set, 
+   static nhpc_status_t nhpc_grid_range_plugin_exec(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
 						    nhpc_socket_t *sock, char **grid_uid);
-   static nhpc_status_t nhpc_grid_range_plugin_client_exec(nhpc_instruction_set_t *instruction_set, 
+   static nhpc_status_t nhpc_grid_range_plugin_client_exec(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
 							   nhpc_socket_t *sock, char **grid_uid);
-   static nhpc_status_t nhpc_grid_range_plugin_processor(nhpc_instruction_set_t *instruction_set, 
+   static nhpc_status_t nhpc_grid_range_plugin_processor(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
 							      nhpc_socket_t *sock, char **grid_uid);
    
 };

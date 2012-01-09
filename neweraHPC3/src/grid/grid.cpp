@@ -29,24 +29,53 @@ using namespace std;
 
 namespace neweraHPC
 {
-   class thread_manager_t;
+   nhpc_grid_server_t *grid_server;
    
-   nhpc_grid_server_t::nhpc_grid_server_t(thread_manager_t **in_thread_manager) 
-   : plugin_manager_t(in_thread_manager) , grid_scheduler_t(in_thread_manager)
+   nhpc_grid_server_t::nhpc_grid_server_t(const char *_host_addr, const char *_host_port, const char *_host_cores) 
+   : network_t(&thread_manager), plugin_manager_t(&thread_manager) , grid_scheduler_t(&thread_manager)
    {
       clients = new rbtree_t(NHPC_RBTREE_STR);
+      thread_manager = new thread_manager_t;
+      
+      nhpc_strcpy(&host_addr, _host_addr);
+      nhpc_strcpy(&host_port, _host_port);
+      host_cores = nhpc_strtoi(_host_cores);
    }
    
-   void nhpc_grid_server_t::grid_server_init()
+   nhpc_status_t nhpc_grid_server_t::grid_server_init()
    {
+      nhpc_status_t nrv;
+      
       plugin_manager_init();
       grid_scheduler_init();
             
       mkdir("/tmp/neweraHPC", 0777);
+      
+      fnc_ptr_t *grid_request_handler = (fnc_ptr_t *)nhpc_grid_server_t::grid_request_init;
+      int rv = network_addons->insert((void *)&grid_request_handler, "GRID");
+
+      add_peer(host_addr, host_port, host_cores);
+
+      grid_server = this;
+
+      nrv = create_server(host_addr, host_port, AF_INET, SOCK_STREAM, 0);  
+      if(nrv != NHPC_SUCCESS)
+	 return nrv;
    }
    
+   nhpc_status_t nhpc_grid_server_t::grid_server_init(const char *_grid_controller_addr, const char *_grid_controller_port)
+   {
+      cout<<"Registering to controller: "<<_grid_controller_addr<<":"<<_grid_controller_port<<endl;
+      nhpc_register_to_controller(_grid_controller_addr, _grid_controller_port, host_addr, host_port, host_cores);
+      
+      grid_server_init();      
+   }
+
    nhpc_grid_server_t::~nhpc_grid_server_t()
    {
+      delete[] host_addr;
+      delete[] host_port;
+      
       char *tmp_host_addr;
       const char *key_str;
       cout<<"Deleting grid client details";
@@ -79,30 +108,32 @@ namespace neweraHPC
       const char *fnc_str = string->strings[1];
       
       if(nhpc_strcmp(fnc_str, "CLIENT_REGISTRATION") == NHPC_SUCCESS)
-	 nrv = grid_client_registration(sock);
+	 nrv = (*grid_server).grid_client_registration(sock);
+      else if(nhpc_strcmp(fnc_str, "NODE_REGISTRATION") == NHPC_SUCCESS)
+	 nrv = (*grid_server).grid_node_registration(sock);
       else 
       {
 	 const char *uid = (char *)sock->headers->search("Grid-Uid");
 	 
-	 if(uid == NULL || grid_client_verify_uid(uid) != NHPC_SUCCESS)
+	 if(uid == NULL || grid_server->grid_client_verify_uid(uid) != NHPC_SUCCESS)
 	 {
 	    nhpc_string_delete(string);
 	    return;
 	 }
 	 
 	 else if(nhpc_strcmp(fnc_str, "FILE_EXCHANGE") == NHPC_SUCCESS)
-	    nrv = grid_file_download(sock, &uid);
+	    nrv = grid_server->grid_file_download(sock, &uid);
 	 else if(nhpc_strcmp(fnc_str, "INSTRUCTION") == NHPC_SUCCESS)
 	 {
 	    nhpc_instruction_set_t *instruction_set;
 	    nrv = nhpc_generate_instruction(&instruction_set, sock->headers);
-	    nrv = grid_execute(instruction_set, sock, &uid);
+	    nrv = grid_server->grid_execute(instruction_set, sock, &uid);
 	 }
 	 else if(nhpc_strcmp(fnc_str, "SUBMISSION") == NHPC_SUCCESS)
 	 {
 	    char *peer_id = (char *)sock->headers->search("Peer");
 	    int peer_id_n = nhpc_strtoi(peer_id);
-	    free_peer(nhpc_strtoi(peer_id));
+	    grid_server->free_peer(nhpc_strtoi(peer_id));
 	    nrv = NHPC_SUCCESS;
 	 }
 	 
@@ -134,6 +165,21 @@ namespace neweraHPC
       delete[] uid;
       
       return nrv;      
+   }
+   
+   nhpc_status_t nhpc_grid_server_t::grid_node_registration(nhpc_socket_t *sock)
+   {
+      rbtree_t *headers = sock->headers;
+      char *node_addr = (char *)headers->search("Node-Addr");
+      char *node_port = (char *)headers->search("Node-Port");
+      char *node_cores = (char *)headers->search("Node-Cores");
+      
+      if(!node_addr || !node_port || !node_cores)
+	 return NHPC_FAIL;
+      
+      add_peer(node_addr, node_port, nhpc_strtoi(node_cores));
+      
+      return NHPC_SUCCESS;
    }
    
    nhpc_status_t nhpc_grid_server_t::grid_client_gen_uid(const char *client_addr, const char **uid)

@@ -21,7 +21,6 @@
 #include <iostream>
 #include <iomanip>
 
-#include <include/grid.h>
 #include <include/network.h>
 
 using namespace std;
@@ -30,30 +29,29 @@ namespace neweraHPC
 {
    network_t *network;
    
-   network_t::network_t() : nhpc_grid_server_t(&thread_manager)
+   network_t::network_t()
    {
       external_thread_manager = false;
-      thread_manager = new thread_manager_t;
+      thread_manager = new thread_manager_t*;
+      *thread_manager = new thread_manager_t;
       
       network_init();
-      
-      grid_server_init();
    }
    
-   network_t::network_t(thread_manager_t *in_thread_manager) : nhpc_grid_server_t(&thread_manager)
+   network_t::network_t(thread_manager_t **in_thread_manager)
    {
       external_thread_manager = true;
       thread_manager = in_thread_manager;
 
       network_init();
-
-      grid_server_init();
    }
    
    void network_t::network_init()
    {
       client_connections = new rbtree_t;
-      mutex = new pthread_mutex_t;      
+      mutex = new pthread_mutex_t;   
+      mutex_addons = new pthread_mutex_t;
+      network_addons = new rbtree_t(NHPC_RBTREE_STR);
       server_sock = NULL;    
       network = this;
       accept_thread_id = 0;
@@ -62,7 +60,7 @@ namespace neweraHPC
    void network_t::network_quit()
    {
       cout<<"\n\nInitiating Server Shutdown"<<endl;
-      (*thread_manager).cancel_thread(accept_thread_id);
+      (**thread_manager).cancel_thread(accept_thread_id);
    }
    
    network_t::~network_t()
@@ -86,6 +84,10 @@ namespace neweraHPC
       delete client_connections;
       cout<<setw(50)<<"OK"<<endl;
       
+      cout<<"Deleting network addons\t\t";
+      delete network_addons;
+      cout<<setw(50)<<"OK"<<endl;
+      
       cout<<"Closing server socket\t\t";
       if(server_sock)
       {
@@ -97,7 +99,7 @@ namespace neweraHPC
       if(!external_thread_manager) 
       {
 	 cout<<"Shuting down thread manager\t";
-	 delete thread_manager;
+	 delete (*thread_manager);
 	 cout<<setw(50)<<"OK"<<endl;
       }
 
@@ -117,6 +119,16 @@ namespace neweraHPC
    inline void network_t::unlock()
    {
       pthread_mutex_unlock(mutex);
+   }
+   
+   inline void network_t::lock_addons()
+   {
+      pthread_mutex_lock(mutex_addons);
+   }
+   
+   inline void network_t::unlock_addons()
+   {
+      pthread_mutex_unlock(mutex_addons);
    }
    
    int network_t::add_client_connection(nhpc_socket_t *sock, int sockfd)
@@ -197,15 +209,13 @@ namespace neweraHPC
 	 return errno;
       }
       
-      add_peer(host_addr, host_port, 2);
-      
       nhpc_thread_details_t *accept_thread = new nhpc_thread_details_t;
       accept_thread->sock           = server_sock;
-      accept_thread->thread_manager = thread_manager;
+      accept_thread->thread_manager = *thread_manager;
       accept_thread->client_socks   = client_connections;
       accept_thread->network        = this;
-      (*thread_manager).init_thread(&accept_thread_id, NULL);
-      (*thread_manager).create_thread(&accept_thread_id, NULL, (void * (*)(void *))network_t::accept_connection, 
+      (**thread_manager).init_thread(&accept_thread_id, NULL);
+      (**thread_manager).create_thread(&accept_thread_id, NULL, (void * (*)(void *))network_t::accept_connection, 
 				      (void *)accept_thread, NHPC_THREAD_JOIN);
       return NHPC_SUCCESS;      
    }

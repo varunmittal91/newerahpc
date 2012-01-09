@@ -58,4 +58,10 @@ typedef size_t nhpc_size_t;
 #define NHPC_FILE 1
 #define NHPC_DIRECTORY 2
 
+typedef void *(*fnc_ptr_t)(void *);
+typedef void *(*fnc_ptr_two_t)(void *, void *);
+typedef nhpc_status_t (*fnc_ptr_nhpc_t)(void *);
+typedef nhpc_status_t (*fnc_ptr_nhpc_two_t)(void *, void *);
+typedef nhpc_status_t (*fnc_ptr_nhpc_plugin_t)(void *, void *, void *, void **);
+
 #endif

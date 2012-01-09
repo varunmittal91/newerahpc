@@ -43,11 +43,11 @@ namespace neweraHPC
       
       if(instruction_set->execute)
       {
-	 nrv = plugin_details->fnc_processor(instruction_set, sock, (void **)grid_uid);
+	 nrv = plugin_details->fnc_processor(this, instruction_set, sock, (void **)grid_uid);
       }
       else 
       {
-	 nrv = plugin_details->fnc_exec(instruction_set, sock, (void **)grid_uid);
+	 nrv = plugin_details->fnc_exec(this, instruction_set, sock, (void **)grid_uid);
       }
       
       return nrv;

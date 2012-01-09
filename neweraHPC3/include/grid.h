@@ -23,16 +23,17 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#include "network_data.h"
+#include "network.h"
 #include "grid_data.h"
 #include "grid_scheduler.h"
 #include "grid_plugin.h"
 #include "grid_instruction_set.h"
 #include "grid_client.h"
+#include "grid_server.h"
 
 namespace neweraHPC 
 {
-   class nhpc_grid_server_t : public plugin_manager_t, public grid_scheduler_t
+   class nhpc_grid_server_t : public network_t, public plugin_manager_t, public grid_scheduler_t
    {
    private:
       struct functions_t
@@ -47,20 +48,34 @@ namespace neweraHPC
       fnc_ptr_t ptr;
       nhpc_status_t grid_client_gen_uid(const char *client_addr, const char **uid);
       nhpc_status_t grid_client_verify_uid(const char *uid);
+      
+      char *grid_controller_addr;
+      char *grid_controller_port;
+      
+      char *host_addr;
+      char *host_port;
+      int host_cores;
+      
+      thread_manager_t *thread_manager;
+      
    public:
-      nhpc_grid_server_t(thread_manager_t **in_thread_manager);
+      nhpc_grid_server_t(const char *in_host_addr, const char *_in_host_port, const char *in_host_cores);      
+      
       ~nhpc_grid_server_t();
-      void grid_server_init();
-      void grid_request_init(nhpc_socket_t *sock);
+      nhpc_status_t grid_server_init();
+      nhpc_status_t grid_server_init(const char *_grid_controller_addr, const char *grid_controller_port);
+      
       nhpc_status_t grid_file_download(nhpc_socket_t *sock, const char **grid_uid);
       nhpc_status_t grid_execute(nhpc_socket_t *sock, const char **grid_uid);
       nhpc_status_t grid_execute(nhpc_instruction_set_t *instruction_set, 
 				 nhpc_socket_t *sock, const char **grid_uid);
       
       nhpc_status_t grid_client_registration(nhpc_socket_t *sock);
+      
+      nhpc_status_t grid_node_registration(nhpc_socket_t *sock);
+
+      static void grid_request_init(nhpc_socket_t *sock);
    };
-   
-   void grid_init(nhpc_socket_t *sock);   
    
    nhpc_status_t nhpc_grid_file_download(nhpc_socket_t *sock, const char **file_path);
 };

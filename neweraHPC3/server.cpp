@@ -27,19 +27,32 @@ using namespace neweraHPC;
 
 int main(int argc,char **argv)
 {
-   if(argc < 3)
+   if(argc < 4)
    {
-      cout<<"Usage: server 'hostname' 'port number'"<<endl;
+      cout<<"Usage: server 'hostname' 'port number' 'core count'"<<endl;
       exit(0);
    }
    
-   network_t network;
-   nhpc_status_t nrv = network.create_server(argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
+   nhpc_grid_server_t grid_server(argv[1], argv[2], argv[3]);
+   if(argc == 6)
+      grid_server.grid_server_init(argv[4], argv[5]);
+   else 
+      grid_server.grid_server_init();
+   
+   /*
+   network_t *network;
+   
+   network = new network_t();
+   
+   nhpc_status_t nrv = (*network).create_server(argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
    if(nrv != NHPC_SUCCESS)
    {
       perror("error at creating server");
       exit(1);
    }
+   
+   delete network;
+    */
 
    return 0;
 }

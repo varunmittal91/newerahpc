@@ -36,6 +36,7 @@ namespace neweraHPC
 	 nhpc_instruction_set_t *instruction_set;
 	 thread_manager_t *thread_manager;
 	 int thread_id;
+	 peer_details_t *peer_details;
       };
       
       rbtree_t *peers;

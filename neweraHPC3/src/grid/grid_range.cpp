@@ -38,7 +38,7 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
-   nhpc_status_t nhpc_grid_range_plugin_exec(nhpc_instruction_set_t *instruction_set, 
+   nhpc_status_t nhpc_grid_range_plugin_exec(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set,
 					     nhpc_socket_t *sock, char **grid_uid)
    {
       network_t *network = sock->server_details->main_network;
@@ -94,7 +94,7 @@ namespace neweraHPC
 	 }
 	 
 	 new_instruction_set->execute = true;
-	 network->queue_job(new_instruction_set);
+	 grid_server->queue_job(new_instruction_set);
 	 cout<<"queueing job no"<<i<<endl;
       }
       
@@ -102,12 +102,12 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
-   nhpc_status_t nhpc_grid_range_plugin_client_exec(nhpc_instruction_set_t *instruction_set, 
+   nhpc_status_t nhpc_grid_range_plugin_client_exec(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
 						    nhpc_socket_t *sock, char **grid_uid)
    {
    }
    
-   nhpc_status_t nhpc_grid_range_plugin_processor(nhpc_instruction_set_t *instruction_set, 
+   nhpc_status_t nhpc_grid_range_plugin_processor(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
 						  nhpc_socket_t *sock, char **grid_uid)
    {
       network_t *network = sock->server_details->main_network;
@@ -193,7 +193,7 @@ namespace neweraHPC
       }
       else 
       {
-	 network->add_child_process(instruction_set, &pid);
+	 grid_server->add_child_process(instruction_set, &pid);
       }
       
       if(exec)

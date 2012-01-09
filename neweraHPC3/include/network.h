@@ -41,38 +41,42 @@
 #include "sockopts.h"
 #include "communication.h"
 #include "http.h"
-#include "grid.h"
 
 namespace neweraHPC
 {  
-   class network_t;
+   //class network_t;
    class nhpc_grid_server_t;
-   
-   struct nhpc_thread_details_t
-   {
-      network_t        *network;
-      thread_manager_t *thread_manager;
-      nhpc_socket_t    *sock;
-      rbtree_t         *client_socks;
-   };
    
    void *get_in_addr(struct sockaddr *sa);
    
-   class network_t : public nhpc_grid_server_t
+   class network_t
    {
    private:
+      struct nhpc_thread_details_t
+      {
+	 network_t        *network;
+	 thread_manager_t *thread_manager;
+	 nhpc_socket_t    *sock;
+	 rbtree_t         *client_socks;
+      };
+      
       struct nhpc_thrad_details_t *server_thread_details;      
       bool external_thread_manager;
+      
       pthread_mutex_t *mutex;
+      pthread_mutex_t *mutex_addons;
+      
       rbtree_t *client_connections;
-      thread_manager_t *thread_manager;
+      thread_manager_t **thread_manager;
       nhpc_socket_t *server_sock;
       int accept_thread_id;
       static void *accept_connection(nhpc_thread_details_t *main_thread);
+      const char *host_addr;
+      const char *host_port;
       
    public:
       network_t();
-      network_t(thread_manager_t *in_thread_manager);
+      network_t(thread_manager_t **in_thread_manager);
       ~network_t();
       void network_init();
       void network_quit();
@@ -83,6 +87,10 @@ namespace neweraHPC
 			    const char *host_port, int family, int type, int protocol);
       nhpc_status_t create_server(const char *host_addr, const char *host_port,
 				  int family, int type, int protocol);
+      
+      rbtree_t *network_addons;
+      void lock_addons();
+      void unlock_addons();
    };
    
    void nhpc_socket_cleanup(nhpc_socket_t *client_sock);

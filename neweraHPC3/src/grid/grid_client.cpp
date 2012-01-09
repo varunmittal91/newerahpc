@@ -121,7 +121,7 @@ namespace neweraHPC
       
       FILE *fp = fopen(file_path, "r");
       nhpc_size_t len;
-      char buffer[1000];
+      char buffer[10000];
       
       int bytes_writen = 0;
       

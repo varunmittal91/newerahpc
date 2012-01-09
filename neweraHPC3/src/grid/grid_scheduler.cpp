@@ -178,10 +178,20 @@ namespace neweraHPC
 	 return NHPC_FAIL;
       }
       
+      peer_details = schedule();
+      if(!peer_details)
+      {
+	 lock();
+	 queued_instructions->insert(instruction_set);
+	 unlock();	 
+	 return NHPC_FAIL;
+      }
+      
       scheduler_thread_data_t *thread_data = new scheduler_thread_data_t;
       thread_data->instruction_set = instruction_set;
       thread_data->scheduler = this;
       thread_data->thread_manager = *thread_manager;
+      thread_data->peer_details = peer_details;
       
       (**thread_manager).init_thread(&(thread_data->thread_id), NULL);
       nrv = (**thread_manager).create_thread(&(thread_data->thread_id), NULL, (void* (*)(void*))job_dispatcher, 
@@ -195,11 +205,10 @@ namespace neweraHPC
       nhpc_instruction_set_t *instruction_set = data->instruction_set;
       grid_scheduler_t *scheduler = data->scheduler;
       thread_manager_t *thread_manager = data->thread_manager;
+      peer_details_t *peer_details = data->peer_details;      
       
       nhpc_status_t nrv = NHPC_SUCCESS;
       
-      peer_details_t *peer_details;      
-      peer_details = (*scheduler).schedule();
       const char *host_addr;
       const char *host_port;
       const char *grid_uid;
@@ -219,7 +228,7 @@ namespace neweraHPC
       if(nrv != NHPC_SUCCESS)
       {
 	 (*scheduler).free_peer(peer_details->id);
-	 (*scheduler).remove_peer(peer_details->id);
+	 //(*scheduler).remove_peer(peer_details->id);
 	 
 	 nrv = NHPC_FAIL;
 	 goto exit_thread;
@@ -320,19 +329,29 @@ namespace neweraHPC
    nhpc_status_t grid_scheduler_t::push_jobs()
    {
       nhpc_status_t nrv = NHPC_FAIL;
-      
       int id;
+      nhpc_instruction_set_t *instruction_set;
       
-      lock();      
-      nhpc_instruction_set_t *instruction_set = (nhpc_instruction_set_t *)queued_instructions->search_first(&id);
-      unlock();
-
-      if(instruction_set && (instruction_set->host_grid_uid))
+      while(1)
       {
 	 lock();
-	 queued_instructions->erase(id);
+	 instruction_set = (nhpc_instruction_set_t *)queued_instructions->search_first(&id);
 	 unlock();
-	 nrv = dispatch_job(instruction_set);
+
+	 if(!instruction_set)
+	 {
+	    break;
+	 }
+	 
+	 if(instruction_set && (instruction_set->host_grid_uid))
+	 {
+	    lock();
+	    queued_instructions->erase(id);
+	    unlock();
+	    nrv = dispatch_job(instruction_set);
+	    if(nrv != NHPC_SUCCESS)
+	       break;
+	 }
       }
       
       return nrv;
@@ -422,13 +441,18 @@ namespace neweraHPC
 	 nhpc_instruction_set_t *instruction_set = (nhpc_instruction_set_t *)queued_instructions->search_first(&id);
 	 grid_scheduler->unlock();
 	 
+	 int core_count = grid_scheduler->cores();
+
 	 if(instruction_set)
 	 {
-	    int core_count = grid_scheduler->cores();
 	    if(core_count > 0)
+	    {
 	       grid_scheduler->push_jobs();
-	    cout<<"Instruction Pending: "<<grid_scheduler->cores()<<endl;
+	       cout<<"Instruction Pending: "<<grid_scheduler->cores()<<endl;
+	    }
 	 }
+	 else 
+	    cout<<"No job pending available cores: "<<core_count<<endl;
 	 
 	 sleep(1);
       }

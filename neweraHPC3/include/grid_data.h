@@ -39,12 +39,6 @@ enum GRID_ARG_TYPE
 #define ARG_COMMAND "3"
 #define ARG_GRID_FILE "4"
 
-typedef void *(*fnc_ptr_t)(void *);
-typedef void *(*fnc_ptr_two_t)(void *, void *);
-typedef nhpc_status_t (*fnc_ptr_nhpc_t)(void *);
-typedef nhpc_status_t (*fnc_ptr_nhpc_two_t)(void *, void *);
-typedef nhpc_status_t (*fnc_ptr_nhpc_plugin_t)(void *, void *, void **);
-
 namespace neweraHPC
 {
    /* Plugin details for the modules that are added to be run in a grid */

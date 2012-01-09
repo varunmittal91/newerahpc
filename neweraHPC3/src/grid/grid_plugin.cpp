@@ -188,7 +188,7 @@ namespace neweraHPC
 	 return NHPC_FAIL;
       }
       
-      char *plugin_name = (char *)(*plugin_details)->fnc_init(NULL, NULL, NULL);
+      char *plugin_name = (char *)(*plugin_details)->fnc_init(NULL, NULL, NULL, NULL);
       if(!plugin_name)
       {
 	 dlerror();

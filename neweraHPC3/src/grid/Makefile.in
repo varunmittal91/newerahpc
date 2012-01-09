@@ -48,7 +48,7 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgrid_la_LIBADD =
 am__objects_1 = grid.lo grid_scheduler.lo grid_plugin.lo grid_nxi.lo \
 	grid_instruction_set.lo grid_client.lo grid_execute.lo \
-	grid_range.lo
+	grid_range.lo grid_server.lo
 am_libgrid_la_OBJECTS = $(am__objects_1)
 libgrid_la_OBJECTS = $(am_libgrid_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -206,7 +206,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SOURCES = grid.cpp grid_scheduler.cpp grid_plugin.cpp grid_nxi.cpp grid_instruction_set.cpp grid_client.cpp grid_execute.cpp grid_range.cpp
+SOURCES = grid.cpp grid_scheduler.cpp grid_plugin.cpp grid_nxi.cpp grid_instruction_set.cpp grid_client.cpp grid_execute.cpp grid_range.cpp grid_server.cpp
 noinst_LTLIBRARIES = libgrid.la
 libgrid_la_SOURCES = $(SOURCES)
 libgrid_la_LDFLAGS = -lpthread -ldl
@@ -271,6 +271,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_plugin.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_range.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_scheduler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_server.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

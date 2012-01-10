@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <stdlib.h>
 
 #include <include/grid.h>
 #include <include/network.h>
@@ -97,7 +98,14 @@ namespace neweraHPC
       (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))grid_scheduler_t::monitor_jobs_pending, 
 				       this, NHPC_THREAD_DEFAULT);
       signal(SIGCHLD, grid_scheduler_t::child_handler);
-   }   
+   }
+   
+   double grid_scheduler::cpu_usage()
+   {
+      double sample[1];
+      getloadavg(sample, 1);
+      return sample;
+   }
    
    int grid_scheduler_t::cores()
    {

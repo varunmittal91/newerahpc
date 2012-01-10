@@ -100,11 +100,11 @@ namespace neweraHPC
       signal(SIGCHLD, grid_scheduler_t::child_handler);
    }
    
-   double grid_scheduler::cpu_usage()
+   double grid_scheduler_t::cpu_usage()
    {
       double sample[1];
       getloadavg(sample, 1);
-      return sample;
+      return sample[1];
    }
    
    int grid_scheduler_t::cores()

@@ -27,6 +27,10 @@ using namespace neweraHPC;
 
 int main(int argc,char **argv)
 {
+   int pid = fork();
+   if(pid != 0)
+      exit(0);
+   
    if(argc < 4)
    {
       cout<<"Usage: server 'hostname' 'port number' 'core count'"<<endl;
@@ -39,20 +43,5 @@ int main(int argc,char **argv)
    else 
       grid_server.grid_server_init();
    
-   /*
-   network_t *network;
-   
-   network = new network_t();
-   
-   nhpc_status_t nrv = (*network).create_server(argv[1], argv[2], AF_INET, SOCK_STREAM, 0);
-   if(nrv != NHPC_SUCCESS)
-   {
-      perror("error at creating server");
-      exit(1);
-   }
-   
-   delete network;
-    */
-
    return 0;
 }

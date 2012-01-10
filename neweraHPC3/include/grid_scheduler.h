@@ -59,6 +59,7 @@ namespace neweraHPC
       ~grid_scheduler_t();
       void grid_scheduler_init();
       int cores();
+      double cpu_usage();
       void add_peer(const char *host, const char *port, int processors);
       void remove_peer(int peer_id);
       peer_details_t *schedule();

@@ -27,6 +27,13 @@ namespace neweraHPC
 {
    class grid_scheduler_t;
    
+   struct task_t
+   {
+      time_t t;
+      double loadavg;
+      nhpc_instruction_set_t *instruction_set;
+   };
+   
    class grid_scheduler_t
    {
    private:
@@ -70,7 +77,7 @@ namespace neweraHPC
       void lock();
       void unlock();
       
-      nhpc_status_t add_child_process(nhpc_instruction_set_t *instruction_set, pid_t *pid);
+      nhpc_status_t add_child_process(task_t *task, pid_t *pid);
 
       static void monitor_jobs_pending(grid_scheduler_t *grid_scheduler);
       static void child_handler(int signum);

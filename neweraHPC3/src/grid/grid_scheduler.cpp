@@ -365,10 +365,10 @@ namespace neweraHPC
       return nrv;
    }
    
-   nhpc_status_t grid_scheduler_t::add_child_process(nhpc_instruction_set_t *instruction_set, pid_t *pid)
+   nhpc_status_t grid_scheduler_t::add_child_process(task_t *task, pid_t *pid)
    {
       pthread_mutex_lock(mutex_child_processes);
-      (*child_processes).insert(instruction_set, *pid);
+      (*child_processes).insert(task, *pid);
       pthread_mutex_unlock(mutex_child_processes);
    }
    
@@ -383,7 +383,10 @@ namespace neweraHPC
 	 if(pid == -1)
 	    break;
 	 
-	 nhpc_instruction_set_t *instruction_set = (nhpc_instruction_set_t *)(*child_processes).search(pid);
+	 task_t *task = (task_t *)(*child_processes).search(pid);
+	 nhpc_instruction_set_t *instruction_set = task->instruction_set;
+	 cout<<task->loadavg<<" "<<cpu_usage()<<" "<<task->t<<" "<<time(NULL)<<endl;
+	 
 	 if(!instruction_set)
 	    continue;
 	 
@@ -425,6 +428,7 @@ namespace neweraHPC
 	 socket_delete(sock);
 	 
 	 nhpc_delete_instruction(instruction_set);
+	 delete task;
 	 
 	 pthread_mutex_lock(mutex_child_processes);
 	 child_processes->erase(pid);

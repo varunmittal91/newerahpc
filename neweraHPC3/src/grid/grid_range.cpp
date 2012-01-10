@@ -193,7 +193,11 @@ namespace neweraHPC
       }
       else 
       {
-	 grid_server->add_child_process(instruction_set, &pid);
+	 task_t *task = new task_t;
+	 time(&(task->t));
+	 task->loadavg = grid_server->cpu_usage();
+	 task->instruction_set = instruction_set;
+	 grid_server->add_child_process(task, &pid);
       }
       
       if(exec)

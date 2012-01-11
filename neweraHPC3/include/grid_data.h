@@ -89,6 +89,10 @@ namespace neweraHPC
       bool status;
       
       bool dynamic;
+      
+      int processor_time;
+      
+      int threads;
    };
    
    struct plugin_request_t

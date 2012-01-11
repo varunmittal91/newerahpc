@@ -102,9 +102,15 @@ namespace neweraHPC
    
    double grid_scheduler_t::cpu_usage()
    {
-      double sample[1];
-      getloadavg(sample, 1);
-      return sample[1];
+      double sample[3];
+      getloadavg(sample, 3);
+      double max = sample[0];
+      if(max < sample[1])
+	 max = sample[1];
+      if(max < sample[2])
+	 max = sample[2];
+      
+      return max;
    }
    
    int grid_scheduler_t::cores()
@@ -124,11 +130,15 @@ namespace neweraHPC
 
    void grid_scheduler_t::add_peer(const char *host, const char *port, int processors)
    {
+      processors = sysconf(_SC_NPROCESSORS_CONF);
+      
       peer_details_t *peer_details = new peer_details_t;
       nhpc_strcpy(&(peer_details->host), host);
       nhpc_strcpy(&(peer_details->port), port);
       peer_details->processors = processors;
       peer_details->weight = 0;
+      peer_details->processor_time = 100;
+      peer_details->threads = processors;
       
       peer_details->id = peers->insert(peer_details);
    }
@@ -147,6 +157,18 @@ namespace neweraHPC
       }
    }
    
+   nhpc_status_t grid_scheduler_t::increase_thread(int peer_id)
+   {
+      peer_details_t *peer_details = (peer_details_t *)peers->search(peer_id);
+      peer_details->threads += 1;
+   }
+   
+   nhpc_status_t grid_scheduler_t::decrease_thread(int peer_id)
+   {
+      peer_details_t *peer_details = (peer_details_t *)peers->search(peer_id);
+      peer_details->threads = peer_details->processors;
+   }
+   
    peer_details_t *grid_scheduler_t::schedule()
    {
       peer_details_t *peer_details = NULL;
@@ -155,7 +177,7 @@ namespace neweraHPC
       {
 	 peer_details = (peer_details_t *)peers->search(i);	 
 	 
-	 if(peer_details->weight < peer_details->processors)
+	 if(peer_details->weight < peer_details->threads)
 	 {
 	    lock();
 	    peer_details->weight++;
@@ -314,6 +336,30 @@ namespace neweraHPC
       push_jobs();
    }
    
+   void grid_scheduler_t::free_peer(int id, double loadavg)
+   {
+      lock();
+      
+      peer_details_t *peer_details = (peer_details_t *)peers->search(id);
+      if(peer_details)
+      {
+	 peer_details->weight--;
+      }
+      
+      double processor_time = (loadavg * 100);
+      cout<<"cpu time: "<<processor_time<<endl;
+      if(processor_time < (peer_details->processor_time * peer_details->processors))
+      {
+	 increase_thread(id); 
+      }
+      else 
+	 decrease_thread(id);
+      
+      unlock();
+      
+      push_jobs();
+   }
+
    void grid_scheduler_t::lock_child_processes()
    {
       
@@ -385,7 +431,7 @@ namespace neweraHPC
 	 
 	 task_t *task = (task_t *)(*child_processes).search(pid);
 	 nhpc_instruction_set_t *instruction_set = task->instruction_set;
-	 cout<<task->loadavg<<" "<<cpu_usage()<<" "<<task->t<<" "<<time(NULL)<<endl;
+	 task->loadavg = cpu_usage();
 	 
 	 if(!instruction_set)
 	    continue;
@@ -423,6 +469,9 @@ namespace neweraHPC
 	 delete headers;
 	 
 	 delete[] peer_id;
+	 
+	 nhpc_size_t size = sizeof(task_t);
+	 socket_sendmsg(sock, (const char *)task, &size);
 	 
 	 socket_close(sock);
 	 socket_delete(sock);

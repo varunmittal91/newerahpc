@@ -71,6 +71,7 @@ namespace neweraHPC
       void remove_peer(int peer_id);
       peer_details_t *schedule();
       void free_peer(int id);
+      void free_peer(int id, double loadavg);
       nhpc_status_t queue_job(nhpc_instruction_set_t *instruction_set);
       nhpc_status_t dispatch_job(nhpc_instruction_set_t *instruction_set);
       nhpc_status_t push_jobs();
@@ -81,6 +82,9 @@ namespace neweraHPC
 
       static void monitor_jobs_pending(grid_scheduler_t *grid_scheduler);
       static void child_handler(int signum);
+      
+      nhpc_status_t increase_thread(int peer_id);
+      nhpc_status_t decrease_thread(int peer_id);
    };   
 };
 

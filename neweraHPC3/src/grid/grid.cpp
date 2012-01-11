@@ -133,7 +133,13 @@ namespace neweraHPC
 	 {
 	    char *peer_id = (char *)sock->headers->search("Peer");
 	    int peer_id_n = nhpc_strtoi(peer_id);
-	    grid_server->free_peer(nhpc_strtoi(peer_id));
+	    if(sock->partial_content)
+	    {
+	       task_t *task = (task_t *)sock->partial_content;
+	       grid_server->free_peer(nhpc_strtoi(peer_id), task->loadavg);
+	    }
+	    else 
+	       grid_server->free_peer(nhpc_strtoi(peer_id));
 	    nrv = NHPC_SUCCESS;
 	 }
 	 

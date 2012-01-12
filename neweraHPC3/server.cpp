@@ -56,6 +56,8 @@ int main(int argc, char **argv)
    while(*tmp_argv != NULL)
    {
       char *arg = *tmp_argv;
+      if(*arg != '-')
+         print_help();
       arg++;
       switch(*arg)
       {

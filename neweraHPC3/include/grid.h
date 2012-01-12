@@ -30,10 +30,11 @@
 #include "grid_instruction_set.h"
 #include "grid_client.h"
 #include "grid_server.h"
+#include "system.h"
 
 namespace neweraHPC 
 {
-   class nhpc_grid_server_t : public network_t, public plugin_manager_t, public grid_scheduler_t
+   class nhpc_grid_server_t : public network_t, public plugin_manager_t, public grid_scheduler_t, public nhpc_system_t
    {
    private:
       struct functions_t

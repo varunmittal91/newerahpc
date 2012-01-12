@@ -17,16 +17,27 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NEWERAHPC_H_
-#define _NEWERAHPC_H_
+#ifndef _SYSTEM_H_
+#define _SYSTEM_H_
 
-#include "file.h"
-#include "rbtree.h"
+#include "system_memory.h"
 #include "thread.h"
-#include "network.h"
-#include "strings.h"
-#include "general.h"
-#include "grid.h"
-#include "system.h"
+
+namespace neweraHPC
+{
+   class nhpc_system_t
+   {
+   private:
+      thread_manager_t **thread_manager;
+      
+   public:
+      nhpc_system_t();
+      nhpc_system_t(thread_manager_t **_thread_manager);
+      ~nhpc_system_t();
+      void init_system();
+      
+      static void *monitor_system(nhpc_system_t *system);
+   };
+};
 
 #endif

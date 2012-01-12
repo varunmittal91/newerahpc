@@ -17,16 +17,16 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NEWERAHPC_H_
-#define _NEWERAHPC_H_
+#ifndef _SYSTEM_MEMORY_H_
+#define _SYSTEM_MEMORY_H_
 
-#include "file.h"
-#include "rbtree.h"
-#include "thread.h"
-#include "network.h"
-#include "strings.h"
-#include "general.h"
-#include "grid.h"
-#include "system.h"
+#include "constants.h"
+
+namespace neweraHPC
+{
+   nhpc_status_t system_mem_free(int *bytes);
+   nhpc_status_t system_mem_used(int *bytes);
+   nhpc_status_t system_mem_total(int *bytes);
+};
 
 #endif

@@ -92,9 +92,10 @@ int main(int argc, char **argv)
       
       int i;
       
-      for (i=getdtablesize();i>=0;--i) close(i);
+      for (i = getdtablesize(); i >= 0; --i)
+	 close(i);
       
-      i=open("/dev/null",O_RDWR);
+      i = open("/dev/null", O_RDWR);
       dup(i);
       dup(i);
    }

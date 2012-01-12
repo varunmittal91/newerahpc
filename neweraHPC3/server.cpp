@@ -28,12 +28,13 @@ using namespace neweraHPC;
 
 void print_help()
 {
-   cout<<"Usage: server \t[-l host_ip:port] [-r remote_ip:port] \n\t\t[-c cpu_time]"<<endl;
+   cout<<"Usage: server \t[-l host_ip:port] [-r remote_ip:port] \n\t\t[-c cpu_time] [-d daemon]"<<endl;
    cout<<"Options:"<<endl;
    cout<<setw(20)<<"-l host_ip:port"<<setw(50)<<":Ip address and port of local server"<<endl;
    cout<<setw(22)<<"-r remote_ip:port"<<setw(46)<<":Ip address and port of controller"<<endl;
    cout<<setw(16)<<"-c cpu_time"<<setw(38)<<":Mac cpu time to use"<<endl;
    cout<<setw(14)<<"-d daemon"<<setw(32)<<":Daemon mode"<<endl;
+   cout<<setw(12)<<"-h help"<<setw(37)<<":This help menu"<<endl;
    
    exit(0);
 }
@@ -87,6 +88,15 @@ int main(int argc, char **argv)
       int pid = fork();
       if(pid != 0)
 	 exit(0);
+      setsid();
+      
+      int i;
+      
+      for (i=getdtablesize();i>=0;--i) close(i);
+      
+      i=open("/dev/null",O_RDWR);
+      dup(i);
+      dup(i);
    }
    
    nhpc_status_t nrv;

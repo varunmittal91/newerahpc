@@ -19,31 +19,74 @@
 
 #include <stdlib.h>
 #include <iostream>
+#include <iomanip>
 
 #include <include/neweraHPC.h>
 
 using namespace std;
 using namespace neweraHPC;
 
+void print_help()
+{
+   cout<<"Usage: server \t[-l host_ip:port] [-r remote_ip:port] \n\t\t[-c cpu_time]"<<endl;
+   cout<<"Options:"<<endl;
+   cout<<setw(20)<<"-l host_ip:port"<<setw(50)<<":Ip address and port of local server"<<endl;
+   cout<<setw(22)<<"-r remote_ip:port"<<setw(46)<<":Ip address and port of controller"<<endl;
+   cout<<setw(16)<<"-c cpu_time"<<setw(38)<<":Mac cpu time to use"<<endl;
+   
+   exit(0);
+}
+
 int main(int argc,char **argv)
 {
+   char *host = NULL;
+   char *controller = NULL;
+   char *cpu_time = NULL;
+   
+   char **tmp_argv = argv + 1;
+   while(*tmp_argv != NULL)
+   {
+      char *arg = *tmp_argv;
+      arg++;
+      switch(*arg)
+      {
+         case 'c':
+	    cpu_time = *(tmp_argv + 1);
+            tmp_argv++;
+            break;
+         case 'l':
+	    host = *(tmp_argv + 1);
+            tmp_argv++;
+            break;
+	 case 'r':
+	    controller = *(tmp_argv + 1);
+	    tmp_argv++;
+	    break;
+	 case 'h':
+	    print_help();
+	    break;
+	 default:
+	    print_help();
+      }
+      tmp_argv++;
+   }   
+   
    /*
    int pid = fork();
    if(pid != 0)
       exit(0);
     */
    
-   if(argc < 4)
-   {
-      cout<<"Usage: server 'hostname' 'port number' 'core count'"<<endl;
-      exit(0);
-   }
+   nhpc_status_t nrv;
    
-   nhpc_grid_server_t grid_server(argv[1], argv[2], argv[3]);
-   if(argc == 6)
-      grid_server.grid_server_init(argv[4], argv[5]);
+   nhpc_grid_server_t grid_server(host, cpu_time);
+   if(controller)
+      nrv = grid_server.grid_server_init(controller);
    else 
-      grid_server.grid_server_init();
+      nrv = grid_server.grid_server_init();
+   
+   if(nrv != NHPC_SUCCESS)
+      cout<<"Grid initialization failed\n"<<endl;
    
    return 0;
 }

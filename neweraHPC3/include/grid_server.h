@@ -24,7 +24,8 @@
 namespace neweraHPC
 {
    nhpc_status_t nhpc_register_to_controller(const char *grid_controller_addr, const char *grid_controller_port,
-					     const char *host_addr, const char *host_port, int host_core_count);
+					     const char *host_addr, const char *host_port, int host_core_count,
+					     int host_cpu_time);
 };
 
 #endif

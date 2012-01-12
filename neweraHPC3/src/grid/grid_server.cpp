@@ -23,7 +23,8 @@
 namespace neweraHPC 
 {
    nhpc_status_t nhpc_register_to_controller(const char *grid_controller_addr, const char *grid_controller_port,
-					     const char *host_addr, const char *host_port, int host_core_count)
+					     const char *host_addr, const char *host_port, int host_core_count,
+					     int host_cpu_time)
    {
       nhpc_status_t nrv;
       nhpc_socket_t *sock;
@@ -32,20 +33,22 @@ namespace neweraHPC
       
       if(nrv != NHPC_SUCCESS)
       {
-	 //socket_delete(sock);
 	 return errno;
       }      
       
       char *node_cores_str = nhpc_itostr(host_core_count);
+      char *node_cpu_time_str = nhpc_itostr(host_cpu_time);
       
       nhpc_headers_t *headers = new nhpc_headers_t;
       headers->insert("GRID NODE_REGISTRATION 2.90");
       headers->insert("Node-Addr", host_addr);
       headers->insert("Node-Port", host_port);
       headers->insert("Node-Cores", node_cores_str);
+      headers->insert("Node-Cpu-Time", node_cpu_time_str);
       headers->write(sock);
       
       delete[] node_cores_str;
+      delete[] node_cpu_time_str;
       delete headers;
       
       socket_close(sock);

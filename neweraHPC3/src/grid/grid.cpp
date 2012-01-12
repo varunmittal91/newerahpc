@@ -31,15 +31,34 @@ namespace neweraHPC
 {
    nhpc_grid_server_t *grid_server;
    
-   nhpc_grid_server_t::nhpc_grid_server_t(const char *_host_addr, const char *_host_port, const char *_host_cores) 
+   nhpc_grid_server_t::nhpc_grid_server_t(const char *in_host, const char *in_cpu_time) 
    : network_t(&thread_manager), plugin_manager_t(&thread_manager) , grid_scheduler_t(&thread_manager)
    {
       clients = new rbtree_t(NHPC_RBTREE_STR);
       thread_manager = new thread_manager_t;
       
-      nhpc_strcpy(&host_addr, _host_addr);
-      nhpc_strcpy(&host_port, _host_port);
-      host_cores = nhpc_strtoi(_host_cores);
+      string_t *string = nhpc_substr(in_host, ':');
+      nhpc_strcpy(&host_addr, string->strings[0]);
+      
+      if(string->count == 1)
+      {
+	 nhpc_strcpy(&host_port, "8080");
+      }
+      else 
+	 nhpc_strcpy(&host_port, string->strings[1]);  
+      
+      if(in_cpu_time)
+      {
+	 host_cpu_time = nhpc_strtoi(in_cpu_time);
+	 if(host_cpu_time > 100)
+	    host_cpu_time = 100;
+      }
+      else 
+	 host_cpu_time = 0;
+      
+      host_cores = sysconf(_SC_NPROCESSORS_CONF);
+      
+      nhpc_string_delete(string);
    }
    
    nhpc_status_t nhpc_grid_server_t::grid_server_init()
@@ -54,7 +73,7 @@ namespace neweraHPC
       fnc_ptr_t *grid_request_handler = (fnc_ptr_t *)nhpc_grid_server_t::grid_request_init;
       int rv = network_addons->insert((void *)&grid_request_handler, "GRID");
 
-      add_peer(host_addr, host_port, host_cores);
+      add_peer(host_addr, host_port, host_cores, host_cpu_time);
 
       grid_server = this;
 
@@ -63,10 +82,27 @@ namespace neweraHPC
 	 return nrv;
    }
    
-   nhpc_status_t nhpc_grid_server_t::grid_server_init(const char *_grid_controller_addr, const char *_grid_controller_port)
+   nhpc_status_t nhpc_grid_server_t::grid_server_init(const char *_grid_controller)
    {
-      cout<<"Registering to controller: "<<_grid_controller_addr<<":"<<_grid_controller_port<<endl;
-      nhpc_register_to_controller(_grid_controller_addr, _grid_controller_port, host_addr, host_port, host_cores);
+      string_t *string = nhpc_substr(_grid_controller, ':');
+      
+      const char *grid_controller_addr = string->strings[0];
+      const char *grid_controller_port;
+      
+      if(string->count == 1)
+	 grid_controller_port = "8080";
+      else 
+	 grid_controller_port = string->strings[1];
+      
+      cout<<"Registering to controller: "<<grid_controller_addr<<":"<<grid_controller_port<<endl;
+      
+      nhpc_status_t nrv = nhpc_register_to_controller(grid_controller_addr, grid_controller_port, host_addr, host_port, 
+						      host_cores, host_cpu_time);
+      
+      nhpc_string_delete(string);
+      
+      if(nrv != NHPC_SUCCESS)
+	 return nrv;
       
       grid_server_init();      
    }
@@ -179,11 +215,12 @@ namespace neweraHPC
       char *node_addr = (char *)headers->search("Node-Addr");
       char *node_port = (char *)headers->search("Node-Port");
       char *node_cores = (char *)headers->search("Node-Cores");
+      char *node_cpu_time = (char *)headers->search("Node-Cpu-Time");
       
-      if(!node_addr || !node_port || !node_cores)
+      if(!node_addr || !node_port || !node_cores || !node_cpu_time)
 	 return NHPC_FAIL;
       
-      add_peer(sock->host, node_port, nhpc_strtoi(node_cores));
+      add_peer(sock->host, node_port, nhpc_strtoi(node_cores), nhpc_strtoi(node_cpu_time));
       
       return NHPC_SUCCESS;
    }

@@ -128,10 +128,8 @@ namespace neweraHPC
       return cores;
    }
 
-   void grid_scheduler_t::add_peer(const char *host, const char *port, int processors)
-   {
-      processors = sysconf(_SC_NPROCESSORS_CONF);
-      
+   void grid_scheduler_t::add_peer(const char *host, const char *port, int processors, int cpu_time)
+   {      
       peer_details_t *peer_details = new peer_details_t;
       nhpc_strcpy(&(peer_details->host), host);
       nhpc_strcpy(&(peer_details->port), port);
@@ -244,6 +242,8 @@ namespace neweraHPC
       const char *grid_uid;
       const char *host_grid_uid = (const char *)instruction_set->host_grid_uid;
       const char *base_dir = nhpc_strconcat("/www/grid/", host_grid_uid, "/");
+      
+      int argument_count = 0;
             
       if(!peer_details)
       {
@@ -263,8 +263,9 @@ namespace neweraHPC
 	 nrv = NHPC_FAIL;
 	 goto exit_thread;
       }
-            
-      for(int i = 1; i < instruction_set->arguments->ret_count(); i++)
+       
+      argument_count = instruction_set->arguments->ret_count();
+      for(int i = 1; i < argument_count; i++)
       {
 	 char *argument = (char *)instruction_set->arguments->search(i);
 	 char *grid_file_str = nhpc_itostr(GRID_FILE);
@@ -353,7 +354,9 @@ namespace neweraHPC
 	 increase_thread(id); 
       }
       else 
+      {
 	 decrease_thread(id);
+      }
       
       unlock();
       

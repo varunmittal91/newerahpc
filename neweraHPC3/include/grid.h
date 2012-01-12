@@ -55,15 +55,16 @@ namespace neweraHPC
       char *host_addr;
       char *host_port;
       int host_cores;
+      int host_cpu_time;
       
       thread_manager_t *thread_manager;
       
    public:
-      nhpc_grid_server_t(const char *in_host_addr, const char *_in_host_port, const char *in_host_cores);      
+      nhpc_grid_server_t(const char *in_host, const char *in_cpu_time);      
       
       ~nhpc_grid_server_t();
       nhpc_status_t grid_server_init();
-      nhpc_status_t grid_server_init(const char *_grid_controller_addr, const char *grid_controller_port);
+      nhpc_status_t grid_server_init(const char *_grid_controller);
       
       nhpc_status_t grid_file_download(nhpc_socket_t *sock, const char **grid_uid);
       nhpc_status_t grid_execute(nhpc_socket_t *sock, const char **grid_uid);

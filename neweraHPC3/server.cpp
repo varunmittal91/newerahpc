@@ -33,15 +33,23 @@ void print_help()
    cout<<setw(20)<<"-l host_ip:port"<<setw(50)<<":Ip address and port of local server"<<endl;
    cout<<setw(22)<<"-r remote_ip:port"<<setw(46)<<":Ip address and port of controller"<<endl;
    cout<<setw(16)<<"-c cpu_time"<<setw(38)<<":Mac cpu time to use"<<endl;
+   cout<<setw(14)<<"-d daemon"<<setw(32)<<":Daemon mode"<<endl;
    
    exit(0);
 }
 
-int main(int argc,char **argv)
+int main(int argc, char **argv)
 {
    char *host = NULL;
    char *controller = NULL;
    char *cpu_time = NULL;
+   bool daemon = false;
+   
+   if(argc == 1)
+   {
+      print_help();
+      exit(0);
+   }
    
    char **tmp_argv = argv + 1;
    while(*tmp_argv != NULL)
@@ -65,17 +73,21 @@ int main(int argc,char **argv)
 	 case 'h':
 	    print_help();
 	    break;
+	 case 'd':
+	    daemon = true;
+	    break;
 	 default:
 	    print_help();
       }
       tmp_argv++;
    }   
    
-   /*
-   int pid = fork();
-   if(pid != 0)
-      exit(0);
-    */
+   if(daemon)
+   {
+      int pid = fork();
+      if(pid != 0)
+	 exit(0);
+   }
    
    nhpc_status_t nrv;
    

@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <sys/sysctl.h>
 
 #include <include/system.h>
 
@@ -49,15 +50,21 @@ namespace neweraHPC
    
    void *nhpc_system_t::monitor_system(nhpc_system_t *system)
    {
-      int bytes_free;
-      int bytes_used;
+      nhpc_meminfo meminfo;
       
+      int mib[2];
+      int64_t physical_memory;
+      size_t length;
+      
+      mib[0] = CTL_HW;
+      mib[1] = HW_MEMSIZE;
+      length = sizeof(long int);
+      sysctl(mib, 2, &(meminfo.total_mem), &length, NULL, 0);
+            
       while(1)
-      {
-	 system_mem_free(&bytes_free);
-	 system_mem_used(&bytes_used);
-	 
-	 cout<<"Memory free: "<<bytes_free<<" Memory Used: "<<bytes_used<<endl;
+      {	 
+	 system_meminfo(&meminfo);
+	 cout<<"Memory free: "<<meminfo.free_mem<<" Memory total: "<<meminfo.total_mem<<endl;
 	 sleep(1);
       }
    }

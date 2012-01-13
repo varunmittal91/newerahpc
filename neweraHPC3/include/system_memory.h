@@ -24,9 +24,14 @@
 
 namespace neweraHPC
 {
-   nhpc_status_t system_mem_free(int *bytes);
-   nhpc_status_t system_mem_used(int *bytes);
-   nhpc_status_t system_mem_total(int *bytes);
+   struct nhpc_meminfo{
+      long int total_mem;
+      long int free_mem;
+      long int total_swap;
+      long int free_swap;
+   };
+   
+   nhpc_status_t system_meminfo(nhpc_meminfo *meminfo);
 };
 
 #endif

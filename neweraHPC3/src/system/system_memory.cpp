@@ -17,10 +17,13 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef __APPLE__
 #include <mach/vm_statistics.h>
 #include <mach/mach_types.h>
 #include <mach/mach_init.h>
 #include <mach/mach_host.h>
+#else if linux
+#endif
 
 #include <include/system.h>
 
@@ -28,7 +31,7 @@ namespace neweraHPC
 {
    nhpc_status_t system_mem_free(int *bytes)
    {
-#ifdef TARGET_OS_MAC
+#ifdef __APPLE__
       vm_size_t page_size;
       mach_port_t mach_port;
       mach_msg_type_number_t count;
@@ -40,11 +43,11 @@ namespace neweraHPC
       if (KERN_SUCCESS == host_page_size(mach_port, &page_size) &&
 	  KERN_SUCCESS == host_statistics(mach_port, HOST_VM_INFO, (host_info_t)&vm_stats, &count))
       {
-	 bytes = (int64_t)vm_stats.free_count * (int64_t)page_size;	 
+	 *bytes = (int64_t)vm_stats.free_count * (int64_t)page_size;	 
       }
       
       return NHPC_SUCCESS;
-#else
+#else if linux
       *bytes = 0;
       
       return NHPC_FAIL;
@@ -53,7 +56,7 @@ namespace neweraHPC
 
    nhpc_status_t system_mem_used(int *bytes)
    {
-#ifdef DARWIN
+#ifdef __APPLE__
       vm_size_t page_size;
       mach_port_t mach_port;
       mach_msg_type_number_t count;
@@ -65,13 +68,13 @@ namespace neweraHPC
       if (KERN_SUCCESS == host_page_size(mach_port, &page_size) &&
 	  KERN_SUCCESS == host_statistics(mach_port, HOST_VM_INFO, (host_info_t)&vm_stats, &count))
       {
-	 bytes = ((int64_t)vm_stats.active_count +
+	 *bytes = ((int64_t)vm_stats.active_count +
 		  (int64_t)vm_stats.inactive_count +
 		  (int64_t)vm_stats.wire_count) *  (int64_t)page_size;
       }
       
       return NHPC_SUCCESS;
-#else
+#else if linux
       *bytes = 0;
       
       return NHPC_FAIL;

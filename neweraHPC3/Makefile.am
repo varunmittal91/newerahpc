@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
+
 SUBDIRS = src tests
 
 bin_PROGRAMS   = server

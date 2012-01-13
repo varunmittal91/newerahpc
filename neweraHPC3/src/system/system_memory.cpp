@@ -30,6 +30,8 @@
 
 #include <include/system.h>
 
+using namespace std;
+
 namespace neweraHPC
 {
    nhpc_status_t system_meminfo(nhpc_meminfo *meminfo)

@@ -87,6 +87,8 @@ int main(int argc, char **argv)
    
    if(daemon)
    {
+      int rv;
+
       int pid = fork();
       if(pid != 0)
 	 exit(0);
@@ -98,8 +100,8 @@ int main(int argc, char **argv)
 	 close(i);
       
       i = open("/dev/null", O_RDWR);
-      dup(i);
-      dup(i);
+      rv = dup(i);
+      rv = dup(i);
    }
    
    nhpc_status_t nrv;

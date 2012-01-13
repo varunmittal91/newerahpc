@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <sys/sysctl.h>
+#include <sys/types.h>
 
 #include <include/system.h>
 
@@ -53,13 +54,15 @@ namespace neweraHPC
       nhpc_meminfo meminfo;
       
       int mib[2];
-      int64_t physical_memory;
+      long int physical_memory;
       size_t length;
       
+#ifdef __APPLE__
       mib[0] = CTL_HW;
       mib[1] = HW_MEMSIZE;
       length = sizeof(long int);
       sysctl(mib, 2, &(meminfo.total_mem), &length, NULL, 0);
+#endif
             
       while(1)
       {	 

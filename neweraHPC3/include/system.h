@@ -25,10 +25,25 @@
 
 namespace neweraHPC
 {
+   struct nhpc_cpuinfo_t
+   {
+      double load_avg_5;
+      double load_avg_15;
+      double load_avg_25;
+      double load_avg_max;
+   };
+   
+   struct nhpc_systeminfo_t
+   {
+      nhpc_cpuinfo_t cpuinfo;
+      nhpc_meminfo_t meminfo;
+   };
+   
    class nhpc_system_t
    {
    private:
       thread_manager_t **thread_manager;
+      nhpc_systeminfo_t *systeminfo;
       
    public:
       nhpc_system_t();
@@ -36,8 +51,17 @@ namespace neweraHPC
       ~nhpc_system_t();
       void init_system();
       
+      nhpc_status_t system_memstats(nhpc_meminfo_t **meminfo);
+      nhpc_status_t system_cpustats(nhpc_cpuinfo_t **cpuinfo);
+      nhpc_status_t system_stats(nhpc_systeminfo_t **systeinfo);
+      
       static void *monitor_system(nhpc_system_t *system);
    };
+   
+   double cpu_usage();
+   nhpc_status_t system_cpuinfo(nhpc_cpuinfo_t *cpuinfo);
+   nhpc_status_t system_systeminfo(nhpc_systeminfo_t *systeminfo);  
+   nhpc_status_t system_loadavg(nhpc_cpuinfo_t *cpuinfo);
 };
 
 #endif

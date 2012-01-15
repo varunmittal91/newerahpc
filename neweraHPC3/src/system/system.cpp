@@ -18,7 +18,6 @@
  */
 
 #include <iostream>
-#include <sys/sysctl.h>
 #include <sys/types.h>
 
 #include <include/system.h>
@@ -43,31 +42,44 @@ namespace neweraHPC
    }
    
    void nhpc_system_t::init_system()
-   {
+   {      
+      systeminfo = new nhpc_systeminfo_t;
+      
       int thread_id;
       (*thread_manager)->init_thread(&thread_id, NULL);
       (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))monitor_system, this, NHPC_THREAD_DEFAULT);
    }
    
+   nhpc_status_t nhpc_system_t::system_memstats(nhpc_meminfo_t **_meminfo)
+   {
+      *_meminfo = &(systeminfo->meminfo);
+   }
+   
+   nhpc_status_t nhpc_system_t::system_cpustats(nhpc_cpuinfo_t **_cpuinfo)
+   {
+      *_cpuinfo = &(systeminfo->cpuinfo);
+   }
+   
+   nhpc_status_t nhpc_system_t::system_stats(nhpc_systeminfo_t **_systeminfo)
+   {
+      *_systeminfo = systeminfo;
+   }   
+
+   nhpc_status_t system_systeminfo(nhpc_systeminfo_t *systeminfo)
+   {
+      system_cpuinfo(&(systeminfo->cpuinfo));
+      system_meminfo(&(systeminfo->meminfo));
+   }
+   
    void *nhpc_system_t::monitor_system(nhpc_system_t *system)
    {
-      nhpc_meminfo meminfo;
+      nhpc_meminfo_t *meminfo = &(system->systeminfo->meminfo);
+      nhpc_systeminfo_t *systeminfo = system->systeminfo;
       
-      int mib[2];
-      long int physical_memory;
-      size_t length;
-      
-#ifdef __APPLE__
-      mib[0] = CTL_HW;
-      mib[1] = HW_MEMSIZE;
-      length = sizeof(long int);
-      sysctl(mib, 2, &(meminfo.total_mem), &length, NULL, 0);
-#endif
-            
       while(1)
       {	 
-	 system_meminfo(&meminfo);
-	 cout<<"Memory free: "<<meminfo.free_mem<<" Memory total: "<<meminfo.total_mem<<endl;
+	 system_cpuinfo(&(systeminfo->cpuinfo));
+	 system_meminfo(meminfo);
 	 sleep(1);
       }
    }

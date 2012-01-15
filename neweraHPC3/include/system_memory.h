@@ -24,14 +24,15 @@
 
 namespace neweraHPC
 {
-   struct nhpc_meminfo{
+   struct nhpc_meminfo_t
+   {
       long int total_mem;
       long int free_mem;
       long int total_swap;
       long int free_swap;
    };
    
-   nhpc_status_t system_meminfo(nhpc_meminfo *meminfo);
+   nhpc_status_t system_meminfo(nhpc_meminfo_t *meminfo);
 };
 
 #endif

@@ -32,8 +32,7 @@ namespace neweraHPC
    nhpc_grid_server_t *grid_server;
    
    nhpc_grid_server_t::nhpc_grid_server_t(const char *in_host, const char *in_cpu_time) 
-   : network_t(&thread_manager), plugin_manager_t(&thread_manager), grid_scheduler_t(&thread_manager),
-   nhpc_system_t(&thread_manager)
+   : network_t(&thread_manager), plugin_manager_t(&thread_manager), grid_scheduler_t(&thread_manager)
    {
       clients = new rbtree_t(NHPC_RBTREE_STR);
       thread_manager = new thread_manager_t;
@@ -171,15 +170,16 @@ namespace neweraHPC
 	 {
 	    char *peer_id = (char *)sock->headers->search("Peer");
 	    int peer_id_n = nhpc_strtoi(peer_id);
-	    /*
+	    
 	    if(sock->partial_content)
 	    {
 	       task_t *task = (task_t *)sock->partial_content;
-	       grid_server->free_peer(nhpc_strtoi(peer_id), task->loadavg);
+	       nhpc_systeminfo_t *systeminfo = &(task->systeminfo);
+	       grid_server->free_peer(nhpc_strtoi(peer_id), systeminfo->cpuinfo.load_avg_max, &(systeminfo->meminfo));
 	    }
 	    else 
-	     */
-	    grid_server->free_peer(nhpc_strtoi(peer_id));
+	       grid_server->free_peer(nhpc_strtoi(peer_id));
+	    
 	    nrv = NHPC_SUCCESS;
 	 }
 	 

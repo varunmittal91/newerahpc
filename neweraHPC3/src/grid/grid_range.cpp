@@ -21,6 +21,7 @@
 
 #include <include/grid.h>
 #include <include/network.h>
+#include <include/system.h>
 
 using namespace std;
 
@@ -195,7 +196,6 @@ namespace neweraHPC
       {
 	 task_t *task = new task_t;
 	 time(&(task->t));
-	 task->loadavg = grid_server->cpu_usage();
 	 task->instruction_set = instruction_set;
 	 grid_server->add_child_process(task, &pid);
       }

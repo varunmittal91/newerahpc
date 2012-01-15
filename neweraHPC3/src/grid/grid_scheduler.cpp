@@ -31,7 +31,7 @@ namespace neweraHPC
 {	
    grid_scheduler_t *scheduler;
    
-   grid_scheduler_t::grid_scheduler_t(thread_manager_t **_thread_manager)
+   grid_scheduler_t::grid_scheduler_t(thread_manager_t **_thread_manager) : nhpc_system_t(_thread_manager)
    {
       peers = new rbtree_t;
       jobs = new rbtree_t(NHPC_RBTREE_STR);
@@ -98,19 +98,6 @@ namespace neweraHPC
       (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))grid_scheduler_t::monitor_jobs_pending, 
 				       this, NHPC_THREAD_DEFAULT);
       signal(SIGCHLD, grid_scheduler_t::child_handler);
-   }
-   
-   double grid_scheduler_t::cpu_usage()
-   {
-      double sample[3];
-      getloadavg(sample, 3);
-      double max = sample[0];
-      if(max < sample[1])
-	 max = sample[1];
-      if(max < sample[2])
-	 max = sample[2];
-      
-      return max;
    }
    
    int grid_scheduler_t::cores()
@@ -337,9 +324,11 @@ namespace neweraHPC
       push_jobs();
    }
    
-   void grid_scheduler_t::free_peer(int id, double loadavg)
+   void grid_scheduler_t::free_peer(int id, double loadavg, nhpc_meminfo_t *meminfo)
    {
       lock();
+      
+      int mem_free = meminfo->total_mem / meminfo->free_mem;
       
       peer_details_t *peer_details = (peer_details_t *)peers->search(id);
       if(peer_details)
@@ -348,8 +337,7 @@ namespace neweraHPC
       }
       
       double processor_time = (loadavg * 100);
-      cout<<"cpu time: "<<processor_time<<endl;
-      if(processor_time < (peer_details->processor_time * peer_details->processors))
+      if(processor_time < (peer_details->processor_time * peer_details->processors) && mem_free <= 10)
       {
 	 increase_thread(id); 
       }
@@ -434,7 +422,7 @@ namespace neweraHPC
 	 
 	 task_t *task = (task_t *)(*child_processes).search(pid);
 	 nhpc_instruction_set_t *instruction_set = task->instruction_set;
-	 task->loadavg = cpu_usage();
+	 system_systeminfo(&(task->systeminfo));
 	 
 	 if(!instruction_set)
 	    continue;
@@ -474,7 +462,7 @@ namespace neweraHPC
 	 delete[] peer_id;
 	 
 	 nhpc_size_t size = sizeof(task_t);
-	 socket_sendmsg(sock, (const char *)task, &size);
+	 socket_sendmsg(sock, (const char *)(task), &size);
 	 
 	 socket_close(sock);
 	 socket_delete(sock);
@@ -484,7 +472,7 @@ namespace neweraHPC
 	 
 	 pthread_mutex_lock(mutex_child_processes);
 	 child_processes->erase(pid);
-	 pthread_mutex_unlock(mutex_child_processes);
+	 pthread_mutex_unlock(mutex_child_processes);	 
       }
       
       return NHPC_SUCCESS;

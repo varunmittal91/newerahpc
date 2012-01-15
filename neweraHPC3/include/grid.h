@@ -34,7 +34,7 @@
 
 namespace neweraHPC 
 {
-   class nhpc_grid_server_t : public network_t, public plugin_manager_t, public grid_scheduler_t, public nhpc_system_t
+   class nhpc_grid_server_t : public network_t, public plugin_manager_t, public grid_scheduler_t
    {
    private:
       struct functions_t

@@ -26,6 +26,7 @@
 #include <mach/mach_types.h>
 #include <mach/mach_init.h>
 #include <mach/mach_host.h>
+#include <sys/sysctl.h>
 #endif
 
 #include <include/system.h>
@@ -34,9 +35,18 @@ using namespace std;
 
 namespace neweraHPC
 {
-   nhpc_status_t system_meminfo(nhpc_meminfo *meminfo)
+   nhpc_status_t system_meminfo(nhpc_meminfo_t *meminfo)
    {
 #ifdef __APPLE__
+      int mib[2];
+      long int physical_memory;
+      size_t length;
+      
+      mib[0] = CTL_HW;
+      mib[1] = HW_MEMSIZE;
+      length = sizeof(long int);
+      sysctl(mib, 2, &(meminfo->total_mem), &length, NULL, 0);      
+      
       vm_size_t page_size;
       mach_port_t mach_port;
       mach_msg_type_number_t count;

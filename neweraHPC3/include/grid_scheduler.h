@@ -22,6 +22,8 @@
 
 #include "grid_data.h"
 #include "rbtree.h"
+#include "system_memory.h"
+#include "system.h"
 
 namespace neweraHPC
 {
@@ -30,11 +32,11 @@ namespace neweraHPC
    struct task_t
    {
       time_t t;
-      double loadavg;
       nhpc_instruction_set_t *instruction_set;
+      nhpc_systeminfo_t systeminfo;
    };
    
-   class grid_scheduler_t
+   class grid_scheduler_t : public nhpc_system_t
    {
    private:
       struct scheduler_thread_data_t
@@ -66,12 +68,11 @@ namespace neweraHPC
       ~grid_scheduler_t();
       void grid_scheduler_init();
       int cores();
-      double cpu_usage();
       void add_peer(const char *host, const char *port, int processors, int cpu_time);
       void remove_peer(int peer_id);
       peer_details_t *schedule();
       void free_peer(int id);
-      void free_peer(int id, double loadavg);
+      void free_peer(int id, double loadavg, nhpc_meminfo_t *meminfo);
       nhpc_status_t queue_job(nhpc_instruction_set_t *instruction_set);
       nhpc_status_t dispatch_job(nhpc_instruction_set_t *instruction_set);
       nhpc_status_t push_jobs();

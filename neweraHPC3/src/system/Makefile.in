@@ -46,7 +46,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libsystem_la_LIBADD =
-am__objects_1 = system.lo system_memory.lo
+am__objects_1 = system.lo system_memory.lo system_cpu.lo
 am_libsystem_la_OBJECTS = $(am__objects_1)
 libsystem_la_OBJECTS = $(am_libsystem_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -202,7 +202,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
-SOURCES = system.cpp system_memory.cpp
+SOURCES = system.cpp system_memory.cpp system_cpu.cpp
 noinst_LTLIBRARIES = libsystem.la 
 libsystem_la_SOURCES = $(SOURCES)
 all: all-am
@@ -258,6 +258,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system_cpu.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/system_memory.Plo@am__quote@
 
 .cpp.o:

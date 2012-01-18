@@ -179,5 +179,37 @@ namespace neweraHPC
 	 return errno;
       
       return NHPC_SUCCESS;
-   }      
+   }    
+   
+   nhpc_status_t thread_mutex_init(nhpc_mutex_t *mutex)
+   {
+      pthread_mutex_init(&(mutex->lock_read), NULL);
+      pthread_mutex_init(&(mutex->lock_write), NULL);
+      
+      return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t thread_mutex_lock(nhpc_mutex_t *mutex, int for_read)
+   {
+      pthread_mutex_t *lock = for_read ? &(mutex->lock_write) : &(mutex->lock_read);
+      pthread_mutex_t *test_lock = for_read ? &(mutex->lock_read) : &(mutex->lock_write);
+      
+      int rv = pthread_mutex_trylock(test_lock);
+      if(rv != 0)
+      {
+	 pthread_mutex_lock(lock);
+	 pthread_mutex_unlock(lock);
+      }
+      
+      return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t thread_mutex_unlock(nhpc_mutex_t *mutex, int for_read)
+   {
+      pthread_mutex_t *lock = for_read ? &(mutex->lock_write) : &(mutex->lock_read);
+
+      pthread_mutex_unlock(lock);
+
+      return NHPC_SUCCESS;
+   }
 };

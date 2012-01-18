@@ -31,8 +31,17 @@
 //! Create thread and reclaim resources of thread after it dies
 #define NHPC_THREAD_DETACH  2
 
+#define NHPC_THREAD_LOCK_READ  1
+#define NHPC_THREAD_LOCK_WRITE 0
+
 namespace neweraHPC
 {
+   struct nhpc_mutex_t
+   {
+      pthread_mutex_t lock_read;
+      pthread_mutex_t lock_write;
+   };
+   
    //! Thread Manager
    /*!
     Class for managing threads. All thread creation and management should be done through this class.
@@ -93,6 +102,10 @@ namespace neweraHPC
       //! Check for thread exit
       int exit_thread();
    };
+   
+   nhpc_status_t thread_mutex_init(nhpc_mutex_t *mutex);
+   nhpc_status_t thread_mutex_lock(nhpc_mutex_t *mutex, int for_read);
+   nhpc_status_t thread_mutex_unlock(nhpc_mutex_t *mutex, int for_read);
 };
 
 #endif

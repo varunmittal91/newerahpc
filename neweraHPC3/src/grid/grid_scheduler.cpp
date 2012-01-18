@@ -328,7 +328,14 @@ namespace neweraHPC
    {
       lock();
       
-      int mem_free = meminfo->total_mem / meminfo->free_mem;
+      int mem_free;
+      
+      if(meminfo->free_mem == 0)
+      {
+	 mem_free = 11;
+      }
+      else 
+	 mem_free = meminfo->total_mem / meminfo->free_mem;
       
       peer_details_t *peer_details = (peer_details_t *)peers->search(id);
       if(peer_details)

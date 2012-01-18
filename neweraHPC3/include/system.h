@@ -44,6 +44,7 @@ namespace neweraHPC
    private:
       thread_manager_t **thread_manager;
       nhpc_systeminfo_t *systeminfo;
+      nhpc_mutex_t mutex;
       
    public:
       nhpc_system_t();

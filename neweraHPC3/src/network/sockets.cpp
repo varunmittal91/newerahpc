@@ -195,9 +195,7 @@ namespace neweraHPC
       if(sock)
       {
 	 if(sock->hints_res)
-	 {
 	    freeaddrinfo(sock->hints_res);
-	 }
 	 if(sock->hints)
 	    delete sock->hints;
 	 if(sock->headers)

@@ -20,6 +20,7 @@
 #include <iostream>
 #include <iomanip>
 
+#include <include/neweraHPC.h>
 #include <include/grid.h>
 #include <include/network.h>
 #include <include/thread.h>
@@ -61,9 +62,131 @@ namespace neweraHPC
       nhpc_string_delete(string);
    }
    
+   nhpc_grid_server_t::nhpc_grid_server_t() 
+   : network_t(&thread_manager), plugin_manager_t(&thread_manager), grid_scheduler_t(&thread_manager)
+   {
+      clients = new rbtree_t(NHPC_RBTREE_STR);
+      thread_manager = new thread_manager_t;
+    
+      host_cpu_time = 0;
+      host_cores = sysconf(_SC_NPROCESSORS_CONF);
+      
+      host_port = NULL;
+      host_addr = NULL;
+   }      
+   
+   void print_help()
+   {
+      cout<<"Usage: server \t[-l host_ip:port] [-r remote_ip:port] \n\t\t[-c cpu_time] [-d daemon]"<<endl;
+      cout<<"Options:"<<endl;
+      cout<<setw(20)<<"-l host_ip:port"<<setw(50)<<":Ip address and port of local server"<<endl;
+      cout<<setw(22)<<"-r remote_ip:port"<<setw(46)<<":Ip address and port of controller"<<endl;
+      cout<<setw(16)<<"-c cpu_time"<<setw(38)<<":Mac cpu time to use"<<endl;
+      cout<<setw(14)<<"-d daemon"<<setw(32)<<":Daemon mode"<<endl;
+      cout<<setw(12)<<"-h help"<<setw(37)<<":This help menu"<<endl;
+      
+      exit(0);
+   }   
+   
    nhpc_status_t nhpc_grid_server_t::grid_server_init()
    {
       nhpc_status_t nrv;
+      
+      char *host = NULL;
+      char *controller = NULL;
+      char *cpu_time = NULL;
+      bool daemon = false;      
+      
+      key_pair_t *key_pair;
+      
+      for(int i = 1; i <= cmdline_arguments.ret_count(); i++)
+      {
+	 key_pair = (key_pair_t *)cmdline_arguments.search_str(i);
+	 
+	 switch(*(key_pair->key))
+	 {
+	    case 'c':
+	       cpu_time = (char *)key_pair->data;
+	       break;
+	    case 'l':
+	       host = (char *)key_pair->data;
+	       break;
+	    case 'r':
+	       controller = (char *)key_pair->data;
+	       break;
+	    case 'h':
+	       print_help();
+	       break;
+	    case 'd':
+	       daemon = true;
+	       break;
+	    default:
+	       print_help();
+	 }	 
+      }
+      
+      if(host)
+      {
+	 string_t *string = nhpc_substr(host, ':');
+	 nhpc_strcpy(&host_addr, string->strings[0]);
+	 
+	 if(string->count == 1)
+	 {
+	    nhpc_strcpy(&host_port, "8080");
+	 }
+	 else 
+	    nhpc_strcpy(&host_port, string->strings[1]);	 
+	 
+	 nhpc_string_delete(string);
+      }
+      if(controller)
+      {
+	 string_t *string = nhpc_substr(controller, ':');
+
+	 const char *controller_addr = string->strings[0];
+	 const char *controller_port;
+	 
+	 if(string->count == 1)
+	    controller_port = "8080";
+	 else 
+	    controller_port = string->strings[1];
+	 
+	 cout<<"Registering to controller: "<<grid_controller_addr<<":"<<grid_controller_port<<endl;
+	 
+	 nhpc_status_t nrv = nhpc_register_to_controller(grid_controller_addr, grid_controller_port, host_addr, host_port, 
+							 host_cores, host_cpu_time);	 
+	 if(nrv == NHPC_FAIL)
+	    cout<<"Registration to the controller failed\n Running without controller"<<endl;
+	 
+	 nhpc_string_delete(string);
+      }
+      if(cpu_time)
+      {
+	 host_cpu_time = nhpc_strtoi(cpu_time);
+	 if(host_cpu_time > 100)
+	    host_cpu_time = 100;
+      }
+      else 
+	 host_cpu_time = 0;      
+      
+      if(daemon)
+      {
+	 int rv;
+	 
+	 int pid = fork();
+	 if(pid != 0)
+	    exit(0);
+	 setsid();
+	 
+	 int i;
+	 
+	 for (i = getdtablesize(); i >= 0; --i)
+	    close(i);
+	 
+	 i = open("/dev/null", O_RDWR);
+	 rv = dup(i);
+	 rv = dup(i);
+      }      
       
       init_system();
       plugin_manager_init();
@@ -83,31 +206,6 @@ namespace neweraHPC
 	 return nrv;
    }
    
-   nhpc_status_t nhpc_grid_server_t::grid_server_init(const char *_grid_controller)
-   {
-      string_t *string = nhpc_substr(_grid_controller, ':');
-      
-      const char *grid_controller_addr = string->strings[0];
-      const char *grid_controller_port;
-      
-      if(string->count == 1)
-	 grid_controller_port = "8080";
-      else 
-	 grid_controller_port = string->strings[1];
-      
-      cout<<"Registering to controller: "<<grid_controller_addr<<":"<<grid_controller_port<<endl;
-      
-      nhpc_status_t nrv = nhpc_register_to_controller(grid_controller_addr, grid_controller_port, host_addr, host_port, 
-						      host_cores, host_cpu_time);
-      
-      nhpc_string_delete(string);
-      
-      if(nrv != NHPC_SUCCESS)
-	 return nrv;
-      
-      grid_server_init();      
-   }
-
    nhpc_grid_server_t::~nhpc_grid_server_t()
    {
       delete[] host_addr;

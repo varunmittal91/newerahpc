@@ -26,91 +26,14 @@
 using namespace std;
 using namespace neweraHPC;
 
-void print_help()
-{
-   cout<<"Usage: server \t[-l host_ip:port] [-r remote_ip:port] \n\t\t[-c cpu_time] [-d daemon]"<<endl;
-   cout<<"Options:"<<endl;
-   cout<<setw(20)<<"-l host_ip:port"<<setw(50)<<":Ip address and port of local server"<<endl;
-   cout<<setw(22)<<"-r remote_ip:port"<<setw(46)<<":Ip address and port of controller"<<endl;
-   cout<<setw(16)<<"-c cpu_time"<<setw(38)<<":Mac cpu time to use"<<endl;
-   cout<<setw(14)<<"-d daemon"<<setw(32)<<":Daemon mode"<<endl;
-   cout<<setw(12)<<"-h help"<<setw(37)<<":This help menu"<<endl;
-   
-   exit(0);
-}
-
 int main(int argc, char **argv)
 {
-   char *host = NULL;
-   char *controller = NULL;
-   char *cpu_time = NULL;
-   bool daemon = false;
-   
-   if(argc == 1)
-   {
-      print_help();
-      exit(0);
-   }
-   
-   char **tmp_argv = argv + 1;
-   while(*tmp_argv != NULL)
-   {
-      char *arg = *tmp_argv;
-      if(*arg != '-')
-         print_help();
-      arg++;
-      switch(*arg)
-      {
-         case 'c':
-	    cpu_time = *(tmp_argv + 1);
-            tmp_argv++;
-            break;
-         case 'l':
-	    host = *(tmp_argv + 1);
-            tmp_argv++;
-            break;
-	 case 'r':
-	    controller = *(tmp_argv + 1);
-	    tmp_argv++;
-	    break;
-	 case 'h':
-	    print_help();
-	    break;
-	 case 'd':
-	    daemon = true;
-	    break;
-	 default:
-	    print_help();
-      }
-      tmp_argv++;
-   }   
-   
-   if(daemon)
-   {
-      int rv;
-
-      int pid = fork();
-      if(pid != 0)
-	 exit(0);
-      setsid();
+   neweraHPC_init(argc, argv);
       
-      int i;
-      
-      for (i = getdtablesize(); i >= 0; --i)
-	 close(i);
-      
-      i = open("/dev/null", O_RDWR);
-      rv = dup(i);
-      rv = dup(i);
-   }
-   
    nhpc_status_t nrv;
    
-   nhpc_grid_server_t grid_server(host, cpu_time);
-   if(controller)
-      nrv = grid_server.grid_server_init(controller);
-   else 
-      nrv = grid_server.grid_server_init();
+   nhpc_grid_server_t grid_server;
+   nrv = grid_server.grid_server_init();
    
    if(nrv != NHPC_SUCCESS)
       cout<<"Grid initialization failed\n"<<endl;

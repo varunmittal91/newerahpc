@@ -57,11 +57,12 @@ namespace neweraHPC
       char *host_port;
       int host_cores;
       int host_cpu_time;
-      
+            
       thread_manager_t *thread_manager;
       
    public:
-      nhpc_grid_server_t(const char *in_host, const char *in_cpu_time);      
+      nhpc_grid_server_t(const char *in_host, const char *in_cpu_time);   
+      nhpc_grid_server_t();
       
       ~nhpc_grid_server_t();
       nhpc_status_t grid_server_init();

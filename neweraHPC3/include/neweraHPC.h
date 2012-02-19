@@ -29,4 +29,11 @@
 #include "grid.h"
 #include "system.h"
 
+extern neweraHPC::rbtree_t cmdline_arguments;
+
+namespace neweraHPC
+{
+   void neweraHPC_init(int argc, char **argv);
+};
+
 #endif

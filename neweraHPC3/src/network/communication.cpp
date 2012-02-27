@@ -21,6 +21,7 @@
 #include <iomanip>
 
 #include <include/network.h>
+#include <include/neweraHPC.h>
 
 using namespace std;
 
@@ -28,7 +29,7 @@ namespace neweraHPC
 {
    void read_communication(nhpc_socket_t *sock)
    {
-      cout<<"Message from: "<<sock->host<<":"<<sock->port<<endl;
+      LOG_INFO("Message from: "<<sock->host<<":"<<sock->port);
       
       sock->headers = new rbtree_t(NHPC_RBTREE_STR);
       
@@ -57,7 +58,6 @@ namespace neweraHPC
       }
       
       nhpc_display_headers(sock);
-      cout<<endl;
       
       char *command = (char *)sock->headers->search("command");
       if(command != NULL)
@@ -145,14 +145,14 @@ namespace neweraHPC
       const char *string;
       key_pair_t *key_pair;
       
-      cout<<"Headers found in the message:"<<(*headers).ret_count()<<endl;
+      LOG_INFO("Headers found in the message:"<<(*headers).ret_count());
       for(int cntr = 1; cntr <= (*headers).ret_count(); cntr++)
       {
 	 key_pair = (key_pair_t *)(*headers).search_str(cntr);
 	 int width = strlen((char *)key_pair->data);
 	 if(key_pair != NULL)
 	 {
-	    cout<<setw(20)<<key_pair->key<<setw(10)<<"\t"<<(char *)(key_pair->data)<<endl;
+	    LOG_INFO(setw(20)<<key_pair->key<<setw(10)<<"\t"<<(char *)(key_pair->data));
 	 }
       }
    }

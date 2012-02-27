@@ -20,6 +20,9 @@
 #include <iostream>
 
 #include <include/constants.h>
+#include <include/error.h>
+
+bool log_on;
 
 using namespace std;
 
@@ -30,4 +33,10 @@ namespace neweraHPC
       if(status == NHPC_TIMEUP)
 	 cout<<message<<": Operation timedout"<<endl;
    }
+   
+   
+   ostream& operator<<(ostream& ostr, const MyObject& obj) {
+      ostr << "(a=" << obj.a << ", b=" << obj.b << ")";
+      return ostr;
+   }   
 };

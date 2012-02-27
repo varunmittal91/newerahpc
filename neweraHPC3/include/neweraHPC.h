@@ -29,7 +29,11 @@
 #include "grid.h"
 #include "system.h"
 
+#include <iostream>
+
 extern neweraHPC::rbtree_t cmdline_arguments;
+
+using namespace std;
 
 namespace neweraHPC
 {

@@ -194,19 +194,19 @@ namespace neweraHPC
    {
       if(sock)
       {
-	 if(sock->hints_res)
-	    freeaddrinfo(sock->hints_res);
-	 if(sock->hints)
-	    delete sock->hints;
-	 if(sock->headers)
-	    nhpc_delete_headers(sock->headers);
-	 if(sock->host)
-	    delete[] sock->host;
-	 if(sock->port)
-	    delete[] (sock->port);
-	 if(sock->partial_content)
-	    delete[] sock->partial_content;
-
+	 //if(sock->hints_res)
+	 //   freeaddrinfo(sock->hints_res);
+	 //if(sock->hints)
+	 //   delete sock->hints;
+	 //if(sock->headers)
+	 //   nhpc_delete_headers(sock->headers);
+	 //if(sock->host)
+	 //   delete[] sock->host;
+	 //if(sock->port)
+	 //   delete[] (sock->port);
+	 //if(sock->partial_content)
+	 //   delete[] sock->partial_content;
+	  
 	 delete sock;
 	 sock = NULL;
       }

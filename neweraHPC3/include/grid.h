@@ -66,7 +66,6 @@ namespace neweraHPC
       
       ~nhpc_grid_server_t();
       nhpc_status_t grid_server_init();
-      nhpc_status_t grid_server_init(const char *_grid_controller);
       
       nhpc_status_t grid_file_download(nhpc_socket_t *sock, const char **grid_uid);
       nhpc_status_t grid_execute(nhpc_socket_t *sock, const char **grid_uid);

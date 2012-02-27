@@ -24,6 +24,7 @@
 #include <include/grid.h>
 #include <include/network.h>
 #include <include/grid_client.h>
+#include <include/error.h>
 
 using namespace std;
 
@@ -511,7 +512,7 @@ namespace neweraHPC
 	    }
 	 }
 	 else 
-	    cout<<"No job pending available cores: "<<core_count<<endl;
+	    LOG_INFO("No job pending available cores: "<<core_count);
 	 
 	 sleep(1);
       }

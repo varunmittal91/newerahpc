@@ -29,14 +29,14 @@ using namespace neweraHPC;
 int main(int argc, char **argv)
 {
    neweraHPC_init(argc, argv);
-      
+   
    nhpc_status_t nrv;
    
    nhpc_grid_server_t grid_server;
    nrv = grid_server.grid_server_init();
    
    if(nrv != NHPC_SUCCESS)
-      cout<<"Grid initialization failed\n"<<endl;
+      LOG_ERROR("Grid initialization failed");
    
    return 0;
 }

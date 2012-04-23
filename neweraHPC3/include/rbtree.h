@@ -108,10 +108,21 @@ static inline void rb_link_node(struct rb_node * node, struct rb_node * parent,	
    *rb_link = node;
 }
 
+/*
 //! Operate rbtree with numeric keys
 #define NHPC_RBTREE_NUM 0
 //! Operate rbtree with string keys
 #define NHPC_RBTREE_STR 1
+//! Operate rbtree with managed numeric index mode
+#define NHPC_RBTREE_NUM_MANAGED
+*/
+ 
+enum RBTREE_MODES
+{
+   NHPC_RBTREE_NUM,
+   NHPC_RBTREE_STR,
+   NHPC_RBTREE_NUM_MANAGED
+};
 
 namespace neweraHPC
 {
@@ -131,7 +142,7 @@ namespace neweraHPC
    {
    private:
       //! rb_root structure define in Linux kernel
-      rb_root *root;
+      rb_root root;
       
       //! node structure 
       /*!
@@ -159,7 +170,10 @@ namespace neweraHPC
       int count;
       
       //! Mode of operation of rbtree
-      bool num_mode;
+      int operation_mode;
+      
+      //! Reorganize numeric indexes
+      void reorganize(int *removed_key);
       
    public:
       //! default rbtree constructor

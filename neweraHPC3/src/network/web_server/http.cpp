@@ -32,7 +32,7 @@ namespace neweraHPC
    
    void http_init(nhpc_socket_t *sock)
    {
-      char *command = (char *)sock->headers->search("command");
+      char *command = (char *)sock->headers.search("command");
       
       if(nhpc_strcmp(command, "GET*") == NHPC_SUCCESS)
 	 http_request(sock);
@@ -44,7 +44,7 @@ namespace neweraHPC
    
    void http_request(nhpc_socket_t *sock)
    {
-      char *command = (char *)sock->headers->search("command");
+      char *command = (char *)sock->headers.search("command");
       string_t *request = nhpc_substr(command, ' ');
       
       if(request->count < 3)
@@ -145,7 +145,7 @@ namespace neweraHPC
 	    nrv = nhpc_analyze_stream(sock, buffer, &size, &header_size);
 	    if(nrv == NHPC_SUCCESS)
 	    {
-	       http_content_length(sock->headers, &file_size);
+	       http_content_length(&(sock->headers), &file_size);
 	       nhpc_display_headers(sock);
 	    }
 	 }

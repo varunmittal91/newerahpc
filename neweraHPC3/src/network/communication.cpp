@@ -31,8 +31,6 @@ namespace neweraHPC
    {
       LOG_INFO("Message from: "<<sock->host<<":"<<sock->port);
       
-      sock->headers = new rbtree_t(NHPC_RBTREE_STR);
-      
       char buffer[1000];
       nhpc_size_t size = 1000;
       nhpc_size_t header_size = 0;
@@ -53,13 +51,12 @@ namespace neweraHPC
       if((size - header_size) != 0)
       {
 	 sock->partial_content_len = (size - header_size);
-	 sock->partial_content = new char [size - header_size];
 	 memcpy(sock->partial_content, (buffer + header_size), (size - header_size));
       }
       
       nhpc_display_headers(sock);
       
-      char *command = (char *)sock->headers->search("command");
+      char *command = (char *)sock->headers.search("command");
       if(command != NULL)
       {
 	 network_t *network = sock->server_details->main_network;
@@ -83,11 +80,6 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *data, nhpc_size_t *len, nhpc_size_t *header_size)
    {
-      if(!(sock->headers))
-      {
-	 sock->headers = new rbtree_t(NHPC_RBTREE_STR);
-      }
-      
       if(header_size != NULL)
 	 *header_size = 0;
       
@@ -96,7 +88,7 @@ namespace neweraHPC
       
       int line_len = 0;
       int old_pos = 0;
-      rbtree_t *headers = sock->headers;
+      rbtree_t *headers = &(sock->headers);
       
       for(int cntr = 0; cntr < *len; cntr++)
       {
@@ -137,7 +129,7 @@ namespace neweraHPC
    
    void nhpc_display_headers(nhpc_socket_t *sock)
    {
-      rbtree_t *headers = sock->headers;
+      rbtree_t *headers = &(sock->headers);
       
       if(headers == NULL)
 	 return;

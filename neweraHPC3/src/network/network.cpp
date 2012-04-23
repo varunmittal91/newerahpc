@@ -22,6 +22,7 @@
 #include <iomanip>
 
 #include <include/network.h>
+#include <include/error.h>
 
 using namespace std;
 
@@ -59,7 +60,7 @@ namespace neweraHPC
    
    void network_t::network_quit()
    {
-      cout<<"\n\nInitiating Server Shutdown"<<endl;
+      LOG_INFO("Initiating Server Shutdown");
       (**thread_manager).cancel_thread(accept_thread_id);
    }
    
@@ -67,7 +68,7 @@ namespace neweraHPC
    {
       lock();
       
-      cout<<"Closing all active sockets\t";      
+      LOG_INFO("Closing all active sockets\t");
       nhpc_socket_t *client_sock;
       int key;
       while(1)
@@ -82,25 +83,21 @@ namespace neweraHPC
       }
       
       delete client_connections;
-      cout<<setw(50)<<"OK"<<endl;
       
-      cout<<"Deleting network addons\t\t";
+      LOG_INFO("Deleting network addons");
       delete network_addons;
-      cout<<setw(50)<<"OK"<<endl;
       
-      cout<<"Closing server socket\t\t";
+      LOG_INFO("Closing server socket");
       if(server_sock)
       {
 	 socket_close(server_sock);
 	 socket_delete(server_sock);
       }
-      cout<<setw(50)<<"\tOK"<<endl;
       
       if(!external_thread_manager) 
       {
-	 cout<<"Shuting down thread manager\t";
+	 LOG_INFO("Shuting down thread manager");
 	 delete (*thread_manager);
-	 cout<<setw(50)<<"OK"<<endl;
       }
 
       delete mutex;
@@ -223,7 +220,7 @@ namespace neweraHPC
    void sig_action(int sig)
    {
       if(sig == SIGPIPE)
-	 cout<<"PIPE Broken at thread - "<<pthread_self()<<endl;
+	 LOG_ERROR("PIPE Broken at thread - "<<pthread_self());
    }
    
    void *network_t::accept_connection(nhpc_thread_details_t *main_thread)
@@ -296,8 +293,10 @@ namespace neweraHPC
 	    client_sock->sockfd = new_sd;
 	    client_sock->server_details = server_details;
 	    client_sock->timeout = 3 * 60 * 60;
-	    nhpc_strcpy((char **)&(client_sock->host), inet_ntoa(client_sockaddr->sin_addr));
-	    client_sock->port = nhpc_itostr(ntohs(client_sockaddr->sin_port));
+	    nhpc_strcpy_noalloc((client_sock->host), inet_ntoa(client_sockaddr->sin_addr));
+	    char *tmp_port = nhpc_itostr(ntohs(client_sockaddr->sin_port));
+	    nhpc_strcpy_noalloc((client_sock->port), tmp_port);
+	    delete[] tmp_port;
 	    
 	    delete client_sockaddr;
 	    

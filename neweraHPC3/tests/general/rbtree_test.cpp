@@ -242,6 +242,26 @@ int main()
    
    delete test_tree;
    
+   cout<<"\n\nTesting managed mode"<<endl;
+
+   test_tree = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+   cout<<(*test_tree).insert(a)<<endl;
+   cout<<(*test_tree).insert(b)<<endl;
+   cout<<(*test_tree).insert(c)<<endl;
+   cout<<(*test_tree).insert(d)<<endl;
+   cout<<(*test_tree).insert(c)<<endl;
+   
+   (*test_tree).erase(4);
+   
+   cout<<(*test_tree).ret_count()<<endl;
+   
+   for(int i = 1; i <= (*test_tree).ret_count(); i++)
+   {
+      void *test = (*test_tree).search(i);
+      (*test_tree).erase(i);
+      cout<<i<<" "<<test<<endl;
+   }
+   
    cout<<"All tree structures and data have been deleted there should not be any trace of memory still remaining\n";
    cout<<"If there is still some memory left that is not deallocated, we have a problem"<<endl;
    

@@ -23,6 +23,7 @@
 #include <include/grid.h>
 #include <include/network.h>
 #include <include/file.h>
+#include <include/error.h>
 
 using namespace std;
 
@@ -40,13 +41,12 @@ namespace neweraHPC
    
    plugin_manager_t::~plugin_manager_t()
    {
-      cout<<"Shuting down plugin manager";
+      LOG_INFO("Shuting down plugin manager");
       delete plugins_requested;
       delete plugins_installed;
       
       delete mutex;
       delete[] grid_directory;
-      cout<<setw(50)<<"\tOK"<<endl;
    }
    
    void plugin_manager_t::plugin_manager_init()
@@ -154,10 +154,10 @@ namespace neweraHPC
 	 else 
 	    nhpc_strcpy(&(new_plugin->path_nxi), dll_path);
 
-	 cout<<"New plugin details:"<<endl;
-	 cout<<"\t"<<new_plugin->plugin_name<<endl;
-	 cout<<"\t"<<new_plugin->path_nxi<<endl;
-	 cout<<"\t"<<new_plugin->path_plugin<<endl;
+	 LOG_DEBUG("New plugin details:");
+	 LOG_DEBUG("\t"<<new_plugin->plugin_name);
+	 LOG_DEBUG("\t"<<new_plugin->path_nxi);
+	 LOG_DEBUG("\t"<<new_plugin->path_plugin);
       }
       
       return nrv;

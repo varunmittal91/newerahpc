@@ -22,7 +22,7 @@
 #include <include/constants.h>
 #include <include/error.h>
 
-bool log_on;
+bool log_on[3];
 
 using namespace std;
 

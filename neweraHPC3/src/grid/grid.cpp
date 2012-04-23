@@ -83,6 +83,7 @@ namespace neweraHPC
       cout<<setw(22)<<"-r remote_ip:port"<<setw(46)<<":Ip address and port of controller"<<endl;
       cout<<setw(16)<<"-c cpu_time"<<setw(38)<<":Mac cpu time to use"<<endl;
       cout<<setw(14)<<"-d daemon"<<setw(32)<<":Daemon mode"<<endl;
+      cout<<setw(15)<<"-v verbose"<<setw(50)<<":Verbose mode: info, debug, all"<<endl;
       cout<<setw(12)<<"-h help"<<setw(37)<<":This help menu"<<endl;
       
       exit(0);
@@ -139,6 +140,12 @@ namespace neweraHPC
 	 
 	 nhpc_string_delete(string);
       }
+      else 
+      {
+	 LOG_ERROR("Host not specified");
+	 print_help();
+      }
+	 
       if(controller)
       {
 	 string_t *string = nhpc_substr(controller, ':');
@@ -151,12 +158,12 @@ namespace neweraHPC
 	 else 
 	    controller_port = string->strings[1];
 	 
-	 cout<<"Registering to controller: "<<grid_controller_addr<<":"<<grid_controller_port<<endl;
+	 LOG_INFO("Registering to controller: "<<grid_controller_addr<<":"<<grid_controller_port);
 	 
 	 nhpc_status_t nrv = nhpc_register_to_controller(grid_controller_addr, grid_controller_port, host_addr, host_port, 
 							 host_cores, host_cpu_time);	 
 	 if(nrv == NHPC_FAIL)
-	    cout<<"Registration to the controller failed\n Running without controller"<<endl;
+	    LOG_ERROR("Registration to the controller failed\n Running without controller");
 	 
 	 nhpc_string_delete(string);
       }
@@ -213,7 +220,7 @@ namespace neweraHPC
       
       char *tmp_host_addr;
       const char *key_str;
-      cout<<"Deleting grid client details";
+      LOG_INFO("Deleting grid client details");
       while(1)
       {
 	 tmp_host_addr = (char *)(*clients).search_first(&key_str);
@@ -226,12 +233,11 @@ namespace neweraHPC
       }
       
       delete clients;
-      cout<<setw(50)<<"\tOK"<<endl;
    }
    
    void nhpc_grid_server_t::grid_request_init(nhpc_socket_t *sock)
    {
-      char *command = (char *)sock->headers->search("command");
+      char *command = (char *)sock->headers.search("command");
       string_t *string = nhpc_substr(command, ' ');
       
       if(string->count < 3)
@@ -248,7 +254,7 @@ namespace neweraHPC
 	 nrv = (*grid_server).grid_node_registration(sock);
       else 
       {
-	 const char *uid = (char *)sock->headers->search("Grid-Uid");
+	 const char *uid = (char *)sock->headers.search("Grid-Uid");
 	 
 	 if(uid == NULL || grid_server->grid_client_verify_uid(uid) != NHPC_SUCCESS)
 	 {
@@ -260,19 +266,25 @@ namespace neweraHPC
 	    nrv = grid_server->grid_file_download(sock, &uid);
 	 else if(nhpc_strcmp(fnc_str, "INSTRUCTION") == NHPC_SUCCESS)
 	 {
+	    LOG_DEBUG("My Max Cpu time: " << grid_server->host_cpu_time);
+	    
 	    nhpc_instruction_set_t *instruction_set;
-	    nrv = nhpc_generate_instruction(&instruction_set, sock->headers);
+	    nrv = nhpc_generate_instruction(&instruction_set, &(sock->headers));
 	    nrv = grid_server->grid_execute(instruction_set, sock, &uid);
 	 }
 	 else if(nhpc_strcmp(fnc_str, "SUBMISSION") == NHPC_SUCCESS)
 	 {
-	    char *peer_id = (char *)sock->headers->search("Peer");
+	    char *peer_id = (char *)sock->headers.search("Peer");
 	    int peer_id_n = nhpc_strtoi(peer_id);
 	    
 	    if(sock->partial_content)
 	    {
 	       task_t *task = (task_t *)sock->partial_content;
 	       nhpc_systeminfo_t *systeminfo = &(task->systeminfo);
+	       
+	       LOG_DEBUG("Node:load_avg_max: " << systeminfo->cpuinfo.load_avg_max);
+	       LOG_DEBUG("Node:meminfo: " << systeminfo->meminfo.free_mem);
+	       
 	       grid_server->free_peer(nhpc_strtoi(peer_id), systeminfo->cpuinfo.load_avg_max, &(systeminfo->meminfo));
 	    }
 	    else 
@@ -313,7 +325,7 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_grid_server_t::grid_node_registration(nhpc_socket_t *sock)
    {
-      rbtree_t *headers = sock->headers;
+      rbtree_t *headers = &(sock->headers);
       char *node_addr = (char *)headers->search("Node-Addr");
       char *node_port = (char *)headers->search("Node-Port");
       char *node_cores = (char *)headers->search("Node-Cores");
@@ -359,9 +371,9 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_grid_server_t::grid_file_download(nhpc_socket_t *sock, const char **grid_uid)
    {
-      char *file_name     = (char *)sock->headers->search("File-Name");
-      char *file_type     = (char *)sock->headers->search("File-Type");
-      char *file_size_str = (char *)sock->headers->search("Content-Length");
+      char *file_name     = (char *)sock->headers.search("File-Name");
+      char *file_type     = (char *)sock->headers.search("File-Type");
+      char *file_size_str = (char *)sock->headers.search("Content-Length");
 
       if(!file_name || !file_type || !file_size_str)
 	 return NHPC_FAIL;

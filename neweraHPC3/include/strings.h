@@ -36,6 +36,7 @@ namespace neweraHPC{
    };
    
    nhpc_status_t nhpc_strcpy(char **dst, const char *src);
+   nhpc_status_t nhpc_strcpy_noalloc(char *dst, const char *src);
    
    /* nhpc_strcmp and nhpc_strcmpi takes two strings as input.
       First string is the subject and the second string is 

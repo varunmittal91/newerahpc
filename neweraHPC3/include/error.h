@@ -17,9 +17,12 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _LOG_H_
+#define _LOG_H_
+
 #include <iostream>
 
-extern bool log_on;
+extern bool log_on[3];
 
 using namespace std;
 
@@ -30,7 +33,7 @@ namespace neweraHPC
    class Log
    {
    public:
-      enum Level { Warning, Error, Info };
+      enum Level { Debug, Warning, Info, Error };
       
       static ostream& GetStream() { return cout; }
       static bool IsLevelActive(Level l) { return true; }
@@ -42,8 +45,11 @@ namespace neweraHPC
    };
    
 #define LOG_ERROR(M)   do { if (Log::IsLevelActive(Log::Error))   (Log::GetStream() << "ERR: " << M << "\n"); } while (false)
-#define LOG_INFO(M)    do { if (Log::IsLevelActive(Log::Info) && log_on)    (Log::GetStream() << "INF: " << M << "\n"); } while (false)
-#define LOG_WARNING(M) do { if (Log::IsLevelActive(Log::Warning) && log_on) (Log::GetStream() << "WRN: " << M << "\n"); } while (false)
+#define LOG_INFO(M)    do { if (Log::IsLevelActive(Log::Info) && log_on[Log::Info])    (Log::GetStream() << "INF: " << M << "\n"); } while (false)
+#define LOG_WARNING(M) do { if (Log::IsLevelActive(Log::Warning) && log_on[Log::Warning]) (Log::GetStream() << "WRN: " << M << "\n"); } while (false)
+#define LOG_DEBUG(M)   do { if (Log::IsLevelActive(Log::Debug) && log_on[Log::Debug])   (Log::GetStream() << "DBG: " << M << "\n"); } while (false)
    
    ostream& operator<<(ostream& ostr, const MyObject& obj);
 };
+
+#endif

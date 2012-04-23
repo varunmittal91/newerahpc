@@ -26,6 +26,9 @@
 #include "rbtree.h"
 #include "thread.h"
 
+#define BUFFER_SIZE_HEADER 1000
+#define BUFFER_SIZE        10000
+
 namespace neweraHPC
 {
    class network_t;
@@ -45,14 +48,14 @@ namespace neweraHPC
       int family;
       int incomplete_operation;
       time_t timeout;
-      const char *host;
-      const char *port;
+      char host[16];
+      char port[6];
       addrinfo *hints;
       addrinfo *hints_res;
-      rbtree_t *headers;
+      rbtree_t headers;
       bool have_headers;
       nhpc_server_details_t *server_details;
-      char *partial_content;
+      char partial_content[BUFFER_SIZE_HEADER];
       nhpc_size_t partial_content_len;
       int thread_id;
    };

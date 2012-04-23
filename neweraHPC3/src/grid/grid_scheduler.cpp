@@ -50,7 +50,7 @@ namespace neweraHPC
    
    grid_scheduler_t::~grid_scheduler_t()
    {
-      cout<<"Shuting down grid scheduler";
+      LOG_INFO("Shuting down grid scheduler");
       
       peer_details_t *peer;
       int key;
@@ -88,8 +88,6 @@ namespace neweraHPC
       
       delete mutex;
       delete mutex_child_processes;
-
-      cout<<setw(50)<<"\tOK"<<endl;
    }
    
    void grid_scheduler_t::grid_scheduler_init()
@@ -508,7 +506,7 @@ namespace neweraHPC
 	    if(core_count > 0)
 	    {
 	       grid_scheduler->push_jobs();
-	       cout<<"Instruction Pending: "<<grid_scheduler->cores()<<endl;
+	       LOG_DEBUG("Instruction Pending: "<<grid_scheduler->cores());
 	    }
 	 }
 	 else 

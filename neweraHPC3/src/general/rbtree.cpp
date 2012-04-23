@@ -25,6 +25,7 @@
 #include <iostream>
 
 #include <include/rbtree.h>
+#include <include/alloc.h>
 
 using namespace std;
 
@@ -32,36 +33,38 @@ namespace neweraHPC
 {
    rbtree_t::rbtree_t()
    {
-      root = new rb_root;
+      memset(&root, 0, sizeof(rb_root));
       
-      root->rb_node = NULL;
       last_assigned_key = 0;
       count = 0;
-      num_mode = true;
+      operation_mode = NHPC_RBTREE_NUM;
    }
    
    rbtree_t::rbtree_t(int mode)
    {
-      root = new rb_root;
+      memset(&root, 0, sizeof(rb_root));
       
-      root->rb_node = NULL;
       last_assigned_key = 0;
       count = 0;
 
       if(mode == NHPC_RBTREE_STR)
-	 num_mode = false;
+	 operation_mode = NHPC_RBTREE_STR;
+      else if(mode == NHPC_RBTREE_NUM_MANAGED)
+      {
+	 operation_mode = NHPC_RBTREE_NUM_MANAGED;
+      }
       else 
-	 num_mode = true;
+	 operation_mode = NHPC_RBTREE_NUM;
    }
    
    rbtree_t::~rbtree_t()
    {
       struct rb_node *node;
       
-      node = rb_first(root);
+      node = rb_first(&root);
       rbtree_t::node *data_prev = NULL;
        
-      for (node = rb_first(root); ; node = rb_next(node))
+      for(node = rb_first(&root); ;node = rb_next(node))
       {
 	 if(data_prev)
             delete data_prev;
@@ -70,8 +73,8 @@ namespace neweraHPC
             break;
 
 	 rbtree_t::node *data = rb_entry(node, rbtree_t::node, node_next);
-	 rb_erase(&data->node_next, root);
-	 if(!num_mode)
+	 rb_erase(&data->node_next, &root);
+	 if(operation_mode == NHPC_RBTREE_STR)
 	 {
 	    if(data->key_pair)
 	       delete[] data->key_pair;
@@ -80,16 +83,41 @@ namespace neweraHPC
 
          data_prev = data;
       }
+   }
+   
+   void rbtree_t::reorganize(int *removed_key)
+   {
+      if(operation_mode != NHPC_RBTREE_NUM_MANAGED)
+	 return;
       
-      delete root;
+      int last_key = *removed_key;
+      rbtree_t::node *node = search_node(last_key);
+      void **data = &(node->node_data);
+      
+      if(node == NULL)
+	 return;
+      
+      while(node != NULL)
+      {	 
+	 last_key++;
+
+	 node = search_node(last_key);
+	 if(node != NULL)
+	 {
+	    *data = node->node_data;
+	    data = &(node->node_data);
+	 }
+      }
+
+      *removed_key = count;
    }
    
    void *rbtree_t::search_first(int *key)
    {
-      if(!num_mode)
+      if(operation_mode == NHPC_RBTREE_STR)
 	 return NULL;
       
-      struct rb_node *node = root->rb_node;
+      struct rb_node *node = root.rb_node;
       
       rbtree_t::node *data = container_of(node, rbtree_t::node, node_next);
       
@@ -103,10 +131,10 @@ namespace neweraHPC
    
    void *rbtree_t::search_first(const char **key_str)
    {
-      if(num_mode)
+      if(operation_mode != NHPC_RBTREE_STR)
 	 return NULL;
       
-      struct rb_node *node = root->rb_node;
+      struct rb_node *node = root.rb_node;
       
       rbtree_t::node *data = container_of(node, rbtree_t::node, node_next);
       
@@ -128,7 +156,7 @@ namespace neweraHPC
       
       int pos_count = 1;
       
-      for (node = rb_first(root); node; node = rb_next(node), pos_count++)
+      for (node = rb_first(&root); node; node = rb_next(node), pos_count++)
       {
 	 data = rb_entry(node, rbtree_t::node, node_next);
 	 if(pos_count == (position))
@@ -145,10 +173,10 @@ namespace neweraHPC
 
    void *rbtree_t::search(int key)
    {
-      if(!num_mode || key == 0)
+      if(operation_mode == NHPC_RBTREE_STR || key == 0)
 	 return NULL;
 
-      struct rb_node *node = root->rb_node;
+      struct rb_node *node = root.rb_node;
       
       while (node) 
       {
@@ -181,10 +209,10 @@ namespace neweraHPC
    
    rbtree_t::node *rbtree_t::search_node(int key)
    {
-      if(!num_mode)
+      if(operation_mode == NHPC_RBTREE_STR)
 	 return NULL;
       
-      struct rb_node *node = root->rb_node;
+      struct rb_node *node = root.rb_node;
       
       while (node) 
       {
@@ -216,7 +244,7 @@ namespace neweraHPC
    
    int rbtree_t::insert(void *in_data)
    {
-      if(!num_mode)
+      if(operation_mode == NHPC_RBTREE_STR)
 	 return false;
       
       /* Create a new rbtree_t::node type and initialize values */
@@ -225,7 +253,7 @@ namespace neweraHPC
       last_assigned_key++;
       data->node_key = last_assigned_key;
       
-      struct rb_node **new_node = &(root->rb_node), *parent = NULL;
+      struct rb_node **new_node = &(root.rb_node), *parent = NULL;
       /* Figure out where to put new node */
       while (*new_node) 
       {
@@ -252,7 +280,7 @@ namespace neweraHPC
       
       /* Add new node and rebalance tree. */
       rb_link_node(&data->node_next, parent, new_node);
-      rb_insert_color(&data->node_next, root);
+      rb_insert_color(&data->node_next, &root);
       count++;
       
       return data->node_key;
@@ -260,7 +288,7 @@ namespace neweraHPC
    
    int rbtree_t::insert(void *in_data, int key)
    {      
-      if(!num_mode)
+      if(operation_mode == NHPC_RBTREE_STR)
 	 return false;
       
       /* Create a new rbtree_t::node type and initialize values */
@@ -269,7 +297,7 @@ namespace neweraHPC
       last_assigned_key++;
       data->node_key = key;
       
-      struct rb_node **new_node = &(root->rb_node), *parent = NULL;
+      struct rb_node **new_node = &(root.rb_node), *parent = NULL;
       /* Figure out where to put new node */
       while (*new_node) 
       {
@@ -301,7 +329,7 @@ namespace neweraHPC
       
       /* Add new node and rebalance tree. */
       rb_link_node(&data->node_next, parent, new_node);
-      rb_insert_color(&data->node_next, root);
+      rb_insert_color(&data->node_next, &root);
       count++;
       
       return data->node_key;
@@ -309,14 +337,18 @@ namespace neweraHPC
    
    int rbtree_t::erase(int key)
    {
-      if(!num_mode)
+      if(operation_mode == NHPC_RBTREE_STR)
 	 return false;
       
+      reorganize(&key);
+      cout<<key<<endl;
+      
       rbtree_t::node *data = rbtree_t::search_node(key);
-      if(data){
-	 rb_erase(&data->node_next,root);
+      if(data){	 
+	 rb_erase(&data->node_next, &root);
 	 delete data;
 	 count--;
+	 
 	 return true;
       }
       else
@@ -325,7 +357,7 @@ namespace neweraHPC
    
    int rbtree_t::update(int key, void *new_in_data)
    {
-      if(!num_mode)
+      if(operation_mode == NHPC_RBTREE_STR)
 	 return false;
       
       rbtree_t::node *data = search_node(key);
@@ -349,11 +381,11 @@ namespace neweraHPC
    {
       struct rb_node *node;
       
-      node = rb_first(root);
+      node = rb_first(&root);
       key_pair_t *key_pair = NULL;
       int pos_count = 1;
       
-      for (node = rb_first(root); node; node = rb_next(node), pos_count++)
+      for (node = rb_first(&root); node; node = rb_next(node), pos_count++)
       {
 	 rbtree_t::node *data = rb_entry(node, rbtree_t::node, node_next);
 	 if(pos_count == key)
@@ -373,10 +405,10 @@ namespace neweraHPC
    
    void *rbtree_t::search(const char *key_str)
    {
-      if(num_mode) 
+      if(operation_mode != NHPC_RBTREE_STR) 
 	 return NULL;
       
-      struct rb_node *node = root->rb_node;
+      struct rb_node *node = root.rb_node;
       
       while (node) 
       {
@@ -404,10 +436,10 @@ namespace neweraHPC
    
    rbtree_t::node *rbtree_t::search_node(const char *key_str)
    {
-      if(num_mode)
+      if(operation_mode != NHPC_RBTREE_STR)
 	 return NULL;
       
-      struct rb_node *node = root->rb_node;
+      struct rb_node *node = root.rb_node;
       
       while (node) 
       {
@@ -435,7 +467,7 @@ namespace neweraHPC
    
    int rbtree_t::insert(void *in_data, const char *key_str)
    {      
-      if(num_mode)
+      if(operation_mode != NHPC_RBTREE_STR)
 	 return false;
       
       /* Create a new rbtree_t::node type and initialize values */
@@ -446,9 +478,9 @@ namespace neweraHPC
       data->node_key = last_assigned_key;
       data->key_pair = NULL;
       
-      struct rb_node **new_node = &(root->rb_node), *parent = NULL;
+      struct rb_node **new_node = &(root.rb_node), *parent = NULL;
       /* Figure out where to put new node */
-      while (*new_node) 
+      while (new_node && *new_node) 
       {
 	 node *this_node = container_of(*new_node, node, node_next);
 	 if(this_node == NULL)
@@ -475,7 +507,7 @@ namespace neweraHPC
       
       /* Add new node and rebalance tree. */
       rb_link_node(&data->node_next, parent, new_node);
-      rb_insert_color(&data->node_next, root);
+      rb_insert_color(&data->node_next, &root);
       count++;
       
       return NHPC_SUCCESS;
@@ -483,12 +515,12 @@ namespace neweraHPC
    
    int rbtree_t::erase(const char *key_str)
    {
-      if(num_mode)
+      if(operation_mode != NHPC_RBTREE_STR)
 	 return NHPC_FAIL;
       
       rbtree_t::node *data = rbtree_t::search_node(key_str);
       if(data){
-	 rb_erase(&(data->node_next), root);
+	 rb_erase(&(data->node_next), &root);
 	 delete[] data->node_key_str;
 	 if(data->key_pair)
 	    delete data->key_pair;

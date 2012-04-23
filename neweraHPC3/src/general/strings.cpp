@@ -40,6 +40,16 @@ namespace neweraHPC{
       return NHPC_SUCCESS;
    }
    
+   nhpc_status_t nhpc_strcpy_noalloc(char *dst, const char *src)
+   {
+      nhpc_size_t len = strlen(src);
+      
+      memcpy(dst, src, len);
+      dst[len] = '\0';
+      
+      return NHPC_SUCCESS;
+   }
+   
    nhpc_status_t nhpc_strcmp(const char *s1, const char *s2)
    {
       const char *tmp_s1 = s1;

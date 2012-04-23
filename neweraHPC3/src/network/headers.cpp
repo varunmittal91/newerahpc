@@ -154,7 +154,5 @@ namespace neweraHPC
 	    headers->erase(key);
 	 }
       }while(string);
-       
-      delete headers;
    }
 }

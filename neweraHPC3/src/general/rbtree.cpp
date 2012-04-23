@@ -341,7 +341,6 @@ namespace neweraHPC
 	 return false;
       
       reorganize(&key);
-      cout<<key<<endl;
       
       rbtree_t::node *data = rbtree_t::search_node(key);
       if(data){	 

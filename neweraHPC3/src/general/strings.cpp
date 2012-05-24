@@ -24,16 +24,86 @@
 #endif
 
 #include <include/strings.h>
+#include <include/strings_pool.h>
 #include <include/constants.h>
+#include <include/error.h>
 
 using namespace std;
 
 namespace neweraHPC{
+   strings_pool_t strings_pool;
+   
+   strings_pool_t::strings_pool_t()
+   {
+      strings_free = new rbtree_t(NHPC_RBTREE_NUM_HASH);
+      strings_allocated = new rbtree_t(NHPC_RBTREE_NUM_HASH);
+   }
+   
+   strings_pool_t::~strings_pool_t()
+   {
+      delete strings_free;
+      delete strings_allocated;
+   }
+   
+   char *strings_pool_t::search_string(nhpc_size_t str_len)
+   {
+      LOG_DEBUG("Searching for available string" << str_len);
+      
+      char *str = (char *)strings_free->search(str_len, 1);
+      if(str == NULL)
+      {
+	 LOG_DEBUG("ALLOCATING NEW STRING");
+	 str = new char [str_len];
+	 strings_allocated->insert(str, str_len);
+      }
+      else 
+      {
+	 LOG_DEBUG("FOUND EXISTING STRING");
+      }
+      
+      memset(str, 0, sizeof(char) * str_len);
+      
+      return str;
+   }
+   
+   void strings_pool_t::free_string(char *str_address)
+   {
+      cout<<str_address<<" ";
+      cout<<strlen(str_address)<<endl;
+      
+      nhpc_size_t str_len = strlen(str_address) + 1;
+      
+      int ret = strings_allocated->erase(str_len, str_address);
+      
+      if(ret == 0)
+      {
+	 LOG_DEBUG("NO string to delete");
+      }
+      else 
+      {
+	 strings_free->insert(str_address, str_len);
+	 LOG_DEBUG("ADDING STRING TO FREE POOL");
+      }
+   }
+   
+   char *nhpc_allocate_str(nhpc_size_t str_len)
+   {
+      char *str = strings_pool.search_string(str_len);
+      
+      return str;
+   }
+   
+   void nhpc_deallocate_str(char *str_address)
+   {
+      strings_pool.free_string(str_address);
+   }
+   
    nhpc_status_t nhpc_strcpy(char **dst, const char *src)
    {
       nhpc_size_t len = strlen(src);
       
-      *dst = new char [len + 1];
+      //*dst = new char [len + 1];
+      *dst = nhpc_allocate_str(len + 1);
       memcpy(*dst, src, len);
       (*dst)[len] = '\0';
 
@@ -184,7 +254,8 @@ namespace neweraHPC{
 	    char *tmp_string;
 	    if(len != 0)
 	    {
-	       tmp_string = new char[len + 1];
+	       //tmp_string = new char[len + 1];
+	       tmp_string = nhpc_allocate_str(len + 1);
 	       memcpy(tmp_string, (tmp_s1 - len), len);
 	       tmp_string[len] = '\0';
 	       
@@ -271,7 +342,8 @@ namespace neweraHPC{
       
       for(int i = 0; i < string->count; i++)
       {
-	 delete[] (string->strings[i]);
+	 nhpc_deallocate_str((string->strings[i]));
+	 //delete[] (string->strings[i]);
       }
       
       delete[] (string->strings);

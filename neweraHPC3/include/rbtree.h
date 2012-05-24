@@ -108,20 +108,12 @@ static inline void rb_link_node(struct rb_node * node, struct rb_node * parent,	
    *rb_link = node;
 }
 
-/*
-//! Operate rbtree with numeric keys
-#define NHPC_RBTREE_NUM 0
-//! Operate rbtree with string keys
-#define NHPC_RBTREE_STR 1
-//! Operate rbtree with managed numeric index mode
-#define NHPC_RBTREE_NUM_MANAGED
-*/
- 
 enum RBTREE_MODES
 {
    NHPC_RBTREE_NUM,
    NHPC_RBTREE_STR,
-   NHPC_RBTREE_NUM_MANAGED
+   NHPC_RBTREE_NUM_MANAGED,
+   NHPC_RBTREE_NUM_HASH
 };
 
 namespace neweraHPC
@@ -135,6 +127,13 @@ namespace neweraHPC
    {
       char *key;
       void *data;
+   };
+   
+   struct hash_elem_t
+   {
+      bool head;
+      void *data;
+      hash_elem_t *next;
    };
    
    //! rbtree
@@ -233,6 +232,10 @@ namespace neweraHPC
        */
       key_pair_t *search_str(int key);
       
+      //! search for specific element in NUM_HASH mode.
+      void *search(int key, int subkey);
+      int search(int key, void *in_data);
+      
       //! insert element with default numeric mode
       int insert(void *);
       
@@ -250,6 +253,10 @@ namespace neweraHPC
       
       //! erase element with string key
       int erase(const char *key_str);
+      
+      //! erase for specific element in NUM_HASH
+      int erase(int key, int subkey);
+      int erase(int key, void *indata);
       
       //! update element with key
       int update(int, void *);

@@ -25,6 +25,7 @@
 #include <string>
 
 #include "constants.h"
+#include "rbtree.h"
 
 namespace neweraHPC{
    static const char *alphabets = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

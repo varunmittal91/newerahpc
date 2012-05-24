@@ -50,9 +50,9 @@ namespace neweraHPC
       if(mode == NHPC_RBTREE_STR)
 	 operation_mode = NHPC_RBTREE_STR;
       else if(mode == NHPC_RBTREE_NUM_MANAGED)
-      {
 	 operation_mode = NHPC_RBTREE_NUM_MANAGED;
-      }
+      else if(mode == NHPC_RBTREE_NUM_HASH)
+	 operation_mode = NHPC_RBTREE_NUM_HASH;
       else 
 	 operation_mode = NHPC_RBTREE_NUM;
    }
@@ -291,6 +291,43 @@ namespace neweraHPC
       if(operation_mode == NHPC_RBTREE_STR)
 	 return false;
       
+      /* Create a hash content structure for NUM_HASH mode */
+      if(operation_mode == NHPC_RBTREE_NUM_HASH)
+      {
+	 hash_elem_t *hash_elem;
+	 
+	 rbtree_t::node *data = search_node(key);
+	 if(data != NULL)
+	 {
+	    int id = 2;
+	    
+	    hash_elem = (hash_elem_t *)data->node_data;
+	    
+	    hash_elem_t *tmp_hash_elem = hash_elem;
+	    while(tmp_hash_elem->next != NULL)
+	    {
+	       tmp_hash_elem = tmp_hash_elem->next;
+	       id++;
+	    }
+	    
+	    tmp_hash_elem->next = new hash_elem_t;
+	    memset((tmp_hash_elem->next), 0, sizeof(hash_elem_t));
+	    tmp_hash_elem->next->data = in_data;
+	    
+	    return id;
+	 }
+	 else 
+	 {
+	    hash_elem = new hash_elem_t;
+	    memset(hash_elem, 0, sizeof(hash_elem_t));
+		  
+	    hash_elem->data = in_data;
+	    hash_elem->head = true;
+	    
+	    in_data = hash_elem;
+	 }
+      }
+      
       /* Create a new rbtree_t::node type and initialize values */
       rbtree_t::node *data = new rbtree_t::node;
       data->node_data = in_data;
@@ -332,7 +369,10 @@ namespace neweraHPC
       rb_insert_color(&data->node_next, &root);
       count++;
       
-      return data->node_key;
+      if(operation_mode == NHPC_RBTREE_NUM_HASH)
+	 return 1;
+      else 
+	 return data->node_key;
    }   
    
    int rbtree_t::erase(int key)
@@ -345,6 +385,21 @@ namespace neweraHPC
       rbtree_t::node *data = rbtree_t::search_node(key);
       if(data){	 
 	 rb_erase(&data->node_next, &root);
+	 
+	 if(operation_mode == NHPC_RBTREE_NUM_HASH)
+	 {
+	    hash_elem_t *hash_elem = (hash_elem_t *)data->node_data;
+	    hash_elem_t *hash_elem_del;
+	    
+	    while(hash_elem != NULL)
+	    {
+	       hash_elem_del = hash_elem;
+	       hash_elem = hash_elem->next;
+	       
+	       delete hash_elem_del;
+	    }
+	 }
+	 
 	 delete data;
 	 count--;
 	 
@@ -352,6 +407,87 @@ namespace neweraHPC
       }
       else
 	 return false;
+   }
+   
+   int rbtree_t::erase(int key, int subkey)
+   {
+      if(operation_mode == NHPC_RBTREE_STR)
+	 return false;
+      
+      reorganize(&key);
+      
+      rbtree_t::node *data = rbtree_t::search_node(key);
+      
+      if(!data || subkey == 0)
+	 return false;
+      
+      hash_elem_t *hash_elem = (hash_elem_t *)data->node_data;
+      
+      if(subkey == 1)
+      {
+	 if(hash_elem->next == NULL)
+	 {
+	    erase(key);
+	    return true;
+	 }
+	 
+	 data->node_data = hash_elem->next;
+	 delete hash_elem;
+	 
+	 return true;
+      }
+      
+      for(int i = 0; i < (subkey - 2); i++)
+      {
+	 hash_elem = hash_elem->next;
+	 
+	 if(hash_elem == NULL)
+	    return false;
+      }
+      
+      if(hash_elem->next == NULL)
+	 hash_elem->next = NULL;
+      else 
+	 hash_elem->next = hash_elem->next->next;
+      
+      delete (hash_elem->next);
+      
+      return true;
+   }
+   
+   int rbtree_t::erase(int key, void *in_data)
+   {
+      if(operation_mode == NHPC_RBTREE_STR)
+	 return false;
+
+      rbtree_t::node *node = search_node(key);
+      if(node == NULL)
+	 return false;
+      
+      hash_elem_t *hash_elem = (hash_elem_t *)node->node_data;
+      void *data_found = NULL;
+      
+      int count = 0;
+      while(hash_elem != NULL)
+      {
+	 count++;
+	 
+	 if(hash_elem->data == in_data)
+	 {
+	    data_found = in_data;
+	    break;
+	 }
+	 
+	 hash_elem = hash_elem->next;
+      }
+
+      if(data_found != NULL)
+      {
+	 erase(key, count);
+	 return count;
+      }
+      
+      return false;
    }
    
    int rbtree_t::update(int key, void *new_in_data)
@@ -463,6 +599,28 @@ namespace neweraHPC
       }
       return NULL;
    }  
+   
+   void *rbtree_t::search(int key, int subkey)
+   {
+      if(operation_mode != NHPC_RBTREE_NUM_HASH)
+	 return NULL;
+      
+      rbtree_t::node *data = search_node(key);
+      
+      if(data == NULL)
+	 return NULL;
+      
+      hash_elem_t *hash_elem = (hash_elem_t *)data->node_data;
+      for(int i = 1; i < subkey && hash_elem != NULL; i++)
+      {
+	 hash_elem = hash_elem->next;
+      }
+      
+      if(hash_elem == NULL)
+	 return NULL;
+      
+      return (hash_elem->data);
+   }
    
    int rbtree_t::insert(void *in_data, const char *key_str)
    {      

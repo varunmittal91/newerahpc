@@ -52,7 +52,7 @@ namespace neweraHPC
       char port[6];
       addrinfo *hints;
       addrinfo *hints_res;
-      rbtree_t headers;
+      rbtree_t *headers;
       bool have_headers;
       nhpc_server_details_t *server_details;
       char partial_content[BUFFER_SIZE_HEADER];

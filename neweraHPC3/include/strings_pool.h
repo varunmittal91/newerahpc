@@ -32,7 +32,7 @@ namespace neweraHPC
       
       struct pool_string_t
       {
-	 void *address;
+	 char *string;
 	 nhpc_size_t len;
       };
    public:
@@ -42,6 +42,9 @@ namespace neweraHPC
       char *search_string(nhpc_size_t str_len);
       void free_string(char *address);
    };
+   
+   char *nhpc_allocate_str(nhpc_size_t str_len);
+   void nhpc_deallocate_str(char *address);
 };
 
 #endif

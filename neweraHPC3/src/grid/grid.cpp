@@ -237,7 +237,7 @@ namespace neweraHPC
    
    void nhpc_grid_server_t::grid_request_init(nhpc_socket_t *sock)
    {
-      char *command = (char *)sock->headers.search("command");
+      char *command = (char *)sock->headers->search("command");
       string_t *string = nhpc_substr(command, ' ');
       
       if(string->count < 3)
@@ -254,7 +254,7 @@ namespace neweraHPC
 	 nrv = (*grid_server).grid_node_registration(sock);
       else 
       {
-	 const char *uid = (char *)sock->headers.search("Grid-Uid");
+	 const char *uid = (char *)sock->headers->search("Grid-Uid");
 	 
 	 if(uid == NULL || grid_server->grid_client_verify_uid(uid) != NHPC_SUCCESS)
 	 {
@@ -269,12 +269,12 @@ namespace neweraHPC
 	    LOG_DEBUG("My Max Cpu time: " << grid_server->host_cpu_time);
 	    
 	    nhpc_instruction_set_t *instruction_set;
-	    nrv = nhpc_generate_instruction(&instruction_set, &(sock->headers));
+	    nrv = nhpc_generate_instruction(&instruction_set, sock->headers);
 	    nrv = grid_server->grid_execute(instruction_set, sock, &uid);
 	 }
 	 else if(nhpc_strcmp(fnc_str, "SUBMISSION") == NHPC_SUCCESS)
 	 {
-	    char *peer_id = (char *)sock->headers.search("Peer");
+	    char *peer_id = (char *)sock->headers->search("Peer");
 	    int peer_id_n = nhpc_strtoi(peer_id);
 	    
 	    if(sock->partial_content)
@@ -325,7 +325,7 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_grid_server_t::grid_node_registration(nhpc_socket_t *sock)
    {
-      rbtree_t *headers = &(sock->headers);
+      rbtree_t *headers = sock->headers;
       char *node_addr = (char *)headers->search("Node-Addr");
       char *node_port = (char *)headers->search("Node-Port");
       char *node_cores = (char *)headers->search("Node-Cores");
@@ -371,9 +371,9 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_grid_server_t::grid_file_download(nhpc_socket_t *sock, const char **grid_uid)
    {
-      char *file_name     = (char *)sock->headers.search("File-Name");
-      char *file_type     = (char *)sock->headers.search("File-Type");
-      char *file_size_str = (char *)sock->headers.search("Content-Length");
+      char *file_name     = (char *)sock->headers->search("File-Name");
+      char *file_type     = (char *)sock->headers->search("File-Type");
+      char *file_size_str = (char *)sock->headers->search("Content-Length");
 
       if(!file_name || !file_type || !file_size_str)
 	 return NHPC_FAIL;

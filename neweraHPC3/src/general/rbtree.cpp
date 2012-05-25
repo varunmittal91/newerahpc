@@ -304,15 +304,26 @@ namespace neweraHPC
 	    hash_elem = (hash_elem_t *)data->node_data;
 	    
 	    hash_elem_t *tmp_hash_elem = hash_elem;
-	    while(tmp_hash_elem->next != NULL)
+	    
+	    int count = 0;
+	    
+	    while(1)
 	    {
+	       count++;
+	       
+	       cout<<count<<" "<<tmp_hash_elem<<" "<<tmp_hash_elem->next<<endl;
+	       
+	       if(tmp_hash_elem->next == NULL)
+		  break;
+	       
 	       tmp_hash_elem = tmp_hash_elem->next;
 	       id++;
 	    }
 	    
 	    tmp_hash_elem->next = new hash_elem_t;
-	    memset((tmp_hash_elem->next), 0, sizeof(hash_elem_t));
-	    tmp_hash_elem->next->data = in_data;
+	    tmp_hash_elem = tmp_hash_elem->next;
+	    memset(tmp_hash_elem, 0, sizeof(hash_elem_t));
+	    tmp_hash_elem->data = in_data;
 	    
 	    return id;
 	 }
@@ -391,8 +402,14 @@ namespace neweraHPC
 	    hash_elem_t *hash_elem = (hash_elem_t *)data->node_data;
 	    hash_elem_t *hash_elem_del;
 	    
+	    int count = 0;
+	    
 	    while(hash_elem != NULL)
 	    {
+	       count++;
+	       
+	       cout<<count<<endl;
+	       
 	       hash_elem_del = hash_elem;
 	       hash_elem = hash_elem->next;
 	       
@@ -445,9 +462,7 @@ namespace neweraHPC
 	    return false;
       }
       
-      if(hash_elem->next == NULL)
-	 hash_elem->next = NULL;
-      else 
+      if(hash_elem->next != NULL)
 	 hash_elem->next = hash_elem->next->next;
       
       delete (hash_elem->next);
@@ -457,7 +472,7 @@ namespace neweraHPC
    
    int rbtree_t::erase(int key, void *in_data)
    {
-      if(operation_mode == NHPC_RBTREE_STR)
+      if(operation_mode != NHPC_RBTREE_NUM_HASH)
 	 return false;
 
       rbtree_t::node *node = search_node(key);

@@ -56,7 +56,7 @@ namespace neweraHPC
       
       nhpc_display_headers(sock);
       
-      char *command = (char *)sock->headers.search("command");
+      char *command = (char *)sock->headers->search("command");
       if(command != NULL)
       {
 	 network_t *network = sock->server_details->main_network;
@@ -88,7 +88,10 @@ namespace neweraHPC
       
       int line_len = 0;
       int old_pos = 0;
-      rbtree_t *headers = &(sock->headers);
+      
+      if(sock->headers == NULL)
+	 sock->headers = new rbtree_t(NHPC_RBTREE_STR);
+      rbtree_t *headers = sock->headers;
       
       for(int cntr = 0; cntr < *len; cntr++)
       {
@@ -129,7 +132,7 @@ namespace neweraHPC
    
    void nhpc_display_headers(nhpc_socket_t *sock)
    {
-      rbtree_t *headers = &(sock->headers);
+      rbtree_t *headers = sock->headers;
       
       if(headers == NULL)
 	 return;

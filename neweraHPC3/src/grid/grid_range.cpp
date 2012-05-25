@@ -44,7 +44,7 @@ namespace neweraHPC
    {
       network_t *network = sock->server_details->main_network;
       int *argument_count = &(instruction_set->argument_count);
-      rbtree_t *headers = &(sock->headers);
+      rbtree_t *headers = sock->headers;
       
       int start = 0;
       int end   = 0;
@@ -112,7 +112,7 @@ namespace neweraHPC
 						  nhpc_socket_t *sock, char **grid_uid)
    {
       network_t *network = sock->server_details->main_network;
-      rbtree_t *headers = &(sock->headers);      
+      rbtree_t *headers = sock->headers;      
       int *argument_count = &(instruction_set->argument_count);
       
       char *exec = NULL;

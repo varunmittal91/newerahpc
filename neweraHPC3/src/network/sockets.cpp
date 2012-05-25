@@ -198,9 +198,15 @@ namespace neweraHPC
 	    freeaddrinfo(sock->hints_res);
 	 if(sock->hints)
 	    delete sock->hints;
+	 //if(sock->headers)
+	 //   delete (sock->headers);
 	 
-	 nhpc_delete_headers(&(sock->headers));
+	 cout<<"cleaning socket"<<endl;
+	 
+	 nhpc_delete_headers(sock->headers);
 	  
+	 cout<<"socket cleanup"<<endl;
+	 
 	 delete sock;
 	 sock = NULL;
       }

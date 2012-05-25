@@ -49,17 +49,24 @@ namespace neweraHPC{
    {
       LOG_DEBUG("Searching for available string" << str_len);
       
-      char *str = (char *)strings_free->search(str_len, 1);
-      if(str == NULL)
+      pool_string_t *pool_string;
+      
+      pool_string = (pool_string_t *)strings_free->search(str_len, 1);
+      if(pool_string == NULL)
       {
 	 LOG_DEBUG("ALLOCATING NEW STRING");
-	 str = new char [str_len];
-	 strings_allocated->insert(str, str_len);
+	 pool_string = new pool_string_t;
+	 pool_string->string = new char [str_len];
       }
       else 
       {
-	 LOG_DEBUG("FOUND EXISTING STRING");
+	 int ret = strings_free->erase(str_len, 1);
+	 LOG_DEBUG("FOUND EXISTING STRING AND REMOVED FROM FREE LIST with return status" << ret);
       }
+
+      strings_allocated->insert(pool_string, str_len);
+
+      char *str = pool_string->string;
       
       memset(str, 0, sizeof(char) * str_len);
       
@@ -68,21 +75,31 @@ namespace neweraHPC{
    
    void strings_pool_t::free_string(char *str_address)
    {
-      cout<<str_address<<" ";
-      cout<<strlen(str_address)<<endl;
-      
       nhpc_size_t str_len = strlen(str_address) + 1;
       
-      int ret = strings_allocated->erase(str_len, str_address);
+      pool_string_t *pool_string;
       
-      if(ret == 0)
+      int i = 1;
+      
+      for(; ; i++)
+      {
+	 pool_string = (pool_string_t *)strings_allocated->search(str_len, i);
+	 if(pool_string == NULL)
+	    break;
+	 
+	 if(pool_string->string == str_address)
+	    break;
+      }
+      
+      if(pool_string == NULL)
       {
 	 LOG_DEBUG("NO string to delete");
       }
       else 
       {
-	 strings_free->insert(str_address, str_len);
-	 LOG_DEBUG("ADDING STRING TO FREE POOL");
+	 int ret = strings_allocated->erase(str_len, i);
+	 strings_free->insert(pool_string, str_len);
+	 LOG_DEBUG("ADDING STRING TO FREE POOL erased " << i << " with return status "<<ret);
       }
    }
    

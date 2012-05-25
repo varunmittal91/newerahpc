@@ -21,6 +21,7 @@
 
 #include <include/headers.h>
 #include <include/sockets.h>
+#include <include/strings_pool.h>
 
 using namespace std;
 
@@ -133,6 +134,7 @@ namespace neweraHPC
       else 
 	 nhpc_strcpy(&argument, (string->strings[1] + 1));
       
+      cout<<"inserting into headers"<<string->strings[0]<<endl;
       headers->insert(argument, string->strings[0]);
       
       nhpc_string_delete(string);
@@ -147,11 +149,17 @@ namespace neweraHPC
       
       do 
       {
+	 cout<<"searching"<<endl;
 	 string = (char *)headers->search_first(&key);
+	 cout<<"searching over"<<endl;
 	 if(string)
 	 {
-	    delete[] string;
+	    cout<<"printing string"<<" "<<string<<key<<endl;
+	    //cout<<string<<endl;
+	    
+	    //nhpc_deallocate_str(string);
 	    headers->erase(key);
+	    cout<<"done string"<<endl;
 	 }
       }while(string);
    }

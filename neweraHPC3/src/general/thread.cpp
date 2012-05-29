@@ -21,6 +21,7 @@
 #include <errno.h>
 
 #include <include/thread.h>
+#include <include/error.h>
 
 using namespace std;
 
@@ -35,6 +36,8 @@ namespace neweraHPC
    
    thread_manager_t::~thread_manager_t()
    {
+      LOG_INFO("Shuting Down Thread Manager");
+      
       pthread_t *thread;
       int thread_id;      
       while(1)
@@ -183,33 +186,30 @@ namespace neweraHPC
    
    nhpc_status_t thread_mutex_init(nhpc_mutex_t *mutex)
    {
-      pthread_mutex_init(&(mutex->lock_read), NULL);
+      pthread_rwlock_init(&(mutex->lock) , NULL);
       pthread_mutex_init(&(mutex->lock_write), NULL);
-      
+
       return NHPC_SUCCESS;
    }
    
    nhpc_status_t thread_mutex_lock(nhpc_mutex_t *mutex, int for_read)
    {
-      pthread_mutex_t *lock = for_read ? &(mutex->lock_write) : &(mutex->lock_read);
-      pthread_mutex_t *test_lock = for_read ? &(mutex->lock_read) : &(mutex->lock_write);
-      
-      int rv = pthread_mutex_trylock(test_lock);
-      if(rv != 0)
+      if(for_read)
+	 pthread_rwlock_rdlock(&(mutex->lock));
+      else 
       {
-	 pthread_mutex_lock(lock);
-	 pthread_mutex_unlock(lock);
+	 pthread_rwlock_wrlock(&(mutex->lock));
+	 pthread_mutex_lock(&(mutex->lock_write));
       }
-      
+	 
       return NHPC_SUCCESS;
    }
    
    nhpc_status_t thread_mutex_unlock(nhpc_mutex_t *mutex, int for_read)
    {
-      pthread_mutex_t *lock = for_read ? &(mutex->lock_write) : &(mutex->lock_read);
-
-      pthread_mutex_unlock(lock);
-
-      return NHPC_SUCCESS;
+      pthread_rwlock_unlock(&(mutex->lock));
+      
+      if(!for_read)
+	 pthread_mutex_unlock(&(mutex->lock_write));
    }
 };

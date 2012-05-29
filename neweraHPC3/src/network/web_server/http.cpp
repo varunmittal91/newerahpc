@@ -101,7 +101,7 @@ namespace neweraHPC
 	    fclose(fp);
 	 }
 	 
-	 delete[] file_path;
+	 nhpc_string_delete(file_path);
       }
       
       nhpc_string_delete(request);

@@ -21,7 +21,7 @@
 #define _NETWORK_H_
 
 /* This will allow 10 connection to be queued */
-#define CONNECTION_QUEUE 10
+#define CONNECTION_QUEUE 100
 
 #include <sys/types.h>
 #include <netinet/in.h>

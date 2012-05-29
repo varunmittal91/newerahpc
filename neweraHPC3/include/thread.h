@@ -38,7 +38,8 @@ namespace neweraHPC
 {
    struct nhpc_mutex_t
    {
-      pthread_mutex_t lock_read;
+      pthread_rwlock_t lock;
+      
       pthread_mutex_t lock_write;
    };
    
@@ -106,6 +107,7 @@ namespace neweraHPC
    nhpc_status_t thread_mutex_init(nhpc_mutex_t *mutex);
    nhpc_status_t thread_mutex_lock(nhpc_mutex_t *mutex, int for_read);
    nhpc_status_t thread_mutex_unlock(nhpc_mutex_t *mutex, int for_read);
+   nhpc_status_t thread_mutex_destroy(nhpc_mutex_t *mutex);
 };
 
 #endif

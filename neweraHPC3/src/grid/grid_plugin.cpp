@@ -46,7 +46,7 @@ namespace neweraHPC
       delete plugins_installed;
       
       delete mutex;
-      delete[] grid_directory;
+      nhpc_string_delete(grid_directory);
    }
    
    void plugin_manager_t::plugin_manager_init()

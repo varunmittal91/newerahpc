@@ -66,6 +66,8 @@ namespace neweraHPC
    
    network_t::~network_t()
    {
+      LOG_INFO("Deleting network structure");
+      
       lock();
       
       LOG_INFO("Closing all active sockets\t");
@@ -158,7 +160,7 @@ namespace neweraHPC
 					  int family, int type, int protocol)
    {            
       int rv, nrv;
-      int connection_queue = 1000;
+      int connection_queue = CONNECTION_QUEUE;
       
       int enable_opts = 1;
       
@@ -306,7 +308,7 @@ namespace neweraHPC
 	    
 	    (*thread_manager).init_thread(&(client_sock->thread_id), NULL);
             (*thread_manager).create_thread(&(client_sock->thread_id), NULL, (void* (*)(void*))read_communication, 
-					    client_sock, NHPC_THREAD_DETACH);	
+					    client_sock, NHPC_THREAD_DEFAULT);	
 	 }while(new_sd != -1);
       }while(true);
    }

@@ -36,8 +36,8 @@ namespace neweraHPC
    {
       for(int i = 1; i <= headers->ret_count(); i++)
       {
-	 const char *tmp_string = (const char *)headers->search(i);
-	 delete[] tmp_string;
+	 char *tmp_string = (char *)headers->search(i);
+	 nhpc_string_delete(tmp_string);
 	 headers->erase(i);
       }
       
@@ -55,7 +55,7 @@ namespace neweraHPC
    {
       char *tmp_property = nhpc_strconcat(property, ": ", argument);
       insert(tmp_property);
-      delete[] tmp_property;
+      nhpc_deallocate_str(tmp_property);
    }
    
    const char *nhpc_headers_t::operator[](int id)
@@ -84,7 +84,7 @@ namespace neweraHPC
 	 
 	 nrv = socket_sendmsg(sock, str, &size);
 	 
-	 delete[] str;
+	 nhpc_string_delete(str);
 	 headers->erase(i);
       }
       
@@ -124,17 +124,16 @@ namespace neweraHPC
 	 for(int i = 2; i < count; i++)
 	 {
 	    char *tmp_str_2 = nhpc_strconcat(tmp_str, ":", string->strings[i]);
-	    delete[] tmp_str;
+	    nhpc_deallocate_str(tmp_str);
 	    tmp_str = tmp_str_2;
 	 }
 	 
 	 nhpc_strcpy(&argument, (tmp_str + 1));
-	 delete[] tmp_str;
+	 nhpc_string_delete(tmp_str);
       }
       else 
 	 nhpc_strcpy(&argument, (string->strings[1] + 1));
       
-      cout<<"inserting into headers"<<string->strings[0]<<endl;
       headers->insert(argument, string->strings[0]);
       
       nhpc_string_delete(string);
@@ -149,17 +148,11 @@ namespace neweraHPC
       
       do 
       {
-	 cout<<"searching"<<endl;
 	 string = (char *)headers->search_first(&key);
-	 cout<<"searching over"<<endl;
 	 if(string)
 	 {
-	    cout<<"printing string"<<" "<<string<<key<<endl;
-	    //cout<<string<<endl;
-	    
-	    //nhpc_deallocate_str(string);
+	    nhpc_deallocate_str(string);
 	    headers->erase(key);
-	    cout<<"done string"<<endl;
 	 }
       }while(string);
    }

@@ -21,6 +21,7 @@
 #include <sys/types.h>
 
 #include <include/system.h>
+#include <include/error.h>
 
 using namespace std;
 
@@ -42,6 +43,8 @@ namespace neweraHPC
    
    nhpc_system_t::~nhpc_system_t()
    {
+      LOG_INFO("Shuting Down System Manager");
+	       
       delete systeminfo;
    }
    

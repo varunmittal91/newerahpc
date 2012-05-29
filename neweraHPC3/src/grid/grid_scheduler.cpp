@@ -135,8 +135,8 @@ namespace neweraHPC
       unlock();
       if(peer_details)
       {
-	 delete[] peer_details->host;
-	 delete[] peer_details->port;
+	 nhpc_string_delete((peer_details->host));
+	 nhpc_string_delete((peer_details->port));
 	 delete peer_details;
       }
    }

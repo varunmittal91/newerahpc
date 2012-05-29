@@ -22,6 +22,7 @@
 
 #include <include/network.h>
 #include <include/neweraHPC.h>
+#include <include/strings_pool.h>
 
 using namespace std;
 
@@ -62,7 +63,11 @@ namespace neweraHPC
 	 network_t *network = sock->server_details->main_network;
 	 
 	 if(nhpc_strcmp(command, "*HTTP*") == NHPC_SUCCESS)
+	 {
+	    cout << "INITIATING HTTP REUQEST" << endl;
 	    http_init(sock);
+	    cout << "HTTP REQUEST COMPLETED" << endl;
+	 }
 	 else if(nhpc_strcmp(command, "*GRID*") == NHPC_SUCCESS)
 	 {
 	    fnc_ptr_t *grid_request_init = (fnc_ptr_t *)network->network_addons->search("GRID");
@@ -100,12 +105,13 @@ namespace neweraHPC
 	    line_len = cntr - old_pos;
 	    if(line_len != 0)
 	    {
-	       char *line = new char [line_len + 1];
+	       char *line = nhpc_allocate_str(line_len + 1);
 	       memcpy(line, (data + old_pos), (line_len));
 	       line[line_len] = '\0';
 	       
 	       nhpc_headers_insert_param(headers, (const char *)line);
-	       delete[] line;
+
+	       nhpc_string_delete(line);
 	    }
 	    else 
 	    {

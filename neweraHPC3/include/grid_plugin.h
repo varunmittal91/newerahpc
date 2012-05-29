@@ -42,7 +42,7 @@ namespace neweraHPC
       nhpc_status_t copy_filetogrid(const char *file_path, const char **base_dir, char **file_path_new);
       
    public:
-      const char *grid_directory;
+      char *grid_directory;
 
       plugin_manager_t(thread_manager_t **in_thread_manager);
       ~plugin_manager_t();

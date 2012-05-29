@@ -21,6 +21,9 @@
 #define _STRINGS_POOL_H_
 
 #include "rbtree.h"
+#include "thread.h"
+
+#define MAX_STRING_COUNT 1000
 
 namespace neweraHPC
 {   
@@ -29,12 +32,19 @@ namespace neweraHPC
    private:
       rbtree_t *strings_free;
       rbtree_t *strings_allocated;
+      nhpc_mutex_t *mutex_free;
+      nhpc_mutex_t *mutex_allocated;
+      
+      int allocated_count;
+      int free_count;
       
       struct pool_string_t
       {
 	 char *string;
 	 nhpc_size_t len;
       };
+      
+      void clean_strings();
    public:
       strings_pool_t();
       ~strings_pool_t();

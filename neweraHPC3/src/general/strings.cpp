@@ -37,10 +37,21 @@ namespace neweraHPC{
    {
       strings_free = new rbtree_t(NHPC_RBTREE_NUM_HASH);
       strings_allocated = new rbtree_t(NHPC_RBTREE_NUM_HASH);
+      
+      mutex_free = new nhpc_mutex_t;
+      thread_mutex_init(mutex_free);
+
+      mutex_allocated = new nhpc_mutex_t;
+      thread_mutex_init(mutex_allocated);
+      
+      free_count = 0;
+      allocated_count = 0;
    }
    
    strings_pool_t::~strings_pool_t()
    {
+      LOG_INFO("Shuting Down String Pool");
+      
       delete strings_free;
       delete strings_allocated;
    }
@@ -49,25 +60,50 @@ namespace neweraHPC{
    {
       LOG_DEBUG("Searching for available string" << str_len);
       
-      pool_string_t *pool_string;
+      char *string = NULL;
+      char *str = NULL;
       
-      pool_string = (pool_string_t *)strings_free->search(str_len, 1);
-      if(pool_string == NULL)
+      nhpc_size_t try_len_limit = str_len + 5;
+      nhpc_size_t try_len = str_len;
+      
+      thread_mutex_lock(mutex_free, NHPC_THREAD_LOCK_WRITE);      	 
+      do 
+      {
+	 string = (char *)strings_free->search(try_len, 1);
+
+	 if(string != NULL)
+	 {
+	    int ret = strings_free->erase(try_len, string);
+	    LOG_DEBUG("FOUND EXISTING STRING AND REMOVED FROM FREE LIST with return status" << ret << " and size: " << try_len<< " original size: " << str_len);
+	    if(ret == 0)
+	       return NULL;
+	    
+	    free_count--;
+	    
+	    break;
+	 }
+	 	 
+	 try_len++; 
+      }while(try_len < try_len_limit);
+      thread_mutex_unlock(mutex_free, NHPC_THREAD_LOCK_WRITE);      
+      
+      if(string == NULL)
       {
 	 LOG_DEBUG("ALLOCATING NEW STRING");
-	 pool_string = new pool_string_t;
-	 pool_string->string = new char [str_len];
+	 
+	 string = (char *)malloc(sizeof(nhpc_size_t) + sizeof(char) * str_len);
+	 nhpc_size_t *str_len_string = (nhpc_size_t *)string;
+	 *str_len_string = str_len;
+	 try_len = str_len;
       }
-      else 
-      {
-	 int ret = strings_free->erase(str_len, 1);
-	 LOG_DEBUG("FOUND EXISTING STRING AND REMOVED FROM FREE LIST with return status" << ret);
-      }
-
-      strings_allocated->insert(pool_string, str_len);
-
-      char *str = pool_string->string;
       
+      str = (char *)(string + sizeof(nhpc_size_t));
+
+      thread_mutex_lock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
+      strings_allocated->insert(string, try_len);
+      allocated_count++;
+      thread_mutex_unlock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
+
       memset(str, 0, sizeof(char) * str_len);
       
       return str;
@@ -75,31 +111,79 @@ namespace neweraHPC{
    
    void strings_pool_t::free_string(char *str_address)
    {
-      nhpc_size_t str_len = strlen(str_address) + 1;
+      LOG_DEBUG("Free count: " << free_count << " Allocated count: " << allocated_count);
       
-      pool_string_t *pool_string;
+      char *str = str_address - sizeof(nhpc_size_t);      
+      nhpc_size_t *str_len_string = (nhpc_size_t *)(str);
+      LOG_DEBUG("Length of string input: " << *str_len_string);
+            
+      thread_mutex_lock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
+      int ret = strings_allocated->erase(*str_len_string, str);
+      thread_mutex_unlock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
       
-      int i = 1;
-      
-      for(; ; i++)
+      if(!ret)
       {
-	 pool_string = (pool_string_t *)strings_allocated->search(str_len, i);
-	 if(pool_string == NULL)
-	    break;
-	 
-	 if(pool_string->string == str_address)
-	    break;
-      }
-      
-      if(pool_string == NULL)
-      {
-	 LOG_DEBUG("NO string to delete");
+	 LOG_ERROR("NO string to delete: " << str_address << *str_len_string);
       }
       else 
       {
-	 int ret = strings_allocated->erase(str_len, i);
-	 strings_free->insert(pool_string, str_len);
-	 LOG_DEBUG("ADDING STRING TO FREE POOL erased " << i << " with return status "<<ret);
+	 thread_mutex_lock(mutex_free, NHPC_THREAD_LOCK_WRITE);
+	 strings_free->insert(str, *str_len_string);
+	 thread_mutex_unlock(mutex_free, NHPC_THREAD_LOCK_WRITE);
+
+	 LOG_DEBUG("ADDING STRING TO FREE POOL erased with return status " << ret);
+	 
+	 free_count++;
+	 allocated_count--;
+      }
+      
+      clean_strings();
+   }
+   
+   void strings_pool_t::clean_strings()
+   {
+      if(free_count > MAX_STRING_COUNT)
+      {
+	 free_count = 0;
+	 
+	 int key;
+	 bool exit_loop;
+	 void *node_data;
+	 
+	 thread_mutex_lock(mutex_free, NHPC_THREAD_LOCK_WRITE);
+	 
+	 while(1)
+	 {
+	    node_data = strings_free->search_first(&key);
+	    
+	    if(!node_data)
+	       break;
+	    
+	    char *string;
+	    
+	    while(1)
+	    {
+	       string = (char *)strings_free->search(key, 1);
+	       if(string)
+	       {
+		  delete[] string;
+		  
+		  strings_free->erase(key, 1);
+	       }
+	       else 
+	       {
+		  exit_loop = true;
+		  break;
+	       }
+	    }
+	    
+	    strings_free->erase(key);
+	 }
+	 
+	 delete strings_free;
+	 strings_free = new rbtree_t(NHPC_RBTREE_NUM_HASH);
+	 
+	 thread_mutex_unlock(mutex_free, NHPC_THREAD_LOCK_WRITE);
       }
    }
    
@@ -119,7 +203,6 @@ namespace neweraHPC{
    {
       nhpc_size_t len = strlen(src);
       
-      //*dst = new char [len + 1];
       *dst = nhpc_allocate_str(len + 1);
       memcpy(*dst, src, len);
       (*dst)[len] = '\0';
@@ -271,7 +354,6 @@ namespace neweraHPC{
 	    char *tmp_string;
 	    if(len != 0)
 	    {
-	       //tmp_string = new char[len + 1];
 	       tmp_string = nhpc_allocate_str(len + 1);
 	       memcpy(tmp_string, (tmp_s1 - len), len);
 	       tmp_string[len] = '\0';
@@ -324,7 +406,7 @@ namespace neweraHPC{
             else 
 	       delete[] (string->strings);
 	    string->strings = tmp_strings;
-	    string->strings[string->count] = new char [len + 1];
+	    string->strings[string->count] = nhpc_allocate_str(len + 1);
 	    char *tmp_string = string->strings[string->count];
 	    (string->count)++;	 
 	    
@@ -360,12 +442,16 @@ namespace neweraHPC{
       for(int i = 0; i < string->count; i++)
       {
 	 nhpc_deallocate_str((string->strings[i]));
-	 //delete[] (string->strings[i]);
       }
       
       delete[] (string->strings);
 
       delete string;
+   }
+   
+   void nhpc_string_delete(char *string)
+   {
+      nhpc_deallocate_str(string);
    }
    
    char *nhpc_strconcat(const char *s1, const char *s2)
@@ -382,13 +468,13 @@ namespace neweraHPC{
 	 return NULL;
       else if(len_s1 == 0)
       {
-	 string = new char [len_s2 + 1];
+	 string = nhpc_allocate_str(len_s2 + 1);
 	 memcpy(string, s2, len_s2);
 	 string[len_s2] = '\0';
       }
       else if(len_s2 == 0)
       {
-	 string = new char [len_s1 + 1];
+	 string = nhpc_allocate_str(len_s1 + 1);
 	 memcpy(string, s1, len_s1);
 	 string[len_s1] = '\0';
       }
@@ -396,7 +482,7 @@ namespace neweraHPC{
       {
 	 nhpc_size_t len = strlen(s1) + strlen(s2);
 
-	 string = new char [len + 1];
+	 string = nhpc_allocate_str(len + 1);
 	 memcpy(string, s1, len_s1);
 	 memcpy(string + len_s1, s2, len_s2);
 	 string[len] = '\0';
@@ -421,7 +507,7 @@ namespace neweraHPC{
 
       nhpc_size_t len = strlen(s1) + strlen(s2) + strlen(s3);
 	 
-      string = new char [len + 1];
+      string = nhpc_allocate_str(len + 1);
       memcpy(string, s1, len_s1);
       memcpy(string + len_s1, s2, len_s2);
       memcpy(string + (len_s1 + len_s2), s3, len_s3);

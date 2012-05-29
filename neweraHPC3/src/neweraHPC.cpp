@@ -73,12 +73,7 @@ namespace neweraHPC
 	 else 
 	    LOG_ERROR("Verbose option invalid");
 	 
-	 cmdline_arguments.erase("v");
-	 
-	 string_t *string = nhpc_substr("hi i am varun", ' ');
-	 nhpc_string_delete(string);
-	 
-	 cout<<endl;
+	 cmdline_arguments.erase("v");	 
       }
    }
 };

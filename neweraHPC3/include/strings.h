@@ -59,6 +59,7 @@ namespace neweraHPC{
    char *nhpc_random_string(nhpc_size_t len);
    
    void nhpc_string_delete(string_t *string);
+   void nhpc_string_delete(char *string);
 };
 
 #endif

@@ -215,8 +215,11 @@ namespace neweraHPC
    
    nhpc_grid_server_t::~nhpc_grid_server_t()
    {
-      delete[] host_addr;
-      delete[] host_port;
+      LOG_INFO("Shuting Down Grid Server");
+      
+
+      nhpc_string_delete(host_addr);
+      nhpc_string_delete(host_port);
       
       char *tmp_host_addr;
       const char *key_str;

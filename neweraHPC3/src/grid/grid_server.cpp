@@ -47,8 +47,8 @@ namespace neweraHPC
       headers->insert("Node-Cpu-Time", node_cpu_time_str);
       headers->write(sock);
       
-      delete[] node_cores_str;
-      delete[] node_cpu_time_str;
+      nhpc_string_delete(node_cores_str);
+      nhpc_string_delete(node_cpu_time_str);
       delete headers;
       
       socket_close(sock);

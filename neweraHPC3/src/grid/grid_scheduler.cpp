@@ -96,7 +96,7 @@ namespace neweraHPC
       (*thread_manager)->init_thread(&thread_id, NULL);
       (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))grid_scheduler_t::monitor_jobs_pending, 
 				       this, NHPC_THREAD_DEFAULT);
-      signal(SIGCHLD, grid_scheduler_t::child_handler);
+      signal(SIGCHLD, child_handler);
    }
    
    int grid_scheduler_t::cores()
@@ -256,17 +256,17 @@ namespace neweraHPC
 	 char *argument = (char *)instruction_set->arguments->search(i);
 	 char *grid_file_str = nhpc_itostr(GRID_FILE);
 	 char *search_value = nhpc_strconcat(grid_file_str, "*");
-	 delete[] grid_file_str;
+	 nhpc_string_delete(grid_file_str);
 	 if(nhpc_strcmp(argument, search_value) == NHPC_SUCCESS)
 	 {
 	    string_t *string = nhpc_substr(argument, ',');
 	    char *file_path = nhpc_strconcat(base_dir, string->strings[1]);
-	    delete[] base_dir;
+	    nhpc_string_delete((char *)base_dir);
 	    base_dir = NULL;
 	    
 	    nrv = nhpc_send_file(grid_uid, host_addr, host_port, file_path);
 	    
-	    delete[] file_path;
+	    nhpc_string_delete(file_path);
 	    nhpc_string_delete(string);
 	    
 	    if(nrv != NHPC_SUCCESS)
@@ -278,17 +278,17 @@ namespace neweraHPC
 	    }
 	 }
 	 
-	 delete[] search_value;
+	 nhpc_string_delete(search_value);
       }
       
       instruction_set->host_peer_id = peer_details->id;
       if(instruction_set->grid_uid)
-	 delete[] (instruction_set->grid_uid);
+	 nhpc_string_delete(instruction_set->grid_uid);
       nhpc_strcpy(&(instruction_set->grid_uid), grid_uid);
       
       nrv = nhpc_send_general_instruction(instruction_set, host_addr, host_port);
       
-      delete[] grid_uid;
+      nhpc_string_delete((char *)grid_uid);
       
    exit_thread:
       if(nrv != NHPC_SUCCESS)
@@ -305,7 +305,7 @@ namespace neweraHPC
       delete data;
       
       if(base_dir)
-	 delete[] base_dir;
+	 nhpc_string_delete((char *)base_dir);
    }
    
    void grid_scheduler_t::free_peer(int id)
@@ -427,6 +427,10 @@ namespace neweraHPC
 	    break;
 	 
 	 task_t *task = (task_t *)(*child_processes).search(pid);
+	 
+	 if(task == NULL)
+	    return NHPC_FAIL;
+	 
 	 nhpc_instruction_set_t *instruction_set = task->instruction_set;
 	 system_systeminfo(&(task->systeminfo));
 	 
@@ -452,7 +456,7 @@ namespace neweraHPC
 	 
 	 if(nrv != NHPC_SUCCESS)
 	 {
-	    delete[] peer_id;
+	    nhpc_string_delete(peer_id);
 	    
 	    return nrv;
 	 }
@@ -465,7 +469,7 @@ namespace neweraHPC
 	 nrv = headers->write(sock);	       
 	 delete headers;
 	 
-	 delete[] peer_id;
+	 nhpc_string_delete(peer_id);
 	 
 	 nhpc_size_t size = sizeof(task_t);
 	 socket_sendmsg(sock, (const char *)(task), &size);
@@ -516,7 +520,7 @@ namespace neweraHPC
       }
    }
    
-   void grid_scheduler_t::child_handler(int signum)
+   void child_handler(int signum)
    {
       if(signum != SIGCHLD)
 	 return;

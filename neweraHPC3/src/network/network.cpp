@@ -43,7 +43,7 @@ namespace neweraHPC
    {
       external_thread_manager = true;
       thread_manager = in_thread_manager;
-
+      
       network_init();
    }
    
@@ -101,7 +101,7 @@ namespace neweraHPC
 	 LOG_INFO("Shuting down thread manager");
 	 delete (*thread_manager);
       }
-
+      
       delete mutex;
    }
    
@@ -200,6 +200,9 @@ namespace neweraHPC
 	 return errno;
       }
       
+      fork();      
+      fork();
+      
       nrv = socket_listen(server_sock, &connection_queue);
       if(nrv != NHPC_SUCCESS)
       {
@@ -215,7 +218,7 @@ namespace neweraHPC
       accept_thread->network        = this;
       (**thread_manager).init_thread(&accept_thread_id, NULL);
       (**thread_manager).create_thread(&accept_thread_id, NULL, (void * (*)(void *))network_t::accept_connection, 
-				      (void *)accept_thread, NHPC_THREAD_JOIN);
+				       (void *)accept_thread, NHPC_THREAD_JOIN);
       return NHPC_SUCCESS;      
    }
    
@@ -229,7 +232,7 @@ namespace neweraHPC
    {
       signal(SIGPIPE, SIG_IGN);
       signal(SIGINT, exit_handler);
-
+      
       nhpc_size_t rv;
       nhpc_status_t nrv;
       pthread_mutex_t mutex;
@@ -268,7 +271,7 @@ namespace neweraHPC
 	 {
 	    continue;
 	 }
-	 	 
+	 
 	 int new_sd;
 	 
 	 do
@@ -277,7 +280,7 @@ namespace neweraHPC
 	    struct sockaddr_in *client_sockaddr = new sockaddr_in;
 	    
 	    new_sd = accept(*server_sockfd, (sockaddr *)client_sockaddr, (socklen_t *)&size);
-
+	    
 	    if(new_sd < 0)
 	    {
 	       delete client_sockaddr;  
@@ -298,7 +301,7 @@ namespace neweraHPC
 	    nhpc_strcpy_noalloc((client_sock->host), inet_ntoa(client_sockaddr->sin_addr));
 	    char *tmp_port = nhpc_itostr(ntohs(client_sockaddr->sin_port));
 	    nhpc_strcpy_noalloc((client_sock->port), tmp_port);
-	    delete[] tmp_port;
+	    nhpc_string_delete(tmp_port);
 	    
 	    delete client_sockaddr;
 	    
@@ -306,9 +309,13 @@ namespace neweraHPC
 	    client_socks->insert(client_sock, new_sd);
 	    pthread_mutex_unlock(&mutex);
 	    
-	    (*thread_manager).init_thread(&(client_sock->thread_id), NULL);
-            (*thread_manager).create_thread(&(client_sock->thread_id), NULL, (void* (*)(void*))read_communication, 
-					    client_sock, NHPC_THREAD_DEFAULT);	
+	    /*
+	     (*thread_manager).init_thread(&(client_sock->thread_id), NULL);
+	     (*thread_manager).create_thread(&(client_sock->thread_id), NULL, (void* (*)(void*))read_communication, 
+	     client_sock, NHPC_THREAD_DEFAULT);	
+	     */
+	    
+	    read_communication(client_sock);
 	 }while(new_sd != -1);
       }while(true);
    }
@@ -326,7 +333,7 @@ namespace neweraHPC
 	 pthread_mutex_unlock(mutex);
 	 
 	 thread_manager->delete_thread_data(client_sock->thread_id);
-
+	 
 	 socket_close(client_sock);
 	 socket_delete(client_sock);
       }

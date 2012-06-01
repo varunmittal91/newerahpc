@@ -57,22 +57,22 @@ namespace neweraHPC
 	 for(int i = 1; i <= count; i++)
 	 {
 	    char *argument_value = (char *)instruct_set->arguments->search(i);
-	    delete[] argument_value;
+	    nhpc_string_delete(argument_value);
 	 }
 	 
 	 delete (instruct_set->arguments);
       }
       
       if(instruct_set->grid_uid)
-	 delete[] (instruct_set->grid_uid);
+	 nhpc_string_delete((instruct_set->grid_uid));
       if(instruct_set->host_grid_uid)
-	 delete[] (instruct_set->host_grid_uid);
+	 nhpc_string_delete((instruct_set->host_grid_uid));
       if(instruct_set->host_peer_port)
-	 delete[] (instruct_set->host_peer_port);
+	 nhpc_string_delete((instruct_set->host_peer_port));
       if(instruct_set->host_peer_addr)
-	 delete[] (instruct_set->host_peer_addr);
+	 nhpc_string_delete((instruct_set->host_peer_addr));
       
-      delete[] instruct_set->plugin_name;
+      nhpc_string_delete((instruct_set->plugin_name));
       delete instruct_set;
    }
    
@@ -97,8 +97,8 @@ namespace neweraHPC
 	 nhpc_strcpy(&tmp_str, arg_value);
 	 
 	 (*instruction_set)->arguments->insert(tmp_str);
-	 delete[] search_string;
-	 delete[] i_str;
+	 nhpc_string_delete(search_string);
+	 nhpc_string_delete(i_str);
       }
       
       if(nrv != NHPC_SUCCESS)
@@ -179,11 +179,11 @@ namespace neweraHPC
 	    
 	    tmp_str1 = nhpc_strconcat(option_str, ",");
 	    argument = nhpc_strconcat(tmp_str1, arg1_n_str);
-	    delete[] arg1_n_str;
+	    nhpc_string_delete(arg1_n_str);
 	    
 	    instruction->arguments->insert(argument);
 	    
-	    delete[] tmp_str1;
+	    nhpc_string_delete(tmp_str1);
 	    break;
 	    
 	 case RANGE:
@@ -201,11 +201,11 @@ namespace neweraHPC
 	    
 	    instruction->arguments->insert(argument);
 	    
-	    delete[] tmp_str1;
-	    delete[] tmp_str2;
-	    delete[] tmp_str3;    
-	    delete[] arg1_n_str;
-	    delete[] arg2_n_str;
+	    nhpc_string_delete(tmp_str1);
+	    nhpc_string_delete(tmp_str2);
+	    nhpc_string_delete(tmp_str3);    
+	    nhpc_string_delete(arg1_n_str);
+	    nhpc_string_delete(arg2_n_str);
 	    
 	    break;
 	    
@@ -219,7 +219,7 @@ namespace neweraHPC
 	    
 	    instruction->arguments->insert(argument);
 	    
-	    delete[] tmp_str1;
+	    nhpc_string_delete(tmp_str1);
 	    break;
 	    
 	 case COMMAND:
@@ -232,7 +232,7 @@ namespace neweraHPC
 	    
 	    instruction->arguments->insert(argument);
 	    
-	    delete[] tmp_str1;
+	    nhpc_string_delete(tmp_str1);
 	    break;	    
 	    
 	 case GRID_FILE:
@@ -245,10 +245,10 @@ namespace neweraHPC
 	    
 	    instruction->arguments->insert(argument);
 	    
-	    delete[] tmp_str1;
+	    nhpc_string_delete(tmp_str1);
 	    break;	    	    
       };
       
-      delete[] option_str;
+      nhpc_string_delete(option_str);
    }
 };

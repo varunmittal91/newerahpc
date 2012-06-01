@@ -35,7 +35,9 @@ namespace neweraHPC
       char *command = (char *)sock->headers->search("command");
       
       if(nhpc_strcmp(command, "GET*") == NHPC_SUCCESS)
+      {
 	 http_request(sock);
+      }
       else if(nhpc_strcmp(command, "HTTP*") == NHPC_SUCCESS)
 	 cout<<"HTTP Response"<<endl;
       else 
@@ -83,7 +85,7 @@ namespace neweraHPC
 	    headers->write(sock);
 	    
 	    delete headers;
-	    delete[] file_size_str;
+	    nhpc_string_delete(file_size_str);
 	    
 	    nhpc_status_t nrv;
 	    
@@ -118,7 +120,7 @@ namespace neweraHPC
       headers->insert("Host", host_addr);
       headers->write(sock);
       delete headers;
-      delete[] command;
+      nhpc_string_delete((char *)command);
       
       FILE *fp = fopen(*file_path, "w+");
       nhpc_status_t nrv;

@@ -64,9 +64,7 @@ namespace neweraHPC
 	 
 	 if(nhpc_strcmp(command, "*HTTP*") == NHPC_SUCCESS)
 	 {
-	    cout << "INITIATING HTTP REUQEST" << endl;
 	    http_init(sock);
-	    cout << "HTTP REQUEST COMPLETED" << endl;
 	 }
 	 else if(nhpc_strcmp(command, "*GRID*") == NHPC_SUCCESS)
 	 {
@@ -80,7 +78,7 @@ namespace neweraHPC
       }
       
       nhpc_socket_cleanup(sock);
-      pthread_exit(NULL);
+      //pthread_exit(NULL);
    }
    
    nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *data, nhpc_size_t *len, nhpc_size_t *header_size)

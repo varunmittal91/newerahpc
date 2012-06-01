@@ -79,9 +79,9 @@ namespace neweraHPC
 	 {
 	    char *j_str = nhpc_itostr(j);
 	    char *argument = nhpc_strconcat("Argument", j_str);
-	    delete[] j_str;
+	    nhpc_string_delete(j_str);
 	    char *argument_value = (char *)headers->search(argument);
-	    delete[] argument;
+	    nhpc_string_delete(argument);
 	    
 	    if(j == range_pos)
 	       nhpc_add_argument(new_instruction_set, VALUE, &i);
@@ -138,7 +138,7 @@ namespace neweraHPC
 	       if(exec)
 	       {
 		  tmp_str1 = nhpc_strconcat(exec, string->strings[1], " ");
-		  delete[] exec;
+		  nhpc_string_delete(exec);
 		  exec = tmp_str1;
 	       }
 	       break;
@@ -153,14 +153,14 @@ namespace neweraHPC
 	       if(exec)
 	       {
 		  tmp_str3 = nhpc_strconcat(exec, tmp_str2);
-		  delete[] exec;
+		  nhpc_string_delete(exec);
 		  exec = tmp_str3;
 	       }
 	       else 
 		  nhpc_strcpy(&exec, tmp_str2);
 	       
-	       delete[] tmp_str1;
-	       delete[] tmp_str2;
+	       nhpc_string_delete(tmp_str1);
+	       nhpc_string_delete(tmp_str2);
 	       
 	       break;
 	       
@@ -168,7 +168,7 @@ namespace neweraHPC
 	       if(exec)
 	       {
 		  tmp_str1 = nhpc_strconcat(exec, string->strings[1], " ");
-		  delete[] exec;
+		  nhpc_string_delete(exec);
 		  exec = tmp_str1;
 	       }
 	       break;
@@ -201,7 +201,7 @@ namespace neweraHPC
       }
       
       if(exec)
-	 delete[] exec;
+	 nhpc_string_delete(exec);
       
       return NHPC_SUCCESS;
    }

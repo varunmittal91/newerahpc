@@ -231,7 +231,7 @@ namespace neweraHPC
 	 if(!tmp_host_addr)
 	    break;
 	 
-	 delete[] tmp_host_addr;
+	 nhpc_string_delete(tmp_host_addr);
 	 (*clients).erase(key_str);
       }
       
@@ -299,7 +299,7 @@ namespace neweraHPC
 	 char *response = nhpc_itostr(nrv);
 	 nhpc_size_t size = strlen(response);
 	 socket_sendmsg(sock, response, &size);
-	 delete[] response;
+	 nhpc_string_delete(response);
       }
       
       cout<<"Executed function with status: "<<nrv<<endl;
@@ -312,16 +312,16 @@ namespace neweraHPC
       nhpc_status_t nrv;
       nrv = NHPC_FAIL;
       
-      const char *uid;
-      nrv = grid_client_gen_uid(sock->host, &uid);
+      char *uid;
+      nrv = grid_client_gen_uid(sock->host, (const char **)&uid);
       
       nhpc_size_t size = strlen(uid);
       nrv = socket_sendmsg(sock, uid, &size);
       
-      const char *dir = nhpc_strconcat(grid_directory, uid);
+      char *dir = nhpc_strconcat(grid_directory, uid);
       mkdir(dir, 0777);
-      delete[] dir;
-      delete[] uid;
+      nhpc_string_delete(dir);
+      nhpc_string_delete(uid);
       
       return nrv;      
    }
@@ -350,7 +350,7 @@ namespace neweraHPC
       do 
       {
 	 if(random_string != NULL)
-	    delete[] random_string;
+	    nhpc_string_delete(random_string);
 	 
 	 random_string = nhpc_random_string(8);
 	 
@@ -392,8 +392,8 @@ namespace neweraHPC
       const char *tmp_path = nhpc_strconcat(grid_path, "/");
       const char *final_path = nhpc_strconcat(tmp_path, file_name);
 
-      delete[] grid_path;
-      delete[] tmp_path;
+      nhpc_string_delete((char *)grid_path);
+      nhpc_string_delete((char *)tmp_path);
       
       int fd = -1;
       int retry_count = 0;
@@ -406,7 +406,7 @@ namespace neweraHPC
       
       if(fd == -1 && close(fd) < 0)
       {
-	 delete[] final_path;
+	 nhpc_string_delete((char *)final_path);
 	 return NHPC_FAIL;
       }
       
@@ -434,12 +434,12 @@ namespace neweraHPC
 	 nrv = install_plugin(final_path, *grid_uid);
 	 if(nrv != NHPC_SUCCESS)
 	 {
-	    delete[] final_path;
+	    nhpc_string_delete((char *)final_path);
 	    return NHPC_FAIL;
 	 }
       }
       
-      delete[] final_path;
+      nhpc_string_delete((char *)final_path);
       
       return NHPC_SUCCESS;
    }

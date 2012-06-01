@@ -109,7 +109,7 @@ namespace neweraHPC
       headers->insert("Content-Length", content_len_str);
       nrv = headers->write(sock);
       
-      delete[] content_len_str;
+      nhpc_string_delete(content_len_str);
       delete headers;
       
       nhpc_string_delete(string);
@@ -182,15 +182,15 @@ namespace neweraHPC
 	 char *i_str = nhpc_itostr(i);
 	 char *tmp_str = nhpc_strconcat("Argument", i_str);
 	 char *argument = (char *)instruction_set->arguments->search(i);
-	 delete[] i_str;
+	 nhpc_string_delete(i_str);
 	 
 	 headers->insert(tmp_str, argument);
-	 delete[] tmp_str;
+	 nhpc_string_delete(tmp_str);
       }
       
       headers->write(sock);
       
-      delete[] argument_count_str;
+      nhpc_string_delete(argument_count_str);
       delete headers;
       
       char buffer[5];
@@ -228,8 +228,8 @@ namespace neweraHPC
       
       if(nrv != NHPC_SUCCESS)
       {
-	 delete[] argument_count_str;
-	 delete[] peer_id_str;
+	 nhpc_string_delete(argument_count_str);
+	 nhpc_string_delete(peer_id_str);
 
 	 return NHPC_FAIL;
       }      
@@ -253,16 +253,16 @@ namespace neweraHPC
 	 char *i_str = nhpc_itostr(i);
 	 char *tmp_str = nhpc_strconcat("Argument", i_str);
 	 char *argument = (char *)instruction_set->arguments->search(i);
-	 delete[] i_str;
+	 nhpc_string_delete(i_str);
 	 
 	 headers->insert(tmp_str, argument);
-	 delete[] tmp_str;
+	 nhpc_string_delete(tmp_str);
       }
       
       headers->write(sock);
       
-      delete[] argument_count_str;
-      delete[] peer_id_str;
+      nhpc_string_delete(argument_count_str);
+      nhpc_string_delete(peer_id_str);
       delete headers; 
       
       socket_close(sock);

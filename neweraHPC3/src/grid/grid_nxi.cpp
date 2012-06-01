@@ -120,10 +120,10 @@ namespace neweraHPC
 	    for(int i = 1; i < (string->count - 1); i++)
 	    {
 	       tmp_str = nhpc_strconcat(final_target, "/");
-	       delete[] final_target;
+	       nhpc_string_delete((char *)final_target);
 	       
 	       final_target = nhpc_strconcat(tmp_str, string->strings[i]);
-	       delete[] tmp_str;
+	       nhpc_string_delete((char *)tmp_str);
 	       
 	       if(nhpc_fileordirectory(final_target) != NHPC_FILE_NOT_FOUND);
 		  mkdir(final_target, 0777);
@@ -144,9 +144,9 @@ namespace neweraHPC
       const char *tmp = nhpc_strconcat("cd ", directory);
       const char *exec_cmd = tmp;
       exec_cmd = nhpc_strconcat(tmp, " && ./exec");
-      delete[] tmp;
+      nhpc_string_delete((char *)tmp);
       int rv = system(exec_cmd);
-      delete[] exec_cmd;
+      nhpc_string_delete((char *)exec_cmd);
       
       if(rv == 0)
       {
@@ -157,7 +157,7 @@ namespace neweraHPC
 	    return NHPC_SUCCESS;
 	 }
 	 
-	 delete[] dll_file;
+	 nhpc_string_delete((char *)dll_file);
       }
       
       return NHPC_FAIL;

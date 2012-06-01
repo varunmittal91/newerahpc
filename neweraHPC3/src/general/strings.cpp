@@ -419,7 +419,7 @@ namespace neweraHPC{
       {
 	 string = new string_t;
 	 string->count = 1;
-	 string->strings = new char *;
+	 string->strings = new char*;
 	 nhpc_strcpy(&(string->strings[0]), s1);
       }
       
@@ -523,7 +523,7 @@ namespace neweraHPC{
       
       if(num <= 0)
       {
-	 char *string = new char[2];
+	 char *string = nhpc_allocate_str(2);
 	 string[0] = '0';
 	 string[1] = '\0';
 	 return string;
@@ -537,7 +537,7 @@ namespace neweraHPC{
       }
       
       tmp_num = num;
-      char *string = new char [count + 1];
+      char *string = nhpc_allocate_str(count + 1);
       string[count] = '\0';
       int i = 0;
       
@@ -573,7 +573,7 @@ namespace neweraHPC{
    
    char *nhpc_random_string(nhpc_size_t len)
    {
-      char *dst = new char [len + 1];
+      char *dst = nhpc_allocate_str(len + 1);
       
       for(int i = 0; i < len; i++)
       {

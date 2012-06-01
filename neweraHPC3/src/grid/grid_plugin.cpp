@@ -127,7 +127,7 @@ namespace neweraHPC
 	    if(dll_path_new != NULL)
 	    {
 	       nhpc_strcpy(&(new_plugin->path_nxi), dll_path_new);
-	       delete[] dll_path_new;
+	       nhpc_string_delete(dll_path_new);
 	    }
 	    else 
 	       nhpc_strcpy(&(new_plugin->path_nxi), file_path);
@@ -140,7 +140,7 @@ namespace neweraHPC
 	    lock();
 	    plugins_installed->erase(new_plugin->plugin_name);
 	    unlock();
-	    delete[] new_plugin->path_nxi;
+	    nhpc_string_delete(new_plugin->path_nxi);
 	    delete new_plugin;
 	    
 	    return nrv;
@@ -149,7 +149,7 @@ namespace neweraHPC
 	 if(dll_path_new != NULL)
 	 {
 	    nhpc_strcpy(&(new_plugin->path_plugin), dll_path_new);
-	    delete[] dll_path_new;
+	    nhpc_string_delete(dll_path_new);
 	 }
 	 else 
 	    nhpc_strcpy(&(new_plugin->path_nxi), dll_path);
@@ -242,8 +242,8 @@ namespace neweraHPC
 	    
 	    if(mkdir(mkdir_path, 0777) == -1)
 	    {
-	       delete[] mkdir_path;
-	       delete[] (*base_dir);
+	       nhpc_string_delete(mkdir_path);
+	       nhpc_string_delete((char *)*base_dir);
 	       
 	       nhpc_string_delete(string);
 	       return NHPC_FAIL;
@@ -256,10 +256,10 @@ namespace neweraHPC
 	 
 	 
 	 char *new_path = nhpc_strconcat(grid_dir, "/");
-	 delete[] grid_dir;
+	 nhpc_string_delete(grid_dir);
 	 grid_dir = new_path;
 	 new_path = nhpc_strconcat(new_path, string->strings[string->count - 1]);
-	 delete[] grid_dir;
+	 nhpc_string_delete(grid_dir);
 	 
 	 nhpc_string_delete(string);
 	 
@@ -273,7 +273,7 @@ namespace neweraHPC
 	 *file_path_new = new_path;
       }
       
-      delete[] search_path;
+      nhpc_string_delete(search_path);
             
       return NHPC_SUCCESS;
    }

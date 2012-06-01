@@ -83,7 +83,7 @@ int main(int argc, char **argv)
 
    cout<<"Plugin Uploaded"<<endl;
    
-   delete[] grid_uid;
-   
+   nhpc_string_delete((char *)grid_uid);   
+		      
    return 0;
 }

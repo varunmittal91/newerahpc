@@ -78,7 +78,9 @@ namespace neweraHPC
 	 if(operation_mode == NHPC_RBTREE_STR)
 	 {
 	    if(data->key_pair)
-	       delete[] data->key_pair;
+	    {
+	       delete data->key_pair;
+	    }
 	    nhpc_deallocate_str(data->node_key_str);
 	 }
 
@@ -344,13 +346,9 @@ namespace neweraHPC
 	 
 	 parent = *new_node;
 	 if (result < 0)
-	 {
 	    new_node = &((*new_node)->rb_left);
-	 }
 	 else if (result > 0)
-	 {
 	    new_node = &((*new_node)->rb_right);
-	 }
 	 else
 	 {  
 	    delete data;
@@ -650,7 +648,7 @@ namespace neweraHPC
 	 }
 	 else 
 	 {
-	    delete[] data->node_key_str;
+	    nhpc_string_delete((data->node_key_str));
 	    delete data;
 	    return false;
 	 }

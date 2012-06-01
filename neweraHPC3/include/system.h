@@ -63,6 +63,8 @@ namespace neweraHPC
    nhpc_status_t system_cpuinfo(nhpc_cpuinfo_t *cpuinfo);
    nhpc_status_t system_systeminfo(nhpc_systeminfo_t *systeminfo);  
    nhpc_status_t system_loadavg(nhpc_cpuinfo_t *cpuinfo);
+   
+   static void child_handler(int signum);
 };
 
 #endif

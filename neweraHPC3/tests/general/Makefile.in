@@ -51,28 +51,28 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_cfg_test_OBJECTS = cfg_test.$(OBJEXT)
 cfg_test_OBJECTS = $(am_cfg_test_OBJECTS)
-cfg_test_DEPENDENCIES = ../../src/libneweraHPC.la
+cfg_test_DEPENDENCIES = ../../src/.libs/libneweraHPC.a
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 am_file_test_OBJECTS = file_test.$(OBJEXT)
 file_test_OBJECTS = $(am_file_test_OBJECTS)
-file_test_DEPENDENCIES = ../../src/libneweraHPC.la
+file_test_DEPENDENCIES = ../../src/.libs/libneweraHPC.a
 am_rb_queue_OBJECTS = rb_queue.$(OBJEXT)
 rb_queue_OBJECTS = $(am_rb_queue_OBJECTS)
-rb_queue_DEPENDENCIES = ../../src/libneweraHPC.la
+rb_queue_DEPENDENCIES = ../../src/.libs/libneweraHPC.a
 am_rbtree_test_OBJECTS = rbtree_test.$(OBJEXT)
 rbtree_test_OBJECTS = $(am_rbtree_test_OBJECTS)
-rbtree_test_DEPENDENCIES = ../../src/libneweraHPC.la
+rbtree_test_DEPENDENCIES = ../../src/.libs/libneweraHPC.a
 am_strings_test_OBJECTS = strings_test.$(OBJEXT)
 strings_test_OBJECTS = $(am_strings_test_OBJECTS)
-strings_test_DEPENDENCIES = ../../src/libneweraHPC.la
+strings_test_DEPENDENCIES = ../../src/.libs/libneweraHPC.a
 am_thread_test_OBJECTS = thread_test.$(OBJEXT)
 thread_test_OBJECTS = $(am_thread_test_OBJECTS)
-thread_test_DEPENDENCIES = ../../src/libneweraHPC.la
+thread_test_DEPENDENCIES = ../../src/.libs/libneweraHPC.a
 am_tree_test_OBJECTS = thread_test.$(OBJEXT)
 tree_test_OBJECTS = $(am_tree_test_OBJECTS)
-tree_test_DEPENDENCIES = ../../src/libneweraHPC.la
+tree_test_DEPENDENCIES = ../../src/.libs/libneweraHPC.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -229,19 +229,19 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 rbtree_test_SOURCES = rbtree_test.cpp
-rbtree_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
+rbtree_test_LDADD = ../../src/.libs/libneweraHPC.a $(INITLIBS)
 thread_test_SOURCES = thread_test.cpp
-thread_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
+thread_test_LDADD = ../../src/.libs/libneweraHPC.a $(INITLIBS)
 tree_test_SOURCES = thread_test.cpp
-tree_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
+tree_test_LDADD = ../../src/.libs/libneweraHPC.a $(INITLIBS)
 cfg_test_SOURCES = cfg_test.cpp
-cfg_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
+cfg_test_LDADD = ../../src/.libs/libneweraHPC.a $(INITLIBS)
 strings_test_SOURCES = strings_test.cpp
-strings_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
+strings_test_LDADD = ../../src/.libs/libneweraHPC.a $(INITLIBS)
 rb_queue_SOURCES = rb_queue.cpp
-rb_queue_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
+rb_queue_LDADD = ../../src/.libs/libneweraHPC.a $(INITLIBS)
 file_test_SOURCES = file_test.cpp
-file_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
+file_test_LDADD = ../../src/.libs/libneweraHPC.a $(INITLIBS)
 all: all-am
 
 .SUFFIXES:
@@ -585,7 +585,7 @@ uninstall-am: uninstall-binPROGRAMS
 	uninstall-binPROGRAMS
 
 
-../../src/libneweraHPC.la:
+../../src/.libs/libneweraHPC.a:
 	make -C "../../src/"
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

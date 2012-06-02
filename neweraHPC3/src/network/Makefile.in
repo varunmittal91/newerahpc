@@ -53,6 +53,10 @@ libnetwork_la_OBJECTS = $(am_libnetwork_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
+libnetwork_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(libnetwork_la_LDFLAGS) $(LDFLAGS) \
+	-o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -245,6 +249,7 @@ SOURCES = network.cpp sockets.cpp sendrecv.cpp headers.cpp waitio.cpp sockopts.c
 noinst_LTLIBRARIES = libnetwork.la 
 libnetwork_la_SOURCES = $(SOURCES)
 libnetwork_la_LIBADD = web_server/libweb_server.la
+libnetwork_la_LDFLAGS = 
 all: all-recursive
 
 .SUFFIXES:
@@ -289,7 +294,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libnetwork.la: $(libnetwork_la_OBJECTS) $(libnetwork_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(CXXLINK)  $(libnetwork_la_OBJECTS) $(libnetwork_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(libnetwork_la_LINK)  $(libnetwork_la_OBJECTS) $(libnetwork_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

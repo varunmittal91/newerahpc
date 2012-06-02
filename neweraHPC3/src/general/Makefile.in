@@ -53,10 +53,6 @@ libgeneral_la_OBJECTS = $(am_libgeneral_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
-libgeneral_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(libgeneral_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -209,7 +205,6 @@ top_srcdir = @top_srcdir@
 SOURCES = rbtree.cpp thread.cpp strings.cpp tree.cpp cfg.cpp parse_tree.cpp error.cpp file.cpp
 noinst_LTLIBRARIES = libgeneral.la
 libgeneral_la_SOURCES = $(SOURCES)
-libgeneral_la_LDFLAGS = -lpthread
 libgeneral_la_CFLAGS = CFLAGS
 all: all-am
 
@@ -255,7 +250,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libgeneral.la: $(libgeneral_la_OBJECTS) $(libgeneral_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libgeneral_la_LINK)  $(libgeneral_la_OBJECTS) $(libgeneral_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK)  $(libgeneral_la_OBJECTS) $(libgeneral_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

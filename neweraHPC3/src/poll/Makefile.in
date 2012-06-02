@@ -52,6 +52,9 @@ libpoll_la_OBJECTS = $(am_libpoll_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
+libpoll_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(libpoll_la_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -205,6 +208,7 @@ ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 SOURCES = wait_io.cpp
 noinst_LTLIBRARIES = libpoll.la 
 libpoll_la_SOURCES = $(SOURCES)
+libpoll_la_LDFLAGS = 
 all: all-am
 
 .SUFFIXES:
@@ -249,7 +253,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libpoll.la: $(libpoll_la_OBJECTS) $(libpoll_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(CXXLINK)  $(libpoll_la_OBJECTS) $(libpoll_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(libpoll_la_LINK)  $(libpoll_la_OBJECTS) $(libpoll_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

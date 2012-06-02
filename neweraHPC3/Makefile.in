@@ -41,8 +41,8 @@ subdir = .
 DIST_COMMON = README $(am__configure_deps) $(dist_doc_DATA) \
 	$(library_include_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
-	$(top_srcdir)/configure COPYING INSTALL config.guess \
-	config.sub depcomp install-sh ltmain.sh missing
+	$(top_srcdir)/configure COPYING config.guess config.sub \
+	depcomp install-sh ltmain.sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -286,7 +286,7 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 SUBDIRS = src tests
 server_SOURCES = server.cpp
-server_LDADD = src/libneweraHPC.la 
+server_LDADD = src/libneweraHPC.la -ldl 
 library_includedir = $(includedir)/neweraHPC
 library_include_HEADERS = include/*.h
 dist_doc_DATA = README
@@ -914,6 +914,9 @@ uninstall-am: uninstall-binPROGRAMS uninstall-dist_docDATA \
 	uninstall uninstall-am uninstall-binPROGRAMS \
 	uninstall-dist_docDATA uninstall-library_includeHEADERS
 
+
+src/libneweraHPC.la:
+	cd src && make
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

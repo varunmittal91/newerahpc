@@ -49,7 +49,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_sockets_test_OBJECTS = sockets_test.$(OBJEXT)
 sockets_test_OBJECTS = $(am_sockets_test_OBJECTS)
-sockets_test_DEPENDENCIES = ../../src/libneweraHPC.la
+sockets_test_DEPENDENCIES = ../../src/.libs/libneweraHPC.a
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
@@ -204,7 +204,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 sockets_test_SOURCES = sockets_test.cpp
-sockets_test_LDADD = ../../src/libneweraHPC.la $(INITLIBS)
+sockets_test_LDADD = ../../src/.libs/libneweraHPC.a $(INITLIBS)
 all: all-am
 
 .SUFFIXES:
@@ -525,7 +525,7 @@ uninstall-am: uninstall-binPROGRAMS
 	uninstall-binPROGRAMS
 
 
-../../src/libneweraHPC.la:
+../../src/.libs/libneweraHPC.a:
 	make -C "../../src/"
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

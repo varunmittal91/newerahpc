@@ -21,7 +21,9 @@
 #define _ALLOC_H_
 
 #include <errno.h>
+#ifdef linux
 #include <malloc.h>
+#endif
 #include <stdlib.h>
 
 #include "error.h"

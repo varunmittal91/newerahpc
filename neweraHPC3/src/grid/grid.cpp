@@ -150,7 +150,7 @@ namespace neweraHPC
       {
 	 string_t *string = nhpc_substr(controller, ':');
 
-	 const char *controller_addr = string->strings[0];
+	 const char *controller_addr = (const char *)(string->strings[0]);
 	 const char *controller_port;
 	 
 	 if(string->count == 1)
@@ -158,13 +158,16 @@ namespace neweraHPC
 	 else 
 	    controller_port = string->strings[1];
 	 
+	 nhpc_strcpy(&grid_controller_addr, controller_addr);
+	 nhpc_strcpy(&grid_controller_port, controller_port);
+	 
 	 LOG_INFO("Registering to controller: "<<grid_controller_addr<<":"<<grid_controller_port);
 	 
 	 nhpc_status_t nrv = nhpc_register_to_controller(grid_controller_addr, grid_controller_port, host_addr, host_port, 
 							 host_cores, host_cpu_time);	 
 	 if(nrv == NHPC_FAIL)
 	    LOG_ERROR("Registration to the controller failed\n Running without controller");
-	 
+
 	 nhpc_string_delete(string);
       }
       if(cpu_time)

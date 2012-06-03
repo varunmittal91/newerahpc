@@ -200,9 +200,6 @@ namespace neweraHPC
 	 return errno;
       }
       
-      fork();      
-      fork();
-      
       nrv = socket_listen(server_sock, &connection_queue);
       if(nrv != NHPC_SUCCESS)
       {

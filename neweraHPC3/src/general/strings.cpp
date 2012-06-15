@@ -116,9 +116,16 @@ namespace neweraHPC{
       char *str = str_address - sizeof(nhpc_size_t);      
       nhpc_size_t *str_len_string = (nhpc_size_t *)(str);
       LOG_DEBUG("Length of string input: " << *str_len_string);
+      
+      if(*str_len_string < 0)
+      {
+	 LOG_ERROR("Invalid memory allocation");
+	 return;
+      }
             
       thread_mutex_lock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
       int ret = strings_allocated->erase(*str_len_string, str);
+      allocated_count--;
       thread_mutex_unlock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
       
       if(!ret)
@@ -128,16 +135,14 @@ namespace neweraHPC{
       else 
       {
 	 thread_mutex_lock(mutex_free, NHPC_THREAD_LOCK_WRITE);
-	 strings_free->insert(str, *str_len_string);
+	 strings_free->insert(str, *str_len_string);	 
+	 free_count++;
 	 thread_mutex_unlock(mutex_free, NHPC_THREAD_LOCK_WRITE);
 
 	 LOG_DEBUG("ADDING STRING TO FREE POOL erased with return status " << ret);
-	 
-	 free_count++;
-	 allocated_count--;
       }
       
-      clean_strings();
+      //clean_strings();
    }
    
    void strings_pool_t::clean_strings()

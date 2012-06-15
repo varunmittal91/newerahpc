@@ -34,6 +34,8 @@
 #define NHPC_THREAD_LOCK_READ  1
 #define NHPC_THREAD_LOCK_WRITE 0
 
+#define MAX_THREADS 50
+
 namespace neweraHPC
 {
    struct nhpc_mutex_t
@@ -57,16 +59,19 @@ namespace neweraHPC
       rbtree_t *active_threads;
       
       //! Mutex varibale
-      pthread_mutex_t *mutex;
+      nhpc_mutex_t mutex_count;
+      nhpc_mutex_t mutex;
+      
+      int thread_count;      
    public:  
       thread_manager_t();
       ~thread_manager_t();
       
       //! Mutex lock routine
-      inline void lock();
+      inline void lock(nhpc_mutex_t *in_mutex, int lock_mode);
       
       //! Mutex unlock routine
-      inline void unlock();
+      inline void unlock(nhpc_mutex_t *in_mutex, int lock_mode);
       
       //! Thread data creation & initiation
       /*! Create & initialize thread data 

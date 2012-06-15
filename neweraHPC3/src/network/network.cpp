@@ -306,13 +306,12 @@ namespace neweraHPC
 	    client_socks->insert(client_sock, new_sd);
 	    pthread_mutex_unlock(&mutex);
 	    
-	    /*
+	    
 	     (*thread_manager).init_thread(&(client_sock->thread_id), NULL);
 	     (*thread_manager).create_thread(&(client_sock->thread_id), NULL, (void* (*)(void*))read_communication, 
 	     client_sock, NHPC_THREAD_DEFAULT);	
-	     */
 	    
-	    read_communication(client_sock);
+	    //read_communication(client_sock);
 	 }while(new_sd != -1);
       }while(true);
    }

@@ -33,14 +33,14 @@ int main()
    if(nrv == NHPC_SUCCESS)
    {
       cout<<tmp_file<<endl;
-      delete[] tmp_file;
+      nhpc_string_delete((char *)tmp_file);
    }
    
    nrv = nhpc_create_tmp_file_or_dir(&tmp_file, "neweraHPC", NHPC_DIRECTORY);
    if(nrv == NHPC_SUCCESS)
    {
       cout<<tmp_file<<endl;
-      delete[] tmp_file;
+      nhpc_string_delete((char *)tmp_file);
    }
 
    return 0;

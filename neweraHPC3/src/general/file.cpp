@@ -112,7 +112,7 @@ namespace neweraHPC
       {
 	 final_target = nhpc_strconcat("/tmp/", target_dir);
 	 string_t *string = nhpc_substr(final_target, '/');
-	 delete[] final_target;
+	 nhpc_string_delete((char *)final_target);
 	 
 	 final_target = nhpc_strconcat("/", string->strings[0]);
 	 
@@ -121,10 +121,10 @@ namespace neweraHPC
 	 for(int i = 1; i < string->count; i++)
 	 {
 	    tmp_str = nhpc_strconcat(final_target, "/");
-	    delete[] final_target;
+	    nhpc_string_delete((char *)final_target);
 
 	    final_target = nhpc_strconcat(tmp_str, string->strings[i]);
-	    delete[] tmp_str;
+	    nhpc_string_delete((char *)tmp_str);
 	 }
 
 	 nhpc_string_delete(string);
@@ -136,13 +136,13 @@ namespace neweraHPC
       if(nrv != NHPC_DIRECTORY)
       {
 	 if(target_dir != NULL)
-	    delete[] final_target;
+	    nhpc_string_delete((char *)final_target);
 	 return NHPC_FAIL;
       }
       
       const char *tmp_target = nhpc_strconcat(final_target, "/");
       if(target_dir != NULL   )
-	 delete[] final_target;
+	 nhpc_string_delete((char *)final_target);
       final_target = tmp_target;
       
       bool unique_found = false;
@@ -155,14 +155,14 @@ namespace neweraHPC
 	 target_name = nhpc_strconcat(final_target, unique_name);
 	 if(nhpc_fileordirectory(target_name) != NHPC_FILE_NOT_FOUND)
 	 {
-	    delete[] target_name;
+	    nhpc_string_delete((char *)target_name);
 	 }
 	 else 
 	 {
 	    unique_found = true;
 	 }
 	 
-	 delete[] unique_name;
+	 nhpc_string_delete((char *)unique_name);
       }
       
       if(target_type == NHPC_DIRECTORY)
@@ -170,12 +170,12 @@ namespace neweraHPC
 	 int rv = mkdir(target_name, 0777);	 
 	 if(rv == -1)
 	 {
-	    delete[] target_name;
+	    nhpc_string_delete((char *)final_target);
 	    return NHPC_FAIL;
 	 }
 	 
 	 const char *tmp_str = nhpc_strconcat(target_name, "/");
-	 delete[] target_name;
+	 nhpc_string_delete((char *)final_target);
 	 target_name = tmp_str;
       }
       else if(target_type == NHPC_FILE)

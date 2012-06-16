@@ -64,6 +64,8 @@ namespace neweraHPC
 	 
 	 if(nhpc_strcmp(command, "*HTTP*") == NHPC_SUCCESS)
 	 {
+	    LOG_DEBUG("\nCOMMUNICATION: STARTING HTTP PROCESSING\n");
+	    
 	    http_init(sock);
 	 }
 	 else if(nhpc_strcmp(command, "*GRID*") == NHPC_SUCCESS)
@@ -78,7 +80,6 @@ namespace neweraHPC
       }
       
       nhpc_socket_cleanup(sock);
-      //pthread_exit(NULL);
    }
    
    nhpc_status_t nhpc_analyze_stream(nhpc_socket_t *sock, char *data, nhpc_size_t *len, nhpc_size_t *header_size)

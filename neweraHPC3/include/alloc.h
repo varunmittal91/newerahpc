@@ -27,20 +27,26 @@
 #include <stdlib.h>
 
 #include "error.h"
+#include "strings_pool.h"
 
 using namespace neweraHPC;
 
 void *operator new(std::size_t size)
 {
+   LOG_INFO("using overloaded new");
+   
    void *new_p = NULL;
-   new_p = malloc(size);
+
+   if(garbage_collector_ready)
+      new_p = nhpc_allocate_str(size);
+   else 
+      new_p = malloc(size);
+   
    if(!new_p)
    {
       LOG_ERROR("Allocation error, errno: " << errno);
       exit(0);
    }
-
-   memset(new_p, 0, size);
    
    return new_p;
 }
@@ -51,38 +57,17 @@ void *operator new[](std::size_t size)
    return new_p;
 }
 
-namespace neweraHPC
+void operator delete(void *ptr)
 {
-   template <class T>
-   T *alloc(int n_items)
-   {
-      T *new_p = (T *)malloc(sizeof(T) * n_items);
-      if(new_p == NULL)
-      {
-	 LOG_ERROR("Unsafe Allocation, errno: " << errno);
-	 exit(0);
-      }
-   }   
-   
-   /*
-   template <class T>
-   void *alloc(int n_items)
-   {
-      T *new_p = malloc(sizeof(T) * n_items);
-      if(new_p == NULL)
-      {
-	 LOG_ERROR("Unsafe Allocation, errno: " << errno);
-	 exit(0);
-      }
-   }
-   */
-   
-   /*
-   void *alloc(int size)
-   {
-      
-   }
-    */
-};
+   if(garbage_collector_ready)
+      nhpc_deallocate_str((char *)ptr);
+   else 
+      free(ptr);
+}
+
+void operator delete[](void *ptr)
+{
+   operator delete(ptr);
+}
 
 #endif

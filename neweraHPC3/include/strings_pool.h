@@ -27,6 +27,8 @@
 
 namespace neweraHPC
 {   
+   extern bool garbage_collector_ready;
+   
    class strings_pool_t
    {
    private:
@@ -55,6 +57,8 @@ namespace neweraHPC
    
    char *nhpc_allocate_str(nhpc_size_t str_len);
    void nhpc_deallocate_str(char *address);
+   
+   void init_garbage_collector();
 };
 
 #endif

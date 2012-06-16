@@ -21,6 +21,7 @@
 
 #include <include/neweraHPC.h>
 #include <include/error.h>
+#include <include/strings_pool.h>
 
 using namespace std;
 
@@ -30,6 +31,8 @@ namespace neweraHPC
 {
    void neweraHPC_init(int argc, char **argv)
    {
+      init_garbage_collector();
+      
       char **tmp_argv = argv + 1;
       
       while(*tmp_argv != NULL)

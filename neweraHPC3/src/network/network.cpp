@@ -216,6 +216,7 @@ namespace neweraHPC
       (**thread_manager).init_thread(&accept_thread_id, NULL);
       (**thread_manager).create_thread(&accept_thread_id, NULL, (void * (*)(void *))network_t::accept_connection, 
 				       (void *)accept_thread, NHPC_THREAD_JOIN);
+      
       return NHPC_SUCCESS;      
    }
    
@@ -309,7 +310,7 @@ namespace neweraHPC
 	    
 	     (*thread_manager).init_thread(&(client_sock->thread_id), NULL);
 	     (*thread_manager).create_thread(&(client_sock->thread_id), NULL, (void* (*)(void*))read_communication, 
-	     client_sock, NHPC_THREAD_DEFAULT);	
+	     client_sock, NHPC_THREAD_DETACH);	
 	    
 	    //read_communication(client_sock);
 	 }while(new_sd != -1);

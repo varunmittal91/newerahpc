@@ -159,6 +159,8 @@ namespace neweraHPC
       //! Last numeric key assigned to data element
       int last_assigned_key;
       
+      int insert_node(int key, rbtree_t::node **data);
+      
       //! Function to return node with given numeric key
       node *search_node(int node_key);
 

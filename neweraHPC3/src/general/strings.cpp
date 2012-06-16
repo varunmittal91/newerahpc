@@ -32,6 +32,12 @@ using namespace std;
 
 namespace neweraHPC{
    strings_pool_t strings_pool;
+   bool garbage_collector_ready = false;
+   
+   void init_garbage_collector()
+   {
+      garbage_collector_ready = true;
+   }
    
    strings_pool_t::strings_pool_t()
    {
@@ -142,7 +148,7 @@ namespace neweraHPC{
 	 LOG_DEBUG("ADDING STRING TO FREE POOL erased with return status " << ret);
       }
       
-      //clean_strings();
+      clean_strings();
    }
    
    void strings_pool_t::clean_strings()

@@ -40,7 +40,10 @@ void *operator new(std::size_t size)
    if(garbage_collector_ready)
       new_p = nhpc_allocate_str(size);
    else 
+   {
       new_p = malloc(size);
+      memset(new_p, 0, size);
+   }
    
    if(!new_p)
    {

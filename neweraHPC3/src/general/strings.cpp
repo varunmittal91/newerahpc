@@ -41,6 +41,8 @@ namespace neweraHPC{
    
    strings_pool_t::strings_pool_t()
    {
+      garbage_collector_ready = false;
+      
       strings_free = new rbtree_t(NHPC_RBTREE_NUM_HASH);
       strings_allocated = new rbtree_t(NHPC_RBTREE_NUM_HASH);
       
@@ -98,6 +100,7 @@ namespace neweraHPC{
 	 LOG_DEBUG("ALLOCATING NEW STRING");
 	 
 	 string = (char *)malloc(sizeof(nhpc_size_t) + sizeof(char) * str_len);
+	 memset(string, 0, sizeof(nhpc_size_t) + sizeof(char) * str_len);
 	 nhpc_size_t *str_len_string = (nhpc_size_t *)string;
 	 *str_len_string = str_len;
 	 try_len = str_len;
@@ -110,13 +113,14 @@ namespace neweraHPC{
       allocated_count++;
       thread_mutex_unlock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
 
-      memset(str, 0, sizeof(char) * str_len);
-      
       return str;
    }
    
    void strings_pool_t::free_string(char *str_address)
    {
+      if(!str_address)
+	 return;
+      
       LOG_DEBUG("Free count: " << free_count << " Allocated count: " << allocated_count);
       
       char *str = str_address - sizeof(nhpc_size_t);      
@@ -136,7 +140,7 @@ namespace neweraHPC{
       
       if(!ret)
       {
-	 LOG_ERROR("NO string to delete: " << str_address << *str_len_string);
+	 LOG_ERROR("NO string to delete: " << str_address << " \t " << *str_len_string);
       }
       else 
       {

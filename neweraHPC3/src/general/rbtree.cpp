@@ -268,7 +268,6 @@ namespace neweraHPC
       }      
 
       (*data) = (rbtree_t::node *)malloc(sizeof(rbtree_t::node));
-      //(*data) = new rbtree_t::node;
       memset((*data), 0, sizeof(rbtree_t::node));
       
       rb_link_node(&((*data)->node_next), parent, new_node);

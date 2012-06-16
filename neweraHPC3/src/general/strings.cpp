@@ -62,6 +62,8 @@ namespace neweraHPC{
       
       delete strings_free;
       delete strings_allocated;
+      
+      LOG_INFO("String Pool closed");
    }
    
    char *strings_pool_t::search_string(nhpc_size_t str_len)

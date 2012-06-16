@@ -28,8 +28,6 @@ using namespace neweraHPC;
 
 int main(int argc, char **argv)
 {
-   int *aa = new int[2];
-   
    neweraHPC_init(argc, argv);
    
    nhpc_status_t nrv;

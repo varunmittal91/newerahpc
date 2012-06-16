@@ -103,6 +103,8 @@ namespace neweraHPC
       }
       
       delete mutex;
+      
+      LOG_INFO("Network stack deleted");
    }
    
    void exit_handler(int signum)

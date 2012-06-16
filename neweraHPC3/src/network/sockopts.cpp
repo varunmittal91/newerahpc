@@ -69,7 +69,6 @@ namespace neweraHPC
    {
       int rv = fcntl(sock->sockfd, F_SETFL, O_NONBLOCK);
       if(rv == -1)return errno;
-      //sock->incomplete_operation = NHPC_INCOMPLETE;
       
       return NHPC_SUCCESS;
    }

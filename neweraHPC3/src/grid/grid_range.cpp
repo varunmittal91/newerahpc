@@ -27,7 +27,8 @@ using namespace std;
 
 namespace neweraHPC
 {
-   nhpc_status_t nhpc_grid_range_plugin_init(plugin_details_t **plugin_details){
+   nhpc_status_t nhpc_grid_range_plugin_init(plugin_details_t **plugin_details)
+   {
       (*plugin_details) = new plugin_details_t;
       memset(*plugin_details, 0, sizeof(plugin_details_t));
       

@@ -50,7 +50,6 @@ int main(int argc, char *argv[]){
       if(nrv != NHPC_SUCCESS)
       {
 	 cout<<"connection failed"<<endl;
-	 nhpc_perror(nrv, "connect");
 	 exit(0);
       }
       

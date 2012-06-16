@@ -142,7 +142,7 @@ namespace neweraHPC{
       
       if(!ret)
       {
-	 LOG_ERROR("NO string to delete: " << str_address << " \t " << *str_len_string);
+	 LOG_ERROR("NO string to delete: " << (void *)str_address << " \t " << *str_len_string);
       }
       else 
       {

@@ -24,45 +24,40 @@
 
 using namespace std;
 
-namespace neweraHPC
+void *operator new(std::size_t size)
 {
-   void *operator new(std::size_t size)
+   void *new_p = NULL;
+      
+   if(garbage_collector_ready)
+      new_p = nhpc_allocate_str(size);
+   else 
    {
-      LOG_INFO("using overloaded new");
-      
-      void *new_p = NULL;
-      
-      if(garbage_collector_ready)
-	 new_p = nhpc_allocate_str(size);
-      else 
-      {
-	 new_p = malloc(size);
-	 memset(new_p, 0, size);
-      }
-      
-      if(!new_p)
-      {
-	 LOG_ERROR("Allocation error, errno: " << errno);
-	 exit(0);
-      }
-      
-      return new_p;
+      new_p = malloc(size);
+       memset(new_p, 0, size);
    }
-   
-   void *operator new[](std::size_t size)
+      
+   if(!new_p)
    {
-      void *new_p = operator new(size);
-      return new_p;
+      LOG_ERROR("Allocation error, errno: " << errno);
+      exit(0);
    }
-   
-   void operator delete(void *ptr)
-   {
-      if(garbage_collector_ready)
-	 nhpc_deallocate_str((char *)ptr);
-   }
-   
-   void operator delete[](void *ptr)
-   {
-      operator delete(ptr);
-   }   
+      
+   return new_p;
 }
+   
+void *operator new[](std::size_t size)
+{
+   void *new_p = operator new(size);
+      return new_p;
+}
+   
+void operator delete(void *ptr)
+{
+   if(garbage_collector_ready)
+      nhpc_deallocate_str((char *)ptr);
+}
+   
+void operator delete[](void *ptr)
+{
+   operator delete(ptr);
+}   

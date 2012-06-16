@@ -41,8 +41,6 @@ namespace neweraHPC{
    
    strings_pool_t::strings_pool_t()
    {
-      garbage_collector_ready = false;
-      
       strings_free = new rbtree_t(NHPC_RBTREE_NUM_HASH);
       strings_allocated = new rbtree_t(NHPC_RBTREE_NUM_HASH);
       
@@ -58,6 +56,8 @@ namespace neweraHPC{
    
    strings_pool_t::~strings_pool_t()
    {
+      garbage_collector_ready = false;
+      
       LOG_INFO("Shuting Down String Pool");
       
       delete strings_free;
@@ -159,13 +159,13 @@ namespace neweraHPC{
    {
       if(free_count > MAX_STRING_COUNT)
       {
+	 thread_mutex_lock(mutex_free, NHPC_THREAD_LOCK_WRITE);
+	 
 	 free_count = 0;
 	 
 	 int key;
 	 bool exit_loop;
 	 void *node_data;
-	 
-	 thread_mutex_lock(mutex_free, NHPC_THREAD_LOCK_WRITE);
 	 
 	 while(1)
 	 {

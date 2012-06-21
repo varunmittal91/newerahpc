@@ -127,8 +127,8 @@ namespace neweraHPC
       nhpc_strcpy(&(peer_details->port), port);
       peer_details->processors = processors;
       peer_details->weight = 0;
-      peer_details->processor_time = 100;
-      peer_details->threads = processors;
+      peer_details->processor_time = cpu_time;
+      peer_details->threads = processors * cpu_time / 100;
       
       peer_details->id = peers->insert(peer_details);
    }
@@ -163,7 +163,9 @@ namespace neweraHPC
    {
       peer_details_t *peer_details = NULL;
       
-      for(int i = 1; i <= peers->ret_count(); i++)
+      int count = peers->ret_count();
+      
+      for(int i = 1; i <= count; i++)
       {
 	 peer_details = (peer_details_t *)peers->search(i);	 
 	 
@@ -349,6 +351,9 @@ namespace neweraHPC
       }
       
       double processor_time = (loadavg * 100);
+      
+      cout<<"Debug: "<<processor_time<<endl;
+      
       if(processor_time < (peer_details->processor_time * peer_details->processors) && mem_free <= 10)
       {
 	 increase_thread(id); 

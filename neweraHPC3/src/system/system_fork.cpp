@@ -78,7 +78,7 @@ namespace neweraHPC
       
       while(1)
       {
-	 pid = waitpid(-1, &status, WUNTRACED);
+	 pid = waitpid(0, &status, WUNTRACED);
 	 if(pid == -1)
 	    break;
 	 

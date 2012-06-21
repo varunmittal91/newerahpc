@@ -31,6 +31,7 @@ using namespace std;
 namespace neweraHPC
 {	
    grid_scheduler_t *scheduler;
+   pthread_mutex_t mutex_handler;
    
    grid_scheduler_t::grid_scheduler_t(thread_manager_t **_thread_manager) : nhpc_system_t(_thread_manager)
    {
@@ -92,6 +93,8 @@ namespace neweraHPC
    
    void grid_scheduler_t::grid_scheduler_init()
    {
+      pthread_mutex_init(&mutex_handler, NULL);
+      
       int thread_id;
       (*thread_manager)->init_thread(&thread_id, NULL);
       (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))grid_scheduler_t::monitor_jobs_pending, 

@@ -23,6 +23,7 @@
 #define MAX_TERMINATED_KEYS 10
 
 #include "system_memory.h"
+#include "alloc.h"
 #include "thread.h"
 
 namespace neweraHPC

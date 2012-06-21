@@ -20,6 +20,8 @@
 #ifndef _SYSTEM_H_
 #define _SYSTEM_H_
 
+#define MAX_TERMINATED_KEYS 10
+
 #include "system_memory.h"
 #include "thread.h"
 
@@ -42,9 +44,21 @@ namespace neweraHPC
    class nhpc_system_t
    {
    private:
+      struct child_process_t
+      {
+	 char *service_name;
+	 bool active;
+	 int pid;
+      };
+      
       thread_manager_t **thread_manager;
       nhpc_systeminfo_t *systeminfo;
       nhpc_mutex_t mutex;
+      
+      nhpc_mutex_t mutex_chld;
+      rbtree_t *child_processes;
+      rbtree_t *child_handlers;
+      int terminated[MAX_TERMINATED_KEYS];
       
    public:
       nhpc_system_t();
@@ -56,6 +70,11 @@ namespace neweraHPC
       nhpc_status_t system_cpustats(nhpc_cpuinfo_t **cpuinfo);
       nhpc_status_t system_stats(nhpc_systeminfo_t **systeinfo);
       
+      nhpc_status_t register_trigger_child_process(char *service_name, fnc_ptr_int_t function);
+      nhpc_status_t create_child_process(char *service_name, int *child_pid);
+      nhpc_status_t free_child_process();      
+      void clean_inactive_children();
+      
       static void *monitor_system(nhpc_system_t *system);
    };
    
@@ -65,6 +84,8 @@ namespace neweraHPC
    nhpc_status_t system_loadavg(nhpc_cpuinfo_t *cpuinfo);
    
    static void child_handler(int signum);
+   
+   void system_prefork_routine();
 };
 
 #endif

@@ -84,7 +84,7 @@ namespace neweraHPC
       nhpc_status_t increase_thread(int peer_id);
       nhpc_status_t decrease_thread(int peer_id);
       
-      nhpc_status_t free_child_process();      
+      static void *child_exit_trigger(int *pid);
    };   
 };
 

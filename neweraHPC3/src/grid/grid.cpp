@@ -305,7 +305,7 @@ namespace neweraHPC
 	 nhpc_string_delete(response);
       }
       
-      cout<<"Executed function with status: "<<nrv<<endl;
+      LOG_INFO("Executed function with status: " << nrv);
       
       nhpc_string_delete(string);
    }

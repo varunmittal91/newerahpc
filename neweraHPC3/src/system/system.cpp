@@ -22,6 +22,7 @@
 
 #include <include/system.h>
 #include <include/error.h>
+#include <include/strings_pool.h>
 
 using namespace std;
 
@@ -32,6 +33,13 @@ namespace neweraHPC
       *thread_manager = new thread_manager_t;
       
       systeminfo = new nhpc_systeminfo_t;
+      
+      thread_mutex_init(&mutex_chld);
+      
+      child_processes = new rbtree_t(NHPC_RBTREE_NUM);
+      child_handlers  = new rbtree_t(NHPC_RBTREE_STR);
+      
+      cout<<child_processes<<endl;
    }
    
    nhpc_system_t::nhpc_system_t(thread_manager_t **_thread_manager)
@@ -39,6 +47,9 @@ namespace neweraHPC
       thread_manager = _thread_manager;
       
       systeminfo = new nhpc_systeminfo_t;
+
+      child_processes = new rbtree_t(NHPC_RBTREE_NUM);
+      child_handlers  = new rbtree_t(NHPC_RBTREE_STR);
    }
    
    nhpc_system_t::~nhpc_system_t()
@@ -99,9 +110,17 @@ namespace neweraHPC
       
       while(1)
       {	 
+	 system->clean_inactive_children();
+	 sleep(1);
+	 continue;
+	 
 	 thread_mutex_lock(&(system->mutex), 0);
 	 system_systeminfo(systeminfo);
-	 thread_mutex_lock(&(system->mutex), 0);
+	 thread_mutex_unlock(&(system->mutex), 0);
+	 
+	 LOG_INFO("System: Max CPU Uage - " << systeminfo->cpuinfo.load_avg_max);
+	 LOG_INFO("System: Free Memory  - " << systeminfo->meminfo.free_mem);
+	 
 	 sleep(1);
       }
    }

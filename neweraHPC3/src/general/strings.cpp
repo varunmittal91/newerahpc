@@ -102,7 +102,8 @@ namespace neweraHPC{
 	 LOG_DEBUG("ALLOCATING NEW STRING");
 	 
 	 string = (char *)malloc(sizeof(nhpc_size_t) + sizeof(char) * str_len);
-	 memset(string, 0, sizeof(nhpc_size_t) + sizeof(char) * str_len);
+	 memset(string, 0, (sizeof(nhpc_size_t) + sizeof(char) * str_len));
+	 
 	 nhpc_size_t *str_len_string = (nhpc_size_t *)string;
 	 *str_len_string = str_len;
 	 try_len = str_len;
@@ -137,12 +138,13 @@ namespace neweraHPC{
             
       thread_mutex_lock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
       int ret = strings_allocated->erase(*str_len_string, str);
-      allocated_count--;
+      if(ret)
+	 allocated_count--;
       thread_mutex_unlock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
       
       if(!ret)
       {
-	 LOG_ERROR("NO string to delete: " << (void *)str_address << " \t " << *str_len_string);
+	 LOG_ERROR("NO string to delete: " << (void *)str_address << " \t " << *str_len_string << " " << str_address);
       }
       else 
       {
@@ -206,14 +208,20 @@ namespace neweraHPC{
    
    char *nhpc_allocate_str(nhpc_size_t str_len)
    {
-      char *str = strings_pool.search_string(str_len);
+      char *str;
+      
+      if(garbage_collector_ready)
+	 str = strings_pool.search_string(str_len);
+      else 
+	 str = new char [str_len];
       
       return str;
    }
    
    void nhpc_deallocate_str(char *str_address)
    {
-      strings_pool.free_string(str_address);
+      if(garbage_collector_ready)
+	 strings_pool.free_string(str_address);
    }
    
    nhpc_status_t nhpc_strcpy(char **dst, const char *src)
@@ -454,11 +462,9 @@ namespace neweraHPC{
    
    void nhpc_string_delete(string_t *string)
    {
-      char **tmp_strings = string->strings;
-      
       for(int i = 0; i < string->count; i++)
       {
-	 nhpc_deallocate_str((string->strings[i]));
+	 delete[] (string->strings[i]);
       }
       
       delete[] (string->strings);
@@ -468,7 +474,7 @@ namespace neweraHPC{
    
    void nhpc_string_delete(char *string)
    {
-      nhpc_deallocate_str(string);
+      delete[] string;
    }
    
    char *nhpc_strconcat(const char *s1, const char *s2)

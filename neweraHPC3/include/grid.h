@@ -30,7 +30,7 @@
 #include "grid_instruction_set.h"
 #include "grid_client.h"
 #include "grid_server.h"
-#include "system.h"
+#include "alloc.h"
 
 namespace neweraHPC 
 {

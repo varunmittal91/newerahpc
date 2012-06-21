@@ -64,4 +64,6 @@ typedef nhpc_status_t (*fnc_ptr_nhpc_t)(void *);
 typedef nhpc_status_t (*fnc_ptr_nhpc_two_t)(void *, void *);
 typedef nhpc_status_t (*fnc_ptr_nhpc_plugin_t)(void *, void *, void *, void **);
 
+typedef void *(*fnc_ptr_int_t)(int *);
+
 #endif

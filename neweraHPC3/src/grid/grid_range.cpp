@@ -97,7 +97,7 @@ namespace neweraHPC
 	 
 	 new_instruction_set->execute = true;
 	 grid_server->queue_job(new_instruction_set);
-	 cout<<"queueing job no"<<i<<endl;
+	 LOG_INFO("queueing job no: " << i);
       }
       
       nhpc_delete_instruction(instruction_set);
@@ -178,20 +178,20 @@ namespace neweraHPC
 	 nhpc_string_delete(string);
       }
       
-      pid = fork();
+      string_t *exec_args = nhpc_substr(exec, ' ');
+      string_t *exec_path = nhpc_substr(exec_args->strings[0], '/');
+      
+      char **args = new char *[exec_args->count];
+      memcpy((args + 1), (exec_args->strings + 1), (sizeof(char**) * (exec_args->count - 1)));
+      args[0] = exec_path->strings[exec_path->count - 1];
+      args[exec_args->count] = NULL;
+
+      grid_server->create_child_process((char *)"GRID", &pid);
       if(pid == 0)
       {
-	 string_t *exec_args = nhpc_substr(exec, ' ');
-	 string_t *exec_path = nhpc_substr(exec_args->strings[0], '/');
+	 execve(exec_args->strings[0], args, NULL);
 	 
-	 char **args = new char *[exec_args->count];
-	 memcpy((args + 1), (exec_args->strings + 1), (sizeof(char**) * (exec_args->count - 1)));
-	 args[0] = exec_path->strings[exec_path->count - 1];
-	 args[exec_args->count] = NULL;
-	 
-	 execv(exec_args->strings[0], args);
-	 
-	 exit(EXIT_FAILURE);
+	 _exit(EXIT_SUCCESS);
       }
       else 
       {
@@ -199,6 +199,10 @@ namespace neweraHPC
 	 time(&(task->t));
 	 task->instruction_set = instruction_set;
 	 grid_server->add_child_process(task, &pid);
+	 
+	 nhpc_string_delete(exec_args);
+	 nhpc_string_delete(exec_path);
+	 delete[] args;
       }
       
       if(exec)

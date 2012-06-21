@@ -33,7 +33,7 @@ void *operator new(std::size_t size)
    else 
    {
       new_p = malloc(size);
-       memset(new_p, 0, size);
+      memset(new_p, 0, size);
    }
       
    if(!new_p)

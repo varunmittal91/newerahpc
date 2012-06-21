@@ -96,6 +96,9 @@ namespace neweraHPC
       (*thread_manager)->init_thread(&thread_id, NULL);
       (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))grid_scheduler_t::monitor_jobs_pending, 
 				       this, NHPC_THREAD_DEFAULT);
+      
+      register_trigger_child_process((char *)"GRID", (fnc_ptr_int_t)child_exit_trigger);
+      
       signal(SIGCHLD, child_handler);
    }
    
@@ -414,80 +417,7 @@ namespace neweraHPC
       (*child_processes).insert(task, *pid);
       pthread_mutex_unlock(mutex_child_processes);
    }
-   
-   nhpc_status_t grid_scheduler_t::free_child_process()
-   {
-      pid_t pid;
-      int status;
       
-      while(1)
-      {
-	 pid = waitpid(-1, &status, WUNTRACED);
-	 if(pid == -1)
-	    break;
-	 
-	 task_t *task = (task_t *)(*child_processes).search(pid);
-	 
-	 if(task == NULL)
-	    return NHPC_FAIL;
-	 
-	 nhpc_instruction_set_t *instruction_set = task->instruction_set;
-	 system_systeminfo(&(task->systeminfo));
-	 
-	 if(!instruction_set)
-	    continue;
-	 
-	 if(status != 0)
-	 {
-	    free_peer(instruction_set->host_peer_id);
-	    queue_job(instruction_set);
-	    continue;
-	 }
-	 
-	 nhpc_status_t nrv;
-	 
-	 char *peer_host = instruction_set->host_peer_addr;
-	 char *peer_port = instruction_set->host_peer_port;
-	 char *peer_id   = nhpc_itostr(instruction_set->host_peer_id);
-	 char *host_uid  = instruction_set->host_grid_uid;
-	 
-	 nhpc_socket_t *sock;
-	 nrv = socket_connect(&sock, peer_host, peer_port, AF_INET, SOCK_STREAM, 0);
-	 
-	 if(nrv != NHPC_SUCCESS)
-	 {
-	    nhpc_string_delete(peer_id);
-	    
-	    return nrv;
-	 }
-	 
-	 nhpc_headers_t *headers = new nhpc_headers_t;
-	 
-	 headers->insert("GRID SUBMISSION 2.90");
-	 headers->insert("Grid-Uid", host_uid);
-	 headers->insert("Peer", peer_id);
-	 nrv = headers->write(sock);	       
-	 delete headers;
-	 
-	 nhpc_string_delete(peer_id);
-	 
-	 nhpc_size_t size = sizeof(task_t);
-	 socket_sendmsg(sock, (const char *)(task), &size);
-	 
-	 socket_close(sock);
-	 socket_delete(sock);
-	 
-	 nhpc_delete_instruction(instruction_set);
-	 delete task;
-	 
-	 pthread_mutex_lock(mutex_child_processes);
-	 child_processes->erase(pid);
-	 pthread_mutex_unlock(mutex_child_processes);	 
-      }
-      
-      return NHPC_SUCCESS;
-   }
-   
    void grid_scheduler_t::monitor_jobs_pending(grid_scheduler_t *grid_scheduler)
    {
       rbtree_t *queued_instructions = grid_scheduler->queued_instructions;
@@ -518,6 +448,71 @@ namespace neweraHPC
 	 
 	 sleep(1);
       }
+   }
+   
+   void *grid_scheduler_t::child_exit_trigger(int *pid)
+   {
+      int status = 0;
+      
+      cout<<"trigger executed pid "<<*pid<<endl;
+      
+      task_t *task = (task_t *)(*(scheduler->child_processes)).search(*pid);
+      
+      if(task == NULL)
+	 return NHPC_FAIL;
+      
+      nhpc_instruction_set_t *instruction_set = task->instruction_set;
+      system_systeminfo(&(task->systeminfo));
+      
+      if(!instruction_set)
+	 return NULL;
+	 
+      if(status != 0)
+      {
+	 scheduler->free_peer(instruction_set->host_peer_id);
+	 scheduler->queue_job(instruction_set);
+	 return NULL;
+      }
+      
+      nhpc_status_t nrv;
+      
+      char *peer_host = instruction_set->host_peer_addr;
+      char *peer_port = instruction_set->host_peer_port;
+      char *peer_id   = nhpc_itostr(instruction_set->host_peer_id);
+      char *host_uid  = instruction_set->host_grid_uid;
+      
+      nhpc_socket_t *sock;
+      nrv = socket_connect(&sock, peer_host, peer_port, AF_INET, SOCK_STREAM, 0);
+      
+      if(nrv != NHPC_SUCCESS)
+      {
+	 nhpc_string_delete(peer_id);
+	 
+	 return NULL;
+      }
+      
+      nhpc_headers_t *headers = new nhpc_headers_t;
+      
+      headers->insert("GRID SUBMISSION 2.90");
+      headers->insert("Grid-Uid", host_uid);
+      headers->insert("Peer", peer_id);
+      nrv = headers->write(sock);	       
+      delete headers;
+      
+      nhpc_string_delete(peer_id);
+      
+      nhpc_size_t size = sizeof(task_t);
+      socket_sendmsg(sock, (const char *)(task), &size);
+      
+      socket_close(sock);
+      socket_delete(sock);
+      
+      nhpc_delete_instruction(instruction_set);
+      delete task;
+      
+      pthread_mutex_lock(scheduler->mutex_child_processes);
+      scheduler->child_processes->erase(*pid);
+      pthread_mutex_unlock(scheduler->mutex_child_processes);	       
    }
    
    void child_handler(int signum)

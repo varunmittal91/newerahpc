@@ -10,7 +10,7 @@ AC_CONFIG_MACRO_DIR([m4])
 
 # Checks for programs.
 AC_PROG_CXX
-AC_ARG_ENABLE(debug, "turn on debug flag", CFLAGS = "$CFLAGS -debug")
+AC_ARG_ENABLE(debug, "turn on debug flag", $CFLAGS = -Ddebug)
 
 # Checks for libraries.
 AC_CHECK_LIB([pthread],[pthread_create],[],[AC_MSG_ERROR([libpthread not found])])
@@ -31,7 +31,6 @@ AC_HEADER_STDBOOL
 AC_C_INLINE
 
 # Checks for library functions.
-LD = g++
 LT_INIT()
 LT_SUPPORTED_TAG(CXX)
 

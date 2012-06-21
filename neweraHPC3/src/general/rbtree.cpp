@@ -68,7 +68,7 @@ namespace neweraHPC
       for(node = rb_first(&root); ;node = rb_next(node))
       {
 	 if(data_prev)
-            delete data_prev;
+            free(data_prev);
 
          if(!node)
             break;
@@ -79,9 +79,9 @@ namespace neweraHPC
 	 {
 	    if(data->key_pair)
 	    {
-	       delete data->key_pair;
+	       delete (data->key_pair);
 	    }
-	    nhpc_deallocate_str(data->node_key_str);
+	    delete[] (data->node_key_str);
 	 }
 
          data_prev = data;
@@ -305,7 +305,9 @@ namespace neweraHPC
 	 return false;
       
       /* Create a new rbtree_t::node type and initialize values */
-      rbtree_t::node *data = new rbtree_t::node;
+      rbtree_t::node *data = (rbtree_t::node *)malloc(sizeof(rbtree_t::node));
+      memset(data, 0, sizeof(rbtree_t::node));
+      
       last_assigned_key++;
       data->node_data = in_data;
       nhpc_strcpy(&(data->node_key_str), key_str);
@@ -357,8 +359,8 @@ namespace neweraHPC
       if(operation_mode == NHPC_RBTREE_NUM_HASH)
       {
 	 hash_elem_t *hash_elem = (hash_elem_t *)malloc(sizeof(hash_elem_t));
-	 
 	 memset(hash_elem, 0, sizeof(hash_elem_t));
+	 
 	 hash_elem->data = in_data;
 	 in_data = hash_elem;
 	 
@@ -448,6 +450,34 @@ namespace neweraHPC
 	 return false;
       
       hash_elem_t *hash_elem = (hash_elem_t *)data->node_data;
+      
+      hash_elem_t **elem = (hash_elem_t **)&(data->node_data), *parent = NULL;
+      int i = 0;
+      
+      while(*elem && i < (subkey - 1))
+      {
+	 parent = *elem;
+	 elem = &((*elem)->next);
+	 
+	 i++;
+      }
+      
+      /*
+      cout<<(*elem)<<endl;
+      cout<<(*elem)->next<<endl;
+      
+      if(subkey == 1 && !((*elem)->next))
+      {
+	 erase(key);
+	 return true;
+      }
+	 
+      cout<<i<<" "<<subkey<<endl;
+
+      parent->next = (*elem)->next;
+      
+      return true;
+       */
       
       if(subkey == 1)
       {
@@ -659,8 +689,8 @@ namespace neweraHPC
 	 rb_erase(&(data->node_next), &root);
 	 nhpc_deallocate_str(data->node_key_str);
 	 if(data->key_pair)
-	    delete data->key_pair;
-	 delete data;
+	    delete (data->key_pair);
+	 free(data);
 	 count--;
 	 return NHPC_SUCCESS;
       }

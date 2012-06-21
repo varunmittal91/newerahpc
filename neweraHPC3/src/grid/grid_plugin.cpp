@@ -47,6 +47,8 @@ namespace neweraHPC
       
       delete mutex;
       nhpc_string_delete(grid_directory);
+      
+      LOG_INFO("Plugin manager down");
    }
    
    void plugin_manager_t::plugin_manager_init()

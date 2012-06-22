@@ -60,6 +60,7 @@ namespace neweraHPC
       void unlock_child_processes();
       
       static void *job_dispatcher(scheduler_thread_data_t *data);
+      static void *peer_status_updates();
       
    public:
       grid_scheduler_t(thread_manager_t **_thread_manager);
@@ -85,6 +86,8 @@ namespace neweraHPC
       nhpc_status_t decrease_thread(int peer_id);
       
       static void *child_exit_trigger(int *pid);
+      
+      static void child_handler(int signum);
    };   
 };
 

@@ -23,6 +23,7 @@
 #include <include/system.h>
 #include <include/error.h>
 #include <include/strings_pool.h>
+#include <include/grid.h>
 
 using namespace std;
 
@@ -38,8 +39,6 @@ namespace neweraHPC
       
       child_processes = new rbtree_t(NHPC_RBTREE_NUM);
       child_handlers  = new rbtree_t(NHPC_RBTREE_STR);
-      
-      cout<<child_processes<<endl;
    }
    
    nhpc_system_t::nhpc_system_t(thread_manager_t **_thread_manager)

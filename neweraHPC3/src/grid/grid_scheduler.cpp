@@ -102,6 +102,7 @@ namespace neweraHPC
       
       register_trigger_child_process((char *)"GRID", (fnc_ptr_int_t)child_exit_trigger);
       
+      
       signal(SIGCHLD, child_handler);
    }
    

@@ -28,7 +28,7 @@
 #include "rbtree.h"
 
 namespace neweraHPC{
-   static const char *alphabets = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+   extern const char *alphabets;// = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
    
    struct string_t
    {

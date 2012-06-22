@@ -28,6 +28,7 @@
 #include "general.h"
 #include "grid.h"
 #include "system.h"
+#include "alloc.h"
 
 #include <iostream>
 

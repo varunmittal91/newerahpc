@@ -31,6 +31,7 @@
 using namespace std;
 
 namespace neweraHPC{
+   const char *alphabets = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
    strings_pool_t strings_pool;
    bool garbage_collector_ready = false;
    
@@ -138,13 +139,15 @@ namespace neweraHPC{
             
       thread_mutex_lock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
       int ret = strings_allocated->erase(*str_len_string, str);
-      if(ret)
+      if(ret != 0)
 	 allocated_count--;
       thread_mutex_unlock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
       
-      if(!ret)
+      if(ret == 0)
       {
 	 LOG_ERROR("NO string to delete: " << (void *)str_address << " \t " << *str_len_string << " " << str_address);
+	 
+	 return;
       }
       else 
       {

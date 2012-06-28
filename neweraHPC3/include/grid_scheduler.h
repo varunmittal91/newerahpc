@@ -36,7 +36,7 @@ namespace neweraHPC
       nhpc_systeminfo_t systeminfo;
    };
    
-   class grid_scheduler_t : public nhpc_system_t
+   class grid_scheduler_t
    {
    private:
       struct scheduler_thread_data_t
@@ -63,6 +63,8 @@ namespace neweraHPC
       static void *peer_status_updates();
       
    public:
+      nhpc_system_t *extern_system;
+
       grid_scheduler_t(thread_manager_t **_thread_manager);
       ~grid_scheduler_t();
       void grid_scheduler_init();
@@ -86,9 +88,9 @@ namespace neweraHPC
       nhpc_status_t decrease_thread(int peer_id);
       
       static void *child_exit_trigger(int *pid);
-      
-      static void child_handler(int signum);
    };   
+   
+   void child_handler(int signum);
 };
 
 #endif

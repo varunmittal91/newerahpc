@@ -29,8 +29,23 @@ using namespace std;
 
 namespace neweraHPC
 {
+   nhpc_system_t nhpc_system;
+   
+   void child_handler(int signum)
+   {
+      if(signum != SIGCHLD)
+	 return;
+      
+      cout<<"recieved signal"<<endl;
+      
+      nhpc_system.free_child_process();
+      
+      cout<<"processed signal"<<endl;
+   }
+
    nhpc_system_t::nhpc_system_t()
    {
+      thread_manager = new thread_manager_t*;
       *thread_manager = new thread_manager_t;
       
       systeminfo = new nhpc_systeminfo_t;
@@ -65,6 +80,8 @@ namespace neweraHPC
       int thread_id;
       (*thread_manager)->init_thread(&thread_id, NULL);
       (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))monitor_system, this, NHPC_THREAD_DEFAULT);
+
+      signal(SIGCHLD, child_handler);      
    }   
    
    nhpc_status_t nhpc_system_t::system_memstats(nhpc_meminfo_t **_meminfo)

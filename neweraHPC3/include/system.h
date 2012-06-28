@@ -85,6 +85,8 @@ namespace neweraHPC
    nhpc_status_t system_loadavg(nhpc_cpuinfo_t *cpuinfo);
    
    void system_prefork_routine();
+   
+   extern nhpc_system_t nhpc_system;
 };
 
 #endif

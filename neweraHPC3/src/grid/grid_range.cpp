@@ -186,7 +186,7 @@ namespace neweraHPC
       args[0] = exec_path->strings[exec_path->count - 1];
       args[exec_args->count] = NULL;
 
-      grid_server->create_child_process((char *)"GRID", &pid);
+      grid_server->extern_system->create_child_process((char *)"GRID", &pid);
       if(pid == 0)
       {
 	 execve(exec_args->strings[0], args, NULL);

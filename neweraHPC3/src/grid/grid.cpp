@@ -198,7 +198,7 @@ namespace neweraHPC
 	 rv = dup(i);
       }      
       
-      init_system();
+      nhpc_system.init_system();
       plugin_manager_init();
       grid_scheduler_init();
             

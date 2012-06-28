@@ -33,7 +33,7 @@ namespace neweraHPC
    grid_scheduler_t *scheduler;
    pthread_mutex_t mutex_handler;
    
-   grid_scheduler_t::grid_scheduler_t(thread_manager_t **_thread_manager) : nhpc_system_t(_thread_manager)
+   grid_scheduler_t::grid_scheduler_t(thread_manager_t **_thread_manager)
    {
       peers = new rbtree_t;
       jobs = new rbtree_t(NHPC_RBTREE_STR);
@@ -93,6 +93,8 @@ namespace neweraHPC
    
    void grid_scheduler_t::grid_scheduler_init()
    {
+      extern_system = &(nhpc_system);
+      
       pthread_mutex_init(&mutex_handler, NULL);
       
       int thread_id;
@@ -100,10 +102,7 @@ namespace neweraHPC
       (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))grid_scheduler_t::monitor_jobs_pending, 
 				       this, NHPC_THREAD_DEFAULT);
       
-      register_trigger_child_process((char *)"GRID", (fnc_ptr_int_t)child_exit_trigger);
-      
-      
-      signal(SIGCHLD, child_handler);
+      nhpc_system.register_trigger_child_process((char *)"GRID", (fnc_ptr_int_t)child_exit_trigger);
    }
    
    int grid_scheduler_t::cores()
@@ -522,13 +521,5 @@ namespace neweraHPC
       pthread_mutex_lock(scheduler->mutex_child_processes);
       scheduler->child_processes->erase(*pid);
       pthread_mutex_unlock(scheduler->mutex_child_processes);	       
-   }
-   
-   void child_handler(int signum)
-   {
-      if(signum != SIGCHLD)
-	 return;
-      
-      scheduler->free_child_process();
-   }
+   }   
 };

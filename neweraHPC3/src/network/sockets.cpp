@@ -22,6 +22,9 @@
 
 #include <iostream>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <include/network.h>
 #include <include/sockets.h>
 

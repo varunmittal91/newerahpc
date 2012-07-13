@@ -20,6 +20,9 @@
 #include <sys/stat.h>
 #include <iostream>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <include/file.h>
 #include <include/strings.h>
 

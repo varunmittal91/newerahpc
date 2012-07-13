@@ -21,6 +21,9 @@
 #include <fstream>
 #include <sys/stat.h>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <include/network.h>
 #include <include/general.h>
 

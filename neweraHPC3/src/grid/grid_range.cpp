@@ -19,6 +19,9 @@
 
 #include <iostream>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <include/grid.h>
 #include <include/network.h>
 #include <include/system.h>

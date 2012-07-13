@@ -20,6 +20,9 @@
 #include <iostream>
 #include <iomanip>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <include/network.h>
 #include <include/neweraHPC.h>
 #include <include/strings_pool.h>
@@ -104,7 +107,8 @@ namespace neweraHPC
 	    line_len = cntr - old_pos;
 	    if(line_len != 0)
 	    {
-	       char *line = nhpc_allocate_str(line_len + 1);
+	       //char *line = nhpc_allocate_str(line_len + 1);
+	       char *line = new char [line_len + 1];
 	       memcpy(line, (data + old_pos), (line_len));
 	       line[line_len] = '\0';
 	       

@@ -19,6 +19,11 @@
 
 #include <iostream>
 
+#include <config.h>
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <include/http.h>
 #include <include/rbtree.h>
 

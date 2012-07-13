@@ -27,7 +27,9 @@
 
 namespace neweraHPC
 {   
+#ifdef ENABLE_GARBAGE_COLLECTOR
    extern bool garbage_collector_ready;
+#endif
    
    class strings_pool_t
    {

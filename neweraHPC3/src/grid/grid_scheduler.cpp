@@ -21,6 +21,9 @@
 #include <iomanip>
 #include <stdlib.h>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <include/grid.h>
 #include <include/network.h>
 #include <include/grid_client.h>

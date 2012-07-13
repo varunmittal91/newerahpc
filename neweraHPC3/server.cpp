@@ -21,6 +21,9 @@
 #include <iostream>
 #include <iomanip>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <include/neweraHPC.h>
 
 using namespace std;

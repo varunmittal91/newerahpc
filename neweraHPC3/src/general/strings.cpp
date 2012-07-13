@@ -23,6 +23,9 @@
 #include <stdlib.h>
 #endif
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <include/strings.h>
 #include <include/strings_pool.h>
 #include <include/constants.h>
@@ -136,6 +139,13 @@ namespace neweraHPC{
 	 LOG_ERROR("Invalid memory allocation");
 	 return;
       }
+      else if(*str_len_string == 0)
+      {
+	 LOG_ERROR("Not in strings pool");
+	 
+	 //free(str_address);
+	 return;
+      }
             
       thread_mutex_lock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
       int ret = strings_allocated->erase(*str_len_string, str);
@@ -231,7 +241,8 @@ namespace neweraHPC{
    {
       nhpc_size_t len = strlen(src);
       
-      *dst = nhpc_allocate_str(len + 1);
+      //*dst = nhpc_allocate_str(len + 1);
+      (*dst) = new char [len + 1];
       memcpy(*dst, src, len);
       (*dst)[len] = '\0';
 
@@ -382,7 +393,8 @@ namespace neweraHPC{
 	    char *tmp_string;
 	    if(len != 0)
 	    {
-	       tmp_string = nhpc_allocate_str(len + 1);
+	       //tmp_string = nhpc_allocate_str(len + 1);
+	       tmp_string = new char [len + 1];
 	       memcpy(tmp_string, (tmp_s1 - len), len);
 	       tmp_string[len] = '\0';
 	       
@@ -434,7 +446,9 @@ namespace neweraHPC{
             else 
 	       delete[] (string->strings);
 	    string->strings = tmp_strings;
-	    string->strings[string->count] = nhpc_allocate_str(len + 1);
+	    //string->strings[string->count] = nhpc_allocate_str(len + 1);
+	    (string->strings[string->count]) = new char [len + 1];
+
 	    char *tmp_string = string->strings[string->count];
 	    (string->count)++;	 
 	    
@@ -494,13 +508,15 @@ namespace neweraHPC{
 	 return NULL;
       else if(len_s1 == 0)
       {
-	 string = nhpc_allocate_str(len_s2 + 1);
+	 //string = nhpc_allocate_str(len_s2 + 1);
+	 string = new char [len_s2 + 1];
 	 memcpy(string, s2, len_s2);
 	 string[len_s2] = '\0';
       }
       else if(len_s2 == 0)
       {
-	 string = nhpc_allocate_str(len_s1 + 1);
+	 //string = nhpc_allocate_str(len_s1 + 1);
+	 string = new char [len_s1 + 1];
 	 memcpy(string, s1, len_s1);
 	 string[len_s1] = '\0';
       }
@@ -508,7 +524,8 @@ namespace neweraHPC{
       {
 	 nhpc_size_t len = strlen(s1) + strlen(s2);
 
-	 string = nhpc_allocate_str(len + 1);
+	 //string = nhpc_allocate_str(len + 1);
+	 string = new char [len + 1];
 	 memcpy(string, s1, len_s1);
 	 memcpy(string + len_s1, s2, len_s2);
 	 string[len] = '\0';
@@ -533,7 +550,8 @@ namespace neweraHPC{
 
       nhpc_size_t len = strlen(s1) + strlen(s2) + strlen(s3);
 	 
-      string = nhpc_allocate_str(len + 1);
+      //string = nhpc_allocate_str(len + 1);
+      string = new char [len + 1];
       memcpy(string, s1, len_s1);
       memcpy(string + len_s1, s2, len_s2);
       memcpy(string + (len_s1 + len_s2), s3, len_s3);
@@ -549,7 +567,8 @@ namespace neweraHPC{
       
       if(num <= 0)
       {
-	 char *string = nhpc_allocate_str(2);
+	 //char *string = nhpc_allocate_str(2);
+	 char *string = new char [2];
 	 string[0] = '0';
 	 string[1] = '\0';
 	 return string;
@@ -563,7 +582,8 @@ namespace neweraHPC{
       }
       
       tmp_num = num;
-      char *string = nhpc_allocate_str(count + 1);
+      //char *string = nhpc_allocate_str(count + 1);
+      char *string = new char [count + 1];
       string[count] = '\0';
       int i = 0;
       
@@ -599,7 +619,8 @@ namespace neweraHPC{
    
    char *nhpc_random_string(nhpc_size_t len)
    {
-      char *dst = nhpc_allocate_str(len + 1);
+      //char *dst = nhpc_allocate_str(len + 1);
+      char *dst = new char [len + 1];
       
       for(int i = 0; i < len; i++)
       {

@@ -17,6 +17,9 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <include/cfg.h>
 
 namespace neweraHPC

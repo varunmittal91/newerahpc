@@ -87,6 +87,8 @@ namespace neweraHPC
    void system_prefork_routine();
    
    extern nhpc_system_t nhpc_system;
+   
+   void child_prepare();
 };
 
 #endif

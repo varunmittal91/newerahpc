@@ -81,6 +81,7 @@ namespace neweraHPC
       (*thread_manager)->init_thread(&thread_id, NULL);
       (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))monitor_system, this, NHPC_THREAD_DEFAULT);
 
+      pthread_atfork(NULL, NULL, child_prepare);
       signal(SIGCHLD, child_handler);      
    }   
    

@@ -24,6 +24,9 @@
 
 #include <iostream>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <include/rbtree.h>
 #include <include/alloc.h>
 #include <include/strings_pool.h>
@@ -687,7 +690,8 @@ namespace neweraHPC
       rbtree_t::node *data = rbtree_t::search_node(key_str);
       if(data){
 	 rb_erase(&(data->node_next), &root);
-	 nhpc_deallocate_str(data->node_key_str);
+	 //nhpc_deallocate_str(data->node_key_str);
+	 delete[] (data->node_key_str);
 	 if(data->key_pair)
 	    delete (data->key_pair);
 	 free(data);

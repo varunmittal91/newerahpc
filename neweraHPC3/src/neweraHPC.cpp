@@ -19,6 +19,9 @@
 
 #include <iostream>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <include/neweraHPC.h>
 #include <include/error.h>
 #include <include/strings_pool.h>

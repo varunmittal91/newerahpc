@@ -20,10 +20,14 @@
 #include <iostream>
 #include <errno.h>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <include/alloc.h>
 
 using namespace std;
 
+#ifdef ENABLE_GARBAGE_COLLECTOR
 void *operator new(std::size_t size)
 {
    void *new_p = NULL;
@@ -32,8 +36,10 @@ void *operator new(std::size_t size)
       new_p = nhpc_allocate_str(size);
    else 
    {
-      new_p = malloc(size);
-      memset(new_p, 0, size);
+      size_t _size = size + sizeof(size_t);
+      
+      new_p = malloc(_size);
+      memset(new_p, 0, _size);
    }
       
    if(!new_p)
@@ -61,3 +67,4 @@ void operator delete[](void *ptr)
 {
    operator delete(ptr);
 }   
+#endif

@@ -37,7 +37,10 @@ host_triplet = @host@
 subdir = src/network
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/configure.ac
+am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -53,10 +56,6 @@ libnetwork_la_OBJECTS = $(am_libnetwork_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
-libnetwork_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(libnetwork_la_LDFLAGS) $(LDFLAGS) \
-	-o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -249,7 +248,6 @@ SOURCES = network.cpp sockets.cpp sendrecv.cpp headers.cpp waitio.cpp sockopts.c
 noinst_LTLIBRARIES = libnetwork.la 
 libnetwork_la_SOURCES = $(SOURCES)
 libnetwork_la_LIBADD = web_server/libweb_server.la
-libnetwork_la_LDFLAGS = 
 all: all-recursive
 
 .SUFFIXES:
@@ -263,9 +261,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/network/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/network/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/network/Makefile
+	  $(AUTOMAKE) --gnu src/network/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -294,7 +292,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libnetwork.la: $(libnetwork_la_OBJECTS) $(libnetwork_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libnetwork_la_LINK)  $(libnetwork_la_OBJECTS) $(libnetwork_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK)  $(libnetwork_la_OBJECTS) $(libnetwork_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

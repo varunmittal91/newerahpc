@@ -30,7 +30,8 @@ namespace neweraHPC
 {   
    void child_prepare()
    {
-      
+      system_prefork_routine();
+      sleep(2);
    }
    
    nhpc_status_t nhpc_system_t::register_trigger_child_process(char *service_name, fnc_ptr_int_t function)
@@ -50,7 +51,6 @@ namespace neweraHPC
       
       if(!check_handler)
       {
-	 cout<<"\n\nfailed\n\n";
 	 exit(0);
 	 return NHPC_FAIL;
       }
@@ -90,8 +90,6 @@ namespace neweraHPC
       
       while(1)
       {
-	 cout<<"waiting for process"<<endl;
-	 
 	 pid = waitpid(0, &status, WUNTRACED);
 	 if(pid == -1)
 	    break;
@@ -117,7 +115,7 @@ namespace neweraHPC
    {
       thread_mutex_lock(&mutex_chld, NHPC_THREAD_LOCK_READ);	 
       int count = child_processes->ret_count();
-      thread_mutex_lock(&mutex_chld, NHPC_THREAD_LOCK_READ);	 
+      thread_mutex_unlock(&mutex_chld, NHPC_THREAD_LOCK_READ);	 
             
       for(int i = 1; i <= count; i++)
       {
@@ -125,7 +123,10 @@ namespace neweraHPC
 	 child_process_t *child_process = (child_process_t *)(*child_processes)[i];
 	 
 	 if(!child_process)
+	 {
+	    thread_mutex_unlock(&mutex_chld, NHPC_THREAD_LOCK_READ);	 
 	    continue;
+	 }
 	 
 	 if(!(child_process->active))
 	 {
@@ -153,6 +154,8 @@ namespace neweraHPC
    
    void system_prefork_routine()
    {
+#ifdef ENABLE_GARBAGE_COLLECTOR
       garbage_collector_ready = false;
+#endif
    }
 };

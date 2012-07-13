@@ -19,6 +19,9 @@
 
 #include <iostream>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 #include <include/headers.h>
 #include <include/sockets.h>
 #include <include/strings_pool.h>
@@ -55,7 +58,8 @@ namespace neweraHPC
    {
       char *tmp_property = nhpc_strconcat(property, ": ", argument);
       insert(tmp_property);
-      nhpc_deallocate_str(tmp_property);
+      delete[] tmp_property;
+      //nhpc_deallocate_str(tmp_property);
    }
    
    const char *nhpc_headers_t::operator[](int id)
@@ -124,7 +128,8 @@ namespace neweraHPC
 	 for(int i = 2; i < count; i++)
 	 {
 	    char *tmp_str_2 = nhpc_strconcat(tmp_str, ":", string->strings[i]);
-	    nhpc_deallocate_str(tmp_str);
+	    //nhpc_deallocate_str(tmp_str);
+	    delete[] tmp_str;
 	    tmp_str = tmp_str_2;
 	 }
 	 
@@ -151,7 +156,8 @@ namespace neweraHPC
 	 string = (char *)headers->search_first(&key);
 	 if(string)
 	 {
-	    nhpc_deallocate_str(string);
+	    //nhpc_deallocate_str(string);
+	    delete[] string;
 	    headers->erase(key);
 	 }
       }while(string);

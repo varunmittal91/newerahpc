@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
+ACLOCAL_AMFLAGS= -I m4
 
 SUBDIRS = src tests
 
@@ -13,3 +13,4 @@ dist_doc_DATA = README
 
 src/libneweraHPC.la:
 	cd src && make
+   

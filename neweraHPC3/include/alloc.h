@@ -31,10 +31,12 @@
 
 using namespace neweraHPC;
 
+#ifdef ENABLE_GARBAGE_COLLECTOR
 void *operator new(std::size_t size);
 void *operator new[](std::size_t size);
 
 void operator delete(void *ptr);
 void operator delete[](void *ptr);
+#endif
 
 #endif

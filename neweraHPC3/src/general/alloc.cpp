@@ -31,38 +31,42 @@ using namespace std;
 void *operator new(std::size_t size)
 {
    void *new_p = NULL;
-      
+   
    if(garbage_collector_ready)
+   {
       new_p = nhpc_allocate_str(size);
+   }
    else 
    {
+      LOG_ERROR("from outside garbage collector");
+      
       size_t _size = size + sizeof(size_t);
       
       new_p = malloc(_size);
       memset(new_p, 0, _size);
    }
-      
+   
    if(!new_p)
    {
       LOG_ERROR("Allocation error, errno: " << errno);
       exit(0);
    }
-      
+   
    return new_p;
 }
-   
+
 void *operator new[](std::size_t size)
 {
    void *new_p = operator new(size);
-      return new_p;
+   return new_p;
 }
-   
+
 void operator delete(void *ptr)
 {
    if(garbage_collector_ready)
       nhpc_deallocate_str((char *)ptr);
 }
-   
+
 void operator delete[](void *ptr)
 {
    operator delete(ptr);

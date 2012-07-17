@@ -20,6 +20,10 @@
 #include <iostream>
 #include <sys/types.h>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+#include <include/alloc.h>
 #include <include/system.h>
 #include <include/error.h>
 #include <include/strings_pool.h>

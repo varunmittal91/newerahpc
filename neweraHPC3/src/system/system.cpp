@@ -20,6 +20,10 @@
 #include <iostream>
 #include <sys/types.h>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+#include <include/alloc.h>
 #include <include/system.h>
 #include <include/error.h>
 #include <include/strings_pool.h>
@@ -36,11 +40,7 @@ namespace neweraHPC
       if(signum != SIGCHLD)
 	 return;
       
-      cout<<"recieved signal"<<endl;
-      
       nhpc_system.free_child_process();
-      
-      cout<<"processed signal"<<endl;
    }
 
    nhpc_system_t::nhpc_system_t()
@@ -82,7 +82,14 @@ namespace neweraHPC
       (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))monitor_system, this, NHPC_THREAD_DEFAULT);
 
       pthread_atfork(NULL, NULL, child_prepare);
-      signal(SIGCHLD, child_handler);      
+      
+      struct sigaction act;
+      memset (&act, 0, sizeof(act));
+      act.sa_handler = child_handler;
+      
+      if (sigaction(SIGCHLD, &act, 0)) {
+	 perror ("sigaction");
+      }
    }   
    
    nhpc_status_t nhpc_system_t::system_memstats(nhpc_meminfo_t **_meminfo)

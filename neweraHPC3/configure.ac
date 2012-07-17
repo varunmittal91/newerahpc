@@ -19,7 +19,7 @@ AC_CHECK_HEADERS([pthread.h])
 AC_CHECK_HEADERS([dlfcn.h])
 
 # Check for optional arguments
-AC_ARG_ENABLE([garbage_collector], [Enable garbage collector], [AC_DEFINE([ENABLE_GARRBAGE_COLLECTOR], [1], [Enable garbage collector])])
+AC_ARG_ENABLE([garbage_collector], [Enable garbage collector], [AC_DEFINE([ENABLE_GARBAGE_COLLECTOR], [1], [Enable garbage collector])])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL

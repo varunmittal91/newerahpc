@@ -29,6 +29,10 @@
 #include <sys/sysctl.h>
 #endif
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+#include <include/alloc.h>
 #include <include/system.h>
 
 using namespace std;

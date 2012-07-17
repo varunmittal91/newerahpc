@@ -15069,7 +15069,7 @@ done
 # Check whether --enable-garbage_collector was given.
 if test "${enable_garbage_collector+set}" = set; then :
   enableval=$enable_garbage_collector;
-$as_echo "#define ENABLE_GARRBAGE_COLLECTOR 1" >>confdefs.h
+$as_echo "#define ENABLE_GARBAGE_COLLECTOR 1" >>confdefs.h
 
 fi
 

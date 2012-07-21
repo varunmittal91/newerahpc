@@ -270,7 +270,8 @@ namespace neweraHPC
 	    return false;
       }      
 
-      (*data) = (rbtree_t::node *)malloc(sizeof(rbtree_t::node));
+      //(*data) = (rbtree_t::node *)malloc(sizeof(rbtree_t::node));
+      (*data) = (rbtree_t::node *)alloc<rbtree_t::node>(1);
       memset((*data), 0, sizeof(rbtree_t::node));
       
       rb_link_node(&((*data)->node_next), parent, new_node);
@@ -308,7 +309,8 @@ namespace neweraHPC
 	 return false;
       
       /* Create a new rbtree_t::node type and initialize values */
-      rbtree_t::node *data = (rbtree_t::node *)malloc(sizeof(rbtree_t::node));
+      //rbtree_t::node *data = (rbtree_t::node *)malloc(sizeof(rbtree_t::node));
+      rbtree_t::node *data = alloc<rbtree_t::node>(1);
       memset(data, 0, sizeof(rbtree_t::node));
       
       last_assigned_key++;
@@ -361,7 +363,8 @@ namespace neweraHPC
       /* Create a hash content structure for NUM_HASH mode */
       if(operation_mode == NHPC_RBTREE_NUM_HASH)
       {
-	 hash_elem_t *hash_elem = (hash_elem_t *)malloc(sizeof(hash_elem_t));
+	 hash_elem_t *hash_elem = alloc<hash_elem_t>(1);
+	 //hash_elem_t *hash_elem = (hash_elem_t *)malloc(sizeof(hash_elem_t));
 	 memset(hash_elem, 0, sizeof(hash_elem_t));
 	 
 	 hash_elem->data = in_data;
@@ -524,7 +527,7 @@ namespace neweraHPC
       if(node == NULL)
 	 return false;
       
-      hash_elem_t *hash_elem = (hash_elem_t *)node->node_data;
+      hash_elem_t *hash_elem = (hash_elem_t *)(node->node_data);
       void *data_found = NULL;
       
       int count = 0;
@@ -532,13 +535,13 @@ namespace neweraHPC
       {
 	 count++;
 	 
-	 if(hash_elem->data == in_data)
+	 if((hash_elem->data) == in_data)
 	 {
 	    data_found = in_data;
 	    break;
 	 }
 	 
-	 hash_elem = hash_elem->next;
+	 hash_elem = (hash_elem->next);
       }
 
       if(data_found != NULL)

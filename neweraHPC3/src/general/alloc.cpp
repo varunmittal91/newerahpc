@@ -42,8 +42,13 @@ void *operator new(std::size_t size)
       
       size_t _size = size + sizeof(size_t);
       
-      new_p = malloc(_size);
+      new_p = alloc<char>(_size);
       memset(new_p, 0, _size);
+      
+      size_t *str_len = (size_t *)new_p;
+      *str_len = size;
+      
+      new_p = (char *)new_p + sizeof(size_t);
    }
    
    if(!new_p)

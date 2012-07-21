@@ -108,6 +108,8 @@ namespace neweraHPC
 	 size = *length - data_sent;
 	 nrv = socket_send(sock, (buffer + data_sent), &size);
 	 data_sent += size;
+	 
+	 usleep(500);
       }while(data_sent != *length && errno != EPIPE);
       
       if(errno == EPIPE)

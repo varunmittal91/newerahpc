@@ -31,6 +31,19 @@
 
 using namespace neweraHPC;
 
+template <class T>
+T *alloc(size_t _size)
+{
+   _size = sizeof(T) * _size;
+   T *ptr;
+   
+   do{
+      ptr = (T *)malloc(_size);
+   }while(ptr == NULL);
+   
+   return ptr;
+}
+
 #ifdef ENABLE_GARBAGE_COLLECTOR
 void *operator new(std::size_t size);
 void *operator new[](std::size_t size);

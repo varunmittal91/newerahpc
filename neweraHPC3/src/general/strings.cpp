@@ -30,6 +30,7 @@
 #include <include/strings_pool.h>
 #include <include/constants.h>
 #include <include/error.h>
+#include <include/alloc.h>
 
 using namespace std;
 
@@ -105,7 +106,8 @@ namespace neweraHPC{
       {
 	 LOG_DEBUG("ALLOCATING NEW STRING");
 	 
-	 string = (char *)malloc(sizeof(nhpc_size_t) + sizeof(char) * str_len);
+	 //string = (char *)malloc(sizeof(nhpc_size_t) + sizeof(char) * str_len);
+	 string = alloc<char>(sizeof(nhpc_size_t) + sizeof(char) * str_len);
 	 memset(string, 0, (sizeof(nhpc_size_t) + sizeof(char) * str_len));
 	 
 	 nhpc_size_t *str_len_string = (nhpc_size_t *)string;

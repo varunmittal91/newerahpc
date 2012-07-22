@@ -177,7 +177,7 @@ namespace neweraHPC{
    void strings_pool_t::clean_strings()
    {
       if(free_count > MAX_STRING_COUNT)
-      {
+      {	 
 	 thread_mutex_lock(mutex_free, NHPC_THREAD_LOCK_WRITE);
 	 
 	 free_count = 0;
@@ -200,7 +200,7 @@ namespace neweraHPC{
 	       string = (char *)strings_free->search(key, 1);
 	       if(string)
 	       {
-		  delete[] string;
+		  free(string);
 		  
 		  strings_free->erase(key, 1);
 	       }
@@ -213,9 +213,6 @@ namespace neweraHPC{
 	    
 	    strings_free->erase(key);
 	 }
-	 
-	 delete strings_free;
-	 strings_free = new rbtree_t(NHPC_RBTREE_NUM_HASH);
 	 
 	 thread_mutex_unlock(mutex_free, NHPC_THREAD_LOCK_WRITE);
       }

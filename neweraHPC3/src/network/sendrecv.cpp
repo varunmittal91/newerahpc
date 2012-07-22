@@ -45,7 +45,11 @@ namespace neweraHPC
       else 
       {
 	 do 
-	 {
+	 {	    
+	    rv = nhpc_wait_for_io_or_timeout(sock, 0);
+	    if(rv != NHPC_SUCCESS)
+	       continue;
+	    
 	    rv = read(sock->sockfd, buffer, *length);
 	 }while(rv == -1 && errno == EINTR);
       }
@@ -82,6 +86,10 @@ namespace neweraHPC
       {
 	 do
 	 {
+	    rv = nhpc_wait_for_io_or_timeout(sock, 0);
+	    if(rv != NHPC_SUCCESS)
+	       continue;
+
 	    rv = write(sock->sockfd, buffer, *length);
 	 }while(rv == -1 && errno == EINTR);
       }
@@ -108,8 +116,6 @@ namespace neweraHPC
 	 size = *length - data_sent;
 	 nrv = socket_send(sock, (buffer + data_sent), &size);
 	 data_sent += size;
-	 
-	 usleep(500);
       }while(data_sent != *length && errno != EPIPE);
       
       if(errno == EPIPE)

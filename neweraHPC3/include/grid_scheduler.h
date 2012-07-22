@@ -88,6 +88,8 @@ namespace neweraHPC
       nhpc_status_t decrease_thread(int peer_id);
       
       static void *child_exit_trigger(int *pid);
+      
+      static void *refresh_node_status(grid_scheduler_t *grid_scheduler);
    };   
    
    void child_handler(int signum);

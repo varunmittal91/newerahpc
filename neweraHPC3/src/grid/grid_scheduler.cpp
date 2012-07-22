@@ -105,6 +105,11 @@ namespace neweraHPC
       (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))grid_scheduler_t::monitor_jobs_pending, 
 				       this, NHPC_THREAD_DEFAULT);
       
+      thread_id;
+      (*thread_manager)->init_thread(&thread_id, NULL);
+      (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))grid_scheduler_t::refresh_node_status, 
+				       this, NHPC_THREAD_DEFAULT);
+
       nhpc_system.register_trigger_child_process((char *)"GRID", (fnc_ptr_int_t)child_exit_trigger);
    }
    
@@ -459,6 +464,12 @@ namespace neweraHPC
 	 
 	 sleep(1);
       }
+   }
+   
+   void *grid_scheduler_t::refresh_node_status(grid_scheduler_t *grid_scheduler)
+   {
+      while(1)
+	 sleep(1);
    }
    
    void *grid_scheduler_t::child_exit_trigger(int *pid)

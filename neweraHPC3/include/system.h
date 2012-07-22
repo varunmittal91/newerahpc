@@ -22,6 +22,8 @@
 
 #define MAX_TERMINATED_KEYS 10
 
+#include <sys/wait.h>
+
 #include "system_memory.h"
 #include "alloc.h"
 #include "thread.h"

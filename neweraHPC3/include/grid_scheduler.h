@@ -90,6 +90,10 @@ namespace neweraHPC
       static void *child_exit_trigger(int *pid);
       
       static void *refresh_node_status(grid_scheduler_t *grid_scheduler);
+      
+      nhpc_status_t request_node_status(peer_details_t *peer_details);
+      nhpc_status_t update_node_status(peer_details_t *peer_details);
+      
    };   
    
    void child_handler(int signum);

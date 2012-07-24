@@ -469,7 +469,10 @@ namespace neweraHPC
    void *grid_scheduler_t::refresh_node_status(grid_scheduler_t *grid_scheduler)
    {
       while(1)
+      {
+	  
 	 sleep(1);
+      }
    }
    
    void *grid_scheduler_t::child_exit_trigger(int *pid)

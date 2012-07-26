@@ -19,6 +19,7 @@
 
 #include <sys/stat.h>
 #include <iostream>
+#include <dirent.h>
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -189,5 +190,42 @@ namespace neweraHPC
       
       *new_file_dir = target_name;
       return NHPC_SUCCESS;
+   }
+
+   string_t *nhpc_get_file_list(const char *dir)
+   {
+      DIR *_dir;
+      struct dirent *ent;
+
+      _dir = opendir(dir);
+
+      string_t *string = NULL;
+
+      if(_dir != NULL)
+      {
+         string = new string_t;
+
+         while((ent = readdir(_dir)) != NULL)
+         {
+            string->count++;
+         }
+
+         string->count++;
+         string->strings = new char* [string->count];
+         string->strings[string->count] = NULL;
+
+         closedir(_dir);
+         _dir = opendir(dir);
+
+         int i = 0;
+         while((ent = readdir(_dir)) != NULL)
+         {
+            nhpc_strcpy(&(string->strings[i]), ent->d_name);
+
+            i++;
+         }
+      }
+
+      return string;
    }
 };

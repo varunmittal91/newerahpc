@@ -25,6 +25,7 @@
 #include <sys/stat.h>
 
 #include "constants.h"
+#include "strings.h"
 
 namespace neweraHPC
 {
@@ -36,6 +37,8 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_create_tmp_file_or_dir(const char **new_file_dir, const char *target_dir, 
 					     int target_type, const char *file_name = NULL);
+
+   string_t *nhpc_get_file_list(const char *dir);
 };
 
 #endif

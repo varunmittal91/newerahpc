@@ -192,7 +192,7 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
 
-   string_t *nhpc_get_file_list(const char *dir)
+   string_t *nhpc_get_file_list(const char *dir, int mode)
    {
       DIR *_dir;
       struct dirent *ent;
@@ -207,6 +207,12 @@ namespace neweraHPC
 
          while((ent = readdir(_dir)) != NULL)
          {
+            if(mode == NHPC_VISIBLE_DIR_CHILD)
+            {
+               if(nhpc_strcmp(ent->d_name, ".*"))
+                  continue;
+            }
+
             string->count++;
          }
 
@@ -220,6 +226,12 @@ namespace neweraHPC
          int i = 0;
          while((ent = readdir(_dir)) != NULL)
          {
+            if(mode == NHPC_VISIBLE_DIR_CHILD)
+            {
+               if(nhpc_strcmp(ent->d_name, ".*"))
+                  continue;
+            }
+
             nhpc_strcpy(&(string->strings[i]), ent->d_name);
 
             i++;

@@ -61,6 +61,13 @@ typedef size_t nhpc_size_t;
 #define NHPC_VISIBLE_DIR_CHILD 0
 #define NHPC_ALL_DIR_CHILD 1
 
+/* Grid specific constants */
+#define PLUGIN_REQUEST_PENDING 0
+#define PLUGIN_REQUEST_SENT 1
+#define PLUGIN_UNDER_PROCESSING 0
+#define PLUGIN_INSTALLED 1
+#define PLUGIN_INSTALL_FAILED
+
 typedef void *(*fnc_ptr_t)(void *);
 typedef void *(*fnc_ptr_two_t)(void *, void *);
 typedef nhpc_status_t (*fnc_ptr_nhpc_t)(void *);

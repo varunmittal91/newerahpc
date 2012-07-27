@@ -362,6 +362,7 @@ namespace neweraHPC
       
       cout<<"Debug: "<<processor_time<<endl;
       
+      /*
       if(processor_time < (peer_details->processor_time * peer_details->processors) && mem_free <= 10)
       {
 	 increase_thread(id); 
@@ -370,6 +371,7 @@ namespace neweraHPC
       {
 	 decrease_thread(id);
       }
+      */
       
       unlock();
       

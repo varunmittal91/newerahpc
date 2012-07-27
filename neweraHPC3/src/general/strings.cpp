@@ -106,7 +106,6 @@ namespace neweraHPC{
       {
 	 LOG_DEBUG("ALLOCATING NEW STRING");
 	 
-	 //string = (char *)malloc(sizeof(nhpc_size_t) + sizeof(char) * str_len);
 	 string = alloc<char>(sizeof(nhpc_size_t) + sizeof(char) * str_len);
 	 memset(string, 0, (sizeof(nhpc_size_t) + sizeof(char) * str_len));
 	 
@@ -145,7 +144,6 @@ namespace neweraHPC{
       {
 	 LOG_ERROR("Not in strings pool");
 	 
-	 //free(str_address);
 	 return;
       }
             
@@ -240,7 +238,6 @@ namespace neweraHPC{
    {
       nhpc_size_t len = strlen(src);
       
-      //*dst = nhpc_allocate_str(len + 1);
       (*dst) = new char [len + 1];
       memcpy(*dst, src, len);
       (*dst)[len] = '\0';
@@ -486,14 +483,12 @@ namespace neweraHPC{
 	 return NULL;
       else if(len_s1 == 0)
       {
-	 //string = nhpc_allocate_str(len_s2 + 1);
 	 string = new char [len_s2 + 1];
 	 memcpy(string, s2, len_s2);
 	 string[len_s2] = '\0';
       }
       else if(len_s2 == 0)
       {
-	 //string = nhpc_allocate_str(len_s1 + 1);
 	 string = new char [len_s1 + 1];
 	 memcpy(string, s1, len_s1);
 	 string[len_s1] = '\0';
@@ -502,7 +497,6 @@ namespace neweraHPC{
       {
 	 nhpc_size_t len = strlen(s1) + strlen(s2);
 
-	 //string = nhpc_allocate_str(len + 1);
 	 string = new char [len + 1];
 	 memcpy(string, s1, len_s1);
 	 memcpy(string + len_s1, s2, len_s2);
@@ -528,7 +522,6 @@ namespace neweraHPC{
 
       nhpc_size_t len = strlen(s1) + strlen(s2) + strlen(s3);
 	 
-      //string = nhpc_allocate_str(len + 1);
       string = new char [len + 1];
       memcpy(string, s1, len_s1);
       memcpy(string + len_s1, s2, len_s2);
@@ -545,7 +538,6 @@ namespace neweraHPC{
       
       if(num <= 0)
       {
-	 //char *string = nhpc_allocate_str(2);
 	 char *string = new char [2];
 	 string[0] = '0';
 	 string[1] = '\0';
@@ -560,7 +552,6 @@ namespace neweraHPC{
       }
       
       tmp_num = num;
-      //char *string = nhpc_allocate_str(count + 1);
       char *string = new char [count + 1];
       string[count] = '\0';
       int i = 0;
@@ -597,7 +588,6 @@ namespace neweraHPC{
    
    char *nhpc_random_string(nhpc_size_t len)
    {
-      //char *dst = nhpc_allocate_str(len + 1);
       char *dst = new char [len + 1];
       
       for(int i = 0; i < len; i++)

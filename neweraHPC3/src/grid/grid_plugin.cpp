@@ -39,6 +39,7 @@ namespace neweraHPC
       plugins_requested = new rbtree_t(NHPC_RBTREE_STR);
       mutex = new pthread_mutex_t;
       pthread_mutex_init(mutex, NULL);
+      thread_mutex_init(nhpc_mutex);
       grid_directory = nhpc_strconcat(HTTP_ROOT, "/grid/");
    }
    
@@ -78,9 +79,9 @@ namespace neweraHPC
    
    nhpc_status_t plugin_manager_t::search_plugin(const char *plugin_name, plugin_details_t **plugin_details)
    {
-      lock();
+      thread_mutex_lock(nhpc_mutex, NHPC_THREAD_LOCK_READ);      
       (*plugin_details) = (plugin_details_t *)(*plugins_installed).search((char *)plugin_name);
-      unlock();
+      thread_mutex_unlock(nhpc_mutex, NHPC_THREAD_LOCK_READ);      
       
       if(!(*plugin_details))
 	 return NHPC_FAIL;
@@ -283,6 +284,43 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
+   nhpc_status_t plugin_manager_t::request_plugin(int peer_id, char *plugin_name)
+   {
+      plugin_request_t *plugin_request;
+
+      thread_mutex_lock(nhpc_mutex, NHPC_THREAD_LOCK_READ);      
+      plugin_request = (plugin_request_t *)plugins_requested->search(plugin_name);
+      thread_mutex_unlock(nhpc_mutex, NHPC_THREAD_LOCK_READ);
+
+      if(plugin_request)
+      {
+         while(plugin_request->status == PLUGIN_UNDER_PROCESSING)
+         {
+            sleep(2);
+         } 
+
+         if(plugin_request->status == PLUGIN_INSTALLED)
+            return NHPC_SUCCESS;
+         else
+            return NHPC_FAIL;
+      }
+      else
+      {
+         plugin_request = new plugin_request_t;
+         plugin_request->peer_id = peer_id;
+         thread_mutex_lock(nhpc_mutex, NHPC_THREAD_LOCK_WRITE);      
+         plugins_requested->insert(plugin_request, plugin_name);
+         thread_mutex_lock(nhpc_mutex, NHPC_THREAD_LOCK_WRITE);       
+      }
+   }
+
+   nhpc_status_t plugin_manager_t::recieve_plugin(const char *plugin_name, const char *plugin_type, 
+						  const char *file_path)
+   {
+
+   }
+
+
    void *nhpc_plugin_request_thread(plugin_manager_t *plugin_manager)
    {
       

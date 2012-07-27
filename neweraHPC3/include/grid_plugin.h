@@ -34,6 +34,13 @@ namespace neweraHPC
    class plugin_manager_t
    {
    private:
+      struct plugin_request_t
+      {
+         int peer_id;
+         int request_sent;
+         int status;
+      };
+
       rbtree_t *plugins_installed;
       rbtree_t *plugins_requested;
       thread_manager_t **thread_manager;
@@ -41,6 +48,7 @@ namespace neweraHPC
       nhpc_status_t install_plugin_dll(const char *dll_path, plugin_details_t **plugin_details);
       nhpc_status_t copy_filetogrid(const char *file_path, const char **base_dir, char **file_path_new);
       
+      nhpc_mutex_t *nhpc_mutex;
    public:
       char *grid_directory;
 
@@ -50,7 +58,10 @@ namespace neweraHPC
       void lock();
       void unlock();
       nhpc_status_t search_plugin(const char *plugin_name, plugin_details_t **plugin_details);
-      int request_plugin(int peer_id, int remote_plugin_id);
+
+      nhpc_status_t request_plugin(int peer_id, char *plugin_name);
+      nhpc_status_t recieve_plugin(const char *plugin_name, const char *plugin_type, const char *file_path);
+
       nhpc_status_t install_plugin(const char *file_path, const char *base_dir = NULL);
    };
    

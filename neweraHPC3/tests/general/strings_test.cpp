@@ -102,7 +102,14 @@ int main()
    cout<<endl;
    
    string_t *string = nhpc_substr("My name is   varun", ' ');
-   string = nhpc_substr("   My name is   varun", ' ');
+   for(int i = 0; i < string->count; i++)
+      cout<<"Substr_1: "<<string->strings[i]<<endl;
+
+   string = nhpc_substr("   My name is   varun  ", '&');
+
+   for(int i = 0; i < string->count; i++)
+      cout<<"Substr: "<<string->strings[i]<<endl;
+
    string = nhpc_substr("My name is   varun   ", ' ');
    string = nhpc_substr("My name is varun", 's');
       

@@ -216,9 +216,8 @@ namespace neweraHPC
             string->count++;
          }
 
-         string->count++;
-         string->strings = new char* [string->count];
-         string->strings[string->count] = NULL;
+         string->strings = new char* [string->count + 1];
+         string->strings[string->count + 1] = NULL;
 
          closedir(_dir);
          _dir = opendir(dir);

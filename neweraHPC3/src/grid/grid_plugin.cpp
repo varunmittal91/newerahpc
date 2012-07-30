@@ -38,8 +38,11 @@ namespace neweraHPC
       plugins_installed = new rbtree_t(NHPC_RBTREE_STR);
       plugins_requested = new rbtree_t(NHPC_RBTREE_STR);
       mutex = new pthread_mutex_t;
+      nhpc_mutex = new nhpc_mutex_t;
+
       pthread_mutex_init(mutex, NULL);
       thread_mutex_init(nhpc_mutex);
+
       grid_directory = nhpc_strconcat(HTTP_ROOT, "/grid/");
    }
    
@@ -50,6 +53,7 @@ namespace neweraHPC
       delete plugins_installed;
       
       delete mutex;
+      delete nhpc_mutex;
       nhpc_string_delete(grid_directory);
       
       LOG_INFO("Plugin manager down");

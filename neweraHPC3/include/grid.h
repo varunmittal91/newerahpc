@@ -37,6 +37,11 @@ namespace neweraHPC
    class nhpc_grid_server_t : public network_t, public plugin_manager_t, public grid_scheduler_t
    {
    private:
+      struct nhpc_job_t
+      {
+	 
+      };
+      
       struct functions_t
       {
 	 fnc_ptr_nhpc_two_t  client_registration;
@@ -60,6 +65,7 @@ namespace neweraHPC
             
       thread_manager_t *thread_manager;
       
+      rbtree_t *jobs;
    public:
       nhpc_grid_server_t(const char *in_host, const char *in_cpu_time);   
       nhpc_grid_server_t();

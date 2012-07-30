@@ -199,7 +199,9 @@ namespace neweraHPC
 	 i = open("/dev/null", O_RDWR);
 	 rv = dup(i);
 	 rv = dup(i);
-      }      
+      }  
+      
+      jobs = new rbtree_t(NHPC_RBTREE_STR);
       
       nhpc_system.init_system();
       plugin_manager_init();

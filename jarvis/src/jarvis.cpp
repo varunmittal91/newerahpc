@@ -20,6 +20,7 @@
 #include <neweraHPC/neweraHPC.h>
 
 #include <include/jarvis.h>
+#include <include/words.h>
 
 using namespace neweraHPC;
 

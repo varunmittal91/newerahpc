@@ -7,26 +7,25 @@ using namespace neweraHPC;
 
 namespace jarvis
 {
-   struct word_definition_t
+   struct word_type_definition_t
    {
+      char **word_features;
       int count;
-      char **word_files;
-      char **word_types;
-   };
-   
-   struct verb_t
-   {
-      char *base_form;
-      char *past_simple;
-      char *past_particilple;
-      char *present_participle;
-      char *third_person_singular;
+      rbtree_t *data;
    };
    
    struct word_t
    {
       char *word_type;
       char *word;
+      char *sub_category;
+      int node_id;
+   };
+   
+   struct list_container_t 
+   {
+      word_t **words;
+      int count;
    };
    
    struct word_meaning_t
@@ -39,6 +38,7 @@ namespace jarvis
    extern rbtree_t *relations;
    extern rbtree_t *nodes;
    extern rbtree_t *functions;
+   extern rbtree_t *adjectives;
    
    extern rbtree_t *verbs;
    
@@ -46,8 +46,7 @@ namespace jarvis
    
    void load_word_library(char *_word_dir);
    
-   nhpc_status_t search_word(const char *word, word_definition_t *word_definition);
-   nhpc_status_t search_word_context(const char *word, word_definition_t *word_definition, int *index);
+   list_container_t *search_word(const char *word);
 };
 
 #endif

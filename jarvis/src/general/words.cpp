@@ -38,6 +38,7 @@ namespace jarvis
    rbtree_t *nodes;
    rbtree_t *functions;
    rbtree_t *verbs;
+   rbtree_t *adjectives;
    
    char *word_dir;
    char *list_dir;
@@ -48,9 +49,13 @@ namespace jarvis
       
       word_list = new rbtree_t(NHPC_RBTREE_STR);
       verbs = new rbtree_t(NHPC_RBTREE_STR);
+      relations = new rbtree_t(NHPC_RBTREE_STR);
+      adjectives = new rbtree_t(NHPC_RBTREE_STR);
       
       word_types = new rbtree_t(NHPC_RBTREE_STR);
       word_types->insert(verbs, "verbs");
+      word_types->insert(relations, "relations");
+      word_types->insert(adjectives, "adjectives");
       
       string_t *file_list = nhpc_get_file_list(word_dir, NHPC_VISIBLE_DIR_CHILD);
       
@@ -63,7 +68,7 @@ namespace jarvis
 	    LOG_ERROR("Jarvis does not know hot to handle " << file_name);
 	    continue;
 	 }
-
+	 
 	 char *file_path = nhpc_strconcat(word_dir, file_name);
 	 
 	 ifstream file_stream(file_path);
@@ -75,12 +80,16 @@ namespace jarvis
 	 rbtree_t **categories = new rbtree_t* [headers->count];
 	 for(int i = 0; i < headers->count; i++)
 	 {
-	    categories[i] = new rbtree_t(NHPC_RBTREE_STR);
+	    categories[i] = new rbtree_t(NHPC_RBTREE_NUM);
 	    main_category->insert((categories[i]), headers->strings[i]);
 	 }
 	 
+	 int count_number = 0;
+	 
 	 while(getline(file_stream, line))
 	 {
+	    count_number++;
+	    
 	    word_meaning_t *word_meaning = new word_meaning_t;
 	    
 	    line_str = line.c_str();
@@ -95,31 +104,52 @@ namespace jarvis
 	       {
 		  char *word_str = words->strings[j];
 		  
-		  word_t *word = (word_t *)word_list->search(word_str);
-	       
-		  if(!word)
+		  list_container_t *list_container = (list_container_t *)word_list->search(word_str);
+		  bool create_new = false;
+		  if(!list_container)
 		  {
-		     word = new word_t;
-		     nhpc_strcpy(&(word->word), word_str);
-		     nhpc_strcpy(&(word->word_type), file_name);
-		     word_list->insert(word, word_str);
+		     list_container = new list_container_t;
+		     list_container->count = 0;
+		     create_new = true;
 		  }
-
-		  LOG_INFO("Adding word: " << word_str << " to: " << file_name << " type: " << headers->strings[i]);
 	       
-		  categories[i]->insert(word_meaning, word_str);
+		  word_t *word = new word_t;
+		  nhpc_strcpy(&(word->word), word_str);
+		  nhpc_strcpy(&(word->word_type), file_name);
+		  nhpc_strcpy(&(word->sub_category), headers->strings[i]);
+		  
+		  word_t **tmp_words = new word_t* [(list_container->count) + 1];
+		  tmp_words[list_container->count] = word;
+		  
+		  if(!create_new)
+		  {
+		     memcpy(tmp_words, (list_container->words), sizeof(word_t*) * (list_container->count));
+		     delete[] (list_container->words);
+		  }
+		  else 
+		  {
+		     word_list->insert(list_container, word_str);
+		  }
+		  list_container->words = tmp_words;
+		  (list_container->count)++;
+		  
+		  word->node_id = categories[i]->insert(word_meaning);
 	       }
 	    }
 	    
 	    nhpc_string_delete(word_data);
 	 }
+	 
+	 LOG_INFO("Added: "<< count_number << " to: " <<file_name);
 
 	 nhpc_string_delete(headers);
       }
    }
    
-   void search_word(char *word)
+   list_container_t *search_word(const char *word)
    {
+      list_container_t *list_container = (list_container_t *)word_list->search(word);
       
+      return list_container;
    }
 }

@@ -17,14 +17,20 @@
  *	along with jarvis.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
+#include <neweraHPC/neweraHPC.h>
+
 #include <include/jarvis.h>
 
+using namespace std;
 using namespace jarvis;
 
 int main(int argc, char **argv)
 {
    jarvis_init(argc, argv); 
 
+   cout << "JARVIS loaded all the data" << endl;
+      
    while(1)
       sleep(1);
    

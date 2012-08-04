@@ -2,6 +2,7 @@
 #define _JARVIS_H_
 
 #include "general.h"
+#include "words.h"
 
 namespace jarvis
 {

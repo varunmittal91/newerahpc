@@ -315,7 +315,6 @@ namespace neweraHPC
       
       last_assigned_key++;
       data->node_data = in_data;
-      nhpc_strcpy(&(data->node_key_str), key_str);
       data->node_key = last_assigned_key;
       data->key_pair = NULL;
       
@@ -341,11 +340,12 @@ namespace neweraHPC
 	 else 
 	 {
 	    LOG_ERROR("need to delete string in rbtree");
-	    nhpc_string_delete((data->node_key_str));
-	    delete data;
+	    free(data);
 	    return false;
 	 }
       }
+      
+      nhpc_strcpy(&(data->node_key_str), key_str);
       
       /* Add new node and rebalance tree. */
       rb_link_node(&(data->node_next), parent, new_node);

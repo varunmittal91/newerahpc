@@ -14,11 +14,32 @@ namespace jarvis
       char **word_types;
    };
    
+   struct verb_t
+   {
+      char *base_form;
+      char *past_simple;
+      char *past_particilple;
+      char *present_participle;
+      char *third_person_singular;
+   };
+   
+   struct word_t
+   {
+      char *word_type;
+      char *word;
+   };
+   
+   struct word_meaning_t
+   {
+      
+   };
+   
    extern rbtree_t *word_list;
    extern rbtree_t *word_types;
    extern rbtree_t *relations;
    extern rbtree_t *nodes;
    extern rbtree_t *functions;
+   
    extern rbtree_t *verbs;
    
    extern char *word_dir;

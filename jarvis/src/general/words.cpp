@@ -20,6 +20,8 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <neweraHPC/neweraHPC.h>
 
 #include <include/general.h>
@@ -38,89 +40,86 @@ namespace jarvis
    rbtree_t *verbs;
    
    char *word_dir;
+   char *list_dir;
 
    void load_word_library(char *_word_dir)
    {
-      word_dir = nhpc_strconcat(_word_dir, "/words/");
-
-      word_list = new rbtree_t(NHPC_RBTREE_STR);
-      word_types = new rbtree_t(NHPC_RBTREE_STR);
+      word_dir = nhpc_strconcat(_word_dir, "/lists/");
       
-      relations = new rbtree_t(NHPC_RBTREE_STR);
-      nodes = new rbtree_t(NHPC_RBTREE_STR);
-      functions = new rbtree_t(NHPC_RBTREE_STR);
+      word_list = new rbtree_t(NHPC_RBTREE_STR);
       verbs = new rbtree_t(NHPC_RBTREE_STR);
       
-      word_types->insert(relations, "relation");
-      word_types->insert(nodes, "node");
-      word_types->insert(functions, "function");
-      word_types->insert(verbs, "verb");
-
-      string_t *string = nhpc_get_file_list(word_dir, NHPC_VISIBLE_DIR_CHILD);
-      if(string == NULL)
-      {
-         LOG_ERROR("JARVIS cannot read data");
-         exit(1);
-      }
-
-      for(int i = 0; (string->strings[i]); i++)
-      {
-	 char *word_file_name = string->strings[i];
-	 
-         char *tmp_word_file = nhpc_strconcat(word_dir, string->strings[i]);
-	 
-	 string_t *tmp_word = nhpc_substr(string->strings[i], ':');
-	 char *word_type = tmp_word->strings[0];
-	 char *word      = tmp_word->strings[1];
-	 
-	 cout<<word<<" "<<word_type<<endl;
-	 
-	 rbtree_t *tmp_rbtree = (rbtree_t *)word_types->search(word_type);
-	 if(tmp_rbtree == NULL)
-	 {
-	    LOG_ERROR("JARVIS does not know how to handle " << string->strings[i] << " from file " << string->strings[i]);
-	 }
-	 else 
-	 {
-	    word_definition_t *word_definition = (word_definition_t *)word_list->search(word);
-	    
-	    if(!word_definition)
-	    {
-	       word_definition = new word_definition_t;
-	       word_definition->word_files = new char*;
-	       word_definition->word_types = new char*;
-	       word_definition->count = 0;
-	       
-	       word_list->insert(word_definition, word);
-	    }
-	    else 
-	    {
-	       char **tmp_word_files = new char* [word_definition->count + 1];
-	       char **tmp_word_types = new char* [word_definition->count + 1];
-	       
-	       memcpy(tmp_word_files, (word_definition->word_files), sizeof(char **) * (word_definition->count));
-	       memcpy(tmp_word_types, (word_definition->word_types), sizeof(char **) * (word_definition->count));
-	       
-	       delete[] (word_definition->word_types);
-	       delete[] (word_definition->word_files);
-	       
-	       word_definition->word_files = tmp_word_files;
-	       word_definition->word_types = tmp_word_types;
-	    }
-	    
-	    int *count = &(word_definition->count);
-	    
-	    nhpc_strcpy(&(word_definition->word_files[*count]), tmp_word_file);
-	    nhpc_strcpy(&(word_definition->word_types[*count]), word_type); 
-	    
-	    (*count)++;
-	    
-	    tmp_rbtree->insert(word_definition, word);
-
-	    nhpc_string_delete(tmp_word);
-	 }
-      }
+      word_types = new rbtree_t(NHPC_RBTREE_STR);
+      word_types->insert(verbs, "verbs");
       
-      nhpc_string_delete(string);
+      string_t *file_list = nhpc_get_file_list(word_dir, NHPC_VISIBLE_DIR_CHILD);
+      
+      for(int i = 0; i < file_list->count; i++)
+      {
+	 char *file_name = file_list->strings[i];	 
+	 rbtree_t *main_category = (rbtree_t *)word_types->search(file_name);
+	 if(!file_name)
+	 {
+	    LOG_ERROR("Jarvis does not know hot to handle " << file_name);
+	    continue;
+	 }
+
+	 char *file_path = nhpc_strconcat(word_dir, file_name);
+	 
+	 ifstream file_stream(file_path);
+	 string line;
+	 
+	 getline(file_stream, line);
+	 const char *line_str = line.c_str();
+	 string_t *headers = nhpc_substr(line_str, ',');
+	 rbtree_t **categories = new rbtree_t* [headers->count];
+	 for(int i = 0; i < headers->count; i++)
+	 {
+	    categories[i] = new rbtree_t(NHPC_RBTREE_STR);
+	    main_category->insert((categories[i]), headers->strings[i]);
+	 }
+	 
+	 while(getline(file_stream, line))
+	 {
+	    word_meaning_t *word_meaning = new word_meaning_t;
+	    
+	    line_str = line.c_str();
+
+	    string_t *word_data = nhpc_substr(line_str, ',');
+
+	    for(int i = 0; i < word_data->count; i++)
+	    {
+	       string_t *words = nhpc_substr((word_data->strings[i]), '/');
+	       
+	       for(int j = 0; j < words->count; j++)
+	       {
+		  char *word_str = words->strings[j];
+		  
+		  word_t *word = (word_t *)word_list->search(word_str);
+	       
+		  if(!word)
+		  {
+		     word = new word_t;
+		     nhpc_strcpy(&(word->word), word_str);
+		     nhpc_strcpy(&(word->word_type), file_name);
+		     word_list->insert(word, word_str);
+		  }
+
+		  LOG_INFO("Adding word: " << word_str << " to: " << file_name << " type: " << headers->strings[i]);
+	       
+		  categories[i]->insert(word_meaning, word_str);
+	       }
+	    }
+	    
+	    nhpc_string_delete(word_data);
+	 }
+
+	 nhpc_string_delete(headers);
+      }
+   }
+   
+   void search_word(char *word)
+   {
+      
    }
 }

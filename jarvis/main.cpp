@@ -25,5 +25,8 @@ int main(int argc, char **argv)
 {
    jarvis_init(argc, argv); 
 
+   while(1)
+      sleep(1);
+   
    return 0;
 }

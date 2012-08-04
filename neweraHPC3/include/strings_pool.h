@@ -42,6 +42,9 @@ namespace neweraHPC
       int allocated_count;
       int free_count;
       
+      nhpc_size_t allocated_bytes;
+      nhpc_size_t free_bytes;
+      
       struct pool_string_t
       {
 	 char *string;

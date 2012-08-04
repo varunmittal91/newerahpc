@@ -57,6 +57,9 @@ namespace neweraHPC{
       
       free_count = 0;
       allocated_count = 0;
+      
+      free_bytes = 0;
+      allocated_bytes = 0;
    }
    
    strings_pool_t::~strings_pool_t()
@@ -94,6 +97,7 @@ namespace neweraHPC{
 	       return NULL;
 	    
 	    free_count--;
+	    free_bytes -= try_len;
 	    
 	    break;
 	 }
@@ -112,6 +116,8 @@ namespace neweraHPC{
 	 nhpc_size_t *str_len_string = (nhpc_size_t *)string;
 	 *str_len_string = str_len;
 	 try_len = str_len;
+	 
+	 allocated_bytes += (sizeof(nhpc_size_t) + sizeof(char) * str_len);
       }
       
       str = (char *)(string + sizeof(nhpc_size_t));
@@ -150,7 +156,12 @@ namespace neweraHPC{
       thread_mutex_lock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
       int ret = strings_allocated->erase(*str_len_string, str);
       if(ret != 0)
+      {
 	 allocated_count--;
+	 allocated_bytes -= (*str_len_string);
+	 free_bytes += (*str_len_string);
+      }
+      
       thread_mutex_unlock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
       
       if(ret == 0)
@@ -166,7 +177,7 @@ namespace neweraHPC{
 	 free_count++;
 	 thread_mutex_unlock(mutex_free, NHPC_THREAD_LOCK_WRITE);
 
-	 LOG_DEBUG("ADDING STRING TO FREE POOL erased with return status " << ret);
+	 LOG_DEBUG("ADDING STRING TO FREE POOL erased with return status " << ret << " Allocated bytes: " << allocated_bytes << " Free bytes: "<< free_bytes);
       }
       
       clean_strings();

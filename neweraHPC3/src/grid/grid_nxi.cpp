@@ -52,7 +52,7 @@ namespace neweraHPC
       nhpc_status_t nrv;
       
       const char *directory;
-      nrv = nhpc_create_tmp_file_or_dir(&directory, "neweraHPC", NHPC_DIRECTORY);
+      nrv = nhpc_create_tmp_file_or_dir(&directory, "/tmp/neweraHPC", NHPC_DIRECTORY);
       if(nrv != NHPC_SUCCESS)
 	 return nrv;
       

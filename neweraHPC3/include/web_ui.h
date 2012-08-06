@@ -25,6 +25,7 @@
 namespace neweraHPC
 {
    extern rbtree_t *app_handlers;
+   extern const char *ui_temp_dir;
    
    struct ui_xml_data
    {
@@ -32,8 +33,9 @@ namespace neweraHPC
    };
    
    nhpc_status_t web_ui_init();
-   void web_ui_init_request(nhpc_socket_t *sock, string_t *request, char **file_path);
+   nhpc_status_t web_ui_init_request(nhpc_socket_t *sock, string_t *request, rbtree_t **ui_details, char **file_path);
    nhpc_status_t web_ui_register(const char *app_name, fnc_ptr_nhpc_two_t func_trigger);
+   nhpc_status_t web_ui_generate(rbtree_t *ui_details, char *file_path);
 };
 
 #endif

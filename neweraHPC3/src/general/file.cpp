@@ -114,7 +114,7 @@ namespace neweraHPC
       const char *final_target;
       if(target_dir != NULL)
       {
-	 final_target = nhpc_strconcat("/tmp/", target_dir);
+	 nhpc_strcpy((char **)&final_target, target_dir);
 	 string_t *string = nhpc_substr(final_target, '/');
 	 nhpc_string_delete((char *)final_target);
 	 
@@ -126,11 +126,11 @@ namespace neweraHPC
 	 {
 	    tmp_str = nhpc_strconcat(final_target, "/");
 	    nhpc_string_delete((char *)final_target);
-
+	    
 	    final_target = nhpc_strconcat(tmp_str, string->strings[i]);
 	    nhpc_string_delete((char *)tmp_str);
 	 }
-
+	 
 	 nhpc_string_delete(string);
       }
       else 
@@ -153,20 +153,37 @@ namespace neweraHPC
       const char *unique_name;
       const char *target_name;
       
-      while(unique_found == false)
+      if(file_name != NULL)
       {
-	 unique_name = nhpc_random_string(7);
-	 target_name = nhpc_strconcat(final_target, unique_name);
-	 if(nhpc_fileordirectory(target_name) != NHPC_FILE_NOT_FOUND)
-	 {
-	    nhpc_string_delete((char *)target_name);
-	 }
-	 else 
-	 {
-	    unique_found = true;
-	 }
+	 target_name = nhpc_strconcat(final_target, file_name);
 	 
-	 nhpc_string_delete((char *)unique_name);
+	 int check_type = nhpc_fileordirectory(target_name);
+	 
+	 if(check_type == target_type)
+	 {
+	    *new_file_dir = target_name;
+	    return NHPC_SUCCESS;
+	 }
+	 else if(nrv != NHPC_FILE_NOT_FOUND)
+	    return NHPC_FAIL;
+      }
+      else 
+      {
+	 while(unique_found == false)
+	 {
+	    unique_name = nhpc_random_string(7);
+	    target_name = nhpc_strconcat(final_target, unique_name);
+	    if(nhpc_fileordirectory(target_name) != NHPC_FILE_NOT_FOUND)
+	    {
+	       nhpc_string_delete((char *)target_name);
+	    }
+	    else 
+	    {
+	       unique_found = true;
+	    }
+	    
+	    nhpc_string_delete((char *)unique_name);
+	 }
       }
       
       if(target_type == NHPC_DIRECTORY)
@@ -191,20 +208,20 @@ namespace neweraHPC
       *new_file_dir = target_name;
       return NHPC_SUCCESS;
    }
-
+   
    string_t *nhpc_get_file_list(const char *dir, int mode)
    {
       DIR *_dir;
       struct dirent *ent;
-
+      
       _dir = opendir(dir);
-
+      
       string_t *string = NULL;
-
+      
       if(_dir != NULL)
       {
          string = new string_t;
-
+	 
          while((ent = readdir(_dir)) != NULL)
          {
             if(mode == NHPC_VISIBLE_DIR_CHILD)
@@ -212,16 +229,16 @@ namespace neweraHPC
                if(nhpc_strcmp(ent->d_name, ".*"))
                   continue;
             }
-
+	    
             string->count++;
          }
-
+	 
          string->strings = new char* [string->count + 1];
          string->strings[string->count + 1] = NULL;
-
+	 
          closedir(_dir);
          _dir = opendir(dir);
-
+	 
          int i = 0;
          while((ent = readdir(_dir)) != NULL)
          {
@@ -230,13 +247,13 @@ namespace neweraHPC
                if(nhpc_strcmp(ent->d_name, ".*"))
                   continue;
             }
-
+	    
             nhpc_strcpy(&(string->strings[i]), ent->d_name);
-
+	    
             i++;
          }
       }
-
+      
       return string;
    }
 };

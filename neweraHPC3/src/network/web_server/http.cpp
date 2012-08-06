@@ -64,7 +64,11 @@ namespace neweraHPC
 	 char *file_path = NULL;
 	 
 	 if(nhpc_strcmp((request->strings[1]), "/app/*") == NHPC_SUCCESS)
-	    web_ui_init_request(sock, request, &file_path);
+	 {
+	    rbtree_t *ui_details;
+	    
+	    nhpc_status_t nrv = web_ui_init_request(sock, request, &ui_details, &file_path);
+	 }
 	 else 
 	    file_path = nhpc_strconcat(HTTP_ROOT, request->strings[1]);
 	 
@@ -120,7 +124,7 @@ namespace neweraHPC
    
    nhpc_status_t http_get_file(const char **file_path, nhpc_socket_t *sock, const char *target_file, const char *host_addr)
    {
-      nhpc_create_tmp_file_or_dir(file_path, "neweraHPC", NHPC_FILE);
+      nhpc_create_tmp_file_or_dir(file_path, "/tmp/neweraHPC", NHPC_FILE);
       
       const char *command = nhpc_strconcat("GET /", target_file, " HTTP/1.1");
       nhpc_headers_t *headers = new nhpc_headers_t;

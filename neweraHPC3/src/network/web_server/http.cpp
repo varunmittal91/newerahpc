@@ -26,6 +26,7 @@
 #endif
 #include <include/network.h>
 #include <include/general.h>
+#include <include/web_ui.h>
 
 using namespace std;
 
@@ -37,7 +38,7 @@ namespace neweraHPC
    {
       char *command = (char *)sock->headers->search("command");
       
-      if(nhpc_strcmp(command, "GET*") == NHPC_SUCCESS)
+      if((nhpc_strcmp(command, "GET*") == NHPC_SUCCESS) || (nhpc_strcmp(command, "POST*") == NHPC_SUCCESS))
       {
 	 http_request(sock);
       }
@@ -60,7 +61,12 @@ namespace neweraHPC
       }
       else 
       {
-	 char *file_path = nhpc_strconcat(HTTP_ROOT, request->strings[1]);
+	 char *file_path = NULL;
+	 
+	 if(nhpc_strcmp((request->strings[1]), "/app/*") == NHPC_SUCCESS)
+	    web_ui_init_request(sock, request, &file_path);
+	 else 
+	    file_path = nhpc_strconcat(HTTP_ROOT, request->strings[1]);
 	 
 	 nhpc_size_t file_size;
 	 nhpc_status_t nrv = nhpc_file_size(file_path, &file_size);

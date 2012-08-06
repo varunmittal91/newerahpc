@@ -17,30 +17,23 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NEWERAHPC_H_
-#define _NEWERAHPC_H_
+#ifndef _WEB_UI_H_
+#define _WEB_UI_H_
 
-#include "file.h"
-#include "rbtree.h"
-#include "thread.h"
-#include "network.h"
-#include "strings.h"
-#include "general.h"
-#include "grid.h"
-#include "system.h"
-#include "alloc.h"
-#include "http.h"
-#include "web_ui.h"
-
-#include <iostream>
-
-extern neweraHPC::rbtree_t cmdline_arguments;
-
-using namespace std;
+#include "network_data.h"
 
 namespace neweraHPC
 {
-   void neweraHPC_init(int argc, char **argv);
+   extern rbtree_t *app_handlers;
+   
+   struct ui_xml_data
+   {
+      char *file_path;
+   };
+   
+   nhpc_status_t web_ui_init();
+   void web_ui_init_request(nhpc_socket_t *sock, string_t *request, char **file_path);
+   nhpc_status_t web_ui_register(const char *app_name, fnc_ptr_nhpc_two_t func_trigger);
 };
 
 #endif

@@ -41,7 +41,9 @@ namespace neweraHPC{
    
    void init_garbage_collector()
    {
+#ifdef ENABLE_GARBAGE_COLLECTOR
       garbage_collector_ready = true;
+#endif
    }
    
    strings_pool_t::strings_pool_t()

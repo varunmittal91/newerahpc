@@ -73,10 +73,14 @@ namespace neweraHPC
       nhpc_create_tmp_file_or_dir((const char **)file_path, ui_temp_dir, NHPC_FILE, app_details->strings[1]);
       
       web_ui_elements_t *web_ui_elements = new web_ui_elements_t(ui_temp_dir, (*file_path));
+      web_ui_elements->add_element("app_title", app_details->strings[1]);
       
       (*func_trigger_local)(sock, web_ui_elements);
       
       web_ui_generate(web_ui_elements, (*file_path));
+      
+      (*file_path) = nhpc_strconcat(ui_temp_dir, "/standard.html");
+      cout<<(*file_path)<<endl;
       
       return NHPC_SUCCESS;
    }
@@ -88,22 +92,34 @@ namespace neweraHPC
       rbtree_t *elements = web_ui_elements->elements;
       char *element;
       
-      element = (char *)elements->search("connect");
+      xml_file<<"<neweraHPC_ui>"<<endl;
+      
+      element = (char *)elements->search("app_title");
       if(element)
       {
-	 xml_file<<"Requesting connect to application: "<<element<<endl;
-	 FILE *fp = fopen(element, "r");
+	 xml_file<<"<app_title>"<<element<<"</app_title>"<<endl;
+      }
+      element = (char *)elements->search("window");
+      if(element)
+      {
+	 xml_file<<"<window>"<<endl;
 	 
-	 if(fp)
+	 element = (char *)elements->search("height");
+	 if(element)
 	 {
-	    xml_file<<"Connection Established"<<endl;
-	    fclose(fp);
+	    xml_file<<"<height>"<<element<<"</height>"<<endl;
 	 }
-	 else 
-	    xml_file<<"Connection failed"<<endl;
+	 element = (char *)elements->search("width");
+	 if(element)
+	 {
+	    xml_file<<"<width>"<<element<<"</width>"<<endl;
+	 }
+	 
+	 xml_file<<"</window>"<<endl;
       }
       
-      xml_file<<"XML data will come here"<<endl;
+      xml_file<<"</neweraHPC_ui>"<<endl;
+      
       xml_file.close();
    }
    
@@ -124,6 +140,10 @@ namespace neweraHPC
 	 char *remote_app_xml_path = nhpc_strconcat(working_dir, property, ".public");
 	 
 	 elements->insert(remote_app_xml_path, "connect");
+      }
+      else 
+      {
+	 elements->insert((void *)property, element);
       }
    }
    

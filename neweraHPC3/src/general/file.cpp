@@ -101,6 +101,22 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
+   nhpc_status_t nhpc_delete_file_dir(const char *target_path)
+   {
+      nhpc_status_t nrv = nhpc_fileordirectory(target_path);
+      
+      if(nrv == NHPC_FILE)
+      {
+	 
+      }
+      else if(nrv == NHPC_DIRECTORY)
+      {
+	 
+      }
+      
+      return NHPC_FAIL;
+   }
+   
    nhpc_status_t nhpc_create_tmp_file_or_dir(const char **new_file_dir, const char *target_dir, 
 					     int target_type, const char *file_name)
    {
@@ -164,8 +180,6 @@ namespace neweraHPC
 	    *new_file_dir = target_name;
 	    return NHPC_SUCCESS;
 	 }
-	 else if(nrv != NHPC_FILE_NOT_FOUND)
-	    return NHPC_FAIL;
       }
       else 
       {

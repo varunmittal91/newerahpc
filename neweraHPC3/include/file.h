@@ -39,6 +39,8 @@ namespace neweraHPC
 					     int target_type, const char *file_name = NULL);
 
    string_t *nhpc_get_file_list(const char *dir, int mode);
+   
+   nhpc_status_t nhpc_delete_file_dir(const char *target_path);
 };
 
 #endif

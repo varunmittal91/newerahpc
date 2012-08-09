@@ -79,6 +79,7 @@ namespace neweraHPC
       
       web_ui_generate(web_ui_elements, (*file_path));
       
+      delete[] (*file_path);
       (*file_path) = nhpc_strconcat(ui_temp_dir, "/standard.html");
       cout<<(*file_path)<<endl;
       

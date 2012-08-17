@@ -32,7 +32,24 @@ using namespace std;
 
 namespace neweraHPC
 {
+   rbtree_t *http_handlers;
    void sig_action(int);
+   
+   nhpc_status_t http_handler_register(const char *handler_string, fnc_ptr_nhpc_t handler_function)
+   {
+      fnc_ptr_nhpc_t *func_trigger_local = new fnc_ptr_nhpc_t;
+      (*func_trigger_local) = handler_function;
+      
+      nhpc_status_t rv = http_handlers->insert(func_trigger_local, handler_string);
+      
+      return rv;      
+   }
+   
+   void http_init()
+   {
+      LOG_INFO("Initialize http handler");
+      http_handlers = new rbtree_t(NHPC_RBTREE_STR);
+   }
    
    void http_init(nhpc_socket_t *sock)
    {
@@ -40,6 +57,34 @@ namespace neweraHPC
       
       if((nhpc_strcmp(command, "GET*") == NHPC_SUCCESS) || (nhpc_strcmp(command, "POST*") == NHPC_SUCCESS))
       {
+	 if((nhpc_strcmp(command, "POST*") == NHPC_SUCCESS) == NHPC_SUCCESS)
+	    cout<<sock->partial_content<<endl;
+	 
+	 string_t *tmp_str = nhpc_substr(command, ' ');
+	 string_t *tmp_str2 = NULL;
+	 char *app_name = NULL;
+	 
+	 if(tmp_str->count == 3)
+	 {
+	    tmp_str2 = nhpc_substr(tmp_str->strings[1], '/');
+	    app_name = tmp_str2->strings[0];
+	 }
+	 else 
+	 {
+	    nhpc_string_delete(tmp_str);
+	    return;
+	 }
+
+	 LOG_INFO("Checking for: " << app_name);
+	 fnc_ptr_nhpc_t *func_trigger_local = (fnc_ptr_nhpc_t *)http_handlers->search(app_name);
+	 if(func_trigger_local != NULL)
+	 {
+	    LOG_INFO("Found http handler: " << app_name);
+	    nhpc_status_t nrv = (*func_trigger_local)(sock);
+	 }
+	 
+	 nhpc_string_delete(tmp_str);
+	 
 	 http_request(sock);
       }
       else if(nhpc_strcmp(command, "HTTP*") == NHPC_SUCCESS)

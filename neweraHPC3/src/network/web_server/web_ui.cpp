@@ -40,6 +40,8 @@ namespace neweraHPC
    {
       app_handlers = new rbtree_t(NHPC_RBTREE_STR);
       
+      http_handler_register("app", (fnc_ptr_nhpc_t)web_ui_handler);
+      
       nhpc_status_t nrv = nhpc_create_tmp_file_or_dir(&ui_temp_dir, HTTP_ROOT, NHPC_DIRECTORY, "ui_temp");
       
       return nrv;
@@ -53,6 +55,11 @@ namespace neweraHPC
       nhpc_status_t rv = app_handlers->insert(func_trigger_local, app_name);
       
       return rv;
+   }
+   
+   nhpc_status_t web_ui_handler(nhpc_socket_t *sock)
+   {
+      
    }
    
    nhpc_status_t web_ui_init_request(nhpc_socket_t *sock, string_t *request, rbtree_t **ui_details, char **file_path)
@@ -114,6 +121,12 @@ namespace neweraHPC
 	 if(element)
 	 {
 	    xml_file<<"<width>"<<element<<"</width>"<<endl;
+	 }
+	 
+	 element = (char *)elements->search("button1");
+	 if(element)
+	 {
+	    xml_file<<"<button1>"<<element<<"</button1>";
 	 }
 	 
 	 xml_file<<"</window>"<<endl;

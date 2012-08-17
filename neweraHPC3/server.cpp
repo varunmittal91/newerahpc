@@ -29,12 +29,31 @@
 using namespace std;
 using namespace neweraHPC;
 
+nhpc_status_t func_trigger(nhpc_socket_t *sock, web_ui_elements_t *web_ui_elements)
+{
+   cout<<"test app trigger invocated"<<endl;
+   
+   web_ui_elements->add_element("connect", "test_app2");
+   web_ui_elements->add_element("window", "window");
+   web_ui_elements->add_element("height", "40%");
+   web_ui_elements->add_element("width", "40%");
+   web_ui_elements->add_element("button1", "about");
+   web_ui_elements->add_element("button2", "help");
+   web_ui_elements->add_public_data();
+   
+   return NHPC_SUCCESS;
+}
+
 int main(int argc, char **argv)
 {
    neweraHPC_init(argc, argv);
    
    nhpc_status_t nrv;
    
+   http_init();
+   web_ui_init();
+   web_ui_register("neweraHPC", (fnc_ptr_nhpc_two_t)func_trigger);
+
    nhpc_grid_server_t grid_server;
    nrv = grid_server.grid_server_init();
    

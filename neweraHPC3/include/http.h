@@ -35,6 +35,11 @@ namespace neweraHPC
       int         status;
    };
    
+   extern rbtree_t *http_handlers;
+   void http_init();
+
+   nhpc_status_t http_handler_register(const char *handler_string, fnc_ptr_nhpc_t handler_function);
+   
    void http_init(nhpc_socket_t *sock);
    void http_request(nhpc_socket_t *sock);
    void http_response(nhpc_socket_t *sock);

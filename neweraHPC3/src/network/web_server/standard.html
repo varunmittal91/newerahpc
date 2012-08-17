@@ -1,7 +1,9 @@
 <html>
    <head>	
+      <script type="text/javascript" src="/ui_temp/jquery-1.8.0.min.js">
+      </script>
       <script type="text/javascript">
-
+      
       	 function getBaseURL() 
          {
             var url = location.href;  // entire url including querystring - also: window.location.href;
@@ -30,14 +32,27 @@
             app_title = app_window[0].getElementsByTagName("app_title")[0].childNodes[0].nodeValue;
             app_height = app_window[0].getElementsByTagName("height")[0].childNodes[0].nodeValue;
             app_width = app_window[0].getElementsByTagName("width")[0].childNodes[0].nodeValue;
+            app_button1 = app_window[0].getElementsByTagName("button1")[0].childNodes[0].nodeValue;
             document.title = app_title; 
             
             document.write('<table height=' + app_height + ' width=' + app_width + ' border=12 ><tr><th>' + app_title +'</th></tr>');
+            document.write("<tr><td><button id=" + app_button1 +  " > " + app_button1 + " </button>");
             document.write('</table>');
+
+            $(document).ready(function()
+            {
+               $('#about').click(function()
+               {
+ 	          jQuery.ajax("/index.html");
+               });
+            });
          } 
       </script>
+     
    </head>
    <body onload="load()">
+      <script type="text/javascript">
+      </script>
    </body>
 </html>
 

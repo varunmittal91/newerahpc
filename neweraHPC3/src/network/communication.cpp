@@ -24,8 +24,9 @@
 #include <config.h>
 #endif
 #include <include/network.h>
-#include <include/neweraHPC.h>
+//#include <include/neweraHPC.h>
 #include <include/strings_pool.h>
+#include <include/error.h>
 
 using namespace std;
 

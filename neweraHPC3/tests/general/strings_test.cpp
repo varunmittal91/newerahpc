@@ -31,6 +31,14 @@ int main()
    const char *s1;
    const char *s2;
    
+   cout<<"Testing new strfind api"<<endl;
+   cout<<"Passing string: /app/neweraHPC?q=test&?t2=test2 testing for ?"<<endl;
+   int pos = nhpc_strfind("/app/neweraHPC?q=test&?t2=test2", '?');
+   cout << "? found at: " << pos << endl;
+   int pos2 = nhpc_strfind("/app/neweraHPC?q=test&?t2=test2", '?', pos + 1);
+   cout << "next ? found at: " << pos2 << endl;
+   cout << "Testing new substr api between limits: " <<nhpc_substr("/app/neweraHPC?q=test&?t2=test2", pos, pos2)<<endl;
+   
    s1 = "GET";
    s2 = "GET";
    cout<<"s1: "<<s1<<" s2: "<<s2<<endl;

@@ -91,33 +91,6 @@ namespace neweraHPC
       }
    }
    
-   void rbtree_t::reorganize(int *removed_key)
-   {
-      if(operation_mode != NHPC_RBTREE_NUM_MANAGED)
-	 return;
-      
-      int last_key = *removed_key;
-      rbtree_t::node *node = search_node(last_key);
-      void **data = &(node->node_data);
-      
-      if(node == NULL)
-	 return;
-      
-      while(node != NULL)
-      {	 
-	 last_key++;
-
-	 node = search_node(last_key);
-	 if(node != NULL)
-	 {
-	    *data = node->node_data;
-	    data = &(node->node_data);
-	 }
-      }
-
-      *removed_key = count;
-   }
-   
    void *rbtree_t::search_first(int *key)
    {
       if(operation_mode == NHPC_RBTREE_STR)
@@ -246,6 +219,34 @@ namespace neweraHPC
 	    return data;
       }
       return NULL;
+   }
+   
+   void rbtree_t::reorganize(int *removed_key)
+   {
+      if(operation_mode != NHPC_RBTREE_NUM_MANAGED)
+	 return;
+      
+      int last_key = *removed_key;
+      rbtree_t::node *node = search_node(last_key);
+      void **data = &(node->node_data);
+      
+      if(node == NULL)
+	 return;
+      
+      while(node != NULL)
+      {	 
+	 last_key++;
+	 
+	 node = search_node(last_key);
+	 if(node != NULL)
+	 {
+	    *data = node->node_data;
+	    data = &(node->node_data);
+	 }
+      }
+      
+      *removed_key = count;
+      last_assigned_key = count - 1;
    }
    
    int rbtree_t::insert_node(int key, rbtree_t::node **data)

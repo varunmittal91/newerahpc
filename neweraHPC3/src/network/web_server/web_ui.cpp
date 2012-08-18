@@ -57,14 +57,19 @@ namespace neweraHPC
       return rv;
    }
    
-   nhpc_status_t web_ui_handler(nhpc_socket_t *sock)
+   nhpc_status_t web_ui_handler(http_data_t *http_data)
    {
-      
+      web_ui_init_request(http_data);
    }
    
-   nhpc_status_t web_ui_init_request(nhpc_socket_t *sock, string_t *request, rbtree_t **ui_details, char **file_path)
+   //nhpc_status_t web_ui_init_request(nhpc_socket_t *sock, string_t *request, rbtree_t **ui_details, char **file_path)
+   nhpc_status_t web_ui_init_request(http_data_t *http_data)
    {
-      string_t *app_details = nhpc_substr(request->strings[1], '/');
+      nhpc_socket_t *sock = http_data->sock;
+      rbtree_t *ui_details;
+      char *file_path;
+      
+      string_t *app_details = nhpc_substr(http_data->request_page, '/');
       if(app_details->count < 2)
       {
 	 return NHPC_FAIL;
@@ -74,21 +79,24 @@ namespace neweraHPC
       
       if(!func_trigger_local)
       {
+	 cout<<"failed\n\n";
 	 return NHPC_FAIL;
       }
       
-      nhpc_create_tmp_file_or_dir((const char **)file_path, ui_temp_dir, NHPC_FILE, app_details->strings[1]);
+      nhpc_create_tmp_file_or_dir((const char **)&file_path, ui_temp_dir, NHPC_FILE, app_details->strings[1]);
       
-      web_ui_elements_t *web_ui_elements = new web_ui_elements_t(ui_temp_dir, (*file_path));
+      web_ui_elements_t *web_ui_elements = new web_ui_elements_t(ui_temp_dir, file_path);
       web_ui_elements->add_element("app_title", app_details->strings[1]);
       
       (*func_trigger_local)(sock, web_ui_elements);
       
-      web_ui_generate(web_ui_elements, (*file_path));
+      web_ui_generate(web_ui_elements, file_path);
       
-      delete[] (*file_path);
-      (*file_path) = nhpc_strconcat(ui_temp_dir, "/standard.html");
-      cout<<(*file_path)<<endl;
+      delete[] file_path;
+      
+      delete[] (http_data->request_page);
+      http_data->request_page = nhpc_strconcat("/ui_temp", "/standard.html");
+      cout<<http_data->request_page<<endl;
       
       return NHPC_SUCCESS;
    }

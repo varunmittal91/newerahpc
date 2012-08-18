@@ -47,7 +47,11 @@ namespace neweraHPC{
    nhpc_status_t nhpc_strcmp(const char *s1, const char *s2);
    nhpc_status_t nhpc_strcmpi(const char *s1, const char *s2);
    
+   int nhpc_strfind(const char *s1, const char s2);
+   int nhpc_strfind(const char *s1, const char s2, int old_position);
+   
    string_t *nhpc_substr(const char *s1, const char s2);
+   char *nhpc_substr(const char *s1, int start_pos, int end_pos);
    
    char *nhpc_strconcat(const char *s1, const char *s2);
    char *nhpc_strconcat(const char *s1, const char *s2, const char *s3);

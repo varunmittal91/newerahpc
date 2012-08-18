@@ -32,6 +32,15 @@ using namespace std;
 
 namespace neweraHPC
 {
+   const char *request_type_strings[] = 
+   {
+      "HTTP_INVALID",
+      "HTTP_REQUEST_GET",
+      "HTTP_REQUEST_POST",
+      "HTTP_RESPONSE_GET",
+      "HTTP_RESPONSE_POST"
+   };
+   
    rbtree_t *http_handlers;
    void sig_action(int);
    
@@ -53,69 +62,43 @@ namespace neweraHPC
    
    void http_init(nhpc_socket_t *sock)
    {
-      char *command = (char *)sock->headers->search("command");
-      
-      if((nhpc_strcmp(command, "GET*") == NHPC_SUCCESS) || (nhpc_strcmp(command, "POST*") == NHPC_SUCCESS))
+      http_data_t *http_data;
+      nhpc_status_t nrv = read_headers(sock->headers, &http_data);
+      http_data->sock = sock;
+      if(nrv == NHPC_SUCCESS)
       {
-	 if((nhpc_strcmp(command, "POST*") == NHPC_SUCCESS) == NHPC_SUCCESS)
+	 LOG_INFO("HTTP Request type: "<<request_type_strings[http_data->request_type]);
+	 http_request(http_data);
+	 
+	 delete_http_header(http_data);
+	 delete http_data;
+      }
+   }
+   
+   void http_request(http_data_t *http_data)
+   {
+      nhpc_socket_t *sock = http_data->sock;
+      
+      if((http_data->request_type) == HTTP_REQUEST_GET || (http_data->request_type) == HTTP_REQUEST_POST)
+      {
+	 if(((http_data->request_type) == HTTP_REQUEST_POST) == NHPC_SUCCESS)
 	    cout<<sock->partial_content<<endl;
 	 
-	 string_t *tmp_str = nhpc_substr(command, ' ');
-	 string_t *tmp_str2 = NULL;
-	 char *app_name = NULL;
+	 string_t *tmp_str = nhpc_substr(http_data->request_page, '/');
+	 char *app_name = tmp_str->strings[0];
 	 
-	 if(tmp_str->count == 3)
-	 {
-	    tmp_str2 = nhpc_substr(tmp_str->strings[1], '/');
-	    app_name = tmp_str2->strings[0];
-	 }
-	 else 
-	 {
-	    nhpc_string_delete(tmp_str);
-	    return;
-	 }
-
 	 LOG_INFO("Checking for: " << app_name);
 	 fnc_ptr_nhpc_t *func_trigger_local = (fnc_ptr_nhpc_t *)http_handlers->search(app_name);
 	 if(func_trigger_local != NULL)
 	 {
 	    LOG_INFO("Found http handler: " << app_name);
-	    nhpc_status_t nrv = (*func_trigger_local)(sock);
+	    nhpc_status_t nrv = (*func_trigger_local)(http_data);
 	 }
 	 
 	 nhpc_string_delete(tmp_str);
 	 
-	 http_request(sock);
-      }
-      else if(nhpc_strcmp(command, "HTTP*") == NHPC_SUCCESS)
-	 cout<<"HTTP Response"<<endl;
-      else 
-	 cout<<"Invalid HTTP Header"<<endl;
-   }
-   
-   void http_request(nhpc_socket_t *sock)
-   {
-      char *command = (char *)sock->headers->search("command");
-      string_t *request = nhpc_substr(command, ' ');
-      
-      if(request->count < 3)
-      {
-	 const char *mssg = "HTTP/1.1 403 Invalid Request\r\n\r\nInvalid request\r\n";
-	 nhpc_size_t size = strlen(mssg);
-	 socket_send(sock, (char *)mssg, &size);
-      }
-      else 
-      {
 	 char *file_path = NULL;
-	 
-	 if(nhpc_strcmp((request->strings[1]), "/app/*") == NHPC_SUCCESS)
-	 {
-	    rbtree_t *ui_details;
-	    
-	    nhpc_status_t nrv = web_ui_init_request(sock, request, &ui_details, &file_path);
-	 }
-	 else 
-	    file_path = nhpc_strconcat(HTTP_ROOT, request->strings[1]);
+	 file_path = nhpc_strconcat(HTTP_ROOT, http_data->request_page);
 	 
 	 nhpc_size_t file_size;
 	 nhpc_status_t nrv = nhpc_file_size(file_path, &file_size);
@@ -136,7 +119,7 @@ namespace neweraHPC
 	 {
 	    FILE *fp = fopen(file_path, "r");
 	    char *file_size_str = nhpc_itostr(file_size);
-
+	    
 	    nhpc_headers_t *headers = new nhpc_headers_t;
 	    headers->insert("HTTP/1.1 200 OK");
 	    headers->insert("Content-Length", file_size_str);
@@ -157,14 +140,18 @@ namespace neweraHPC
 	       
 	       nrv = socket_sendmsg(sock, buffer, &len);	
 	    }while(!feof(fp) && errno != EPIPE);
-		   
+	    
 	    fclose(fp);
 	 }
 	 
-	 nhpc_string_delete(file_path);
+	 nhpc_string_delete(file_path);	 
       }
-      
-      nhpc_string_delete(request);
+      else if((http_data->request_type) == HTTP_INVALID)
+      {
+	 const char *mssg = "HTTP/1.1 403 Invalid Request\r\n\r\nInvalid request\r\n";
+	 nhpc_size_t size = strlen(mssg);
+	 socket_send(sock, (char *)mssg, &size);	 
+      }
    }
    
    nhpc_status_t http_get_file(const char **file_path, nhpc_socket_t *sock, const char *target_file, const char *host_addr)

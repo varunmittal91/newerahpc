@@ -17,31 +17,55 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NEWERAHPC_H_
-#define _NEWERAHPC_H_
+#ifndef _JSON_H_
+#define _JSON_H_
 
-#include "file.h"
 #include "rbtree.h"
-#include "thread.h"
-#include "network.h"
-#include "strings.h"
-#include "general.h"
-#include "grid.h"
-#include "system.h"
-#include "alloc.h"
-#include "http.h"
-#include "web_ui.h"
-#include "json.h"
 
-#include <iostream>
-
-extern neweraHPC::rbtree_t cmdline_arguments;
-
-using namespace std;
+#define JSON_END 0
+#define JSON_INCOMPLETE -1
 
 namespace neweraHPC
 {
-   void neweraHPC_init(int argc, char **argv);
+   enum json_object
+   {
+      JSON_STRING,
+      JSON_NUMBER,
+      JSON_TRUE,
+      JSON_FALSE,
+      JSON_NULL,
+      JSON_OBJECT,
+      JSON_ARRAY
+   };
+   
+   class nhpc_json_t
+   {
+   private:
+      struct search_elem_t
+      {
+	 rbtree_t *branch;
+	 int position;
+      };      
+      
+      rbtree_t *nodes;
+      rbtree_t *backtrack;
+      rbtree_t *search_queue;
+   public:
+      struct key_pair_t
+      {
+	 char *key;
+	 void *value;
+	 int json_object;
+      };
+
+      nhpc_json_t();
+      ~nhpc_json_t();
+      nhpc_status_t add_element(int json_object, const char *key, const void *value = NULL);
+      nhpc_status_t close_element();
+      void print();
+      int search(key_pair_t **key_pair);
+      void print_new();
+   };
 };
 
 #endif

@@ -384,6 +384,56 @@ namespace neweraHPC{
       return NHPC_SUCCESS;
    }
    
+   int nhpc_strfind(const char *s1, const char s2)
+   {
+      return nhpc_strfind(s1, s2, 0);
+   }
+   
+   int nhpc_strfind(const char *s1, const char s2, int old_position)
+   {
+      const char *tmp_s1 = s1;
+      int position = 0;
+      
+      while(*tmp_s1 != '\0' && old_position != 0)
+      {
+	 tmp_s1++;
+	 old_position--;
+	 position++;
+      }
+      
+      if(old_position > 0)
+      {
+	 position = 0;
+	 return position;
+      }
+      
+      while(*tmp_s1 != '\0')
+      {
+	 position++;
+	 if(*tmp_s1 == s2)
+	 {
+	    return position;
+	 }	 
+	 tmp_s1++;
+      }
+      
+      position = 0;
+      return position;
+   }
+   
+   char *nhpc_substr(const char *s1, int start_pos, int end_pos)
+   {
+      if(start_pos < 1 || end_pos < 1 || (start_pos == end_pos) ||end_pos > strlen(s1))
+	 return NULL;
+
+      nhpc_size_t len = end_pos - start_pos + 2;
+      char *new_string = new char[len];
+      memcpy(new_string, (s1 + start_pos - 1), len - 1);
+      new_string[len - 1] = '\0';
+      
+      return new_string;
+   }
+   
    string_t *nhpc_substr(const char *s1, const char s2)
    {
       string_t *string = new string_t;

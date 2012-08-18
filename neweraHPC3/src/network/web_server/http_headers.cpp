@@ -31,9 +31,92 @@ using namespace std;
 
 namespace neweraHPC
 {
-   void read_headers(rbtree_t *headers, http_data_t *http_data)
+   nhpc_status_t read_headers(rbtree_t *headers, http_data_t **http_data)
    {
+      char *command = (char *)headers->search("command");
       
+      char *http_version = NULL;
+      char *status_str = NULL;
+      char *referer = (char *)headers->search("Referer");
+      char *origin = (char *)headers->search("Origin");
+      char *content_type = (char *)headers->search("Content-Type");
+      char *host = (char *)headers->search("Host");
+      char *content_length = (char *)headers->search("Content-Length");
+      char *user_agent = (char *)headers->search("User-Agent");
+      int request_type;
+      char *request_page = NULL;
+      char *request_get = NULL;
+      
+      string_t *command_str = nhpc_substr(command, ' ');
+      if(command_str->count == 2)
+      {
+	 /* TODO HTTP SERVER */
+	 request_type = HTTP_INVALID;
+
+	 nhpc_string_delete(command_str);
+	 return NHPC_FAIL;
+	 
+	 nhpc_strcpy(&http_version, (command_str->strings[0]));
+      }
+      else if(command_str->count == 3)
+      {
+	 char *request_type_str = command_str->strings[0];
+	 if(nhpc_strcmp(request_type_str, "GET") == NHPC_SUCCESS)
+	    request_type = HTTP_REQUEST_GET;
+	 else if(nhpc_strcmp(request_type_str, "POST") == NHPC_SUCCESS)
+	    request_type = HTTP_REQUEST_POST;
+	 else 
+	 {
+	    request_type = HTTP_INVALID;
+	    return NHPC_FAIL;
+	 }
+	 
+	 char *request = command_str->strings[1];
+	 if(nhpc_strcmp(request, "*?*") == NHPC_SUCCESS)
+	 {
+	    int tmp_pos = nhpc_strfind(request, '?');
+	    request_page = nhpc_substr(request, 1, tmp_pos - 1);
+	    request_get = nhpc_substr(request, tmp_pos, strlen(request));
+	 }
+	 else 
+	    nhpc_strcpy(&request_page, (command_str->strings[1]));
+	    	 
+	 nhpc_strcpy(&http_version, (command_str->strings[2]));
+      }
+      nhpc_string_delete(command_str);
+      
+      (*http_data) = new http_data_t;
+      http_data_t *local_data = (*http_data);
+      if(content_length)
+      {
+	 local_data->content_length = nhpc_strtoi(content_length);
+      }
+
+      local_data->http_version = http_version;
+      local_data->user_agent = user_agent;
+      local_data->request_page = request_page;
+      local_data->request_get = request_get;
+      local_data->status_str = status_str;
+      local_data->request_type = request_type;
+      local_data->host = host;
+      local_data->origin = origin;
+      local_data->referer = referer;
+      local_data->content_type = content_type;
+      local_data->headers = headers;
+      
+      return NHPC_SUCCESS;
+   }
+   
+   void delete_http_header(http_data_t *http_data)
+   {
+      if(http_data->request_page)
+	 delete[] (http_data->request_page);
+      if(http_data->request_get)
+	 delete[] (http_data->request_get);
+      if(http_data->status_str)
+	 delete[] (http_data->status_str);
+      if(http_data->http_version)
+	 delete[] (http_data->http_version);    
    }
    
    nhpc_status_t http_content_length(rbtree_t *headers, nhpc_size_t *size)

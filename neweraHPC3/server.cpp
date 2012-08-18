@@ -44,9 +44,47 @@ nhpc_status_t func_trigger(nhpc_socket_t *sock, web_ui_elements_t *web_ui_elemen
    return NHPC_SUCCESS;
 }
 
+void test_json()
+{
+   nhpc_json_t nhpc_json;
+   
+   nhpc_json.add_element(JSON_STRING, "firstName", "varun");
+   nhpc_json.add_element(JSON_STRING, "lastName", "dhawan");
+
+   nhpc_json.add_element(JSON_OBJECT, "address");
+   nhpc_json.add_element(JSON_STRING, "streetAddress", "sector 1");
+   nhpc_json.add_element(JSON_NUMBER, "houseNumber", "420");
+   nhpc_json.close_element();
+
+   nhpc_json.add_element(JSON_ARRAY, "numbers");
+   nhpc_json.add_element(JSON_OBJECT, "address");
+   nhpc_json.add_element(JSON_STRING, "streetAddress", "sector 1");
+   nhpc_json.add_element(JSON_NUMBER, "houseNumber", "420");
+   nhpc_json.close_element();
+   nhpc_json.add_element(JSON_OBJECT, "address");
+   nhpc_json.add_element(JSON_STRING, "streetAddress", "sector 2");
+   nhpc_json.add_element(JSON_NUMBER, "houseNumber", "421");
+   nhpc_json.close_element();
+
+   nhpc_json.close_element();
+
+   /*
+   nhpc_json.add_element(JSON_NUMBER, NULL, "23");
+   nhpc_json.add_element(JSON_NUMBER, NULL, "24");
+   nhpc_json.add_element(JSON_NUMBER, NULL, "25");
+   nhpc_json.close_element();
+    */
+   
+   nhpc_json.close_element();
+   
+   nhpc_json.print_new();
+}
+
 int main(int argc, char **argv)
 {
    neweraHPC_init(argc, argv);
+
+   test_json();
    
    nhpc_status_t nrv;
    

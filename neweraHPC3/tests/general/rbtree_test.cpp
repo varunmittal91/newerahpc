@@ -245,21 +245,22 @@ int main()
    cout<<"\n\nTesting managed mode"<<endl;
 
    test_tree = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
-   (*test_tree).insert(a);
-   (*test_tree).insert(b);
-   (*test_tree).insert(c);
-   (*test_tree).insert(d);
-   (*test_tree).insert(c);
+   cout<<"Inserting: "<<(*test_tree).insert(a)<<endl;
+   cout<<"Inserting: "<<(*test_tree).insert(b)<<endl;
+   cout<<"Inserting: "<<(*test_tree).insert(c)<<endl;
+   cout<<"Inserting: "<<(*test_tree).insert(d)<<endl;
+   //(*test_tree).insert(c);
    
-   (*test_tree).erase(4);
+   (*test_tree).erase(2);
+   cout<<"Inserting: "<<(*test_tree).insert(b)<<endl;
    
-   cout<<(*test_tree).ret_count()<<endl;
+   cout<<"Count: "<<(*test_tree).ret_count()<<endl;
    
    for(int i = 1; i <= (*test_tree).ret_count(); i++)
    {
       void *test = (*test_tree).search(i);
-      (*test_tree).erase(i);
-      i--;
+      //(*test_tree).erase(i);
+      //i--;
       cout<<i<<" "<<test<<endl;
    }
    

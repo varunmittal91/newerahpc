@@ -168,8 +168,6 @@ namespace neweraHPC{
       
       if(ret == 0)
       {
-	 LOG_ERROR("NO string to delete: " << (void *)str_address << " \t " << *str_len_string << " " << str_address);
-	 
 	 return;
       }
       else 
@@ -665,5 +663,18 @@ namespace neweraHPC{
       dst[len] = '\0';
       
       return dst;
+   }
+   
+   int skip_white_spaces(char **string_ptr)
+   {
+      int skipped_steps = 0;
+      
+      while(**string_ptr == ' ')
+      {
+	 skipped_steps++;
+	 (*string_ptr)++;
+      }
+      
+      return skipped_steps;
    }
 }

@@ -45,7 +45,11 @@ namespace neweraHPC
       {
 	 rbtree_t *branch;
 	 int position;
-      };      
+      };  
+      struct stream_elem_t
+      {
+	 int json_object;
+      };
       
       rbtree_t *nodes;
       rbtree_t *backtrack;
@@ -60,11 +64,12 @@ namespace neweraHPC
 
       nhpc_json_t();
       ~nhpc_json_t();
-      nhpc_status_t add_element(int json_object, const char *key, const void *value = NULL);
+      nhpc_status_t add_element(int json_object, const char *key = NULL, const void *value = NULL);
       nhpc_status_t close_element();
-      void print();
       int search(key_pair_t **key_pair);
-      void print_new();
+      char *get_stream();
+      nhpc_status_t build_structure(const char *json_string);
+      bool is_delimiter(char in_char);
    };
 };
 

@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <iomanip>
+#include <fstream>
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -52,32 +53,47 @@ void test_json()
    nhpc_json.add_element(JSON_STRING, "lastName", "dhawan");
 
    nhpc_json.add_element(JSON_OBJECT, "address");
-   nhpc_json.add_element(JSON_STRING, "streetAddress", "sector 1");
-   nhpc_json.add_element(JSON_NUMBER, "houseNumber", "420");
+      nhpc_json.add_element(JSON_STRING, "streetAddress", "sector 1");
+      nhpc_json.add_element(JSON_NUMBER, "houseNumber", "420");
    nhpc_json.close_element();
 
-   nhpc_json.add_element(JSON_ARRAY, "numbers");
-   nhpc_json.add_element(JSON_OBJECT, "address");
-   nhpc_json.add_element(JSON_STRING, "streetAddress", "sector 1");
-   nhpc_json.add_element(JSON_NUMBER, "houseNumber", "420");
-   nhpc_json.close_element();
-   nhpc_json.add_element(JSON_OBJECT, "address");
-   nhpc_json.add_element(JSON_STRING, "streetAddress", "sector 2");
-   nhpc_json.add_element(JSON_NUMBER, "houseNumber", "421");
+   nhpc_json.add_element(JSON_ARRAY, "addresses");
+      nhpc_json.add_element(JSON_OBJECT);
+	 nhpc_json.add_element(JSON_STRING, "streetAddress", "sector 1");
+	 nhpc_json.add_element(JSON_NUMBER, "houseNumber", "420");
+      nhpc_json.close_element();
+      nhpc_json.add_element(JSON_OBJECT);
+	 nhpc_json.add_element(JSON_STRING, "streetAddress", "sector 2");
+	 nhpc_json.add_element(JSON_NUMBER, "houseNumber", "421");
+      nhpc_json.close_element();
    nhpc_json.close_element();
 
+   nhpc_json.add_element(JSON_ARRAY, "numbers2");
+      nhpc_json.add_element(JSON_NUMBER, "Number", "420");
+      nhpc_json.add_element(JSON_NUMBER, "Number", "421");
+   nhpc_json.close_element();   
+   
+   nhpc_json.add_element(JSON_OBJECT, "complex");
+      nhpc_json.add_element(JSON_OBJECT, "complex_in");
+	 nhpc_json.add_element(JSON_ARRAY, "complex_in_in");
+	    nhpc_json.add_element(JSON_NUMBER, "1", "12");
+	    nhpc_json.add_element(JSON_NUMBER, "2", "12");
+	 nhpc_json.close_element();
+	 nhpc_json.add_element(JSON_ARRAY, "complex_in_in2");
+	    nhpc_json.add_element(JSON_TRUE, "value1");
+	    nhpc_json.add_element(JSON_TRUE, "value2");
+	 nhpc_json.close_element();
+      nhpc_json.close_element();
    nhpc_json.close_element();
-
-   /*
-   nhpc_json.add_element(JSON_NUMBER, NULL, "23");
-   nhpc_json.add_element(JSON_NUMBER, NULL, "24");
-   nhpc_json.add_element(JSON_NUMBER, NULL, "25");
+   
+   nhpc_json.add_element(JSON_OBJECT, "complex1");
    nhpc_json.close_element();
-    */
    
    nhpc_json.close_element();
    
-   nhpc_json.print_new();
+   char *json_string = nhpc_json.get_stream();
+   cout<<json_string<<endl;
+   delete[] json_string;   
 }
 
 int main(int argc, char **argv)

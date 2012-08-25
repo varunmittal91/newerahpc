@@ -38,8 +38,6 @@ void *operator new(std::size_t size)
    }
    else 
    {
-      LOG_ERROR("from outside garbage collector");
-      
       size_t _size = size + sizeof(size_t);
       
       new_p = alloc<char>(_size);

@@ -40,116 +40,129 @@ namespace jarvis
    rbtree_t *verbs;
    rbtree_t *adjectives;
    
-   char *word_dir;
-   char *list_dir;
-
-   void load_word_library(char *_word_dir)
+   const char *word_dir;
+   const char *word_net_dir;  
+   const char *word_net_indexs[4] = {"index.adv", "index.adj", "index.noun", "index.verb"};
+   const char **word_net_index_files;
+   
+   nhpc_status_t init_word_net_database()
    {
-      word_dir = nhpc_strconcat(_word_dir, "/lists/");
+      nhpc_status_t nrv;
+      
+      word_dir = (const char *)cmdline_arguments.search("d");
+      
+      if(word_dir == NULL)
+	 word_dir = "data";
+      
+      nrv = nhpc_fileordirectory(word_dir);
+      if(nrv != NHPC_DIRECTORY)
+      {
+	 LOG_ERROR("Jarvis Data Directory Missing");
+	 return NHPC_FAIL;
+      }
+      
+      word_net_dir = nhpc_strconcat(word_dir, "/", "dict");
+      if(nrv != NHPC_DIRECTORY)
+      {
+	 LOG_ERROR("WordNET Database Missing");
+	 return NHPC_FAIL;
+      }
+      
+      word_net_index_files = new const char* [4];
+      for(int i = 0; i < 4; i++)
+      {
+	 word_net_index_files[i] = nhpc_strconcat(word_net_dir, "/", word_net_indexs[i]);
+	 cout << "loading index file: " << word_net_index_files[i] << endl;
+      }
       
       word_list = new rbtree_t(NHPC_RBTREE_STR);
-      verbs = new rbtree_t(NHPC_RBTREE_STR);
-      relations = new rbtree_t(NHPC_RBTREE_STR);
-      adjectives = new rbtree_t(NHPC_RBTREE_STR);
       
-      word_types = new rbtree_t(NHPC_RBTREE_STR);
-      word_types->insert(verbs, "verbs");
-      word_types->insert(relations, "relations");
-      word_types->insert(adjectives, "adjectives");
-      
-      string_t *file_list = nhpc_get_file_list(word_dir, NHPC_VISIBLE_DIR_CHILD);
-      
-      for(int i = 0; i < file_list->count; i++)
-      {
-	 char *file_name = file_list->strings[i];	 
-	 rbtree_t *main_category = (rbtree_t *)word_types->search(file_name);
-	 if(!file_name)
-	 {
-	    LOG_ERROR("Jarvis does not know hot to handle " << file_name);
-	    continue;
-	 }
-	 
-	 char *file_path = nhpc_strconcat(word_dir, file_name);
-	 
-	 ifstream file_stream(file_path);
-	 string line;
-	 
-	 getline(file_stream, line);
-	 const char *line_str = line.c_str();
-	 string_t *headers = nhpc_substr(line_str, ',');
-	 rbtree_t **categories = new rbtree_t* [headers->count];
-	 for(int i = 0; i < headers->count; i++)
-	 {
-	    categories[i] = new rbtree_t(NHPC_RBTREE_NUM);
-	    main_category->insert((categories[i]), headers->strings[i]);
-	 }
-	 
-	 int count_number = 0;
-	 
-	 while(getline(file_stream, line))
-	 {
-	    count_number++;
-	    
-	    word_meaning_t *word_meaning = new word_meaning_t;
-	    
-	    line_str = line.c_str();
-
-	    string_t *word_data = nhpc_substr(line_str, ',');
-
-	    for(int i = 0; i < word_data->count; i++)
-	    {
-	       string_t *words = nhpc_substr((word_data->strings[i]), '/');
-	       
-	       for(int j = 0; j < words->count; j++)
-	       {
-		  char *word_str = words->strings[j];
-		  
-		  list_container_t *list_container = (list_container_t *)word_list->search(word_str);
-		  bool create_new = false;
-		  if(!list_container)
-		  {
-		     list_container = new list_container_t;
-		     list_container->count = 0;
-		     create_new = true;
-		  }
-	       
-		  word_t *word = new word_t;
-		  nhpc_strcpy(&(word->word), word_str);
-		  nhpc_strcpy(&(word->word_type), file_name);
-		  nhpc_strcpy(&(word->sub_category), headers->strings[i]);
-		  
-		  word_t **tmp_words = new word_t* [(list_container->count) + 1];
-		  tmp_words[list_container->count] = word;
-		  
-		  if(!create_new)
-		  {
-		     memcpy(tmp_words, (list_container->words), sizeof(word_t*) * (list_container->count));
-		     delete[] (list_container->words);
-		  }
-		  else 
-		  {
-		     word_list->insert(list_container, word_str);
-		  }
-		  list_container->words = tmp_words;
-		  (list_container->count)++;
-		  
-		  word->node_id = categories[i]->insert(word_meaning);
-	       }
-	    }
-	    
-	    nhpc_string_delete(word_data);
-	 }
-	 
-	 LOG_INFO("Added: "<< count_number << " to: " <<file_name);
-
-	 nhpc_string_delete(headers);
-      }
+      return NHPC_SUCCESS;
    }
    
-   list_container_t *search_word(const char *word)
+   nhpc_status_t word_lookup(const char *_word, word_record_t **word_record_ptr)
    {
-      list_container_t *list_container = (list_container_t *)word_list->search(word);
+      word_record_t *word_record = (word_record_t *)word_list->search(_word);
       
-      return list_container;
+      if(!word_record)
+      {
+	 cout<<"Word record not found"<<endl;
+	 word_record = new word_record_t;
+	 word_list->insert(word_record, _word);	 
+	 
+	 int threads[4];
+	 int i = 2;
+	 //for(int i = 0; i < 1; i++)
+	 //{
+	    search_param_t *search_param = new search_param_t;
+	    search_param->file_name = word_net_index_files[i];
+	    search_param->word = _word;
+	    
+	    thread_manager->init_thread(&(threads[i]), NULL);
+	    thread_manager->create_thread(&(threads[i]), NULL, (void* (*)(void*))read_index_file, search_param, NHPC_THREAD_DEFAULT);
+	    
+	    delete search_param;
+	 //}
+	 
+	 return NHPC_FAIL;
+      }
+	 	 
+      if(!(word_record->has_word))
+      {
+	 cout<<"Record found but not word"<<endl;
+	 return NHPC_FAIL;
+      }
+      
+      return NHPC_SUCCESS;
    }
-}
+   
+   void *read_index_file(search_param_t *search_param)
+   {
+      bool found_word = false;
+      
+      search_param->index_record = NULL;
+      
+      cout << "searching in file: " << search_param->file_name << endl;
+      
+      string line;
+      ifstream index_file(search_param->file_name);
+      int line_number = 1;
+      
+      while(getline(index_file, line))
+      {
+	 const char *line_str = line.c_str();
+	 
+	 int space = nhpc_strfind(line_str, ' ');
+	 
+	 char *src_word = nhpc_substr(line_str, 1, space - 1);
+	 if(src_word != NULL)
+	 {
+	    int cmpr_status = 0;
+	    cout << space << endl;
+	    cout << search_param->word << ":" << src_word << ":" <<cmpr_status <<line_number<< endl;
+	    cmpr_status = strcmp((search_param->word), src_word);
+	    
+	    delete[] src_word;
+	    
+	    if(cmpr_status < 0)
+	       break;
+	    else if(cmpr_status == 0)
+	    {
+	       cout << "src_word: " << src_word << endl;
+	       
+	       found_word = true;
+	       break;
+	    }
+	 }
+	 else 
+	    cout << "error: " << line_number << search_param->file_name << endl;
+	 
+	 line_number++;
+      }
+      
+      if(found_word)
+	 cout << "found word" << endl;
+      
+      index_file.close();
+   }
+};

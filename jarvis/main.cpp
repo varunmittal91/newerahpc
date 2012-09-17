@@ -18,6 +18,8 @@
  */
 
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <neweraHPC/neweraHPC.h>
 
 #include <include/jarvis.h>
@@ -30,7 +32,20 @@ int main(int argc, char **argv)
    jarvis_init(argc, argv); 
 
    cout << "JARVIS loaded all the data" << endl;
-      
+   
+   word_record_t *word_record;
+   word_lookup("apple", &word_record);
+   //word_lookup("apple", &word_record);
+   
+   char *word_lookup = (char *)cmdline_arguments.search("w");
+   if(word_lookup != NULL)
+   {
+      char *cmd1 = nhpc_strconcat("wn ", word_lookup, " -hypen");
+      char *cmd2 = nhpc_strconcat("wn ", word_lookup, " -hypev");
+      system(cmd1);
+      system(cmd2);
+   }
+   
    while(1)
       sleep(1);
    

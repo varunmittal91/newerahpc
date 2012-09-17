@@ -7,9 +7,12 @@ AM_CONFIG_HEADER(config.h)
 AC_CONFIG_SRCDIR([main.cpp])
 AC_CONFIG_MACRO_DIR([m4])
 
+LT_INIT
+
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_LIBTOOL
+AM_PROG_LIBTOOL
 
 # Checks for libraries.
 AC_CHECK_LIB([pthread],[pthread_create],[],[AC_MSG_ERROR([libpthread not found])])

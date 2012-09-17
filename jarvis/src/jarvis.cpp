@@ -17,26 +17,30 @@
  *	along with jarvis.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string>
 #include <neweraHPC/neweraHPC.h>
 
 #include <include/jarvis.h>
 #include <include/words.h>
 
+using namespace std;
 using namespace neweraHPC;
 
 namespace jarvis
 {
+   char *jarvis_data;
+   thread_manager_t *thread_manager;
+   
    void jarvis_init(int argc, char **argv)
    {
+      nhpc_status_t nrv;
+      
       neweraHPC_init(argc, argv);
 
-      char *jarvis_data = (char *)cmdline_arguments.search("d");
-      if(jarvis_data == NULL)
-      {
-         LOG_ERROR("Jarvis data directory not available");
-         exit(0);
-      } 
-
-      load_word_library(jarvis_data);
+      nrv = init_word_net_database();
+      if(nrv != NHPC_SUCCESS)
+	 return;
+      
+      thread_manager = new thread_manager_t;
    }
 };

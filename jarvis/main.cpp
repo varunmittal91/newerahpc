@@ -34,16 +34,49 @@ int main(int argc, char **argv)
    cout << "JARVIS loaded all the data" << endl;
    
    word_record_t *word_record;
-   word_lookup("apple", &word_record);
-   //word_lookup("apple", &word_record);
    
-   char *word_lookup = (char *)cmdline_arguments.search("w");
-   if(word_lookup != NULL)
+   char *word = (char *)cmdline_arguments.search("w");
+   if(word != NULL)
    {
-      char *cmd1 = nhpc_strconcat("wn ", word_lookup, " -hypen");
-      char *cmd2 = nhpc_strconcat("wn ", word_lookup, " -hypev");
-      system(cmd1);
-      system(cmd2);
+      word_lookup(word, &word_record);
+   }
+   
+   char *file_input = (char *)cmdline_arguments.search("i");
+   if(file_input)
+   {
+      ifstream file(file_input);
+      
+      if(file.is_open())
+      {
+	 string lines;
+	 string line;
+	 
+	 while(getline(file, line))
+	 {
+	    lines += line;
+	 }
+	 
+	 rbtree_t *sentences = parse_sentence(lines.c_str());
+	 
+	 int sentences_count = sentences->ret_count();
+	 sentence_type_t *sentence_type;
+	 
+	 for(int i = 1; i <= sentences_count; i++)
+	 {
+	    sentence_type = (sentence_type_t *)sentences->search(i);
+	    if(sentence_type->is_question)
+	    {
+	       cout<<"Question: "<<sentence_type->sentence<<"?"<<endl;
+	    }
+	    else
+	    {
+	       cout<<"Declarative: "<<sentence_type->sentence<<"."<<endl;
+	    }
+	    
+	    rbtree_t *entities = break_entities(sentence_type);
+	    //establish_relation_type(sentence_type->sentence);
+	 }
+      }
    }
    
    while(1)

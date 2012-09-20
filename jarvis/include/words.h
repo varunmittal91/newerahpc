@@ -6,6 +6,9 @@
 
 #include "jarvis.h"
 
+#define INDEX_FILES_COUNT 4
+#define POS_COUNT 5
+
 using namespace neweraHPC;
 
 namespace jarvis
@@ -18,12 +21,14 @@ namespace jarvis
    extern rbtree_t *adjectives;
    extern rbtree_t *verbs;
    
-   enum POS
+   /*based on characters defined in WordNet */
+   enum POS 
    {
-      ADV,
-      ADJ,
-      NOUN,
-      VERB
+      ADV = 114, //r
+      ADJ = 97, //a
+      ADJ_SAT = 115, //s
+      NOUN = 110, //n
+      VERB = 118 //v
    };
    
    extern const char *word_net_indexs[4];
@@ -31,7 +36,16 @@ namespace jarvis
    
    struct index_record_t
    {
-      
+      const char *lemma;
+      char pos;
+      int synset_cnt;
+      int p_cnt;
+      int tagsense_cnt;
+      int *synset_offset;
+   };
+   
+   struct failed_record_t
+   {
    };
    
    struct search_param_t
@@ -39,6 +53,7 @@ namespace jarvis
       const char *word;
       const char *file_name;
       index_record_t *index_record;
+      bool is_complete;
    };
    
    struct word_record_t

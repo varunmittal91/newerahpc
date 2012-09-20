@@ -26,6 +26,7 @@
 
 #include <include/general.h>
 #include <include/words.h>
+#include <include/jarvis_data.h>
 
 using namespace std;
 using namespace neweraHPC;
@@ -42,7 +43,7 @@ namespace jarvis
    
    const char *word_dir;
    const char *word_net_dir;  
-   const char *word_net_indexs[4] = {"index.adv", "index.adj", "index.noun", "index.verb"};
+   const char *word_net_indexs[INDEX_FILES_COUNT] = {"index.adv", "index.adj", "index.noun", "index.verb"};
    const char **word_net_index_files;
    
    nhpc_status_t init_word_net_database()
@@ -68,8 +69,8 @@ namespace jarvis
 	 return NHPC_FAIL;
       }
       
-      word_net_index_files = new const char* [4];
-      for(int i = 0; i < 4; i++)
+      word_net_index_files = new const char* [INDEX_FILES_COUNT];
+      for(int i = 0; i < INDEX_FILES_COUNT; i++)
       {
 	 word_net_index_files[i] = nhpc_strconcat(word_net_dir, "/", word_net_indexs[i]);
 	 cout << "loading index file: " << word_net_index_files[i] << endl;
@@ -82,38 +83,7 @@ namespace jarvis
    
    nhpc_status_t word_lookup(const char *_word, word_record_t **word_record_ptr)
    {
-      word_record_t *word_record = (word_record_t *)word_list->search(_word);
-      
-      if(!word_record)
-      {
-	 cout<<"Word record not found"<<endl;
-	 word_record = new word_record_t;
-	 word_list->insert(word_record, _word);	 
-	 
-	 int threads[4];
-	 int i = 2;
-	 //for(int i = 0; i < 1; i++)
-	 //{
-	    search_param_t *search_param = new search_param_t;
-	    search_param->file_name = word_net_index_files[i];
-	    search_param->word = _word;
-	    
-	    thread_manager->init_thread(&(threads[i]), NULL);
-	    thread_manager->create_thread(&(threads[i]), NULL, (void* (*)(void*))read_index_file, search_param, NHPC_THREAD_DEFAULT);
-	    
-	    delete search_param;
-	 //}
-	 
-	 return NHPC_FAIL;
-      }
-	 	 
-      if(!(word_record->has_word))
-      {
-	 cout<<"Record found but not word"<<endl;
-	 return NHPC_FAIL;
-      }
-      
-      return NHPC_SUCCESS;
+      rbtree_t *word_tree = jarvis_data.lookup_word(_word);      
    }
    
    void *read_index_file(search_param_t *search_param)
@@ -121,8 +91,6 @@ namespace jarvis
       bool found_word = false;
       
       search_param->index_record = NULL;
-      
-      cout << "searching in file: " << search_param->file_name << endl;
       
       string line;
       ifstream index_file(search_param->file_name);
@@ -135,11 +103,10 @@ namespace jarvis
 	 int space = nhpc_strfind(line_str, ' ');
 	 
 	 char *src_word = nhpc_substr(line_str, 1, space - 1);
+	 int cmpr_status;
+	 
 	 if(src_word != NULL)
 	 {
-	    int cmpr_status = 0;
-	    cout << space << endl;
-	    cout << search_param->word << ":" << src_word << ":" <<cmpr_status <<line_number<< endl;
 	    cmpr_status = strcmp((search_param->word), src_word);
 	    
 	    delete[] src_word;
@@ -148,21 +115,28 @@ namespace jarvis
 	       break;
 	    else if(cmpr_status == 0)
 	    {
-	       cout << "src_word: " << src_word << endl;
+	       index_record_t *index_record = new index_record_t;
+	       search_param->index_record = index_record;
+	       
+	       string_t *index_parts = nhpc_substr(line_str, ' ');
+	       index_record->pos = *(index_parts->strings[1]);
+	       nhpc_strcpy((char **)&(index_record->lemma), (index_parts->strings[0]));
 	       
 	       found_word = true;
 	       break;
 	    }
 	 }
-	 else 
-	    cout << "error: " << line_number << search_param->file_name << endl;
 	 
 	 line_number++;
       }
       
       if(found_word)
-	 cout << "found word" << endl;
+      {
+	 cout << "found word: " << search_param->word << " in: " << search_param->file_name << endl;
+      }
       
       index_file.close();
+      
+      search_param->is_complete = true;
    }
 };

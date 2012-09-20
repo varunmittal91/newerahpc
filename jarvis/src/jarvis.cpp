@@ -22,13 +22,13 @@
 
 #include <include/jarvis.h>
 #include <include/words.h>
+#include <include/jarvis_data.h>
 
 using namespace std;
 using namespace neweraHPC;
 
 namespace jarvis
 {
-   char *jarvis_data;
    thread_manager_t *thread_manager;
    
    void jarvis_init(int argc, char **argv)
@@ -42,5 +42,6 @@ namespace jarvis
 	 return;
       
       thread_manager = new thread_manager_t;
+      jarvis_data.init_morphological_database();
    }
 };

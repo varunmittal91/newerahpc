@@ -17,6 +17,8 @@ namespace jarvis
    void determine_relation_sentence(rbtree_t *sentences);
    void establish_relation_type(const char *sentence);
    rbtree_t *establish_entities(const char *sentence);
+   
+   rbtree_t *break_entities(sentence_type_t *sentence);
 };
 
 #endif

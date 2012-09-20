@@ -8,7 +8,6 @@
 
 namespace jarvis
 {
-   extern char *jarvis_data;
    extern thread_manager_t *thread_manager;
    
    void jarvis_init(int argc, char **argv);

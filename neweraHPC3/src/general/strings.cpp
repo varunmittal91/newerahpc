@@ -421,9 +421,9 @@ namespace neweraHPC{
    
    char *nhpc_substr(const char *s1, int start_pos, int end_pos)
    {
-      if(start_pos < 1 || end_pos < 1 || (start_pos == end_pos) ||end_pos > strlen(s1))
+      if(start_pos < 1 || end_pos < 1 || end_pos > strlen(s1))
 	 return NULL;
-
+      
       nhpc_size_t len = end_pos - start_pos + 2;
       char *new_string = new char[len];
       memcpy(new_string, (s1 + start_pos - 1), len - 1);
@@ -676,5 +676,13 @@ namespace neweraHPC{
       }
       
       return skipped_steps;
+   }
+   
+   char *nhpc_strtolower(char *s1)
+   {
+      for(int i = 0; s1[i]; i++)
+	 s1[i] = tolower(s1[i]);
+      
+      return s1;
    }
 }

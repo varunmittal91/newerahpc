@@ -91,9 +91,23 @@ void test_json()
    
    nhpc_json.close_element();
    
+   nhpc_json.print();
    char *json_string = nhpc_json.get_stream();
    cout<<json_string<<endl;
-   delete[] json_string;   
+
+   ifstream json_test_file("/tmp/test.json");
+   string json_string2, line;
+   while(getline(json_test_file, line))
+   {
+      json_string2 += line;
+   }
+   cout<<json_string2<<endl;
+   
+   nhpc_json_t *test = new nhpc_json_t;
+   test->build_structure(json_string2.c_str());
+   cout<<test->get_stream()<<endl;
+   
+   //test->print();
 }
 
 int main(int argc, char **argv)

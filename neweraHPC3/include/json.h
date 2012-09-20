@@ -51,6 +51,7 @@ namespace neweraHPC
 	 int json_object;
       };
       
+      int stream_length;
       rbtree_t *nodes;
       rbtree_t *backtrack;
       rbtree_t *search_queue;
@@ -70,6 +71,7 @@ namespace neweraHPC
       char *get_stream();
       nhpc_status_t build_structure(const char *json_string);
       bool is_delimiter(char in_char);
+      void print();
    };
 };
 

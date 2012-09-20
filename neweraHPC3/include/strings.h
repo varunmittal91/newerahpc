@@ -66,6 +66,8 @@ namespace neweraHPC{
    void nhpc_string_delete(char *string);
    
    int skip_white_spaces(char **string_ptr);
+   
+   char *nhpc_strtolower(char *s1);
 };
 
 #endif

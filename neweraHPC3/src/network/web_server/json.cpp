@@ -28,6 +28,8 @@ namespace neweraHPC
 {
    nhpc_json_t::nhpc_json_t()
    {
+      stream_length = 2;
+      
       nodes = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
       backtrack = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
       search_queue = NULL;
@@ -95,14 +97,29 @@ namespace neweraHPC
 	 return NHPC_FAIL;
       }
       
-      key_pair_t *key_pair_last = (key_pair_t *)current->search(current->ret_count() - 1);
+      key_pair_t *key_pair_last = (key_pair_t *)current->search(current->ret_count());
+      /*
       if(key_pair_last)
 	 if(key_pair_last->json_object != JSON_ARRAY && json_object == JSON_OBJECT && key == NULL)
+	 {
+	    cout << "previous oject: " <<key_pair_last->json_object << endl;
+	    
+	    cout << "failed due to recent procedure" << endl;
 	    return NHPC_FAIL;
+	 }
+      */
+       
+      int stream_length_new = stream_length;
+      if(current->ret_count() > 1)
+	 stream_length_new += 1;
       
       key_pair_t *key_pair = new key_pair_t;
       if(key)
+      {
 	 nhpc_strcpy(&(key_pair->key), key);
+	 
+	 stream_length_new += strlen(key_pair->key) + 4;
+      }
       key_pair->json_object = json_object;
       
       if(json_object == JSON_STRING || json_object == JSON_NUMBER)
@@ -113,36 +130,47 @@ namespace neweraHPC
 	 }
 	 
 	 nhpc_strcpy((char **)&(key_pair->value), (char *)value);
+	 
+	 if(json_object == JSON_STRING)
+	    stream_length_new += strlen((char *)key_pair->value) + 2;
+	 else 
+	    stream_length_new += strlen((char *)key_pair->value);
       }
       else if(json_object == JSON_TRUE)
       {
-	 nhpc_strcpy((char **)&(key_pair->value), (char *)"true");	 
+	 nhpc_strcpy((char **)&(key_pair->value), (char *)"true");
+	 stream_length_new += 4;
       }
       else if(json_object == JSON_FALSE)
       {
 	 nhpc_strcpy((char **)&(key_pair->value), (char *)"false");	 
+	 stream_length_new += 5;
       }
       else if(json_object == JSON_NULL)
       {
 	 nhpc_strcpy((char **)&(key_pair->value), (char *)"null");	 
+	 stream_length_new += 4;
       }      
       else if(json_object == JSON_ARRAY)
       {
 	 rbtree_t *new_child = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
 	 key_pair->value = new_child;
 	 backtrack->insert(new_child);
+	 stream_length_new += 2;
       }
       else if(json_object == JSON_OBJECT)
       {
 	 rbtree_t *new_child = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
 	 key_pair->value = new_child;
 	 backtrack->insert(new_child);
+	 stream_length_new += 2;
       }
       else 
       {
 	 goto error_state;
       }
       
+      stream_length = stream_length_new;
       current->insert(key_pair);
       return NHPC_SUCCESS;
       
@@ -217,6 +245,9 @@ namespace neweraHPC
    
    char *nhpc_json_t::get_stream()
    {
+      char *out_stream = new char [stream_length];
+      char *tmp_stream = out_stream;
+      
       string *out;
       int level;
       key_pair_t *key_pair;
@@ -236,20 +267,50 @@ namespace neweraHPC
       stream_elem->json_object = JSON_OBJECT;
       stack->insert(stream_elem);
       (*out) += "{";
+      *tmp_stream = '{';
+      tmp_stream++;
       
       bool is_branch = false;
       
       while(level != JSON_END)
       {
 	 if(key_pair->key)
+	 {
+	    cout<<"Adding to string: "<<key_pair->key<<endl;
 	    (*out) = (*out) + "\"" + key_pair->key + "\":";
+	    
+	    *tmp_stream = '"';
+	    tmp_stream++;
+	    nhpc_strcpy_noalloc(tmp_stream, (key_pair->key));
+	    tmp_stream += strlen(key_pair->key);
+	    *tmp_stream = '"';
+	    tmp_stream++;
+	    *tmp_stream = ':';
+	    tmp_stream++;
+	 }
 	 
 	 if(key_pair->value)
 	 {
 	    if(key_pair->json_object == JSON_STRING)
+	    {
 	       (*out) = (*out) + "\"" + (char *)(key_pair->value) + "\"";
+	       
+	       *tmp_stream = '"';
+	       tmp_stream++;
+	       nhpc_strcpy_noalloc(tmp_stream, (const char *)(key_pair->value));
+	       tmp_stream += strlen((const char *)key_pair->value);
+	       *tmp_stream = '"';
+	       tmp_stream++;
+	       
+	       cout << "Adding key: " << (char *)key_pair->value << " " << strlen((const char *)(key_pair->value)) << endl;
+	    }
 	    else if((key_pair->json_object) != JSON_OBJECT && (key_pair->json_object) != JSON_ARRAY)
+	    {
 	       (*out) = (*out) + (char *)(key_pair->value);
+	       
+	       nhpc_strcpy_noalloc(tmp_stream, (const char *)(key_pair->value));
+	       tmp_stream += strlen((const char *)key_pair->value);
+	    }
 	 }
 	 
 	 if((key_pair->json_object) == JSON_ARRAY || (key_pair->json_object) == JSON_OBJECT)
@@ -257,16 +318,32 @@ namespace neweraHPC
 	    is_branch = true;
 	    
 	    if((key_pair->json_object) == JSON_ARRAY)
-	       (*out) += "[";
+	    {
+	       cout << "Adding [" << endl;
+	       (*out) = (*out) + "[";
+	       
+	       *tmp_stream = '[';
+	       tmp_stream++;
+	    }
 	    else if((key_pair->json_object) == JSON_OBJECT)
-	       (*out) += "{";
+	    {
+	       cout << "Adding {" << endl;
+	       (*out) = (*out) + "{";
+	       
+	       *tmp_stream = '{';
+	       tmp_stream++;
+	    }
 	    
 	    stream_elem_t *stream_elem = new stream_elem_t;
 	    stream_elem->json_object = key_pair->json_object;
 	    stack->insert(stream_elem);
 	 }
 	 else 
+	 {
+	    cout << "Non object element" << endl;
 	    is_branch = false;
+	 }
+	 cout << "object: " << key_pair->json_object << endl;
 	 
 	 old_level = level;
 	 last_object = key_pair->json_object;
@@ -281,20 +358,32 @@ namespace neweraHPC
 	    else 
 	       count = 1;
 	    
+	    cout << old_level << " " << level << " " << stack->ret_count() << endl;
+	    
 	    for(int i = 0; i < count; i++)
 	    {
 	       stream_elem_t *stream_elem = (stream_elem_t *)stack->search(stack->ret_count());
 	       if(stream_elem->json_object == JSON_ARRAY)
 	       {
 		  (*out) += "]";
+		  cout << "Removing ] " << endl;
+		  
+		  *tmp_stream = ']';
+		  tmp_stream++;		  
 	       }
 	       else
 	       {
+		  cout << "Removing } " << endl;
 		  (*out) += "}";
+		  
+		  *tmp_stream = '}';
+		  tmp_stream++;		  
 	       }
 	       
 	       delete stream_elem;
 	       stack->erase(stack->ret_count());
+	       
+	       //level -= count;
 	    }
 	    
 	    is_branch = false;
@@ -303,11 +392,16 @@ namespace neweraHPC
 	 if(old_level >= level && level != JSON_END)
 	 {
 	    (*out) += ",";
+	    
+	    *tmp_stream = ',';
+	    tmp_stream++;		  	    
 	 }
       }
       
       if(stack->ret_count() != 0)
       {
+	 cout<<"stack not empty"<<endl;
+	 
 	 stream_elem_t *stream_elem = (stream_elem_t *)stack->search(stack->ret_count());
 	 delete stream_elem;
 	 
@@ -316,9 +410,13 @@ namespace neweraHPC
       
       delete stack;
       
-      char *out_str = (char *)(*out).c_str();
-      delete out;
+      cout << "custome string: " << out_stream << endl;
       
+      char *out_str = (char *)(*out).c_str();
+      cout << "actual length: " << (*out).length() << endl;
+      cout << "string length: " << stream_length << endl;
+      cout << "calculated length: " << strlen(out_stream) << endl;
+      delete out;
       return out_str;
    }
    
@@ -391,12 +489,21 @@ namespace neweraHPC
 	    start_pos += skip_white_spaces(&json_string_ptr);
 	    end_pos = start_pos;
 	    
+	    if(key)
+	       cout<<"key: "<<key<<endl;
+	    
 	    if(*json_string_ptr == '{' || *json_string_ptr == '[')
 	    {
 	       if(*json_string_ptr == '[')
+	       {
+		  cout<<"Array"<<endl;
 		  add_element(JSON_ARRAY, key);
+	       }
 	       else 
+	       {
+		  cout<<"Object"<<endl;
 		  add_element(JSON_OBJECT, key);		  
+	       }
 	       delete[] key;
 	       key = NULL;
 	       
@@ -406,11 +513,21 @@ namespace neweraHPC
 	    else 
 	    {
 	       bool ignore_space = false;
+	       bool close_string = true;
 	       if(*json_string_ptr == '"')
-		  ignore_space = true;
-		  
-	       while(!is_delimiter(*json_string_ptr))
 	       {
+		  ignore_space = true;
+		  close_string = false;
+	       }
+	       
+	       while(1)
+	       {
+		  if(close_string)
+		  {
+		     if(is_delimiter(*json_string_ptr))
+			break;
+		  }
+		  
 		  if(!ignore_space)
 		     if(*json_string_ptr == ' ')
 			break;
@@ -425,6 +542,7 @@ namespace neweraHPC
 		  if(*json_string_ptr == '"')
 		  {
 		     ignore_space = false;
+		     close_string = true;
 		  }
 	       }
 	       
@@ -452,6 +570,9 @@ namespace neweraHPC
 		  add_element(JSON_NUMBER, key, value);
 	       }
 	       
+	       if(value)
+		  cout<<"value: "<<value<<endl;
+	       
 	       delete[] key;
 	       delete[] value;
 	       key = NULL;
@@ -461,6 +582,7 @@ namespace neweraHPC
 	 else if(*json_string_ptr == '{')
 	 {
 	    add_element(JSON_OBJECT);
+	    cout<<"Array Object"<<endl;
 	    
 	    json_string_ptr++;
 	    start_pos++;
@@ -468,7 +590,10 @@ namespace neweraHPC
 	 else if(is_delimiter(*json_string_ptr))
 	 {
 	    if(*json_string_ptr != ',')
+	    {
 	       close_element();
+	       cout<<"Closing element"<<endl;
+	    }
 
 	    json_string_ptr++;
 	    start_pos++;
@@ -487,6 +612,7 @@ namespace neweraHPC
       
       if(backtrack->ret_count() != 0)
       {
+	 cout<<"incomplete structure"<<endl;
 	 goto error_state;
       }
       
@@ -494,5 +620,51 @@ namespace neweraHPC
       
    error_state:
       return NHPC_FAIL;
+   }
+   
+   void nhpc_json_t::print()
+   {
+      key_pair_t *key_pair;
+      nhpc_status_t nrv;
+      int tab_count = 0;
+      cout << "{" <<endl;
+      
+      nrv = search(&key_pair);
+      int old_level = nrv;
+      
+      while(nrv != JSON_END)
+      {
+	 for(int i = 0; i < tab_count; i++)
+	    cout << " ";
+	 
+	 if(key_pair->json_object == JSON_OBJECT)
+	 {
+	    if(key_pair->key)
+	       cout << key_pair->key << ":";
+	    cout << "{" << endl;
+	    
+	    tab_count++;
+	    old_level++;
+	 }
+	 else if(key_pair->json_object == JSON_ARRAY)
+	 {
+	    cout << key_pair->key << "[" << endl;
+	    
+	    tab_count++;
+	    old_level++;
+	 }
+	 
+	 if(nrv > old_level)
+	 {
+	    old_level++;
+	 }
+	 
+	 nrv = search(&key_pair);
+	 if(nrv < old_level)
+	 {
+	    tab_count--;
+	    old_level = nrv;
+	 }
+      }
    }
 };

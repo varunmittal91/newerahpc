@@ -167,19 +167,6 @@ namespace neweraHPC
 	 goto error_state;
       }
       
-      cout << "Adding element current_level: " << current_level << endl;
-      if(key)
-      {
-	 cout << "Adding: " << key;
-	 if(value)
-	 {
-	    cout << ": " << value << endl;
-	 
-	 }
-	 else 
-	    cout << endl;
-      }
-      
       stream_length = stream_length_new;
       current->insert(key_pair);
       return NHPC_SUCCESS;
@@ -193,7 +180,6 @@ namespace neweraHPC
    nhpc_status_t nhpc_json_t::close_element()
    {
       nhpc_status_t nrv = backtrack->erase(backtrack->ret_count());
-      cout << "Close element status: " << nrv << endl;
       if(nrv == NHPC_SUCCESS)
       {
 	 current_level--;
@@ -450,19 +436,14 @@ namespace neweraHPC
 	    start_pos += skip_white_spaces(&json_string_ptr);
 	    end_pos = start_pos;
 	    
-	    if(key)
-	       cout<<"key: "<<key<<endl;
-	    
 	    if(*json_string_ptr == '{' || *json_string_ptr == '[')
 	    {
 	       if(*json_string_ptr == '[')
 	       {
-		  cout<<"Array"<<endl;
 		  add_element(JSON_ARRAY, key);
 	       }
 	       else 
 	       {
-		  cout<<"Object"<<endl;
 		  add_element(JSON_OBJECT, key);		  
 	       }
 	       delete[] key;
@@ -531,9 +512,6 @@ namespace neweraHPC
 		  add_element(JSON_NUMBER, key, value);
 	       }
 	       
-	       if(value)
-		  cout<<"value: "<<value<<endl;
-	       
 	       delete[] key;
 	       delete[] value;
 	       key = NULL;
@@ -543,7 +521,6 @@ namespace neweraHPC
 	 else if(*json_string_ptr == '{')
 	 {
 	    add_element(JSON_OBJECT);
-	    cout<<"Array Object"<<endl;
 	    
 	    json_string_ptr++;
 	    start_pos++;
@@ -553,7 +530,6 @@ namespace neweraHPC
 	    if(*json_string_ptr != ',')
 	    {
 	       close_element();
-	       cout<<"Closing element"<<endl;
 	    }
 
 	    json_string_ptr++;
@@ -573,7 +549,6 @@ namespace neweraHPC
       
       if(backtrack->ret_count() != 0)
       {
-	 cout<<"incomplete structure"<<endl;
 	 goto error_state;
       }
       

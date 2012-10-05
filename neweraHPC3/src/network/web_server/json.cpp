@@ -28,6 +28,8 @@ namespace neweraHPC
 {
    nhpc_json_t::nhpc_json_t()
    {
+      current_level = 1;
+      
       stream_length = 2;
       
       nodes = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
@@ -98,16 +100,6 @@ namespace neweraHPC
       }
       
       key_pair_t *key_pair_last = (key_pair_t *)current->search(current->ret_count());
-      /*
-      if(key_pair_last)
-	 if(key_pair_last->json_object != JSON_ARRAY && json_object == JSON_OBJECT && key == NULL)
-	 {
-	    cout << "previous oject: " <<key_pair_last->json_object << endl;
-	    
-	    cout << "failed due to recent procedure" << endl;
-	    return NHPC_FAIL;
-	 }
-      */
        
       int stream_length_new = stream_length;
       if(current->ret_count() > 1)
@@ -121,6 +113,7 @@ namespace neweraHPC
 	 stream_length_new += strlen(key_pair->key) + 4;
       }
       key_pair->json_object = json_object;
+      key_pair->level = current_level;
       
       if(json_object == JSON_STRING || json_object == JSON_NUMBER)
       {
@@ -157,6 +150,8 @@ namespace neweraHPC
 	 key_pair->value = new_child;
 	 backtrack->insert(new_child);
 	 stream_length_new += 2;
+	 
+	 current_level++;
       }
       else if(json_object == JSON_OBJECT)
       {
@@ -164,10 +159,25 @@ namespace neweraHPC
 	 key_pair->value = new_child;
 	 backtrack->insert(new_child);
 	 stream_length_new += 2;
+	 
+	 current_level++;
       }
       else 
       {
 	 goto error_state;
+      }
+      
+      cout << "Adding element current_level: " << current_level << endl;
+      if(key)
+      {
+	 cout << "Adding: " << key;
+	 if(value)
+	 {
+	    cout << ": " << value << endl;
+	 
+	 }
+	 else 
+	    cout << endl;
       }
       
       stream_length = stream_length_new;
@@ -183,11 +193,16 @@ namespace neweraHPC
    nhpc_status_t nhpc_json_t::close_element()
    {
       nhpc_status_t nrv = backtrack->erase(backtrack->ret_count());
+      cout << "Close element status: " << nrv << endl;
+      if(nrv == NHPC_SUCCESS)
+      {
+	 current_level--;
+      }
       
       return nrv;
    }
       
-   int nhpc_json_t::search(key_pair_t **_key_pair)
+   int nhpc_json_t::search(key_pair_t **_key_pair, int *child_count)
    {
       if(backtrack->ret_count() != 0)
       {
@@ -236,6 +251,9 @@ namespace neweraHPC
 	    search_elem->branch = (rbtree_t *)key_pair->value;
 	    search_elem->position = 1;
 	    search_queue->insert(search_elem);
+
+	    if(child_count)
+	       *child_count = search_elem->branch->ret_count();
 	 }  
 	 
 	 *(_key_pair) = key_pair;
@@ -243,181 +261,124 @@ namespace neweraHPC
       }
    }
    
-   char *nhpc_json_t::get_stream()
+   const char *nhpc_json_t::get_stream()
    {
-      char *out_stream = new char [stream_length];
-      char *tmp_stream = out_stream;
-      
-      string *out;
-      int level;
-      key_pair_t *key_pair;
-      level = search(&key_pair);
-      
-      if(level == JSON_INCOMPLETE)
-	 return NULL;
-      
-      out = new string;
-      
-      int old_level = 1;
-      int last_object = 0;
-      
+      struct object_status_t
+      {
+	 rbtree_t *tree;
+	 int elements_done;
+	 int elements;
+	 int json_object;
+      };
       rbtree_t *stack = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
       
-      stream_elem_t *stream_elem = new stream_elem_t;
-      stream_elem->json_object = JSON_OBJECT;
-      stack->insert(stream_elem);
-      (*out) += "{";
-      *tmp_stream = '{';
-      tmp_stream++;
+      key_pair_t *key_pair = NULL;
+      key_pair_t *key_pair_current;
       
-      bool is_branch = false;
+      int json_object = 0;
+      int json_object_old = 0;      
+      int tab_count = 0;
       
-      while(level != JSON_END)
+      int child_count;
+      int child_count_tmp = 0;
+      
+      object_status_t *object_status = new object_status_t;
+      object_status->tree = nodes;
+      object_status->elements_done = 0;
+      object_status->elements = nodes->ret_count();
+      object_status->json_object = JSON_OBJECT;
+      stack->insert(object_status);
+      
+      string json_out = "{";
+      
+      do 
       {
-	 if(key_pair->key)
-	 {
-	    cout<<"Adding to string: "<<key_pair->key<<endl;
-	    (*out) = (*out) + "\"" + key_pair->key + "\":";
-	    
-	    *tmp_stream = '"';
-	    tmp_stream++;
-	    nhpc_strcpy_noalloc(tmp_stream, (key_pair->key));
-	    tmp_stream += strlen(key_pair->key);
-	    *tmp_stream = '"';
-	    tmp_stream++;
-	    *tmp_stream = ':';
-	    tmp_stream++;
-	 }
+	 object_status_t *object_status_current = (object_status_t *)stack->search(stack->ret_count());
 	 
-	 if(key_pair->value)
+	 if(key_pair)
 	 {
-	    if(key_pair->json_object == JSON_STRING)
-	    {
-	       (*out) = (*out) + "\"" + (char *)(key_pair->value) + "\"";
-	       
-	       *tmp_stream = '"';
-	       tmp_stream++;
-	       nhpc_strcpy_noalloc(tmp_stream, (const char *)(key_pair->value));
-	       tmp_stream += strlen((const char *)key_pair->value);
-	       *tmp_stream = '"';
-	       tmp_stream++;
-	       
-	       cout << "Adding key: " << (char *)key_pair->value << " " << strlen((const char *)(key_pair->value)) << endl;
-	    }
-	    else if((key_pair->json_object) != JSON_OBJECT && (key_pair->json_object) != JSON_ARRAY)
-	    {
-	       (*out) = (*out) + (char *)(key_pair->value);
-	       
-	       nhpc_strcpy_noalloc(tmp_stream, (const char *)(key_pair->value));
-	       tmp_stream += strlen((const char *)key_pair->value);
-	    }
-	 }
-	 
-	 if((key_pair->json_object) == JSON_ARRAY || (key_pair->json_object) == JSON_OBJECT)
-	 {
-	    is_branch = true;
+	    (object_status_current->elements_done)++;
 	    
-	    if((key_pair->json_object) == JSON_ARRAY)
-	    {
-	       cout << "Adding [" << endl;
-	       (*out) = (*out) + "[";
+	    if(key_pair->json_object == JSON_OBJECT || key_pair->json_object == JSON_ARRAY)
+	    {	       
+	       object_status_t *object_status = new object_status_t;
+	       object_status->tree = (rbtree_t *)(key_pair->value);
+	       object_status->elements_done = 0;
+	       object_status->elements = ((rbtree_t *)(key_pair->value))->ret_count();
+	       object_status->json_object = key_pair->json_object;
+	       stack->insert(object_status);
 	       
-	       *tmp_stream = '[';
-	       tmp_stream++;
-	    }
-	    else if((key_pair->json_object) == JSON_OBJECT)
-	    {
-	       cout << "Adding {" << endl;
-	       (*out) = (*out) + "{";
-	       
-	       *tmp_stream = '{';
-	       tmp_stream++;
-	    }
-	    
-	    stream_elem_t *stream_elem = new stream_elem_t;
-	    stream_elem->json_object = key_pair->json_object;
-	    stack->insert(stream_elem);
-	 }
-	 else 
-	 {
-	    cout << "Non object element" << endl;
-	    is_branch = false;
-	 }
-	 cout << "object: " << key_pair->json_object << endl;
-	 
-	 old_level = level;
-	 last_object = key_pair->json_object;
-	 level = search(&key_pair);
-	 
-	 if(old_level > level || (old_level == level && is_branch == true))
-	 {
-	    int count;
-	    
-	    if(old_level > level)
-	       count = old_level - level;
-	    else 
-	       count = 1;
-	    
-	    cout << old_level << " " << level << " " << stack->ret_count() << endl;
-	    
-	    for(int i = 0; i < count; i++)
-	    {
-	       stream_elem_t *stream_elem = (stream_elem_t *)stack->search(stack->ret_count());
-	       if(stream_elem->json_object == JSON_ARRAY)
+	       if(key_pair->json_object == JSON_OBJECT)
 	       {
-		  (*out) += "]";
-		  cout << "Removing ] " << endl;
-		  
-		  *tmp_stream = ']';
-		  tmp_stream++;		  
+		  if(object_status_current->json_object == JSON_ARRAY)
+		     json_out = json_out + "{";
+		  else 
+		     json_out = json_out + "\"" + key_pair->key + "\"" + ": {";
+	       }
+	       else 
+	       {
+		  json_out = json_out + "\"" + key_pair->key + "\"" + ": [";
+	       }
+	       
+	       object_status_current = object_status;
+	    }
+	    else 
+	    {
+	       json_out = json_out + "\"" + key_pair->key + "\"";
+	       
+	       if(key_pair->json_object == JSON_NULL)
+	       {
+		  json_out = json_out + ": null";
+	       }
+	       else if(key_pair->json_object == JSON_TRUE)
+	       {
+		  json_out = json_out + + ": true";
+	       }
+	       else if(key_pair->json_object == JSON_FALSE)
+	       {
+		  json_out = json_out + + ": false";
+	       }
+	       else if(key_pair->json_object == JSON_NUMBER)
+	       {
+		  json_out = json_out + + ": " + (char *)key_pair->value;
 	       }
 	       else
 	       {
-		  cout << "Removing } " << endl;
-		  (*out) += "}";
-		  
-		  *tmp_stream = '}';
-		  tmp_stream++;		  
+		  json_out = json_out + + ": \"" + (char *)key_pair->value + "\"";
 	       }
 	       
-	       delete stream_elem;
+	       if(object_status_current->elements_done < object_status_current->elements)
+	       {
+		  json_out = json_out + ",";
+	       }
+	    }	    
+	    
+	    while(object_status_current && object_status_current->elements_done == object_status_current->elements)
+	    {
 	       stack->erase(stack->ret_count());
 	       
-	       //level -= count;
+	       if(object_status_current->json_object == JSON_OBJECT)
+	       {
+		  json_out = json_out + "}";
+	       }
+	       else 
+	       {
+		  json_out = json_out + "]";
+	       }
+	       
+	       object_status_current = (object_status_t *)stack->search(stack->ret_count());
+	       if(object_status_current && object_status_current->elements_done < object_status_current->elements)
+	       {
+		  json_out = json_out + ",";
+	       }
 	    }
-	    
-	    is_branch = false;
 	 }
 	 
-	 if(old_level >= level && level != JSON_END)
-	 {
-	    (*out) += ",";
-	    
-	    *tmp_stream = ',';
-	    tmp_stream++;		  	    
-	 }
-      }
+	 json_object_old = json_object;
+	 json_object = search(&key_pair);
+      }while(json_object != JSON_END);
       
-      if(stack->ret_count() != 0)
-      {
-	 cout<<"stack not empty"<<endl;
-	 
-	 stream_elem_t *stream_elem = (stream_elem_t *)stack->search(stack->ret_count());
-	 delete stream_elem;
-	 
-	 (*out) += '}';
-      }
-      
-      delete stack;
-      
-      cout << "custome string: " << out_stream << endl;
-      
-      char *out_str = (char *)(*out).c_str();
-      cout << "actual length: " << (*out).length() << endl;
-      cout << "string length: " << stream_length << endl;
-      cout << "calculated length: " << strlen(out_stream) << endl;
-      delete out;
-      return out_str;
+      return json_out.c_str();
    }
    
    bool nhpc_json_t::is_delimiter(char in_char)
@@ -624,47 +585,103 @@ namespace neweraHPC
    
    void nhpc_json_t::print()
    {
-      key_pair_t *key_pair;
-      nhpc_status_t nrv;
-      int tab_count = 0;
-      cout << "{" <<endl;
+      cout << "Printing json_object" << endl;
       
-      nrv = search(&key_pair);
-      int old_level = nrv;
-      
-      while(nrv != JSON_END)
+      struct object_status_t
       {
-	 for(int i = 0; i < tab_count; i++)
-	    cout << " ";
+	 rbtree_t *tree;
+	 int elements_done;
+	 int elements;
+	 int json_object;
+      };
+      rbtree_t *stack = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+      
+      key_pair_t *key_pair = NULL;
+      key_pair_t *key_pair_current;
+      
+      int json_object = 0;
+      int json_object_old = 0;      
+      int tab_count = 0;
+      
+      int child_count;
+      int child_count_tmp = 0;
+      
+      object_status_t *object_status = new object_status_t;
+      object_status->tree = nodes;
+      object_status->elements_done = 0;
+      object_status->elements = nodes->ret_count();
+      object_status->json_object = JSON_OBJECT;
+      stack->insert(object_status);
+      
+      do 
+      {
+	 object_status_t *object_status_current = (object_status_t *)stack->search(stack->ret_count());
 	 
-	 if(key_pair->json_object == JSON_OBJECT)
+	 if(key_pair)
 	 {
-	    if(key_pair->key)
-	       cout << key_pair->key << ":";
-	    cout << "{" << endl;
+	    (object_status_current->elements_done)++;
 	    
-	    tab_count++;
-	    old_level++;
-	 }
-	 else if(key_pair->json_object == JSON_ARRAY)
-	 {
-	    cout << key_pair->key << "[" << endl;
-	    
-	    tab_count++;
-	    old_level++;
+	    if(key_pair->json_object == JSON_OBJECT || key_pair->json_object == JSON_ARRAY)
+	    {	       
+	       object_status_t *object_status = new object_status_t;
+	       object_status->tree = (rbtree_t *)(key_pair->value);
+	       object_status->elements_done = 0;
+	       object_status->elements = ((rbtree_t *)(key_pair->value))->ret_count();
+	       object_status->json_object = key_pair->json_object;
+	       stack->insert(object_status);
+
+	       if(key_pair->json_object == JSON_OBJECT)
+	       {
+		  if(object_status_current->json_object == JSON_ARRAY)
+		     cout << "{";
+		  else 
+		     cout << key_pair->key << ": {";
+	       }
+	       else 
+	       {
+		  cout << key_pair->key << ": [";
+	       }
+
+	       object_status_current = object_status;
+	       
+	       cout << endl;	       
+	    }
+	    else 
+	    {
+	       if(key_pair->json_object == JSON_NULL)
+		  cout << key_pair->key << ": null";
+	       else if(key_pair->json_object == JSON_TRUE)
+		  cout << key_pair->key << ": true";
+	       else if(key_pair->json_object == JSON_FALSE)
+		  cout << key_pair->key << ": false";
+	       else if(key_pair->json_object == JSON_NUMBER)
+		  cout << key_pair->key << ": " << (char *)key_pair->value;
+	       else
+		  cout << key_pair->key << ": \"" << (char *)key_pair->value << "\"";
+
+	       if(object_status_current->elements_done < object_status_current->elements)
+		  cout << ",";
+
+	       cout << endl;
+	    }	    
+
+	    while(object_status_current && object_status_current->elements_done == object_status_current->elements)
+	    {
+	       stack->erase(stack->ret_count());
+
+	       if(object_status_current->json_object == JSON_OBJECT)
+		  cout << "}" << endl;
+	       else 
+		  cout << "]" << endl;
+	       
+	       object_status_current = (object_status_t *)stack->search(stack->ret_count());
+	       if(object_status_current && object_status_current->elements_done < object_status_current->elements)
+		  cout << "," << endl;
+	    }
 	 }
 	 
-	 if(nrv > old_level)
-	 {
-	    old_level++;
-	 }
-	 
-	 nrv = search(&key_pair);
-	 if(nrv < old_level)
-	 {
-	    tab_count--;
-	    old_level = nrv;
-	 }
-      }
+	 json_object_old = json_object;
+	 json_object = search(&key_pair);
+      }while(json_object != JSON_END);
    }
 };

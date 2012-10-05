@@ -62,7 +62,6 @@ namespace neweraHPC
       web_ui_init_request(http_data);
    }
    
-   //nhpc_status_t web_ui_init_request(nhpc_socket_t *sock, string_t *request, rbtree_t **ui_details, char **file_path)
    nhpc_status_t web_ui_init_request(http_data_t *http_data)
    {
       nhpc_socket_t *sock = http_data->sock;

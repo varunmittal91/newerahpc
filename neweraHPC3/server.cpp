@@ -45,77 +45,10 @@ nhpc_status_t func_trigger(nhpc_socket_t *sock, web_ui_elements_t *web_ui_elemen
    return NHPC_SUCCESS;
 }
 
-void test_json()
-{
-   nhpc_json_t nhpc_json;
-   
-   nhpc_json.add_element(JSON_STRING, "firstName", "varun");
-   nhpc_json.add_element(JSON_STRING, "lastName", "dhawan");
-
-   nhpc_json.add_element(JSON_OBJECT, "address");
-      nhpc_json.add_element(JSON_STRING, "streetAddress", "sector 1");
-      nhpc_json.add_element(JSON_NUMBER, "houseNumber", "420");
-   nhpc_json.close_element();
-
-   nhpc_json.add_element(JSON_ARRAY, "addresses");
-      nhpc_json.add_element(JSON_OBJECT);
-	 nhpc_json.add_element(JSON_STRING, "streetAddress", "sector 1");
-	 nhpc_json.add_element(JSON_NUMBER, "houseNumber", "420");
-      nhpc_json.close_element();
-      nhpc_json.add_element(JSON_OBJECT);
-	 nhpc_json.add_element(JSON_STRING, "streetAddress", "sector 2");
-	 nhpc_json.add_element(JSON_NUMBER, "houseNumber", "421");
-      nhpc_json.close_element();
-   nhpc_json.close_element();
-
-   nhpc_json.add_element(JSON_ARRAY, "numbers2");
-      nhpc_json.add_element(JSON_NUMBER, "Number", "420");
-      nhpc_json.add_element(JSON_NUMBER, "Number", "421");
-   nhpc_json.close_element();   
-   
-   nhpc_json.add_element(JSON_OBJECT, "complex");
-      nhpc_json.add_element(JSON_OBJECT, "complex_in");
-	 nhpc_json.add_element(JSON_ARRAY, "complex_in_in");
-	    nhpc_json.add_element(JSON_NUMBER, "1", "12");
-	    nhpc_json.add_element(JSON_NUMBER, "2", "12");
-	 nhpc_json.close_element();
-	 nhpc_json.add_element(JSON_ARRAY, "complex_in_in2");
-	    nhpc_json.add_element(JSON_TRUE, "value1");
-	    nhpc_json.add_element(JSON_TRUE, "value2");
-	 nhpc_json.close_element();
-      nhpc_json.close_element();
-   nhpc_json.close_element();
-   
-   nhpc_json.add_element(JSON_OBJECT, "complex1");
-   nhpc_json.close_element();
-   
-   nhpc_json.close_element();
-   
-   nhpc_json.print();
-   char *json_string = nhpc_json.get_stream();
-   cout<<json_string<<endl;
-
-   ifstream json_test_file("/tmp/test.json");
-   string json_string2, line;
-   while(getline(json_test_file, line))
-   {
-      json_string2 += line;
-   }
-   cout<<json_string2<<endl;
-   
-   nhpc_json_t *test = new nhpc_json_t;
-   test->build_structure(json_string2.c_str());
-   cout<<test->get_stream()<<endl;
-   
-   //test->print();
-}
-
 int main(int argc, char **argv)
 {
    neweraHPC_init(argc, argv);
 
-   test_json();
-   
    nhpc_status_t nrv;
    
    http_init();

@@ -42,6 +42,7 @@ namespace jarvis
 	 return;
       
       thread_manager = new thread_manager_t;
+      jarvis_data.init();
       jarvis_data.init_morphological_database();
    }
 };

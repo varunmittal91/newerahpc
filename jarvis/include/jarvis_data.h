@@ -17,6 +17,7 @@ namespace jarvis
       rbtree_t *jarvis_dictionary_pos;
       rbtree_t *failed_searches;
       rbtree_t *morphological_database;
+      rbtree_t *pointer_database; // contains all pointer symbol strings and corresponding enum identifier
       
       nhpc_mutex_t *mutex;
       
@@ -30,6 +31,7 @@ namespace jarvis
    public:
       jarvis_data_t();
       ~jarvis_data_t();
+      void init();
       void init_morphological_database();
       
       nhpc_status_t add_word(index_record_t *index_record);

@@ -31,6 +31,42 @@ namespace jarvis
       VERB = 118 //v
    };
    
+   struct pointer_symbol_set_t
+   {
+      int pointer_symbol_num;
+      char *pointer_symbol_str;
+   };
+   
+   enum POINTER_SYMBOL
+   {
+      ANTONYM,       // !  / Adv, Adj, Verb, Noun / Antonym 
+      HYPERNYM,      // @  / Verb, Noun           / Hypernym
+      I_HYPERNYM,    // @! / Noun                 / Instance Hypernym
+      HYPONYM,       //    / Verb, Noun           / Hyponym
+      I_HYPONYM,     // i  / Noun                 / Instance Hyponym
+      M_HOLONYM,     // #m / Noun                 / Member holonym
+      S_HOLONYM,     // #s / Noun                 / Sybstane holonym
+      P_HOLONYM,     // #p / Noun                 / Part holonym
+      M_MERONYM,     // %m / Noun                 / Member meronym
+      S_MERONYM,     // %s / Noun                 / Substance meronym
+      P_MERONYM,     // %p / Noun                 / Part meronym
+      ATTRIBUTE,     // =  / Adj, Noun            / Attribute
+      DE_FORM,       // +  / Verb, Noun                 / Derivationally related form
+      D_TOPIC,       // ;c / Adv, Adj, Verb, Noun / Domain of synset - TOPIC
+      M_TOPIC,       // -c / Noun                 / Member of this domain - TOPIC
+      D_REGION,      // ;r / Adv, Adj, Verb, Noun / Domain of synset - REGION 
+      M_REGION,      // -r / Noun                 / Member of this domain - REGION 
+      D_USAGE,       // ;u / Adv, Adj, Verb, Noun / Domain of synset - USAGE
+      M_USAGE,       // -u / Noun                 / Member of this domain - USAGE
+      ENTAILMENT,    // *  / Verb                 / Entailment
+      CAUSE,         // >  / Verb                 / Cause
+      A_SEE,         // ^  / Adj, Verb            / Also see
+      V_GROUP,       // $  / Verb                 / Verb group
+      SIMILAR_TO,    // &  / Adj                  / Similar to
+      PA_VERB,       // <  / Adj                  / Participle of verb
+      PERTAINYM      // \  / Adv, Adj             / Derived from adjctive, Pertains to noun
+   };
+   
    extern const char *word_net_indexs[4];
    extern const char **word_net_index_files;
    
@@ -38,10 +74,13 @@ namespace jarvis
    {
       const char *lemma;
       char pos;
-      int synset_cnt;
-      int p_cnt;
       int tagsense_cnt;
-      int *synset_offset;
+      
+      int synset_cnt;
+      index_record_t **synset_ptr;
+
+      int symbols_cnt;
+      char *symbols_ptr[2];
    };
    
    struct failed_record_t
@@ -73,6 +112,7 @@ namespace jarvis
    nhpc_status_t init_word_net_database();
    nhpc_status_t word_lookup(const char *_word, word_record_t **word_record_ptr);
    void *read_index_file(search_param_t *search_param);
+   void *read_data_file(search_param_t *search_param);
 };
 
 #endif

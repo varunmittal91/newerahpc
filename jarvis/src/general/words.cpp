@@ -86,6 +86,11 @@ namespace jarvis
       rbtree_t *word_tree = jarvis_data.lookup_word(_word);      
    }
    
+   void *read_data_file(search_param_t *search_param)
+   {
+      
+   }
+   
    void *read_index_file(search_param_t *search_param)
    {
       bool found_word = false;
@@ -121,6 +126,17 @@ namespace jarvis
 	       string_t *index_parts = nhpc_substr(line_str, ' ');
 	       index_record->pos = *(index_parts->strings[1]);
 	       nhpc_strcpy((char **)&(index_record->lemma), (index_parts->strings[0]));
+	       
+	       int *synset_cnt = &(index_record->synset_cnt);
+	       int *symbols_cnt = &(index_record->symbols_cnt);
+	       (*synset_cnt) = nhpc_strtoi(index_parts->strings[2]);
+	       (*symbols_cnt) = nhpc_strtoi(index_parts->strings[3]);
+	       
+	       cout << line_str << endl;
+	       int field_count = (*synset_cnt) + (*symbols_cnt) + 6;
+	       cout << field_count << " " << index_parts->count << endl;
+	       
+	       //cout << 
 	       
 	       found_word = true;
 	       break;

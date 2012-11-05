@@ -119,7 +119,12 @@ int main()
       cout<<"Substr: "<<string->strings[i]<<endl;
 
    string = nhpc_substr("My name is   varun   ", ' ');
-   string = nhpc_substr("My name is varun", 's');
+   string = nhpc_substr("  My name is varun  end ", ' ');
+   for(int i = 0; i < string->count; i++)
+   {
+      cout << string->strings[i] << endl;
+   }
+   exit(0);
       
    cout<<endl<<"Concatenating strings:"<<endl;
    

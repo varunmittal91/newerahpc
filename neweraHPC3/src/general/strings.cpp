@@ -53,7 +53,7 @@ namespace neweraHPC{
       
       mutex_free = new nhpc_mutex_t;
       thread_mutex_init(mutex_free);
-
+      
       mutex_allocated = new nhpc_mutex_t;
       thread_mutex_init(mutex_allocated);
       
@@ -90,7 +90,7 @@ namespace neweraHPC{
       do 
       {
 	 string = (char *)strings_free->search(try_len, 1);
-
+	 
 	 if(string != NULL)
 	 {
 	    int ret = strings_free->erase(try_len, string);
@@ -103,7 +103,7 @@ namespace neweraHPC{
 	    
 	    break;
 	 }
-	 	 
+	 
 	 try_len++; 
       }while(try_len < try_len_limit);
       thread_mutex_unlock(mutex_free, NHPC_THREAD_LOCK_WRITE);      
@@ -123,12 +123,12 @@ namespace neweraHPC{
       }
       
       str = (char *)(string + sizeof(nhpc_size_t));
-
+      
       thread_mutex_lock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
       strings_allocated->insert(string, try_len);
       allocated_count++;
       thread_mutex_unlock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
-
+      
       return str;
    }
    
@@ -154,7 +154,7 @@ namespace neweraHPC{
 	 
 	 return;
       }
-            
+      
       thread_mutex_lock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);
       int ret = strings_allocated->erase(*str_len_string, str);
       if(ret != 0)
@@ -176,7 +176,7 @@ namespace neweraHPC{
 	 strings_free->insert(str, *str_len_string);	 
 	 free_count++;
 	 thread_mutex_unlock(mutex_free, NHPC_THREAD_LOCK_WRITE);
-
+	 
 	 LOG_DEBUG("ADDING STRING TO FREE POOL erased with return status " << ret << " Allocated bytes: " << allocated_bytes << " Free bytes: "<< free_bytes);
       }
       
@@ -252,7 +252,7 @@ namespace neweraHPC{
       (*dst) = new char [len + 1];
       memcpy(*dst, src, len);
       (*dst)[len] = '\0';
-
+      
       return NHPC_SUCCESS;
    }
    
@@ -434,7 +434,9 @@ namespace neweraHPC{
    
    string_t *nhpc_substr(const char *s1, const char s2)
    {
-      string_t *string = new string_t;
+      nhpc_size_t s1_len = strlen(s1);
+      
+      string_t *string = NULL;
       char **strings = NULL;
       int count = 0;
       
@@ -443,73 +445,56 @@ namespace neweraHPC{
       int current_pos = 1;
       size_t len = 0;
       
-      while(*tmp_s1 != '\0')
+      while(current_pos <= s1_len)
       {
-         len = current_pos - old_pos;
+	 if(*tmp_s1 == s2 || (current_pos == s1_len && current_pos > old_pos))
+	 {
+	    len = current_pos - old_pos;
 
-         if(*tmp_s1 != s2)
-         {
-            current_pos++;
-            tmp_s1++;
-            continue;
-         }
-         else if(len == 0)
-         {
-            while(*tmp_s1 == s2)
-            {
-               tmp_s1++;
-               old_pos++;
-               current_pos++;
-            }
-         }
-         else
-         {
-            char **tmp_strings = new char* [count + 1];
-            if(strings != NULL)
-            {
-               memcpy(tmp_strings, strings, (sizeof(char *) * count));
-               delete[] strings;
-            }
-            strings = tmp_strings;
-            strings[count] = new char [len + 1];
-            memcpy((strings[count]), (tmp_s1 - len), sizeof(char) * len);
-            (strings[count])[len] = '\0';
-
-            count++;
-            old_pos = current_pos + 1;
-         }
-         
-         tmp_s1++;
-         current_pos++;
+	    if(current_pos == s1_len)
+	       len++;
+	       
+	    if(len != 0)
+	    {
+	       char *extracted_string = new char [len + 1];
+	       memcpy(extracted_string, s1 + old_pos - 1, sizeof(char) * len);
+	       extracted_string[len] = '\0';
+	       
+	       char **tmp_strings = new char* [count + 1];
+	       if(strings != NULL)
+	       {
+		  memcpy(tmp_strings, strings, (sizeof(char *) * count));
+		  delete[] strings;
+	       }
+	       strings = tmp_strings;
+	       strings[count] = extracted_string;
+	       count++;
+	       
+	       old_pos = current_pos;
+	    }
+	    
+	    while(*tmp_s1 == s2)
+	    {
+	       tmp_s1++;
+	       current_pos++;
+	       old_pos++;
+	    }
+	 }
+	 
+	 tmp_s1++;
+	 current_pos++;
       }
 
-      char *last_string = NULL;
-      if(current_pos > old_pos)
+      if(count > 0)
       {
-         count++; 
-         len = current_pos - old_pos;
-         last_string = new char [len + 1];
-         memcpy(last_string, tmp_s1 - len, (sizeof(char) * len));
-         last_string[len] = '\0';
+	 string = new string_t;
+	 string->strings = new char* [count + 1];
+	 string->count = count;
+	 memcpy((string->strings), strings, sizeof(char*) * count);
+	 string->strings[count] = NULL;
+	 delete[] strings;
       }
-
-      char **tmp_strings = new char* [count + 1];
-      if(strings != NULL)
-      {
-         memcpy(tmp_strings, strings, sizeof(char*) * count);
-         delete[] strings;
-      }
-      strings = tmp_strings;
-
-      if(last_string != NULL)
-      {
-         strings[count - 1] = last_string;
-      }
-      strings[count] = NULL;
-
-      string->strings = strings;
-      string->count = count;
-
+      
       return string;
    }
    
@@ -521,7 +506,7 @@ namespace neweraHPC{
       }
       
       delete[] (string->strings);
-
+      
       delete string;
    }
    
@@ -557,13 +542,13 @@ namespace neweraHPC{
       else 
       {
 	 nhpc_size_t len = strlen(s1) + strlen(s2);
-
+	 
 	 string = new char [len + 1];
 	 memcpy(string, s1, len_s1);
 	 memcpy(string + len_s1, s2, len_s2);
 	 string[len] = '\0';
       }
-
+      
       return string;
    }
    
@@ -580,9 +565,9 @@ namespace neweraHPC{
       
       if((len_s1 == 0) && (len_s2 == 0) && (len_s3 == 0))
 	 return NULL;
-
+      
       nhpc_size_t len = strlen(s1) + strlen(s2) + strlen(s3);
-	 
+      
       string = new char [len + 1];
       memcpy(string, s1, len_s1);
       memcpy(string + len_s1, s2, len_s2);
@@ -591,7 +576,7 @@ namespace neweraHPC{
       
       return string;
    }
-
+   
    char *nhpc_itostr(int num)
    {
       int tmp_num = num;
@@ -624,7 +609,7 @@ namespace neweraHPC{
 	 string[count - i - 1] = digit + 48;
 	 i++;
       }      
-
+      
       return string;
    }
    

@@ -50,6 +50,7 @@ namespace neweraHPC
       char	  *referer;
       char	  *origin;
       char	  *http_version;
+      char        *custom_response_data;
       char	  *host;
       rbtree_t    *headers;
       nhpc_socket_t *sock;

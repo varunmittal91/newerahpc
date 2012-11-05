@@ -17,3 +17,9 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _NUI_H_
+#define _NUI_H_
+
+#include "nui_html.h"
+
+#endif

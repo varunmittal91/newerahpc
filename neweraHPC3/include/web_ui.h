@@ -21,11 +21,25 @@
 #define _WEB_UI_H_
 
 #include "network_data.h"
+#include "json.h"
+#include "nui.h"
 
 namespace neweraHPC
 {
    extern rbtree_t *app_handlers;
    extern const char *ui_temp_dir;
+   
+   struct app_details_t
+   {
+      fnc_ptr_nhpc_two_t func_trigger_local;
+      rbtree_t *instances;
+      char *app_name;
+   };
+   
+   struct app_instance_t
+   {
+      int instance_id;
+   };
    
    struct ui_xml_data
    {
@@ -35,13 +49,16 @@ namespace neweraHPC
    class web_ui_elements_t
    {
    public:
-      rbtree_t *elements;
+      nhpc_json_t *elements;
+      rbtree_t *elements_tree;
       web_ui_elements_t(const char *_working_dir, const char *_app_xml);
       ~web_ui_elements_t();
       
+      char *app_name;
       char *working_dir;
       char *app_xml;
       char *app_xml_public;
+      int instance_id;
       
       nhpc_status_t add_element(const char *element, const char *property);
       nhpc_status_t add_public_data();

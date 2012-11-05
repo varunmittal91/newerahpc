@@ -26,6 +26,7 @@
 #endif
 #include <include/http.h>
 #include <include/rbtree.h>
+#include <include/alloc.h>
 
 using namespace std;
 
@@ -87,6 +88,9 @@ namespace neweraHPC
       
       (*http_data) = new http_data_t;
       http_data_t *local_data = (*http_data);
+      //memset(local_data, 0, sizeof(http_data_t));
+      initialize_mem(local_data);
+      
       if(content_length)
       {
 	 local_data->content_length = nhpc_strtoi(content_length);

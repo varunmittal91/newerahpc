@@ -98,7 +98,8 @@ namespace neweraHPC
 	 nhpc_string_delete(tmp_str);
 	 
 	 char *file_path = NULL;
-	 file_path = nhpc_strconcat(HTTP_ROOT, http_data->request_page);
+	 if(!(http_data->custom_response_data))
+	    file_path = nhpc_strconcat(HTTP_ROOT, http_data->request_page);
 	 
 	 nhpc_size_t file_size;
 	 nhpc_status_t nrv = nhpc_file_size(file_path, &file_size);
@@ -117,34 +118,63 @@ namespace neweraHPC
 	 }
 	 else 
 	 {
-	    FILE *fp = fopen(file_path, "r");
-	    char *file_size_str = nhpc_itostr(file_size);
-	    
 	    nhpc_headers_t *headers = new nhpc_headers_t;
 	    headers->insert("HTTP/1.1 200 OK");
-	    headers->insert("Content-Length", file_size_str);
-	    headers->write(sock);
+
+	    char *file_size_str;
 	    
-	    delete headers;
-	    nhpc_string_delete(file_size_str);
-	    
-	    nhpc_status_t nrv;
-	    
-	    char buffer[10000];	    
-	    nhpc_size_t len;
-	    
-	    do
+	    if(!(http_data->custom_response_data))
 	    {
-	       bzero(buffer, sizeof(buffer));
-	       len = fread(buffer, 1, sizeof(buffer), fp);
+	       cout << "Reading from a file" << endl;
 	       
-	       nrv = socket_sendmsg(sock, buffer, &len);	
-	    }while(!feof(fp) && errno != EPIPE);
+	       FILE *fp = fopen(file_path, "r");
+	       file_size_str = nhpc_itostr(file_size);
 	    
-	    fclose(fp);
+	       headers->insert("Content-Length", file_size_str);
+
+	       /* Deciding mime types */
+	       if(nhpc_strcmp(file_path, "*.json"))
+		  headers->insert("Content-Type: application/json");
+	       else if(nhpc_strcmp(file_path, "*.js"))
+		  headers->insert("Content-Type: application/javascript");
+	       else if(nhpc_strcmp(file_path, "*.css"))
+		  headers->insert("Content-Type: text/css");
+	       	    
+	       headers->write(sock);
+	    
+	       delete headers;
+	       nhpc_string_delete(file_size_str);
+	    
+	       nhpc_status_t nrv;
+	    
+	       char buffer[10000];	    
+	       nhpc_size_t len;
+	    
+	       do
+	       {
+		  bzero(buffer, sizeof(buffer));
+		  len = fread(buffer, 1, sizeof(buffer), fp);
+	       
+		  nrv = socket_sendmsg(sock, buffer, &len);	
+	       }while(!feof(fp) && errno != EPIPE);
+	    
+	       fclose(fp);
+	       nhpc_string_delete(file_path);	 
+	    }
+	    else 
+	    {
+	       file_size = strlen(http_data->custom_response_data);
+	       file_size_str = nhpc_itostr(file_size);
+
+	       headers->insert("Content-Length", file_size_str);
+	       headers->write(sock);
+	       delete headers;
+	       
+	       socket_sendmsg(sock, http_data->custom_response_data, &file_size);
+	    }
+	    
+	    nhpc_string_delete(file_size_str);
 	 }
-	 
-	 nhpc_string_delete(file_path);	 
       }
       else if((http_data->request_type) == HTTP_INVALID)
       {

@@ -49,10 +49,13 @@ namespace neweraHPC
    
    nhpc_status_t web_ui_register(const char *app_name, fnc_ptr_nhpc_two_t func_trigger)
    {
-      fnc_ptr_nhpc_two_t *func_trigger_local = new fnc_ptr_nhpc_two_t;
-      (*func_trigger_local) = func_trigger;
+      app_details_t *app_details = new app_details_t;
+      app_details->func_trigger_local = func_trigger;
+      app_details->instances = new rbtree_t(NHPC_RBTREE_NUM);
+      nhpc_strcpy(&(app_details->app_name), app_name);
+      cout << "Registered: " << app_details->app_name << endl;
       
-      nhpc_status_t rv = app_handlers->insert(func_trigger_local, app_name);
+      nhpc_status_t rv = app_handlers->insert(app_details, app_name);
       
       return rv;
    }
@@ -68,26 +71,42 @@ namespace neweraHPC
       rbtree_t *ui_details;
       char *file_path;
       
-      string_t *app_details = nhpc_substr(http_data->request_page, '/');
-      if(app_details->count < 2)
+      string_t *app_details_str = nhpc_substr(http_data->request_page, '/');
+      if(app_details_str->count < 2)
       {
 	 return NHPC_FAIL;
       }
       
-      fnc_ptr_nhpc_two_t *func_trigger_local = (fnc_ptr_nhpc_two_t *)app_handlers->search(app_details->strings[1]);
+      app_details_t *app_details = (app_details_t *)app_handlers->search(app_details_str->strings[1]);
       
-      if(!func_trigger_local)
+      if(!app_details)
       {
 	 cout<<"failed\n\n";
 	 return NHPC_FAIL;
       }
       
-      nhpc_create_tmp_file_or_dir((const char **)&file_path, ui_temp_dir, NHPC_FILE, app_details->strings[1]);
+      int instance_count = app_details->instances->ret_count();
+      app_instance_t *app_instance = new app_instance_t;
+      app_instance->instance_id = instance_count + 1;
+      app_details->instances->insert(app_instance);
+      cout << "Current:Instance_id:" << instance_count << endl;
+      
+      char *app_name = app_details_str->strings[1];
+      app_details_str->strings[1] = nhpc_strconcat(app_details_str->strings[1], ".json");
+      nhpc_create_tmp_file_or_dir((const char **)&file_path, ui_temp_dir, NHPC_FILE, app_details_str->strings[1]);
       
       web_ui_elements_t *web_ui_elements = new web_ui_elements_t(ui_temp_dir, file_path);
-      web_ui_elements->add_element("app_title", app_details->strings[1]);
+      web_ui_elements->instance_id = instance_count;
+      web_ui_elements->add_element("app_title", app_details_str->strings[1]);
+      nhpc_strcpy(&(web_ui_elements->app_name), app_name);
       
-      (*func_trigger_local)(sock, web_ui_elements);
+      web_ui_elements->elements->add_element(JSON_STRING, "appname", app_name);
+      web_ui_elements->elements->add_element(JSON_OBJECT, "app_attributes");
+	 web_ui_elements->elements->add_element(JSON_STRING, "instance_id", nhpc_itostr(instance_count));
+	 web_ui_elements->elements->add_element(JSON_STRING, "type", "window");
+      web_ui_elements->elements->close_element();      
+      
+      (*(app_details->func_trigger_local))(sock, web_ui_elements);
       
       web_ui_generate(web_ui_elements, file_path);
       
@@ -104,42 +123,7 @@ namespace neweraHPC
    {
       ofstream xml_file(file_path);
       
-      rbtree_t *elements = web_ui_elements->elements;
-      char *element;
-      
-      xml_file<<"<neweraHPC_ui>"<<endl;
-      
-      element = (char *)elements->search("app_title");
-      if(element)
-      {
-	 xml_file<<"<app_title>"<<element<<"</app_title>"<<endl;
-      }
-      element = (char *)elements->search("window");
-      if(element)
-      {
-	 xml_file<<"<window>"<<endl;
-	 
-	 element = (char *)elements->search("height");
-	 if(element)
-	 {
-	    xml_file<<"<height>"<<element<<"</height>"<<endl;
-	 }
-	 element = (char *)elements->search("width");
-	 if(element)
-	 {
-	    xml_file<<"<width>"<<element<<"</width>"<<endl;
-	 }
-	 
-	 element = (char *)elements->search("button1");
-	 if(element)
-	 {
-	    xml_file<<"<button1>"<<element<<"</button1>";
-	 }
-	 
-	 xml_file<<"</window>"<<endl;
-      }
-      
-      xml_file<<"</neweraHPC_ui>"<<endl;
+      xml_file << web_ui_elements->elements->get_stream() << endl;
       
       xml_file.close();
    }
@@ -149,7 +133,8 @@ namespace neweraHPC
       working_dir = nhpc_strconcat(_working_dir, "/");
       
       string_t *temp = nhpc_substr(_app_xml, '/');
-      elements = new rbtree_t(NHPC_RBTREE_STR);
+      elements = new nhpc_json_t;
+      elements_tree = new rbtree_t(NHPC_RBTREE_STR);
       
       nhpc_strcpy(&app_xml, temp->strings[temp->count - 1]);
    }
@@ -159,12 +144,10 @@ namespace neweraHPC
       if(nhpc_strcmp(element, "connect") == NHPC_SUCCESS)
       {
 	 char *remote_app_xml_path = nhpc_strconcat(working_dir, property, ".public");
-	 
-	 elements->insert(remote_app_xml_path, "connect");
       }
       else 
       {
-	 elements->insert((void *)property, element);
+	 elements_tree->insert((void *)property, element);
       }
    }
    

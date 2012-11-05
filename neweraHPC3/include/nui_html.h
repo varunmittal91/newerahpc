@@ -1,5 +1,5 @@
 /*
- *	(C) 2011 Varun Mittal <varunmittal91@gmail.com>
+ *	(C) 2012 Varun Mittal <varunmittal91@gmail.com>
  *	NeweraHPC program is distributed under the terms of the GNU General Public License v2
  *
  *	This file is part of NeweraHPC.
@@ -17,32 +17,11 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NEWERAHPC_H_
-#define _NEWERAHPC_H_
-
-#include "file.h"
-#include "rbtree.h"
-#include "list.h"
-#include "thread.h"
-#include "network.h"
-#include "strings.h"
-#include "general.h"
-#include "grid.h"
-#include "system.h"
-#include "alloc.h"
-#include "http.h"
-#include "web_ui.h"
-#include "json.h"
-
-#include <iostream>
-
-extern neweraHPC::rbtree_t cmdline_arguments;
-
-using namespace std;
+#ifndef _NUI_HTML_H_
+#define _NUI_HTML_H_
 
 namespace neweraHPC
 {
-   void neweraHPC_init(int argc, char **argv);
 };
 
 #endif

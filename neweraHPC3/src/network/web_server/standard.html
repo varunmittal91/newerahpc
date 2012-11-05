@@ -18,7 +18,7 @@
  
             xml_path = (document.URL).split("/");
             xml_path = xml_path[xml_path.length - 1];
-	    xml_path = host + "/ui_temp/" + xml_path;
+	    xml_path = host + "/ui_temp/" + xml_path + ".json";
          
             if (window.XMLHttpRequest)
                xmlhttp=new XMLHttpRequest();
@@ -27,6 +27,11 @@
             xmlhttp.open("GET", xml_path, false);
             xmlhttp.send();
             xmlDoc=xmlhttp.responseXML;     
+
+	    $.getJSON(xml_path, function(items)
+            {
+            
+            });
             
             app_window = xmlDoc.getElementsByTagName("neweraHPC_ui");            
             app_title = app_window[0].getElementsByTagName("app_title")[0].childNodes[0].nodeValue;

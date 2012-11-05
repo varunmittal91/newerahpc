@@ -52,4 +52,16 @@ void operator delete(void *ptr);
 void operator delete[](void *ptr);
 #endif
 
+template <class T>
+void initialize_mem(T *ptr)
+{
+   memset(ptr, 0, sizeof(T));
+}
+
+template <class T>
+void initialize_mem(T *ptr, int count)
+{
+   memset(ptr, 0, sizeof(T) * count);
+}
+
 #endif

@@ -32,16 +32,6 @@ using namespace neweraHPC;
 
 nhpc_status_t func_trigger(nhpc_socket_t *sock, web_ui_elements_t *web_ui_elements)
 {
-   cout<<"test app trigger invocated"<<endl;
-   
-   /*
-   web_ui_elements->elements->add_element(JSON_STRING, "appname", "Desktop");
-
-   web_ui_elements->elements->add_element(JSON_OBJECT, "app_attributes");
-      web_ui_elements->elements->add_element(JSON_STRING, "type", "window");
-   web_ui_elements->elements->close_element();
-    */
-   
    web_ui_elements->elements->add_element(JSON_OBJECT, "NuiWindow");
       web_ui_elements->elements->add_element(JSON_STRING, "height", "100%");
       web_ui_elements->elements->add_element(JSON_STRING, "width", "100%");

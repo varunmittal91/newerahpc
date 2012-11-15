@@ -96,6 +96,7 @@ namespace neweraHPC
       nhpc_create_tmp_file_or_dir((const char **)&file_path, ui_temp_dir, NHPC_FILE, app_details_str->strings[1]);
       
       web_ui_elements_t *web_ui_elements = new web_ui_elements_t(ui_temp_dir, file_path);
+      web_ui_elements->http_data = http_data;
       web_ui_elements->instance_id = instance_count;
       web_ui_elements->add_element("app_title", app_details_str->strings[1]);
       nhpc_strcpy(&(web_ui_elements->app_name), app_name);
@@ -123,7 +124,8 @@ namespace neweraHPC
    {
       ofstream xml_file(file_path);
       
-      xml_file << web_ui_elements->elements->get_stream() << endl;
+      web_ui_elements->http_data->custom_response_data = (char *)web_ui_elements->elements->get_stream();
+      web_ui_elements->http_data->custom_response_type = NHPC_FILE;
       
       xml_file.close();
    }

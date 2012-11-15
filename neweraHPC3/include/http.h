@@ -51,6 +51,7 @@ namespace neweraHPC
       char	  *origin;
       char	  *http_version;
       char        *custom_response_data;
+      short int    custom_response_type;
       char	  *host;
       rbtree_t    *headers;
       nhpc_socket_t *sock;

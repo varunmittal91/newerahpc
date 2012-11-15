@@ -59,6 +59,7 @@ namespace neweraHPC
       char *app_xml;
       char *app_xml_public;
       int instance_id;
+      http_data_t *http_data;
       
       nhpc_status_t add_element(const char *element, const char *property);
       nhpc_status_t add_public_data();

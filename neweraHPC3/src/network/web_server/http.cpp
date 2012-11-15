@@ -98,11 +98,18 @@ namespace neweraHPC
 	 nhpc_string_delete(tmp_str);
 	 
 	 char *file_path = NULL;
-	 if(!(http_data->custom_response_data))
-	    file_path = nhpc_strconcat(HTTP_ROOT, http_data->request_page);
-	 
 	 nhpc_size_t file_size;
-	 nhpc_status_t nrv = nhpc_file_size(file_path, &file_size);
+	 nhpc_status_t nrv;
+	 
+	 if(!(http_data->custom_response_data))
+	 {
+	    file_path = nhpc_strconcat(HTTP_ROOT, http_data->request_page);
+	    nrv = nhpc_file_size(file_path, &file_size);
+	 }
+	 else 
+	 {	    	 
+	    nrv = http_data->custom_response_type;
+	 }
 	 
 	 if(nrv == NHPC_FILE_NOT_FOUND)
 	 {

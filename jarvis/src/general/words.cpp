@@ -23,6 +23,7 @@
 #include <fstream>
 #include <string>
 #include <neweraHPC/neweraHPC.h>
+#include <neweraHPC/list.h>
 
 #include <include/general.h>
 #include <include/words.h>
@@ -44,7 +45,9 @@ namespace jarvis
    const char *word_dir;
    const char *word_net_dir;  
    const char *word_net_indexs[INDEX_FILES_COUNT] = {"index.adv", "index.adj", "index.noun", "index.verb"};
+   const char *word_net_datas[INDEX_FILES_COUNT] = {"data.adv", "data.adj", "data.noun", "data.verb"};
    const char **word_net_index_files;
+   const char **word_net_data_files;
    
    nhpc_status_t init_word_net_database()
    {
@@ -70,9 +73,11 @@ namespace jarvis
       }
       
       word_net_index_files = new const char* [INDEX_FILES_COUNT];
+      word_net_data_files = new const char* [INDEX_FILES_COUNT];
       for(int i = 0; i < INDEX_FILES_COUNT; i++)
       {
 	 word_net_index_files[i] = nhpc_strconcat(word_net_dir, "/", word_net_indexs[i]);
+	 word_net_data_files[i] = nhpc_strconcat(word_net_dir, "/", word_net_datas[i]);
 	 cout << "loading index file: " << word_net_index_files[i] << endl;
       }
       
@@ -86,9 +91,94 @@ namespace jarvis
       rbtree_t *word_tree = jarvis_data.lookup_word(_word);      
    }
    
-   void *read_data_file(search_param_t *search_param)
+   void *read_data_file(search_param_t *search_param, list_t *synset_offsets, int ptr_symbol = NULL)
    {
+      index_record_t *index_record = search_param->index_record;
+      index_record->synset_subsets = new rbtree_t(NHPC_RBTREE_NUM_HASH);
+      rbtree_t *synset_subsets = index_record->synset_subsets;
       
+      ifstream data_file(search_param->file_name_data);
+      if(!data_file.is_open())
+      {
+	 return NULL;
+      }
+      
+      int offset;
+      string line;
+      while((offset = (synset_offsets->pop_elem())) != -1)
+      {
+	 data_file.seekg(offset);
+	 getline(data_file, line);
+	 
+	 const char *line_str = line.c_str();
+	 
+	 int pos = nhpc_strfind(line_str, '|');
+	 char *synset_str = nhpc_substr(line_str, 1, pos - 1);
+	 
+	 string_t *synset_parts = nhpc_substr(synset_str, ' ');
+	 char *word_count_str = synset_parts->strings[3];
+	 int word_count = nhpc_strtoi(word_count_str);
+	 index_record->synset_words = new index_record_t* [word_count];
+	 
+	 char *ptr_count_str = synset_parts->strings[4 + 2 * word_count];
+	 int ptr_count = nhpc_strtoi(ptr_count_str);
+	 
+	 int part_of_speech = (int)*(synset_parts->strings[2]);
+	 
+	 int parts_position = 4;
+	 
+	 for(int i = 0; i < word_count; i++)
+	 {
+	    char *synset_word = synset_parts->strings[parts_position];
+
+	    parts_position += 2;
+	    
+	    cout << "looking word: " << synset_word << endl;
+	    jarvis_data.lookup_word(synset_word);
+	    cout << "done" << endl;
+	    
+	    /*
+	    index_record_t *new_index_record = new index_record_t;
+	    nhpc_strcpy((char **)&(new_index_record->lemma), synset_word);
+	    new_index_record->pos = part_of_speech;
+	    
+	    jarvis_data.add_word(new_index_record);
+
+	    index_record->synset_words[i] = new_index_record;
+	     */
+	 }
+	 
+	 parts_position = 4 + 2 * word_count + 1;
+	 for(int i = 0; i < ptr_count; i++)
+	 {
+	    char *ptr_symbol_str = synset_parts->strings[parts_position];
+	    ptr_symbol_set_t *ptr_symbol_set = jarvis_data.search_ptr_symbol(ptr_symbol_str);
+	    if(!ptr_symbol_set)
+	    {
+	       continue;
+	    }
+
+	    if(ptr_symbol)
+	    {
+	       if(ptr_symbol == ptr_symbol_set->ptr_symbol_num)
+	       {
+		  cout << "found required synset pointer" << endl;
+		  
+		  break;
+	       }
+	    }
+	    if(!ptr_symbol)
+	    {
+	       //cout << "no specifi pointer asked" << endl;
+	    }
+
+	    parts_position += 4;
+	 }
+	 
+	 //exit(0);
+      }
+      
+      data_file.close();
    }
    
    void *read_index_file(search_param_t *search_param)
@@ -132,12 +222,38 @@ namespace jarvis
 	       (*synset_cnt) = nhpc_strtoi(index_parts->strings[2]);
 	       (*symbols_cnt) = nhpc_strtoi(index_parts->strings[3]);
 	       
-	       cout << line_str << endl;
 	       int field_count = (*synset_cnt) + (*symbols_cnt) + 6;
-	       cout << field_count << " " << index_parts->count << endl;
+	       if(field_count != index_parts->count)
+	       {
+		  cout << "white space symbol found in index file" << endl;
+		  exit(0);
+	       }
 	       
-	       //cout << 
+	       index_record->symbols_ptr = new short int[*symbols_cnt];
 	       
+	       for(int i = 4; i < (4 + *symbols_cnt); i++)
+	       {
+		  ptr_symbol_set_t *ptr_symbol_set = (ptr_symbol_set_t *)jarvis_data.search_ptr_symbol(index_parts->strings[i]);
+		  
+		  if(!ptr_symbol_set)
+		  {
+		     continue;
+		  }
+
+		  index_record->symbols_ptr[i - 4] = ptr_symbol_set->ptr_symbol_num;
+	       }
+	       
+	       list_t synset_offsets(LIST_MIN_FIRST);
+	       
+	       for(int i = (4 + *symbols_cnt + 2); i < field_count; i++)
+	       {
+		  synset_offsets.add_elem(nhpc_strtoi(index_parts->strings[i]));
+	       }
+	       
+	       jarvis_data.add_word(search_param->index_record);
+	       read_data_file(search_param, &(synset_offsets), HYPERNYM);
+	       search_param->index_record->is_done = true;
+				 
 	       found_word = true;
 	       break;
 	    }
@@ -148,7 +264,7 @@ namespace jarvis
       
       if(found_word)
       {
-	 cout << "found word: " << search_param->word << " in: " << search_param->file_name << endl;
+	 cout << "found word: " << search_param->word << " in: " << search_param->file_name << endl << endl;
       }
       
       index_file.close();

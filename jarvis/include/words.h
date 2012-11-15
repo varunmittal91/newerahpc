@@ -3,6 +3,7 @@
 
 #include <neweraHPC/rbtree.h>
 #include <neweraHPC/thread.h>
+#include <neweraHPC/list.h>
 
 #include "jarvis.h"
 
@@ -31,13 +32,13 @@ namespace jarvis
       VERB = 118 //v
    };
    
-   struct pointer_symbol_set_t
+   struct ptr_symbol_set_t
    {
-      int pointer_symbol_num;
-      char *pointer_symbol_str;
+      int ptr_symbol_num;
+      char *ptr_symbol_str;
    };
    
-   enum POINTER_SYMBOL
+   enum ptr_symbol
    {
       ANTONYM,       // !  / Adv, Adj, Verb, Noun / Antonym 
       HYPERNYM,      // @  / Verb, Noun           / Hypernym
@@ -51,7 +52,7 @@ namespace jarvis
       S_MERONYM,     // %s / Noun                 / Substance meronym
       P_MERONYM,     // %p / Noun                 / Part meronym
       ATTRIBUTE,     // =  / Adj, Noun            / Attribute
-      DE_FORM,       // +  / Verb, Noun                 / Derivationally related form
+      DE_FORM,       // +  / Verb, Noun           / Derivationally related form
       D_TOPIC,       // ;c / Adv, Adj, Verb, Noun / Domain of synset - TOPIC
       M_TOPIC,       // -c / Noun                 / Member of this domain - TOPIC
       D_REGION,      // ;r / Adv, Adj, Verb, Noun / Domain of synset - REGION 
@@ -69,6 +70,7 @@ namespace jarvis
    
    extern const char *word_net_indexs[4];
    extern const char **word_net_index_files;
+   extern const char **word_net_data_files;
    
    struct index_record_t
    {
@@ -77,10 +79,14 @@ namespace jarvis
       int tagsense_cnt;
       
       int synset_cnt;
-      index_record_t **synset_ptr;
+      index_record_t **synset_words;
 
       int symbols_cnt;
-      char *symbols_ptr[2];
+      short int *symbols_ptr;
+      //index_record_t **synset_subsets;
+      rbtree_t *synset_subsets;
+      
+      bool is_done;
    };
    
    struct failed_record_t
@@ -91,6 +97,7 @@ namespace jarvis
    {
       const char *word;
       const char *file_name;
+      const char *file_name_data;
       index_record_t *index_record;
       bool is_complete;
    };
@@ -112,7 +119,7 @@ namespace jarvis
    nhpc_status_t init_word_net_database();
    nhpc_status_t word_lookup(const char *_word, word_record_t **word_record_ptr);
    void *read_index_file(search_param_t *search_param);
-   void *read_data_file(search_param_t *search_param);
+   void *read_data_file(search_param_t *search_param, list_t *synset_offsets, int ptr_symbol);
 };
 
 #endif

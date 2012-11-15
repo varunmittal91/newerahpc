@@ -17,6 +17,9 @@ namespace jarvis
       morphological_database = new rbtree_t(NHPC_RBTREE_NUM_HASH);
       pointer_database = new rbtree_t(NHPC_RBTREE_STR);
       
+      mutex_ptr_symbols = new nhpc_mutex_t;
+      thread_mutex_init(mutex_ptr_symbols);
+      
       rbtree_t *tmp_rbtrees[POS_COUNT];
       for(int i = 0; i < POS_COUNT; i++)
       {
@@ -33,112 +36,146 @@ namespace jarvis
    
    jarvis_data_t::~jarvis_data_t()
    {
-      pointer_symbol_set_t *pointer_symbol;
-      
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = ANTONYM;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), "!");
-      pointer_database->insert(pointer_symbol, "!");
-
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = HYPERNYM;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), "@");
-      pointer_database->insert(pointer_symbol, "@");
-      
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = I_HYPERNYM;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), "@i");
-      pointer_database->insert(pointer_symbol, "@i");
-
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = HYPONYM;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), " ");
-      pointer_database->insert(pointer_symbol, " ");
-
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = I_HYPONYM;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), "i");
-      pointer_database->insert(pointer_symbol, "i");
-
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = M_HOLONYM;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), "#m");
-      pointer_database->insert(pointer_symbol, "#m");
-
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = S_HOLONYM;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), "#s");
-      pointer_database->insert(pointer_symbol, "#s");
-
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = P_HOLONYM;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), "#p");
-      pointer_database->insert(pointer_symbol, "#p");
-
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = M_MERONYM;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), "%m");
-      pointer_database->insert(pointer_symbol, "%m");
-      
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = S_MERONYM;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), "%s");
-      pointer_database->insert(pointer_symbol, "%s");
-      
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = P_MERONYM;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), "%p");
-      pointer_database->insert(pointer_symbol, "%p");
-
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = ATTRIBUTE;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), "=");
-      pointer_database->insert(pointer_symbol, "=");
-
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = DE_FORM;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), "+");
-      pointer_database->insert(pointer_symbol, "+");
-
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = D_TOPIC;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), ";c");
-      pointer_database->insert(pointer_symbol, ";c");
-      
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = M_TOPIC;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), "-c");
-      pointer_database->insert(pointer_symbol, "-c");
-            
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = D_REGION;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), ";r");
-      pointer_database->insert(pointer_symbol, ";r");
-      
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = M_REGION;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), "-r");
-      pointer_database->insert(pointer_symbol, "-r");
-      
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = D_USAGE;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), ";u");
-      pointer_database->insert(pointer_symbol, ";u");
-      
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = M_USAGE;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), "-u");
-      pointer_database->insert(pointer_symbol, "-u");
-      
-      pointer_symbol = new pointer_symbol_set_t;
-      pointer_symbol->pointer_symbol_num = ENATILMENT;
-      nhpc_strcpy(&(pointer_symbol->pointer_symbol_str), "*");
-      pointer_database->insert(pointer_symbol, "*");
    }
    
    void jarvis_data_t::init()
    {
+      ptr_symbol_set_t *ptr_symbol;
       
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = ANTONYM;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "!");
+      pointer_database->insert(ptr_symbol, "!");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = HYPERNYM;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "@");
+      pointer_database->insert(ptr_symbol, "@");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = I_HYPERNYM;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "@i");
+      pointer_database->insert(ptr_symbol, "@i");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = HYPONYM;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), " ");
+      pointer_database->insert(ptr_symbol, " ");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = I_HYPONYM;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "i");
+      pointer_database->insert(ptr_symbol, "i");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = M_HOLONYM;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "#m");
+      pointer_database->insert(ptr_symbol, "#m");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = S_HOLONYM;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "#s");
+      pointer_database->insert(ptr_symbol, "#s");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = P_HOLONYM;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "#p");
+      pointer_database->insert(ptr_symbol, "#p");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = M_MERONYM;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "%m");
+      pointer_database->insert(ptr_symbol, "%m");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = S_MERONYM;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "%s");
+      pointer_database->insert(ptr_symbol, "%s");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = P_MERONYM;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "%p");
+      pointer_database->insert(ptr_symbol, "%p");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = ATTRIBUTE;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "=");
+      pointer_database->insert(ptr_symbol, "=");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = DE_FORM;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "+");
+      pointer_database->insert(ptr_symbol, "+");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = D_TOPIC;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), ";c");
+      pointer_database->insert(ptr_symbol, ";c");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = M_TOPIC;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "-c");
+      pointer_database->insert(ptr_symbol, "-c");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = D_REGION;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), ";r");
+      pointer_database->insert(ptr_symbol, ";r");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = M_REGION;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "-r");
+      pointer_database->insert(ptr_symbol, "-r");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = D_USAGE;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), ";u");
+      pointer_database->insert(ptr_symbol, ";u");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = M_USAGE;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "-u");
+      pointer_database->insert(ptr_symbol, "-u");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = ENTAILMENT;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "*");
+      pointer_database->insert(ptr_symbol, "*");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = CAUSE;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), ">");
+      pointer_database->insert(ptr_symbol, ">");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = A_SEE;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "^");
+      pointer_database->insert(ptr_symbol, "^");      
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = V_GROUP;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "$");
+      pointer_database->insert(ptr_symbol, "$");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = SIMILAR_TO;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "&");
+      pointer_database->insert(ptr_symbol, "&");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = PA_VERB;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "<");
+      pointer_database->insert(ptr_symbol, "<");
+      
+      ptr_symbol = new ptr_symbol_set_t;
+      ptr_symbol->ptr_symbol_num = PERTAINYM;
+      nhpc_strcpy(&(ptr_symbol->ptr_symbol_str), "\\");
+      pointer_database->insert(ptr_symbol, "\\");
+   }
+   
+   ptr_symbol_set_t *jarvis_data_t::search_ptr_symbol(char *symbol)
+   {
+      return (ptr_symbol_set_t *)pointer_database->search(symbol);
    }
    
    void jarvis_data_t::init_morphological_database()
@@ -237,6 +274,8 @@ namespace jarvis
       rbtree_t *word_tree = (rbtree_t *)jarvis_dictionary->search(index_record->lemma);
       if(!word_tree)
       {
+	 LOG_INFO("Adding new word_tree for " << index_record->lemma);
+	 
 	 word_tree = new rbtree_t(NHPC_RBTREE_NUM);
 	 jarvis_dictionary->insert(word_tree, index_record->lemma);
       }
@@ -245,7 +284,11 @@ namespace jarvis
       
       rbtree_t *pos_tree = (rbtree_t *)jarvis_dictionary_pos->search(index_record->pos);
       if(!pos_tree->search(index_record->lemma))
+      {
+	 LOG_INFO("Adding new index_record for " << index_record->lemma << " in " << index_record->pos);
+	 
 	 pos_tree->insert(index_record, index_record->lemma);
+      }
       
       thread_mutex_unlock(mutex, NHPC_THREAD_LOCK_WRITE);
    }
@@ -260,7 +303,7 @@ namespace jarvis
       
       if(!word_tree)
       {
-	 nrv = load_word(word);
+	 nrv = jarvis_data_t::load_word(word);
 	 
 	 if(nrv == NHPC_SUCCESS)
 	 {
@@ -340,10 +383,10 @@ namespace jarvis
 	    else 
 	       new_word = root_word;
 	    
-
 	    search_param_t *search_param = new search_param_t;
 	    memset(search_param, 0, sizeof(search_param_t));
 	    search_param->file_name = word_net_index_files[file_index];
+	    search_param->file_name_data = word_net_data_files[file_index];
 	    search_param->word = new_word;
 	    read_index_file(search_param);
 	    if(search_param->index_record)
@@ -371,6 +414,41 @@ namespace jarvis
       return index_record;
    }
    
+   nhpc_status_t jarvis_data_t::load_word(const char *_word, int pos)
+   {
+      thread_mutex_lock(mutex, NHPC_THREAD_LOCK_READ);
+      void *test_failed_word = failed_searches->search(_word);
+      if(test_failed_word)
+	 return NHPC_FAIL;
+      thread_mutex_unlock(mutex, NHPC_THREAD_LOCK_READ);
+
+      int index_id = 0;
+      
+      search_param_t *search_param = new search_param_t;
+      memset(search_param, 0, sizeof(search_param_t));
+      if(pos == ADV)
+      {
+	 index_id = 0;
+      }
+      else if(pos == ADJ)
+      {
+	 index_id = 1;
+      }
+      else if(pos == NOUN)
+      {
+	 index_id = 2;
+      }
+      else if(pos == VERB)
+      {
+	 index_id = 3;
+      }
+      
+      search_param->file_name = word_net_index_files[index_id];
+      search_param->file_name_data = word_net_data_files[index_id];
+      
+      read_index_file(search_param);
+   }
+   
    nhpc_status_t jarvis_data_t::load_word(const char *_word)
    {
       thread_mutex_lock(mutex, NHPC_THREAD_LOCK_READ);
@@ -388,6 +466,7 @@ namespace jarvis
 	 search_param = new search_param_t;
 	 memset(search_param, 0, sizeof(search_param_t));
 	 search_param->file_name = word_net_index_files[i];
+	 search_param->file_name_data = word_net_data_files[i];
 	 search_param->word = _word;
 	 search_params[i] = search_param;
 	 
@@ -417,7 +496,7 @@ namespace jarvis
 	    {
 	       if(search_params[i]->index_record)
 	       {
-		  jarvis_data.add_word(search_params[i]->index_record);
+		  //jarvis_data.add_word(search_params[i]->index_record);
 		  found_word = true;
 	       }
 	       else if(i != 4)

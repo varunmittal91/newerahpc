@@ -28,7 +28,7 @@
 using namespace std;
 
 #ifdef ENABLE_GARBAGE_COLLECTOR
-void *operator new(std::size_t size)
+void *operator new(std::size_t size) throw (std::bad_alloc)
 {
    void *new_p = NULL;
    
@@ -58,19 +58,19 @@ void *operator new(std::size_t size)
    return new_p;
 }
 
-void *operator new[](std::size_t size)
+void *operator new[](std::size_t size) throw (std::bad_alloc)
 {
    void *new_p = operator new(size);
    return new_p;
 }
 
-void operator delete(void *ptr)
+void operator delete(void *ptr) throw ()
 {
    if(garbage_collector_ready)
       nhpc_deallocate_str((char *)ptr);
 }
 
-void operator delete[](void *ptr)
+void operator delete[](void *ptr) throw ()
 {
    operator delete(ptr);
 }   

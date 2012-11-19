@@ -45,11 +45,11 @@ T *alloc(size_t _size)
 }
 
 #ifdef ENABLE_GARBAGE_COLLECTOR
-void *operator new(std::size_t size);
-void *operator new[](std::size_t size);
+void *operator new(std::size_t size) throw (std::bad_alloc);
+void *operator new[](std::size_t size) throw (std::bad_alloc);
 
-void operator delete(void *ptr);
-void operator delete[](void *ptr);
+void operator delete(void *ptr) throw ();
+void operator delete[](void *ptr) throw ();
 #endif
 
 template <class T>

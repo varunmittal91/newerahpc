@@ -124,8 +124,6 @@ int main()
    {
       cout << string->strings[i] << endl;
    }
-   exit(0);
-      
    cout<<endl<<"Concatenating strings:"<<endl;
    
    s1 = "Varun";

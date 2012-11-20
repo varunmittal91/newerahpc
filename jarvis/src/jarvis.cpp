@@ -1,5 +1,5 @@
 /*
- *	(C) 2012 Varun Mittal <varunmittal91@gmail.com> & Uday Vir Singh <udayvirsingh@gmail.com>
+ *	(C) 2012 Varun Mittal <varunmittal91@gmail.com>
  *	jarvis program is distributed under the terms of the GNU General Public License v3
  *
  *	This file is part of jarvis.

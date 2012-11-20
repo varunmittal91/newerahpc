@@ -1,3 +1,22 @@
+/*
+ *	(C) 2012 Varun Mittal <varunmittal91@gmail.com>
+ *	jarvis program is distributed under the terms of the GNU General Public License v3
+ *
+ *	This file is part of jarvis.
+ *
+ *	jarvis is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation version 3 of the License.
+ *
+ *	jarvis is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *
+ *	You should have received a copy of the GNU General Public License
+ *	along with jarvis.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _JARVIS_WORDS_H_
 #define _JARVIS_WORDS_H_
 
@@ -21,6 +40,9 @@ namespace jarvis
    extern rbtree_t *functions;
    extern rbtree_t *adjectives;
    extern rbtree_t *verbs;
+   
+   extern const char *word_net_indexs[INDEX_FILES_COUNT];
+   extern const char *word_net_datas[INDEX_FILES_COUNT];
    
    /*based on characters defined in WordNet */
    enum POS 
@@ -86,6 +108,8 @@ namespace jarvis
       //index_record_t **synset_subsets;
       rbtree_t *synset_subsets;
       
+      list_t *synset_offsets;
+      
       bool is_done;
    };
    
@@ -119,7 +143,7 @@ namespace jarvis
    nhpc_status_t init_word_net_database();
    nhpc_status_t word_lookup(const char *_word, word_record_t **word_record_ptr);
    void *read_index_file(search_param_t *search_param);
-   void *read_data_file(search_param_t *search_param, list_t *synset_offsets, int ptr_symbol);
+   void *read_data_file(const char *data_file_name, list_t *synset_offsets, const char *word, int ptr_symbol);
 };
 
 #endif

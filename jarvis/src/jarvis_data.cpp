@@ -1,7 +1,27 @@
+/*
+ *	(C) 2012 Varun Mittal <varunmittal91@gmail.com>
+ *	jarvis program is distributed under the terms of the GNU General Public License v3
+ *
+ *	This file is part of jarvis.
+ *
+ *	jarvis is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation version 3 of the License.
+ *
+ *	jarvis is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *
+ *	You should have received a copy of the GNU General Public License
+ *	along with jarvis.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <iostream>
 #include <fstream>
 
 #include <include/jarvis_data.h>
+#include <include/words.h>
 
 using namespace std;
 
@@ -290,7 +310,37 @@ namespace jarvis
 	 pos_tree->insert(index_record, index_record->lemma);
       }
       
+      read_index_record(index_record);
+      
       thread_mutex_unlock(mutex, NHPC_THREAD_LOCK_WRITE);
+   }
+   
+   nhpc_status_t jarvis_data_t::read_index_record(index_record_t *index_record)
+   {
+      const char *data_file;
+      int data_file_id = 0;
+      if(index_record->pos == ADV)
+      {
+	 data_file_id = 0; 
+      }
+      else if(index_record->pos == ADJ)
+      {
+	 data_file_id = 1; 	 
+      }
+      else if(index_record->pos == NOUN)
+      {
+	 data_file_id = 2; 
+      }
+      else if(index_record->pos == VERB)
+      {
+	 data_file_id = 3; 
+      }
+      data_file = word_net_data_files[data_file_id];
+      
+      read_data_file(data_file, index_record->synset_offsets, index_record->lemma, HYPERNYM);
+      //exit(0);
+      
+      return NHPC_SUCCESS;
    }
    
    rbtree_t *jarvis_data_t::lookup_word(const char *word)
@@ -414,42 +464,7 @@ namespace jarvis
       return index_record;
    }
    
-   nhpc_status_t jarvis_data_t::load_word(const char *_word, int pos)
-   {
-      thread_mutex_lock(mutex, NHPC_THREAD_LOCK_READ);
-      void *test_failed_word = failed_searches->search(_word);
-      if(test_failed_word)
-	 return NHPC_FAIL;
-      thread_mutex_unlock(mutex, NHPC_THREAD_LOCK_READ);
-
-      int index_id = 0;
-      
-      search_param_t *search_param = new search_param_t;
-      memset(search_param, 0, sizeof(search_param_t));
-      if(pos == ADV)
-      {
-	 index_id = 0;
-      }
-      else if(pos == ADJ)
-      {
-	 index_id = 1;
-      }
-      else if(pos == NOUN)
-      {
-	 index_id = 2;
-      }
-      else if(pos == VERB)
-      {
-	 index_id = 3;
-      }
-      
-      search_param->file_name = word_net_index_files[index_id];
-      search_param->file_name_data = word_net_data_files[index_id];
-      
-      read_index_file(search_param);
-   }
-   
-   nhpc_status_t jarvis_data_t::load_word(const char *_word)
+   nhpc_status_t jarvis_data_t::load_word(const char *_word, int _pos)
    {
       thread_mutex_lock(mutex, NHPC_THREAD_LOCK_READ);
       void *test_failed_word = failed_searches->search(_word);
@@ -457,81 +472,113 @@ namespace jarvis
 	 return NHPC_FAIL;
       thread_mutex_unlock(mutex, NHPC_THREAD_LOCK_READ);
       
-      int threads[INDEX_FILES_COUNT];
-      search_param_t **search_params = new search_param_t* [INDEX_FILES_COUNT];
+      int thread_count;
+      int *threads;
+      search_param_t **search_params;
       search_param_t *search_param;
-      int thread_state = NHPC_THREAD_DEFAULT;
-      for(int i = 0; i < INDEX_FILES_COUNT; i++)
+      
+      if(_pos)
       {
+	 int index_id;
+	 
 	 search_param = new search_param_t;
 	 memset(search_param, 0, sizeof(search_param_t));
-	 search_param->file_name = word_net_index_files[i];
-	 search_param->file_name_data = word_net_data_files[i];
-	 search_param->word = _word;
-	 search_params[i] = search_param;
-	 
-	 if(i == (INDEX_FILES_COUNT - 1))
+	 if(_pos == ADV)
 	 {
-	    thread_state = NHPC_THREAD_JOIN;
+	    index_id = 0;
+	 }
+	 else if(_pos == ADJ)
+	 {
+	    index_id = 1;
+	 }
+	 else if(_pos == NOUN)
+	 {
+	    index_id = 2;
+	 }
+	 else if(_pos == VERB)
+	 {
+	    index_id = 3;
 	 }
 	 
-	 thread_manager->init_thread(&(threads[i]), NULL);
-	 thread_manager->create_thread(&(threads[i]), NULL, (void* (*)(void*))read_index_file, search_param, NHPC_THREAD_DEFAULT);
+	 search_param->file_name = word_net_index_files[index_id];
+	 search_param->file_name_data = word_net_data_files[index_id];
+	 	 
+	 read_index_file(search_param);
       }
-      
-      bool delete_structures = true;
-      bool found_word = false;
-      
-      while(1)
+      else 
       {
+	 thread_count = INDEX_FILES_COUNT;
+	 search_params = new search_param_t* [thread_count];
+	 threads = new int [thread_count];
+	 
 	 for(int i = 0; i < INDEX_FILES_COUNT; i++)
 	 {
-	    if(!(search_params[i]->is_complete))
-	       delete_structures = false;
-	 }
+	    LOG_INFO("Spawning search thread for index");
+	    
+	    search_param = new search_param_t;
+	    memset(search_param, 0, sizeof(search_param_t));
+	    search_param->file_name = word_net_index_files[i];
+	    search_param->file_name_data = word_net_data_files[i];
+	    search_param->word = _word;
+	    search_params[i] = search_param;
+	    
+	    thread_manager->init_thread(&(threads[i]), NULL);
+	    thread_manager->create_thread(&(threads[i]), NULL, (void* (*)(void*))read_index_file, search_param, NHPC_THREAD_DEFAULT);
+	 }	 
 	 
-	 if(delete_structures)
+	 bool delete_structures = true;
+	 bool found_word = false;
+	 
+	 while(1)
 	 {
 	    for(int i = 0; i < INDEX_FILES_COUNT; i++)
 	    {
-	       if(search_params[i]->index_record)
-	       {
-		  //jarvis_data.add_word(search_params[i]->index_record);
-		  found_word = true;
-	       }
-	       else if(i != 4)
-	       {
-		  int pos;
-		  if(i == 0)
-		     pos = ADV;
-		  else if(i == 1)
-		     pos = ADJ;
-		  else if(i == 2)
-		     pos = NOUN;
-		  else if(i == 3)
-		     pos = VERB;
-		  
-		  char *word_morphic = morphological_analyses((char *)_word, pos);
-		  if(word_morphic)
-		     found_word = true;
-	       }
-	       
-	       delete (search_params[i]);
-	    }	       
-	    delete[] search_params;
+	       if(!(search_params[i]->is_complete))
+		  delete_structures = false;
+	    }
 	    
-	    break;
+	    if(delete_structures)
+	    {
+	       for(int i = 0; i < INDEX_FILES_COUNT; i++)
+	       {
+		  if(search_params[i]->index_record)
+		  {
+		     found_word = true;
+		  }
+		  else if(i != 4)
+		  {
+		     int pos;
+		     if(i == 0)
+			pos = ADV;
+		     else if(i == 1)
+			pos = ADJ;
+		     else if(i == 2)
+			pos = NOUN;
+		     else if(i == 3)
+			pos = VERB;
+		     
+		     char *word_morphic = morphological_analyses((char *)_word, pos);
+		     if(word_morphic)
+			found_word = true;
+		  }
+		  
+		  delete (search_params[i]);
+	       }	       
+	       delete[] search_params;
+	       
+	       break;
+	    }
+	    delete_structures = true;
+	 } 
+	 
+	 if(!found_word)
+	 {
+	    failed_record_t *failed_record = new failed_record_t;
+	    failed_searches->insert(failed_record, _word);
+	    return NHPC_FAIL;
 	 }
-	 delete_structures = true;
-      } 
-      
-      if(!found_word)
-      {
-	 failed_record_t *failed_record = new failed_record_t;
-	 failed_searches->insert(failed_record, _word);
-	 return NHPC_FAIL;
+	 
+	 return NHPC_SUCCESS;	 
       }
-      
-      return NHPC_SUCCESS;
    }
 };

@@ -1,5 +1,5 @@
 /*
- *	(C) 2012 Varun Mittal <varunmittal91@gmail.com> & Uday Vir Singh <udayvirsingh@gmail.com>
+ *	(C) 2012 Varun Mittal <varunmittal91@gmail.com>
  *	jarvis program is distributed under the terms of the GNU General Public License v3
  *
  *	This file is part of jarvis.
@@ -91,13 +91,15 @@ namespace jarvis
       rbtree_t *word_tree = jarvis_data.lookup_word(_word);      
    }
    
-   void *read_data_file(search_param_t *search_param, list_t *synset_offsets, int ptr_symbol = NULL)
+   void *read_data_file(const char *data_file_name, list_t *synset_offsets, const char *word, int ptr_symbol = NULL)
    {
-      index_record_t *index_record = search_param->index_record;
-      index_record->synset_subsets = new rbtree_t(NHPC_RBTREE_NUM_HASH);
-      rbtree_t *synset_subsets = index_record->synset_subsets;
+      LOG_INFO("Reading data file for word: " << word << " in: " << data_file_name);
       
-      ifstream data_file(search_param->file_name_data);
+      //index_record_t *index_record = search_param->index_record;
+      //index_record->synset_subsets = new rbtree_t(NHPC_RBTREE_NUM_HASH);
+      //rbtree_t *synset_subsets = index_record->synset_subsets;
+      
+      ifstream data_file(data_file_name);
       if(!data_file.is_open())
       {
 	 return NULL;
@@ -105,6 +107,7 @@ namespace jarvis
       
       int offset;
       string line;
+      
       while((offset = (synset_offsets->pop_elem())) != -1)
       {
 	 data_file.seekg(offset);
@@ -118,7 +121,7 @@ namespace jarvis
 	 string_t *synset_parts = nhpc_substr(synset_str, ' ');
 	 char *word_count_str = synset_parts->strings[3];
 	 int word_count = nhpc_strtoi(word_count_str);
-	 index_record->synset_words = new index_record_t* [word_count];
+	 //index_record->synset_words = new index_record_t* [word_count];
 	 
 	 char *ptr_count_str = synset_parts->strings[4 + 2 * word_count];
 	 int ptr_count = nhpc_strtoi(ptr_count_str);
@@ -127,15 +130,18 @@ namespace jarvis
 	 
 	 int parts_position = 4;
 	 
+	 LOG_INFO("Synset word count: " << word_count);
+	 
 	 for(int i = 0; i < word_count; i++)
 	 {
 	    char *synset_word = synset_parts->strings[parts_position];
 
 	    parts_position += 2;
 	    
-	    cout << "looking word: " << synset_word << endl;
-	    jarvis_data.lookup_word(synset_word);
-	    cout << "done" << endl;
+	    LOG_INFO("Word in synset: " << synset_word);
+	    //cout << "looking word: " << synset_word << endl;
+	    //jarvis_data.lookup_word(synset_word);
+	    //cout << "done" << endl;
 	    
 	    /*
 	    index_record_t *new_index_record = new index_record_t;
@@ -155,6 +161,8 @@ namespace jarvis
 	    ptr_symbol_set_t *ptr_symbol_set = jarvis_data.search_ptr_symbol(ptr_symbol_str);
 	    if(!ptr_symbol_set)
 	    {
+	       LOG_ERROR("Pointer symbol: " << ptr_symbol_str << " does not exist");
+	       
 	       continue;
 	    }
 
@@ -162,7 +170,7 @@ namespace jarvis
 	    {
 	       if(ptr_symbol == ptr_symbol_set->ptr_symbol_num)
 	       {
-		  cout << "found required synset pointer" << endl;
+		  (*synset_offsets).add_elem(nhpc_strtoi(synset_parts->strings[parts_position + 1]));
 		  
 		  break;
 	       }
@@ -179,10 +187,14 @@ namespace jarvis
       }
       
       data_file.close();
+      
+      LOG_INFO("Data read cycle complete");
    }
    
    void *read_index_file(search_param_t *search_param)
    {
+      LOG_INFO("Reading index file for word: " << search_param->word << " in: " << search_param->file_name);
+
       bool found_word = false;
       
       search_param->index_record = NULL;
@@ -211,6 +223,7 @@ namespace jarvis
 	    else if(cmpr_status == 0)
 	    {
 	       index_record_t *index_record = new index_record_t;
+	       index_record->synset_offsets = new list_t(LIST_MIN_FIRST);
 	       search_param->index_record = index_record;
 	       
 	       string_t *index_parts = nhpc_substr(line_str, ' ');
@@ -243,15 +256,15 @@ namespace jarvis
 		  index_record->symbols_ptr[i - 4] = ptr_symbol_set->ptr_symbol_num;
 	       }
 	       
-	       list_t synset_offsets(LIST_MIN_FIRST);
+	       list_t *synset_offsets = (index_record->synset_offsets);
 	       
 	       for(int i = (4 + *symbols_cnt + 2); i < field_count; i++)
 	       {
-		  synset_offsets.add_elem(nhpc_strtoi(index_parts->strings[i]));
+		  (*synset_offsets).add_elem(nhpc_strtoi(index_parts->strings[i]));
 	       }
 	       
 	       jarvis_data.add_word(search_param->index_record);
-	       read_data_file(search_param, &(synset_offsets), HYPERNYM);
+	       //read_data_file(search_param, &(synset_offsets), HYPERNYM);
 	       search_param->index_record->is_done = true;
 				 
 	       found_word = true;
@@ -270,5 +283,7 @@ namespace jarvis
       index_file.close();
       
       search_param->is_complete = true;
+      
+      LOG_INFO("Index read complete");
    }
 };

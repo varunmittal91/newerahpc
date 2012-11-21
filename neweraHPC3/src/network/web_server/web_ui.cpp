@@ -62,7 +62,22 @@ namespace neweraHPC
    
    nhpc_status_t web_ui_handler(http_data_t *http_data)
    {
-      web_ui_init_request(http_data);
+      cout << http_data->request_page << endl;
+      if(nhpc_strcmp(http_data->request_page, "*.json") == NHPC_SUCCESS)
+      {
+	 int str_pos = nhpc_strfind(http_data->request_page, '.');
+	 char *request_page = nhpc_substr(http_data->request_page, 1, str_pos - 1);
+	 cout << request_page << endl;
+	 delete[] (http_data->request_page);
+	 http_data->request_page = request_page;
+	 
+	 web_ui_init_request(http_data);
+      }
+      else 
+      {
+	 delete[] (http_data->request_page);
+	 http_data->request_page = nhpc_strconcat("/ui_temp", "/standard.html");
+      }
    }
    
    nhpc_status_t web_ui_init_request(http_data_t *http_data)
@@ -113,21 +128,18 @@ namespace neweraHPC
       
       delete[] file_path;
       
-      delete[] (http_data->request_page);
-      http_data->request_page = nhpc_strconcat("/ui_temp", "/standard.html");
-      cout<<http_data->request_page<<endl;
-      
       return NHPC_SUCCESS;
    }
    
    nhpc_status_t web_ui_generate(web_ui_elements_t *web_ui_elements, char *file_path)
    {
-      ofstream xml_file(file_path);
+      //ofstream xml_file(file_path);
       
+      LOG_INFO("Webui path requested: " << file_path);
       web_ui_elements->http_data->custom_response_data = (char *)web_ui_elements->elements->get_stream();
       web_ui_elements->http_data->custom_response_type = NHPC_FILE;
       
-      xml_file.close();
+      //xml_file.close();
    }
    
    web_ui_elements_t::web_ui_elements_t(const char *_working_dir, const char *_app_xml)

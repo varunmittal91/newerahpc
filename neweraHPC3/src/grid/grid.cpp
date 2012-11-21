@@ -125,6 +125,7 @@ namespace neweraHPC
 	       daemon = true;
 	       break;
 	    default:
+	       LOG_ERROR("Invalid command line option: " << *(key_pair->key));
 	       print_help();
 	 }	 
       }

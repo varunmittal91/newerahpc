@@ -40,6 +40,7 @@ namespace neweraHPC
       else 
       {
 	 struct stat *buffer = new struct stat;
+	 memset(buffer, 0, sizeof(struct stat));
 	 nhpc_status_t nrv = stat(file_path, buffer);
 	 
 	 *size = buffer->st_size;
@@ -53,6 +54,7 @@ namespace neweraHPC
    nhpc_status_t nhpc_fileordirectory(const char *file_path)
    {
       struct stat *buffer = new struct stat;
+      memset(buffer, 0, sizeof(struct stat));
       nhpc_status_t nrv = stat(file_path, buffer);
       
       if(nrv != 0)
@@ -235,6 +237,7 @@ namespace neweraHPC
       if(_dir != NULL)
       {
          string = new string_t;
+	 memset(string, 0, sizeof(string_t));
 	 
          while((ent = readdir(_dir)) != NULL)
          {

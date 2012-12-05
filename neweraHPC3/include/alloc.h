@@ -31,19 +31,6 @@
 
 using namespace neweraHPC;
 
-template <class T>
-T *alloc(size_t _size)
-{
-   _size = sizeof(T) * _size;
-   T *ptr;
-   
-   do{
-      ptr = (T *)malloc(_size);
-   }while(ptr == NULL);
-   
-   return ptr;
-}
-
 #ifdef ENABLE_GARBAGE_COLLECTOR
 void *operator new(std::size_t size) throw (std::bad_alloc);
 void *operator new[](std::size_t size) throw (std::bad_alloc);
@@ -51,17 +38,5 @@ void *operator new[](std::size_t size) throw (std::bad_alloc);
 void operator delete(void *ptr) throw ();
 void operator delete[](void *ptr) throw ();
 #endif
-
-template <class T>
-void initialize_mem(T *ptr)
-{
-   memset(ptr, 0, sizeof(T));
-}
-
-template <class T>
-void initialize_mem(T *ptr, int count)
-{
-   memset(ptr, 0, sizeof(T) * count);
-}
 
 #endif

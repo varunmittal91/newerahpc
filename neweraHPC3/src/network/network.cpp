@@ -55,6 +55,9 @@ namespace neweraHPC
       client_connections = new rbtree_t;
       mutex = new pthread_mutex_t;   
       mutex_addons = new pthread_mutex_t;
+      pthread_mutex_init(mutex, NULL);
+      pthread_mutex_init(mutex_addons, NULL);
+      
       network_addons = new rbtree_t(NHPC_RBTREE_STR);
       server_sock = NULL;    
       network = this;
@@ -214,6 +217,8 @@ namespace neweraHPC
       }
       
       nhpc_thread_details_t *accept_thread = new nhpc_thread_details_t;
+      memset(accept_thread, 0, sizeof(nhpc_thread_details_t));
+      
       accept_thread->sock           = server_sock;
       accept_thread->thread_manager = *thread_manager;
       accept_thread->client_socks   = client_connections;
@@ -281,6 +286,7 @@ namespace neweraHPC
 	 {
 	    nhpc_size_t size = sizeof(sockaddr_in);
 	    struct sockaddr_in *client_sockaddr = new sockaddr_in;
+	    memset(client_sockaddr, 0, sizeof(struct sockaddr_in));
 	    
 	    new_sd = accept(*server_sockfd, (sockaddr *)client_sockaddr, (socklen_t *)&size);
 	    

@@ -70,7 +70,7 @@ namespace neweraHPC
 	 LOG_INFO("HTTP Request type: "<<request_type_strings[http_data->request_type]);
 	 http_request(http_data);
 	 
-	 delete_http_header(http_data);
+	 delete_http_headers(http_data);
 	 delete http_data;
       }
    }
@@ -132,8 +132,6 @@ namespace neweraHPC
 	    
 	    if(!(http_data->custom_response_data))
 	    {
-	       cout << "Reading from a file" << endl;
-	       
 	       FILE *fp = fopen(file_path, "r");
 	       file_size_str = nhpc_itostr(file_size);
 	    
@@ -174,6 +172,9 @@ namespace neweraHPC
 	       file_size_str = nhpc_itostr(file_size);
 
 	       headers->insert("Content-Length", file_size_str);
+	       if(http_data->custom_response_mime)
+		  headers->insert(http_data->custom_response_mime);
+               headers->insert("Access-Control-Allow-Origin: *");
 	       headers->write(sock);
 	       delete headers;
 	       
@@ -182,6 +183,9 @@ namespace neweraHPC
 	    
 	    nhpc_string_delete(file_size_str);
 	 }
+	 
+	 if(file_path)
+	    delete file_path;
       }
       else if((http_data->request_type) == HTTP_INVALID)
       {

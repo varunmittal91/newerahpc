@@ -40,7 +40,7 @@ void *operator new(std::size_t size) throw (std::bad_alloc)
    {
       size_t _size = size + sizeof(size_t);
       
-      new_p = alloc<char>(_size);
+      new_p = malloc(_size);
       memset(new_p, 0, _size);
       
       size_t *str_len = (size_t *)new_p;

@@ -52,6 +52,7 @@ namespace neweraHPC
       char	  *http_version;
       char        *custom_response_data;
       short int    custom_response_type;
+      char        *custom_response_mime;
       char	  *host;
       rbtree_t    *headers;
       nhpc_socket_t *sock;
@@ -65,7 +66,7 @@ namespace neweraHPC
    void http_init(nhpc_socket_t *sock);
    
    nhpc_status_t read_headers(rbtree_t *headers, http_data_t **http_data);
-   void delete_http_header(http_data_t *http_data);
+   nhpc_status_t delete_http_headers(http_data_t *http_data);
    
    void http_request(http_data_t *sock);
    void http_response(nhpc_socket_t *sock);

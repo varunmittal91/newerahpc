@@ -32,6 +32,36 @@ using namespace std;
 
 namespace neweraHPC
 {
+   nhpc_status_t delete_http_headers(http_data_t *http_data)
+   {
+      if(http_data->user_agent)
+	 delete (http_data->user_agent);
+      if(http_data->request_page)
+	 delete (http_data->request_page);
+      if(http_data->request_get)
+	 delete (http_data->request_get);
+      if(http_data->status_str)
+	 delete (http_data->status_str);
+      if(http_data->content_type)
+	 delete (http_data->content_type);
+      if(http_data->referer)
+	 delete (http_data->referer);
+      if(http_data->origin)
+	 delete (http_data->origin);
+      if(http_data->http_version)
+	 delete (http_data->http_version);
+      if(http_data->custom_response_data)
+	 delete (http_data->custom_response_data);
+      if(http_data->custom_response_mime)
+	 delete (http_data->custom_response_mime);
+      if(http_data->host)
+	 delete (http_data->host);
+	 
+      delete http_data;
+      
+      return NHPC_SUCCESS;
+   }
+   
    nhpc_status_t read_headers(rbtree_t *headers, http_data_t **http_data)
    {
       char *command = (char *)headers->search("command");
@@ -88,8 +118,7 @@ namespace neweraHPC
       
       (*http_data) = new http_data_t;
       http_data_t *local_data = (*http_data);
-      //memset(local_data, 0, sizeof(http_data_t));
-      initialize_mem(local_data);
+      memset(local_data, 0, sizeof(http_data_t));
       
       if(content_length)
       {
@@ -107,20 +136,8 @@ namespace neweraHPC
       local_data->referer = referer;
       local_data->content_type = content_type;
       local_data->headers = headers;
-      
+            
       return NHPC_SUCCESS;
-   }
-   
-   void delete_http_header(http_data_t *http_data)
-   {
-      if(http_data->request_page)
-	 delete[] (http_data->request_page);
-      if(http_data->request_get)
-	 delete[] (http_data->request_get);
-      if(http_data->status_str)
-	 delete[] (http_data->status_str);
-      if(http_data->http_version)
-	 delete[] (http_data->http_version);    
    }
    
    nhpc_status_t http_content_length(rbtree_t *headers, nhpc_size_t *size)

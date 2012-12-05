@@ -29,13 +29,6 @@ namespace neweraHPC
    extern rbtree_t *app_handlers;
    extern const char *ui_temp_dir;
    
-   struct app_details_t
-   {
-      fnc_ptr_nhpc_two_t func_trigger_local;
-      rbtree_t *instances;
-      char *app_name;
-   };
-   
    struct app_instance_t
    {
       int instance_id;
@@ -51,7 +44,8 @@ namespace neweraHPC
    public:
       nhpc_json_t *elements;
       rbtree_t *elements_tree;
-      web_ui_elements_t(const char *_working_dir, const char *_app_xml);
+      //web_ui_elements_t(const char *_working_dir, const char *_app_xml);
+      web_ui_elements_t();
       ~web_ui_elements_t();
       
       char *app_name;
@@ -63,6 +57,14 @@ namespace neweraHPC
       
       nhpc_status_t add_element(const char *element, const char *property);
       nhpc_status_t add_public_data();
+   };
+   
+   struct app_details_t
+   {
+      fnc_ptr_nhpc_two_t func_trigger_local;
+      rbtree_t *instances;
+      char *app_name;
+      web_ui_elements_t *web_ui_elements;
    };
    
    nhpc_status_t web_ui_init();

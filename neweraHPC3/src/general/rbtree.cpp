@@ -271,8 +271,7 @@ namespace neweraHPC
 	    return false;
       }      
 
-      //(*data) = (rbtree_t::node *)malloc(sizeof(rbtree_t::node));
-      (*data) = (rbtree_t::node *)alloc<rbtree_t::node>(1);
+      (*data) = (rbtree_t::node *)malloc(sizeof(rbtree_t::node));
       memset((*data), 0, sizeof(rbtree_t::node));
       
       rb_link_node(&((*data)->node_next), parent, new_node);
@@ -310,8 +309,7 @@ namespace neweraHPC
 	 return false;
       
       /* Create a new rbtree_t::node type and initialize values */
-      //rbtree_t::node *data = (rbtree_t::node *)malloc(sizeof(rbtree_t::node));
-      rbtree_t::node *data = alloc<rbtree_t::node>(1);
+      rbtree_t::node *data = (rbtree_t::node *)malloc(sizeof(rbtree_t::node));
       memset(data, 0, sizeof(rbtree_t::node));
       
       last_assigned_key++;
@@ -364,8 +362,7 @@ namespace neweraHPC
       /* Create a hash content structure for NUM_HASH mode */
       if(operation_mode == NHPC_RBTREE_NUM_HASH)
       {
-	 hash_elem_t *hash_elem = alloc<hash_elem_t>(1);
-	 //hash_elem_t *hash_elem = (hash_elem_t *)malloc(sizeof(hash_elem_t));
+	 hash_elem_t *hash_elem = (hash_elem_t *)malloc(sizeof(hash_elem_t));
 	 memset(hash_elem, 0, sizeof(hash_elem_t));
 	 
 	 hash_elem->data = in_data;
@@ -468,23 +465,6 @@ namespace neweraHPC
 	 
 	 i++;
       }
-      
-      /*
-      cout<<(*elem)<<endl;
-      cout<<(*elem)->next<<endl;
-      
-      if(subkey == 1 && !((*elem)->next))
-      {
-	 erase(key);
-	 return true;
-      }
-	 
-      cout<<i<<" "<<subkey<<endl;
-
-      parent->next = (*elem)->next;
-      
-      return true;
-       */
       
       if(subkey == 1)
       {
@@ -590,7 +570,10 @@ namespace neweraHPC
 	 if(pos_count == key)
 	 {
 	    if(!(data->key_pair))
+	    {
 	       data->key_pair = new key_pair_t;
+	       memset((data->key_pair), 0, sizeof(key_pair_t));
+	    }
 	    key_pair = data->key_pair;
 	    key_pair->key = data->node_key_str;
 	    key_pair->data = data->node_data;
@@ -694,7 +677,6 @@ namespace neweraHPC
       rbtree_t::node *data = rbtree_t::search_node(key_str);
       if(data){
 	 rb_erase(&(data->node_next), &root);
-	 //nhpc_deallocate_str(data->node_key_str);
 	 delete[] (data->node_key_str);
 	 if(data->key_pair)
 	    delete (data->key_pair);

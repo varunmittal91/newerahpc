@@ -106,8 +106,13 @@ namespace neweraHPC
    {
       thread_mutex_lock(&mutex, 1);
       
-      *_cpuinfo = new nhpc_cpuinfo_t;
+      nhpc_cpuinfo_t *temp_cpuinfo = new nhpc_cpuinfo_t;
+      cout << temp_cpuinfo << endl;
+      
+      (*_cpuinfo) = temp_cpuinfo;
       memcpy(_cpuinfo, &(systeminfo->cpuinfo), sizeof(nhpc_cpuinfo_t));
+      cout << "test" << endl;
+      cout << (*_cpuinfo) << endl;
       
       thread_mutex_unlock(&mutex, 1);
    }

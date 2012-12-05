@@ -98,6 +98,8 @@ namespace neweraHPC{
 	    if(ret == 0)
 	       return NULL;
 	    
+	    char *string_zero = string + sizeof(nhpc_size_t);
+	    
 	    free_count--;
 	    free_bytes -= try_len;
 	    
@@ -112,8 +114,7 @@ namespace neweraHPC{
       {
 	 LOG_DEBUG("ALLOCATING NEW STRING");
 	 
-	 string = alloc<char>(sizeof(nhpc_size_t) + sizeof(char) * str_len);
-	 memset(string, 0, (sizeof(nhpc_size_t) + sizeof(char) * str_len));
+	 string = (char *)malloc((sizeof(nhpc_size_t) + sizeof(char) * str_len));
 	 
 	 nhpc_size_t *str_len_string = (nhpc_size_t *)string;
 	 *str_len_string = str_len;
@@ -185,10 +186,12 @@ namespace neweraHPC{
    
    void strings_pool_t::clean_strings()
    {
+      thread_mutex_lock(mutex_free, NHPC_THREAD_LOCK_WRITE);
+      
+      //LOG_ERROR("Free count: " << free_count << " allocated count: " << allocated_count);
+
       if(free_count > MAX_STRING_COUNT)
       {	 
-	 thread_mutex_lock(mutex_free, NHPC_THREAD_LOCK_WRITE);
-	 
 	 free_count = 0;
 	 
 	 int key;
@@ -198,6 +201,7 @@ namespace neweraHPC{
 	 while(1)
 	 {
 	    node_data = strings_free->search_first(&key);
+	    cout << key << endl;
 	    
 	    if(!node_data)
 	       break;
@@ -222,9 +226,9 @@ namespace neweraHPC{
 	    
 	    strings_free->erase(key);
 	 }
-	 
-	 thread_mutex_unlock(mutex_free, NHPC_THREAD_LOCK_WRITE);
       }
+      
+      thread_mutex_unlock(mutex_free, NHPC_THREAD_LOCK_WRITE);
    }
    
    char *nhpc_allocate_str(nhpc_size_t str_len)
@@ -234,7 +238,10 @@ namespace neweraHPC{
       if(garbage_collector_ready)
 	 str = strings_pool.search_string(str_len);
       else 
+      {
 	 str = new char [str_len];
+	 memset(str, 0, sizeof(char) * str_len);
+      }
       
       return str;
    }

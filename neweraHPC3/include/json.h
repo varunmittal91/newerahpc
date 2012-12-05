@@ -38,6 +38,12 @@ namespace neweraHPC
       JSON_ARRAY
    };
    
+   enum json_mide
+   {
+      JSON_INSERT,
+      JSON_UPDATE
+   };
+   
    class nhpc_json_t
    {
    private:
@@ -70,6 +76,9 @@ namespace neweraHPC
       nhpc_status_t add_element(int json_object, const char *key = NULL, const void *value = NULL);
       nhpc_status_t close_element();
       int search(key_pair_t **key_pair, int *child_count = NULL);
+
+      nhpc_status_t search(const char *key);
+      
       const char *get_stream();
       nhpc_status_t build_structure(const char *json_string);
       bool is_delimiter(char in_char);

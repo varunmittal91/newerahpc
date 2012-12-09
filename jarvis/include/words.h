@@ -110,6 +110,8 @@ namespace jarvis
       
       list_t *synset_offsets;
       
+      rbtree_t *word_senses;
+      
       bool is_done;
    };
    
@@ -143,7 +145,7 @@ namespace jarvis
    nhpc_status_t init_word_net_database();
    nhpc_status_t word_lookup(const char *_word, word_record_t **word_record_ptr);
    void *read_index_file(search_param_t *search_param);
-   void *read_data_file(const char *data_file_name, list_t *synset_offsets, const char *word, int ptr_symbol);
+   rbtree_t *read_data_file(const char *data_file_name, list_t *synset_offsets, const char *word, int ptr_symbol);
 };
 
 #endif

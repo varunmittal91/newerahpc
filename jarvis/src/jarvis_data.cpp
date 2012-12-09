@@ -337,7 +337,7 @@ namespace jarvis
       }
       data_file = word_net_data_files[data_file_id];
       
-      read_data_file(data_file, index_record->synset_offsets, index_record->lemma, HYPERNYM);
+      index_record->word_senses = read_data_file(data_file, index_record->synset_offsets, index_record->lemma, HYPERNYM);
       //exit(0);
       
       return NHPC_SUCCESS;

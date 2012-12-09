@@ -27,6 +27,18 @@
 using namespace std;
 using namespace neweraHPC;
 
+void jarvis_web_handler(http_data_t *http_data)
+{
+   cout << "web request encountered" << endl;
+   
+   if(http_data->request_get)
+   {
+      nhpc_strcpy(&(http_data->custom_response_data), "jarvis input accepted");
+      http_data->custom_response_type = NHPC_FILE;
+      cout << http_data->request_get << endl;
+   }
+}
+
 namespace jarvis
 {
    thread_manager_t *thread_manager;
@@ -44,5 +56,13 @@ namespace jarvis
       thread_manager = new thread_manager_t;
       jarvis_data.init();
       jarvis_data.init_morphological_database();
+      
+      cout << "JARVIS loaded all the data" << endl;
+      
+      http_init();
+      http_handler_register("jarvis", (fnc_ptr_nhpc_t)jarvis_web_handler);
+      
+      nhpc_grid_server_t grid_server;
+      nrv = grid_server.grid_server_init();
    }
 };

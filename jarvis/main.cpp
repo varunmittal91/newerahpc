@@ -27,13 +27,23 @@
 using namespace std;
 using namespace jarvis;
 
+nhpc_status_t func_trigger_jarvis(nhpc_socket_t *sock, web_ui_elements_t *web_ui_elements)
+{
+   cout << "Dock application trigger initiated" << endl;
+   
+   web_ui_elements->elements->add_element(JSON_STRING, "appname", "Dock");
+   web_ui_elements->elements->close_element();
+}
+
 int main(int argc, char **argv)
 {
    jarvis_init(argc, argv); 
-
-   cout << "JARVIS loaded all the data" << endl;
+      
+   //neweraHPC_init(argc, argv);
    
-   word_record_t *word_record;
+   nhpc_status_t nrv;
+   
+   word_record_t *word_record;   
    
    char *word = (char *)cmdline_arguments.search("w");
    if(word != NULL)

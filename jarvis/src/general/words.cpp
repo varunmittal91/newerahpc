@@ -91,7 +91,7 @@ namespace jarvis
       rbtree_t *word_tree = jarvis_data.lookup_word(_word);      
    }
    
-   void *read_data_file(const char *data_file_name, list_t *synset_offsets, const char *word, int ptr_symbol = NULL)
+   rbtree_t *read_data_file(const char *data_file_name, list_t *synset_offsets, const char *word, int ptr_symbol = NULL)
    {
       LOG_INFO("Reading data file for word: " << word << " in: " << data_file_name);
       
@@ -108,8 +108,33 @@ namespace jarvis
       int offset;
       string line;
       
-      while((offset = (synset_offsets->pop_elem())) != -1)
+      rbtree_t *word_senses = new rbtree_t;
+      rbtree_t *word_tree;      
+      list_t *synset_offsets_tmp = new list_t(LIST_MIN_FIRST);
+      
+      //while((offset = (synset_offsets->pop_elem())) != -1)
+      while(1)
       {
+	 offset = synset_offsets_tmp->pop_elem();	 
+	 if(offset == -1)
+	 {
+	    offset = synset_offsets->pop_elem();
+	    if(offset == -1)
+	    {
+	       break;
+	    }
+	    else 
+	    {
+	       cout << "extracting new sense" << endl;
+	       
+	       word_tree = new rbtree_t;
+	       word_senses->insert(word_tree);
+	    }
+	 }
+	 
+	 rbtree_t *word_set = new rbtree_t();
+	 word_tree->insert(word_set);
+	 
 	 data_file.seekg(offset);
 	 getline(data_file, line);
 	 
@@ -130,6 +155,7 @@ namespace jarvis
 	 
 	 int parts_position = 4;
 	 
+	 LOG_INFO("Reading new sense");
 	 LOG_INFO("Synset word count: " << word_count);
 	 
 	 for(int i = 0; i < word_count; i++)
@@ -139,6 +165,9 @@ namespace jarvis
 	    parts_position += 2;
 	    
 	    LOG_INFO("Word in synset: " << synset_word);
+
+	    word_set->insert(synset_word);
+	    
 	    //cout << "looking word: " << synset_word << endl;
 	    //jarvis_data.lookup_word(synset_word);
 	    //cout << "done" << endl;
@@ -161,7 +190,7 @@ namespace jarvis
 	    ptr_symbol_set_t *ptr_symbol_set = jarvis_data.search_ptr_symbol(ptr_symbol_str);
 	    if(!ptr_symbol_set)
 	    {
-	       LOG_ERROR("Pointer symbol: " << ptr_symbol_str << " does not exist");
+	       //LOG_ERROR("Pointer symbol: " << ptr_symbol_str << " does not exist");
 	       
 	       continue;
 	    }
@@ -170,7 +199,7 @@ namespace jarvis
 	    {
 	       if(ptr_symbol == ptr_symbol_set->ptr_symbol_num)
 	       {
-		  (*synset_offsets).add_elem(nhpc_strtoi(synset_parts->strings[parts_position + 1]));
+		  (*synset_offsets_tmp).add_elem(nhpc_strtoi(synset_parts->strings[parts_position + 1]));
 		  
 		  break;
 	       }
@@ -188,7 +217,39 @@ namespace jarvis
       
       data_file.close();
       
+      int word_sense_count = word_senses->ret_count();
+      for(int i = 1; i <= word_sense_count; i++)
+      {
+	 cout << "sense:" << word_sense_count << endl;
+	 
+	 rbtree_t *word_tree = (rbtree_t *)(*word_senses)[i];
+	 
+	 int synset_level_count = word_tree->ret_count();
+	 
+	 for(int j = 1; j <= synset_level_count; j++)
+	 {
+	    for(int x = 1; x < j; x++)
+	       cout << "\t";
+	    
+	    rbtree_t *words = (rbtree_t *)(*word_tree)[j];
+	    
+	    int word_count = words->ret_count();
+	    
+	    for(int k = 1; k <= word_count; k++)
+	    {
+	       char *word = (char *)(*words)[k];
+	       
+	       cout << word << ",";
+	    }
+	    
+	    cout << endl;
+	 }
+      }
+      
+      
       LOG_INFO("Data read cycle complete");
+      
+      return word_senses;
    }
    
    void *read_index_file(search_param_t *search_param)

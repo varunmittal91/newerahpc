@@ -21,6 +21,7 @@
 
 #include <include/general.h>
 #include <include/words.h>
+#include <include/jarvis_data.h>
 
 using namespace std;
 using namespace neweraHPC;
@@ -68,9 +69,48 @@ namespace jarvis
       return sentences;
    }
    
+   void establish_sense(rbtree_t *senses_available)
+   {
+      int senses_count = senses_available->ret_count();
+      
+      for(int i = 1; i <= senses_count; i++)
+      {
+	 rbtree_t *word_senses = (rbtree_t *)(*senses_available)[i];
+	 int word_sense_count = (*word_senses).ret_count();
+	 
+	 for(int j = 1; j <= word_sense_count; j++)
+	 {
+	    rbtree_t *word_tree = (rbtree_t *)(*word_senses)[j];
+	    
+	    int synset_level_count = word_tree->ret_count();
+	    
+	    for(int k = 1; k <= synset_level_count; k++)
+	    {
+	       for(int x = 1; x < k; x++)
+		  cout << "\t";
+	       
+	       rbtree_t *words = (rbtree_t *)(*word_tree)[k];
+	       
+	       int word_count = words->ret_count();
+	       
+	       for(int l = 1; l <= word_count; l++)
+	       {
+		  char *word = (char *)(*words)[l];
+		  
+		  cout << word << ",";
+	       }
+	       
+	       cout << endl;
+	    }
+	 }	 
+      }
+   }
+   
    rbtree_t *break_entities(sentence_type_t *sentence)
    {
       cout << sentence->sentence << endl;
+      
+      rbtree_t *senses_available = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
       
       string_t *string = nhpc_substr(sentence->sentence, ' ');
       cout << "Sentence parts: "<<endl;
@@ -78,8 +118,16 @@ namespace jarvis
       {
 	 cout << "\t" << string->strings[i] << endl;
 	 
-	 word_lookup(nhpc_strtolower(string->strings[i]), NULL);
+	 rbtree_t *word_tree = jarvis_data.lookup_word(nhpc_strtolower(string->strings[i]));
+	 index_record_t *index_record = (index_record_t *)word_tree->search(NOUN);
+	 
+	 if(index_record)
+	 {
+	    senses_available->insert(index_record->word_senses);
+	 }
       }
+      
+      establish_sense(senses_available);
    }
    
    void determine_relation_sentence(rbtree_t *sentences)

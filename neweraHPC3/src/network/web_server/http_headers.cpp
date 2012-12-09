@@ -34,28 +34,18 @@ namespace neweraHPC
 {
    nhpc_status_t delete_http_headers(http_data_t *http_data)
    {
-      if(http_data->user_agent)
-	 delete (http_data->user_agent);
       if(http_data->request_page)
 	 delete (http_data->request_page);
       if(http_data->request_get)
 	 delete (http_data->request_get);
       if(http_data->status_str)
 	 delete (http_data->status_str);
-      if(http_data->content_type)
-	 delete (http_data->content_type);
-      if(http_data->referer)
-	 delete (http_data->referer);
-      if(http_data->origin)
-	 delete (http_data->origin);
       if(http_data->http_version)
 	 delete (http_data->http_version);
       if(http_data->custom_response_data)
 	 delete (http_data->custom_response_data);
       if(http_data->custom_response_mime)
 	 delete (http_data->custom_response_mime);
-      if(http_data->host)
-	 delete (http_data->host);
 	 
       delete http_data;
       
@@ -92,6 +82,7 @@ namespace neweraHPC
       else if(command_str->count == 3)
       {
 	 char *request_type_str = command_str->strings[0];
+	 
 	 if(nhpc_strcmp(request_type_str, "GET") == NHPC_SUCCESS)
 	    request_type = HTTP_REQUEST_GET;
 	 else if(nhpc_strcmp(request_type_str, "POST") == NHPC_SUCCESS)
@@ -116,9 +107,9 @@ namespace neweraHPC
       }
       nhpc_string_delete(command_str);
       
-      (*http_data) = new http_data_t;
+      //(*http_data) = new http_data_t;
       http_data_t *local_data = (*http_data);
-      memset(local_data, 0, sizeof(http_data_t));
+      //memset(local_data, 0, sizeof(http_data_t));
       
       if(content_length)
       {

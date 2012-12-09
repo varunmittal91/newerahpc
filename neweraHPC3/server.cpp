@@ -129,7 +129,7 @@ int main(int argc, char **argv)
 {
    neweraHPC_init(argc, argv);
 
-   nhpc_status_t nrv;
+   nhpc_status_t nrv;   
    
    http_init();
    web_ui_init();

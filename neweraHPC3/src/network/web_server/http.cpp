@@ -62,17 +62,24 @@ namespace neweraHPC
    
    void http_init(nhpc_socket_t *sock)
    {
-      http_data_t *http_data;
+      http_data_t *http_data = new http_data_t;
+      memset(http_data, 0, sizeof(http_data_t));
       nhpc_status_t nrv = read_headers(sock->headers, &http_data);
+
+      if(!http_data)
+      {
+	 cout << "server crashing" << endl;
+	 exit(0);
+      }
+      
       http_data->sock = sock;
       if(nrv == NHPC_SUCCESS)
       {
 	 LOG_INFO("HTTP Request type: "<<request_type_strings[http_data->request_type]);
-	 http_request(http_data);
-	 
-	 delete_http_headers(http_data);
-	 delete http_data;
+	 http_request(http_data);	 
       }
+      
+      delete_http_headers(http_data);
    }
    
    void http_request(http_data_t *http_data)
@@ -132,7 +139,6 @@ namespace neweraHPC
 	    
 	    if(!(http_data->custom_response_data))
 	    {
-	       FILE *fp = fopen(file_path, "r");
 	       file_size_str = nhpc_itostr(file_size);
 	    
 	       headers->insert("Content-Length", file_size_str);
@@ -150,6 +156,13 @@ namespace neweraHPC
 	       delete headers;
 	       nhpc_string_delete(file_size_str);
 	    
+	       FILE *fp = fopen(file_path, "r");
+	       if(!fp)
+	       {
+		  cout << "Error opening file" << endl;
+		  exit(0);
+	       }
+
 	       nhpc_status_t nrv;
 	    
 	       char buffer[10000];	    

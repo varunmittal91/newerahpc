@@ -71,7 +71,9 @@ namespace neweraHPC
       for(node = rb_first(&root); ;node = rb_next(node))
       {
 	 if(data_prev)
+	 {
             free(data_prev);
+	 }
 
          if(!node)
             break;
@@ -272,6 +274,8 @@ namespace neweraHPC
       }      
 
       (*data) = (rbtree_t::node *)malloc(sizeof(rbtree_t::node));
+      if(!(*data))
+	 LOG_ERROR("Allocation failed");
       memset((*data), 0, sizeof(rbtree_t::node));
       
       rb_link_node(&((*data)->node_next), parent, new_node);
@@ -310,6 +314,8 @@ namespace neweraHPC
       
       /* Create a new rbtree_t::node type and initialize values */
       rbtree_t::node *data = (rbtree_t::node *)malloc(sizeof(rbtree_t::node));
+      if(!data)
+	 LOG_ERROR("Allocation failed");
       memset(data, 0, sizeof(rbtree_t::node));
       
       last_assigned_key++;
@@ -363,6 +369,8 @@ namespace neweraHPC
       if(operation_mode == NHPC_RBTREE_NUM_HASH)
       {
 	 hash_elem_t *hash_elem = (hash_elem_t *)malloc(sizeof(hash_elem_t));
+	 if(!hash_elem)
+	    LOG_ERROR("Allocation failed");
 	 memset(hash_elem, 0, sizeof(hash_elem_t));
 	 
 	 hash_elem->data = in_data;

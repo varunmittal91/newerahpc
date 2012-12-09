@@ -33,9 +33,9 @@ neweraHPC::rbtree_t cmdline_arguments(NHPC_RBTREE_STR);
 namespace neweraHPC
 {
    void neweraHPC_init(int argc, char **argv)
-   {
+   {      
       init_garbage_collector();
-      
+
       char **tmp_argv = argv + 1;
       
       while(*tmp_argv != NULL)

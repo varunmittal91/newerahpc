@@ -329,7 +329,7 @@ namespace neweraHPC
    }
    
    void nhpc_socket_cleanup(nhpc_socket_t *client_sock)
-   {      
+   {    
       if(client_sock != NULL)
       {
 	 rbtree_t *client_socks = client_sock->server_details->client_socks;

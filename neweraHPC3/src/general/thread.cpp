@@ -102,7 +102,9 @@ namespace neweraHPC
 	 thread_mutex_unlock(&mutex_count, NHPC_THREAD_LOCK_READ);      
 	 
 	 if(tmp_thread_count > MAX_THREADS)
+	 {
 	    sleep(1);
+	 }
 	 else 
 	    break;
       };

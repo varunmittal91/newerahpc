@@ -246,7 +246,6 @@ namespace neweraHPC
 	    
 	    search_elem->branch = (rbtree_t *)key_pair->value;
 	    search_elem->position = 1;
-	    cout << search_queue << endl;
 	    search_queue->insert(search_elem);
 
 	    if(child_count)

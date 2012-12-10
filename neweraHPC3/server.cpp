@@ -129,6 +129,16 @@ int main(int argc, char **argv)
 {
    neweraHPC_init(argc, argv);
 
+   nhpc_json_t *json = new nhpc_json_t;
+   json->add_element(JSON_ARRAY, "key");
+   json->add_element(JSON_STRING, "test", "string");
+   json->add_element(JSON_STRING, "test", "string2");
+   json->close_element();
+   json->close_element();
+   
+   cout << json->get_stream() << endl;
+   
+   
    nhpc_status_t nrv;   
    
    http_init();

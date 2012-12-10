@@ -113,7 +113,8 @@ namespace neweraHPC
       {
 	 nhpc_strcpy(&(key_pair->key), key);
 	 
-	 stream_length_new += strlen(key_pair->key) + 4;
+	 if(key_pair_last && key_pair_last->json_object != JSON_ARRAY)
+	    stream_length_new += strlen(key_pair->key) + 4;
       }
       key_pair->json_object = json_object;
       key_pair->level = current_level;
@@ -291,6 +292,7 @@ namespace neweraHPC
       stack->insert(object_status);
       
       char *json_out_str = new char [stream_length + 1];
+      memset(json_out_str, 0, stream_length + 1);
       json_out_str[stream_length] = '\0';
       char *json_out_str_tmp = json_out_str;
       
@@ -358,12 +360,31 @@ namespace neweraHPC
 	    {
 	       //json_out = json_out + "\"" + key_pair->key + "\"";
 	       
+	       if(object_status_current && object_status_current->json_object == JSON_ARRAY)
+	       {
+		  //json_out = json_out + "{";
+	       }
+	       else 
+	       {
+		  //json_out = json_out + "\"" + key_pair->key + "\"" + ": {";
+		  
+		  *json_out_str_tmp = '"'; 
+		  json_out_str_tmp++;
+		  memcpy((json_out_str_tmp), key_pair->key, strlen(key_pair->key));
+		  json_out_str_tmp = json_out_str_tmp + strlen(key_pair->key);
+		  memcpy((json_out_str_tmp), "\"", 1);
+		  json_out_str_tmp++;
+	       }
+	       
+	       
+	       /*
 	       *json_out_str_tmp = '"'; 
 	       json_out_str_tmp++;
 	       memcpy((json_out_str_tmp), key_pair->key, strlen(key_pair->key));
 	       json_out_str_tmp = json_out_str_tmp + strlen(key_pair->key);
 	       memcpy((json_out_str_tmp), "\"", 1);
 	       json_out_str_tmp++;
+		*/
 	       
 	       if(key_pair->json_object == JSON_NULL)
 	       {
@@ -398,9 +419,14 @@ namespace neweraHPC
 	       else
 	       {
 		  //json_out = json_out + + ": \"" + (char *)key_pair->value + "\"";
-		  
-		  memcpy((json_out_str_tmp), ": ", 2);
-		  json_out_str_tmp += 2;
+		  if(object_status_current && object_status_current->json_object == JSON_ARRAY)
+		  {
+		  }
+		  else 
+		  {
+		     memcpy((json_out_str_tmp), ": ", 2);
+		     json_out_str_tmp += 2;
+		  }
 		  
 		  *json_out_str_tmp = '"';
 		  json_out_str_tmp++;

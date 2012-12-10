@@ -34,6 +34,7 @@ namespace neweraHPC
 	 elem_t *next;
       };
             
+      int count;
       short int mode;
       elem_t *head;
       pthread_mutex_t *mutex;
@@ -44,6 +45,7 @@ namespace neweraHPC
       void display();
       void add_elem(int number);
       int pop_elem();
+      int ret_count();
    };
 };
 

@@ -626,6 +626,30 @@ namespace neweraHPC{
       return string;
    }
    
+   int nhpc_hexstrtoi(const char *str)
+   {
+      const char *tmp_str = str;
+      int size = strlen(str);
+      int num = 0;
+      
+      int tmp_num = 0;
+      int ascii_value;
+      while(*tmp_str != '\0')
+      {
+	 ascii_value = (int)(*tmp_str);
+	 if(ascii_value >=97 && ascii_value <= 102)
+	    tmp_num = ascii_value - 87;
+	 else 
+	    tmp_num = ascii_value - 48;
+	 
+	 num += tmp_num * pow(16, (size - 1));
+	 size--;
+	 tmp_str++;
+      }
+      
+      return num;
+   }
+   
    int nhpc_strtoi(const char *str)
    {
       const char *tmp_str = str;

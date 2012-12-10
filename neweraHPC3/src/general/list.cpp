@@ -39,6 +39,8 @@ namespace neweraHPC
 	 mode = LIST_MAX_FIRST;
       else 
 	 mode = LIST_MIN_FIRST;
+      
+      count = 0;
    }
    
    list_t::~list_t()
@@ -67,6 +69,8 @@ namespace neweraHPC
       new_elem->data = number;
       
       pthread_mutex_lock(mutex);
+      
+      count++;
       
       if(head == NULL)
       {
@@ -122,6 +126,7 @@ namespace neweraHPC
 	 int number = tmp_elem->data;
 	 	 
 	 delete tmp_elem;
+	 count--;
 	 
 	 return number;
       }
@@ -144,5 +149,16 @@ namespace neweraHPC
       
       pthread_mutex_unlock(mutex);
    }   
+   
+   int list_t::ret_count()
+   {
+      int _count;
+      
+      pthread_mutex_lock(mutex);
+      _count = count;
+      pthread_mutex_unlock(mutex);
+
+      return _count;
+   }
 };
 

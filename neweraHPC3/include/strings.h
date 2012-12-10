@@ -59,6 +59,7 @@ namespace neweraHPC{
    char *nhpc_itostr(int num);
    
    int nhpc_strtoi(const char *str);
+   int nhpc_hexstrtoi(const char *str);
    
    char *nhpc_random_string(nhpc_size_t len);
    

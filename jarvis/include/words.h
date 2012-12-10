@@ -139,6 +139,12 @@ namespace jarvis
       index_record_t *index_record;
    };
    
+   struct word_sense_t
+   {
+      rbtree_t *word_sense;
+      int matched_level;
+   };
+   
    extern const char *word_dir;
    extern const char *word_net_dir;
    

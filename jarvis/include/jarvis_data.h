@@ -65,7 +65,7 @@ namespace jarvis
       
       char *morphological_analyses(char *word, int pos);
       
-      nhpc_status_t load_word(const char *word, int pos = NULL);
+      nhpc_status_t load_word(const char *word, char **morphic_word, int pos = NULL);
       //nhpc_status_t load_word(const char *word);
       
       nhpc_status_t read_index_record(index_record_t *index_record);

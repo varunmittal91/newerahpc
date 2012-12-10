@@ -353,13 +353,22 @@ namespace jarvis
       
       if(!word_tree)
       {
-	 nrv = jarvis_data_t::load_word(word);
+	 char *morphic_word;
+	 nrv = jarvis_data_t::load_word(word, &morphic_word);
 	 
 	 if(nrv == NHPC_SUCCESS)
 	 {
 	    thread_mutex_lock(mutex, NHPC_THREAD_LOCK_READ);
 	    word_tree = (rbtree_t *)jarvis_dictionary->search(word);
+	    
+	    if(!word_tree && morphic_word)
+	       word_tree = (rbtree_t *)jarvis_dictionary->search(morphic_word);
+	    
 	    thread_mutex_unlock(mutex, NHPC_THREAD_LOCK_READ);	 
+	 }
+	 else 
+	 {
+	    cout << "word lookup failed" << endl;
 	 }
       }
       
@@ -440,12 +449,17 @@ namespace jarvis
 	    search_param->word = new_word;
 	    read_index_file(search_param);
 	    if(search_param->index_record)
+	    {
+	       nhpc_strcpy(&morphic_word, new_word);
 	       add_word(search_param->index_record);
+	    }
 	    
 	    delete search_param;	    
 	    delete[] new_word;
 	 }
       }
+   
+      return morphic_word;
    }
    
    index_record_t *jarvis_data_t::lookup_word(const char *word, int pos)
@@ -464,8 +478,10 @@ namespace jarvis
       return index_record;
    }
    
-   nhpc_status_t jarvis_data_t::load_word(const char *_word, int _pos)
+   nhpc_status_t jarvis_data_t::load_word(const char *_word, char **morphic_word, int _pos)
    {
+      (*morphic_word) = NULL;
+      
       thread_mutex_lock(mutex, NHPC_THREAD_LOCK_READ);
       void *test_failed_word = failed_searches->search(_word);
       if(test_failed_word)
@@ -559,7 +575,10 @@ namespace jarvis
 		     
 		     char *word_morphic = morphological_analyses((char *)_word, pos);
 		     if(word_morphic)
+		     {
 			found_word = true;
+			nhpc_strcpy(morphic_word, word_morphic);
+		     }
 		  }
 		  
 		  delete (search_params[i]);

@@ -95,10 +95,6 @@ namespace jarvis
    {
       LOG_INFO("Reading data file for word: " << word << " in: " << data_file_name);
       
-      //index_record_t *index_record = search_param->index_record;
-      //index_record->synset_subsets = new rbtree_t(NHPC_RBTREE_NUM_HASH);
-      //rbtree_t *synset_subsets = index_record->synset_subsets;
-      
       ifstream data_file(data_file_name);
       if(!data_file.is_open())
       {
@@ -112,7 +108,6 @@ namespace jarvis
       rbtree_t *word_tree;      
       list_t *synset_offsets_tmp = new list_t(LIST_MIN_FIRST);
       
-      //while((offset = (synset_offsets->pop_elem())) != -1)
       while(1)
       {
 	 offset = synset_offsets_tmp->pop_elem();	 
@@ -136,6 +131,7 @@ namespace jarvis
 	 word_tree->insert(word_set);
 	 
 	 data_file.seekg(offset);
+	 
 	 getline(data_file, line);
 	 
 	 const char *line_str = line.c_str();
@@ -145,10 +141,15 @@ namespace jarvis
 	 
 	 string_t *synset_parts = nhpc_substr(synset_str, ' ');
 	 char *word_count_str = synset_parts->strings[3];
-	 int word_count = nhpc_strtoi(word_count_str);
-	 //index_record->synset_words = new index_record_t* [word_count];
+	 
+	 int word_count = nhpc_hexstrtoi(word_count_str);
 	 
 	 char *ptr_count_str = synset_parts->strings[4 + 2 * word_count];
+	 if(!ptr_count_str)
+	 {
+	    cout << "failed" << endl;
+	    continue;
+	 }
 	 int ptr_count = nhpc_strtoi(ptr_count_str);
 	 
 	 int part_of_speech = (int)*(synset_parts->strings[2]);
@@ -160,27 +161,14 @@ namespace jarvis
 	 
 	 for(int i = 0; i < word_count; i++)
 	 {
-	    char *synset_word = synset_parts->strings[parts_position];
+	    char *synset_word;
+	    nhpc_strcpy(&synset_word, synset_parts->strings[parts_position]);
 
 	    parts_position += 2;
 	    
 	    LOG_INFO("Word in synset: " << synset_word);
 
 	    word_set->insert(synset_word);
-	    
-	    //cout << "looking word: " << synset_word << endl;
-	    //jarvis_data.lookup_word(synset_word);
-	    //cout << "done" << endl;
-	    
-	    /*
-	    index_record_t *new_index_record = new index_record_t;
-	    nhpc_strcpy((char **)&(new_index_record->lemma), synset_word);
-	    new_index_record->pos = part_of_speech;
-	    
-	    jarvis_data.add_word(new_index_record);
-
-	    index_record->synset_words[i] = new_index_record;
-	     */
 	 }
 	 
 	 parts_position = 4 + 2 * word_count + 1;
@@ -212,41 +200,16 @@ namespace jarvis
 	    parts_position += 4;
 	 }
 	 
+	 nhpc_string_delete(synset_parts);
+	 
 	 //exit(0);
       }
       
+      delete synset_offsets_tmp;
+      delete synset_offsets;
+      
       data_file.close();
-      
-      int word_sense_count = word_senses->ret_count();
-      for(int i = 1; i <= word_sense_count; i++)
-      {
-	 cout << "sense:" << word_sense_count << endl;
-	 
-	 rbtree_t *word_tree = (rbtree_t *)(*word_senses)[i];
-	 
-	 int synset_level_count = word_tree->ret_count();
-	 
-	 for(int j = 1; j <= synset_level_count; j++)
-	 {
-	    for(int x = 1; x < j; x++)
-	       cout << "\t";
-	    
-	    rbtree_t *words = (rbtree_t *)(*word_tree)[j];
-	    
-	    int word_count = words->ret_count();
-	    
-	    for(int k = 1; k <= word_count; k++)
-	    {
-	       char *word = (char *)(*words)[k];
-	       
-	       cout << word << ",";
-	    }
-	    
-	    cout << endl;
-	 }
-      }
-      
-      
+            
       LOG_INFO("Data read cycle complete");
       
       return word_senses;
@@ -280,10 +243,14 @@ namespace jarvis
 	    delete[] src_word;
 	    
 	    if(cmpr_status < 0)
+	    {
 	       break;
+	    }
 	    else if(cmpr_status == 0)
 	    {
 	       index_record_t *index_record = new index_record_t;
+	       memset(index_record, 0, sizeof(index_record_t));
+	       
 	       index_record->synset_offsets = new list_t(LIST_MIN_FIRST);
 	       search_param->index_record = index_record;
 	       
@@ -303,20 +270,6 @@ namespace jarvis
 		  exit(0);
 	       }
 	       
-	       index_record->symbols_ptr = new short int[*symbols_cnt];
-	       
-	       for(int i = 4; i < (4 + *symbols_cnt); i++)
-	       {
-		  ptr_symbol_set_t *ptr_symbol_set = (ptr_symbol_set_t *)jarvis_data.search_ptr_symbol(index_parts->strings[i]);
-		  
-		  if(!ptr_symbol_set)
-		  {
-		     continue;
-		  }
-
-		  index_record->symbols_ptr[i - 4] = ptr_symbol_set->ptr_symbol_num;
-	       }
-	       
 	       list_t *synset_offsets = (index_record->synset_offsets);
 	       
 	       for(int i = (4 + *symbols_cnt + 2); i < field_count; i++)
@@ -325,9 +278,10 @@ namespace jarvis
 	       }
 	       
 	       jarvis_data.add_word(search_param->index_record);
-	       //read_data_file(search_param, &(synset_offsets), HYPERNYM);
 	       search_param->index_record->is_done = true;
-				 
+			
+	       nhpc_string_delete(index_parts);
+	       
 	       found_word = true;
 	       break;
 	    }

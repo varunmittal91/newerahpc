@@ -134,17 +134,24 @@ namespace neweraHPC
       
       struct rb_node *node;
       rbtree_t::node *data = NULL;
-      
-      int pos_count = 1;
-      
-      for (node = rb_first(&root); node; node = rb_next(node), pos_count++)
+
+      if(operation_mode == NHPC_RBTREE_STR)
       {
-	 data = rb_entry(node, rbtree_t::node, node_next);
-	 if(pos_count == (position))
+	 int pos_count = 1;
+      
+	 for (node = rb_first(&root); node; node = rb_next(node), pos_count++)
 	 {
-	    break;
+	    data = rb_entry(node, rbtree_t::node, node_next);
+	    if(pos_count == (position))
+	    {
+	       break;
+	    }
 	 }
-      }      
+      }
+      else if(operation_mode == NHPC_RBTREE_NUM || operation_mode == NHPC_RBTREE_NUM_MANAGED)
+      {
+	 data = search_node(position);
+      }
       
       if(data)
 	 return data->node_data;

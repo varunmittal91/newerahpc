@@ -38,11 +38,13 @@ namespace neweraHPC
    
    nhpc_status_t web_ui_init()
    {
+      nhpc_status_t nrv;
+
       app_handlers = new rbtree_t(NHPC_RBTREE_STR);
       
       http_handler_register("app", (fnc_ptr_nhpc_t)web_ui_handler);
       
-      nhpc_status_t nrv = nhpc_create_tmp_file_or_dir(&ui_temp_dir, HTTP_ROOT, NHPC_DIRECTORY, "ui_temp");
+      nrv = nhpc_create_tmp_file_or_dir(&ui_temp_dir, HTTP_ROOT, NHPC_DIRECTORY, "ui_temp");
       
       return nrv;
    }

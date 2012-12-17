@@ -154,7 +154,6 @@ namespace neweraHPC
 	       headers->write(sock);
 	    
 	       delete headers;
-	       nhpc_string_delete(file_size_str);
 	    
 	       FILE *fp = fopen(file_path, "r");
 	       if(!fp)
@@ -177,7 +176,6 @@ namespace neweraHPC
 	       }while(!feof(fp) && errno != EPIPE);
 	    
 	       fclose(fp);
-	       nhpc_string_delete(file_path);	 
 	    }
 	    else 
 	    {
@@ -196,9 +194,9 @@ namespace neweraHPC
 	    
 	    nhpc_string_delete(file_size_str);
 	 }
-	 
+
 	 if(file_path)
-	    delete file_path;
+	    nhpc_string_delete(file_path);
       }
       else if((http_data->request_type) == HTTP_INVALID)
       {

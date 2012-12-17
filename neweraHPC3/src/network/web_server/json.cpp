@@ -21,11 +21,415 @@
 #include <string>
 
 #include <include/json.h>
+#include <include/error.h>
 
 using namespace std;
 
 namespace neweraHPC
 {
+   const char* JSON_OBJECT_STRINGS[5] = {"{JSON_INCOMPLETE}", "{JSON_END}", "{JSON_ARRAY}", "{JSON_OBJECT}", "{JSON_OBJECT_NOT_FOUND}"};
+   
+   json_t::json_t()
+   {
+      root = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+      
+      key_pair_t *key_pair = new key_pair_t;
+      memset(key_pair, 0, sizeof(key_pair_t));
+
+      key_pair->branch        = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+      key_pair->branch_object = new rbtree_t(NHPC_RBTREE_STR);
+      key_pair->json_object   = JSON_OBJECT;
+
+      root_key_pair = key_pair;
+      root->insert(key_pair);
+      
+      search_queue = NULL;
+      current_key_pair = NULL;
+      
+      json_length = 2;
+   }
+   
+   json_t::~json_t()
+   {
+      
+   }
+   
+   int json_t::traverse(key_pair_t **_key_pair)
+   {
+      int level = root->ret_count();
+      if(level > 0)
+      {
+	 cout << "json not complete" << endl;
+	 return JSON_INCOMPLETE;
+      }
+       
+   loop:
+      search_elem_t *search_elem;
+      int search_queue_count = 1;
+      
+      if(search_queue == NULL)
+      {
+	 search_queue = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+	 search_elem = new search_elem_t;
+	 memset(search_elem, 0, sizeof(search_elem_t));
+	 
+	 search_elem->position = 1;
+	 search_elem->branch = root_key_pair->branch;
+	 search_queue->insert(search_elem);
+      }
+      else 
+      {
+	 search_queue_count = search_queue->ret_count();
+	 search_elem = (search_elem_t *)search_queue->search(search_queue_count);
+	 
+	 if(search_elem == NULL)
+	 {
+	    delete search_queue;
+	    search_queue = NULL;
+	    return JSON_END;
+	 }
+      }
+      
+      key_pair_t *key_pair = (key_pair_t *)search_elem->branch->search(search_elem->position);
+      if(!key_pair)
+      {
+	 search_queue->erase(search_queue_count);
+	 delete search_elem;
+	 goto loop;
+      }
+      else 
+      {
+	 (search_elem->position)++;
+	 
+	 if(key_pair->json_object == JSON_ARRAY || key_pair->json_object == JSON_OBJECT)
+	 {
+	    search_elem = new search_elem_t;
+	    memset(search_elem, 0, sizeof(search_elem_t));
+	    
+	    search_elem->branch = key_pair->branch;
+	    search_elem->position = 1;
+	    search_queue->insert(search_elem);
+	 }  
+	 *_key_pair = key_pair;
+	 
+	 return key_pair->json_object;
+      }
+   }
+   
+   void json_t::print()
+   {
+      int level = root->ret_count();
+      if(level > 0)
+      {
+	 return;
+      }
+      
+      key_pair_t *key_pair;
+      search_elem_t *search_elem, *search_elem_old;
+
+      int json_status;
+      int current_position, element_count;
+      
+      cout << "{";
+      
+      while((json_status = traverse(&key_pair)) != JSON_END)
+      {
+	 search_elem      = (search_elem_t *)search_queue->search(search_queue->ret_count());
+	 search_elem_old  = (search_elem_t *)search_queue->search(search_queue->ret_count() - 1);
+	 current_position = (search_elem->position);
+	 element_count    = search_elem->branch->ret_count();
+	 
+	 if(key_pair->json_object == JSON_OBJECT_CLOSE || key_pair->json_object == JSON_ARRAY_CLOSE)
+	 {
+	    if(key_pair->json_object == JSON_OBJECT_CLOSE)
+	    {
+	       cout << "}" ;
+	    }
+	    else if(key_pair->json_object == JSON_ARRAY_CLOSE)
+	    {
+	       cout << "]";
+	    }
+	    
+	    if(search_elem_old)
+	    {
+	       current_position = search_elem_old->position;
+	       element_count    = search_elem_old->branch->ret_count();
+	    
+	       if(current_position < element_count)
+		  cout << ",";
+	    }
+
+	    continue;
+	 }
+	 
+	 if(key_pair->key)
+	    cout << key_pair->key << ": ";
+	 if(key_pair->value)
+	    cout << key_pair->value;
+	 if(key_pair->json_object == JSON_ARRAY || key_pair->json_object == JSON_OBJECT)
+	 {
+	    if(key_pair->json_object == JSON_ARRAY)
+	       cout << "[";
+	    if(key_pair->json_object == JSON_OBJECT)
+	       cout << "{";
+	 }
+	 
+	 if(current_position < element_count && current_position > 1)
+	    cout << ",";
+      }
+      
+      cout << endl;
+      cout << "JSON length: " << json_length << endl;
+   }
+   
+   const char *json_t::operator[](const char *key)
+   {
+      int level = root->ret_count();
+      if(level > 0)
+      {
+	 return NULL;
+      }
+      
+      key_pair_t *key_pair;
+      int        *json_status;
+      
+      if(current_key_pair == NULL)
+      {
+	 current_key_pair = root_key_pair;
+      }
+
+      json_status = &(current_key_pair->json_object);
+      if(*json_status == JSON_ARRAY)
+      {
+	 return JSON_OBJECT_STRINGS[*json_status];
+      }
+      
+      key_pair = (key_pair_t *)current_key_pair->branch_object->search(key);
+      if(key_pair)
+      {
+	 json_status = &(key_pair->json_object);
+	 
+	 if(*json_status == JSON_OBJECT || *json_status == JSON_ARRAY)
+	 {
+	    current_key_pair = key_pair;
+	    return JSON_OBJECT_STRINGS[*json_status];
+	 }
+      }
+      else 
+	 return JSON_OBJECT_STRINGS[JSON_OBJECT_NOT_FOUND];
+      
+      return key_pair->value;
+   }
+   
+   const char *json_t::operator[](int key)
+   {
+      int level = root->ret_count();
+      if(level > 0)
+      {
+	 return NULL;
+      }      
+      
+      int	 element_count;
+      int	 *json_object;
+      key_pair_t *key_pair;
+      
+      if(current_key_pair == NULL)
+	 return JSON_OBJECT_STRINGS[JSON_OBJECT_NOT_FOUND];
+      
+      if(current_key_pair->json_object == JSON_OBJECT)
+	 return JSON_OBJECT_STRINGS[JSON_OBJECT];
+      
+      element_count = current_key_pair->branch->ret_count();
+
+      if(key < 0 || key > (element_count - 2))
+      {
+	 return JSON_OBJECT_STRINGS[JSON_OBJECT_NOT_FOUND];
+      }
+
+      key_pair    = (key_pair_t *)current_key_pair->branch->search(key + 1);
+      json_object = &(key_pair->json_object);
+
+      if(*json_object == JSON_ARRAY || *json_object == JSON_OBJECT)
+      {
+	 current_key_pair = key_pair;
+	 
+	 return JSON_OBJECT_STRINGS[*json_object];
+      }
+      
+      return key_pair->value;
+   }
+   
+   void json_t::reinitialize_search()
+   {
+      current_key_pair = NULL;
+   }
+   
+   nhpc_status_t json_t::close_element()
+   {
+      int level = root->ret_count();
+      if(level == 0)
+	 return NHPC_FAIL;
+
+      key_pair_t *last_key_pair = (key_pair_t *)(*root).search(level);
+      
+      key_pair_t *key_pair = new key_pair_t;
+      memset(key_pair, 0, sizeof(key_pair_t));
+
+      if(last_key_pair->json_object == JSON_OBJECT)
+      {
+	 key_pair->json_object = JSON_OBJECT_CLOSE;
+      }
+      else if(last_key_pair->json_object == JSON_ARRAY)
+      {
+	 key_pair->json_object = JSON_ARRAY_CLOSE;
+      }
+      else 
+	 LOG_ERROR("Invalid close");
+      
+      last_key_pair->branch->insert(key_pair);
+      
+      root->erase(level);
+      
+      return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t json_t::add_element(int json_object, const char *input1, const char *input2)
+   {
+      int level = root->ret_count();
+      if(level == 0)
+	 return NHPC_FAIL;
+
+      key_pair_t *last_key = (key_pair_t *)(*root).search(level);
+      int current_json_object = last_key->json_object;
+      
+      const char *key = NULL, *value = NULL;
+      
+      bool copy_key = false;
+      bool copy_value = false;
+      bool copy_value_quotes = false;
+      bool create_object = false;
+      bool is_valid = false;
+      
+      if(current_json_object == JSON_ARRAY)
+      {
+	 if(json_object == JSON_ARRAY || json_object == JSON_OBJECT)
+	 {
+	    if(input1 || input2)
+	       return NHPC_FAIL;
+	    
+	    create_object = true;
+	 }
+	 else 
+	 {
+	    if(!input1 || input2)
+	       return NHPC_FAIL;
+	    
+	    if(json_object == JSON_STRING)
+	       copy_value_quotes = true;
+	    copy_value = true;
+	    
+	    value = input1;
+	 }
+	 
+	 is_valid = true;
+      }
+      else if(json_object == JSON_STRING || json_object == JSON_NUMBER)
+      {
+	 key = input1, value = input2;
+	 
+	 if(!key || !value)
+	    return NHPC_FAIL;
+	 
+	 if(json_object == JSON_STRING)
+	    copy_value_quotes = true;
+	 copy_key = true;
+	 copy_value = true;
+	 
+	 is_valid = true;
+      }
+      else if(json_object == JSON_TRUE || json_object == JSON_FALSE || json_object == JSON_NULL || json_object == JSON_OBJECT || json_object == JSON_ARRAY)
+      {
+	 if(input2 || !input1)
+	    return NHPC_FAIL;
+	 
+	 key = input1;
+	 
+	 if(json_object != JSON_ARRAY && json_object != JSON_OBJECT)
+	 {
+	    if(json_object == JSON_TRUE)
+	       value = "true";
+	    else if(json_object == JSON_FALSE)
+	       value = "false";
+	    else if(json_object == JSON_NULL)
+	       value = "null";
+	    
+	    copy_value = true;
+	 }
+	 else 
+	    create_object = true;
+	 
+	 copy_key = true;
+	 
+	 is_valid = true;
+      }
+      
+      if(!is_valid)
+	 return NHPC_FAIL;
+      
+      key_pair_t *key_pair = new key_pair_t;
+      memset(key_pair, 0, sizeof(key_pair_t));
+      key_pair->json_object = json_object;
+      
+      if(copy_key)
+      {
+	 nhpc_size_t len = strlen(key) + 3;
+	 
+	 char *key_str = new char [len];
+	 *key_str = '"';
+	 memcpy((key_str + 1), key, len - 3);
+	 key_str[len - 2] = '"';
+	 key_str[len - 1] = '\0';
+	 key_pair->key = key_str;
+	 
+	 json_length += len - 1;
+      }
+      if(copy_value)
+      {
+	 nhpc_strcpy(&(key_pair->value), value);  
+	 json_length += strlen(value);
+	 
+	 if(copy_key)
+	    json_length += 2;
+	 if(copy_value_quotes)
+	    json_length += 2;
+      }
+      
+      if(create_object)
+      {
+	 key_pair->branch = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+	 if(json_object == JSON_OBJECT)
+	    key_pair->branch_object = new rbtree_t(NHPC_RBTREE_STR);
+	 
+	 root->insert(key_pair);
+	 
+	 json_length += 2;
+	 if(copy_key)
+	    json_length += 2;
+      }
+      last_key->branch->insert(key_pair);
+      if(last_key->json_object == JSON_OBJECT)
+      {
+	 last_key->branch_object->insert(key_pair, key);
+      }
+      
+      if(last_key->branch->ret_count() > 1)
+      {
+	 json_length += 1;
+      }
+      
+      return NHPC_SUCCESS;
+   }  
+   
    nhpc_json_t::nhpc_json_t()
    {
       current_level = 1;
@@ -113,8 +517,7 @@ namespace neweraHPC
       {
 	 nhpc_strcpy(&(key_pair->key), key);
 	 
-	 if(key_pair_last && key_pair_last->json_object != JSON_ARRAY)
-	    stream_length_new += strlen(key_pair->key) + 4;
+	 stream_length_new += strlen(key_pair->key) + 4;
       }
       key_pair->json_object = json_object;
       key_pair->level = current_level;
@@ -299,8 +702,6 @@ namespace neweraHPC
       *json_out_str_tmp = '{';
       json_out_str_tmp++;
       
-      //string json_out = "{";
-      
       do 
       {
 	 object_status_t *object_status_current = (object_status_t *)stack->search(stack->ret_count());
@@ -325,15 +726,11 @@ namespace neweraHPC
 	       {
 		  if(object_status_current && object_status_current->json_object == JSON_ARRAY)
 		  {
-		     //json_out = json_out + "{";
-		     
 		     *json_out_str_tmp = '{';
 		     json_out_str_tmp++;
 		  }
 		  else 
 		  {
-		     //json_out = json_out + "\"" + key_pair->key + "\"" + ": {";
-
 		     *json_out_str_tmp = '"';
 		     json_out_str_tmp++;
 		     memcpy((json_out_str_tmp), key_pair->key, strlen(key_pair->key));
@@ -344,8 +741,6 @@ namespace neweraHPC
 	       }
 	       else 
 	       {
-		  //json_out = json_out + "\"" + key_pair->key + "\"" + ": [";
-
 		  *json_out_str_tmp = '"';
 		  json_out_str_tmp++;
 		  memcpy((json_out_str_tmp), key_pair->key, strlen(key_pair->key));
@@ -358,59 +753,30 @@ namespace neweraHPC
 	    }
 	    else 
 	    {
-	       //json_out = json_out + "\"" + key_pair->key + "\"";
-	       
-	       if(object_status_current && object_status_current->json_object == JSON_ARRAY)
-	       {
-		  //json_out = json_out + "{";
-	       }
-	       else 
-	       {
-		  //json_out = json_out + "\"" + key_pair->key + "\"" + ": {";
-		  
-		  *json_out_str_tmp = '"'; 
-		  json_out_str_tmp++;
-		  memcpy((json_out_str_tmp), key_pair->key, strlen(key_pair->key));
-		  json_out_str_tmp = json_out_str_tmp + strlen(key_pair->key);
-		  memcpy((json_out_str_tmp), "\"", 1);
-		  json_out_str_tmp++;
-	       }
-	       
-	       
-	       /*
 	       *json_out_str_tmp = '"'; 
 	       json_out_str_tmp++;
 	       memcpy((json_out_str_tmp), key_pair->key, strlen(key_pair->key));
 	       json_out_str_tmp = json_out_str_tmp + strlen(key_pair->key);
 	       memcpy((json_out_str_tmp), "\"", 1);
 	       json_out_str_tmp++;
-		*/
 	       
 	       if(key_pair->json_object == JSON_NULL)
 	       {
-		  //json_out = json_out + ": null";
-
 		  memcpy((json_out_str_tmp), ": null", 6);
 		  json_out_str_tmp += 6;
 	       }
 	       else if(key_pair->json_object == JSON_TRUE)
 	       {
-		  //json_out = json_out + + ": true";
-
 		  memcpy((json_out_str_tmp), ": true", 6);
 		  json_out_str_tmp += 6;
 	       }
 	       else if(key_pair->json_object == JSON_FALSE)
 	       {
-		  //json_out = json_out + + ": false";
-		  
 		  memcpy((json_out_str_tmp), ": false", 7);
 		  json_out_str_tmp += 7;
 	       }
 	       else if(key_pair->json_object == JSON_NUMBER)
 	       {
-		  //json_out = json_out + + ": " + (char *)key_pair->value;
-		  
 		  memcpy((json_out_str_tmp), ": ", 2);
 		  json_out_str_tmp += 2;
 		  memcpy((json_out_str_tmp), (const char *)key_pair->value, strlen((char *)key_pair->value));
@@ -418,15 +784,8 @@ namespace neweraHPC
 	       }
 	       else
 	       {
-		  //json_out = json_out + + ": \"" + (char *)key_pair->value + "\"";
-		  if(object_status_current && object_status_current->json_object == JSON_ARRAY)
-		  {
-		  }
-		  else 
-		  {
-		     memcpy((json_out_str_tmp), ": ", 2);
-		     json_out_str_tmp += 2;
-		  }
+		  memcpy((json_out_str_tmp), ": ", 2);
+		  json_out_str_tmp += 2;
 		  
 		  *json_out_str_tmp = '"';
 		  json_out_str_tmp++;
@@ -438,8 +797,6 @@ namespace neweraHPC
 	       
 	       if(object_status_current && object_status_current->elements_done < object_status_current->elements)
 	       {
-		  //json_out = json_out + ",";
-		  
 		  *json_out_str_tmp = ',';
 		  json_out_str_tmp++;
 	       }
@@ -451,15 +808,11 @@ namespace neweraHPC
 	       
 	       if(object_status_current->json_object == JSON_OBJECT)
 	       {
-		  //json_out = json_out + "}";
-		  
 		  *json_out_str_tmp = '}';
 		  json_out_str_tmp++;
 	       }
 	       else 
 	       {
-		  //json_out = json_out + "]";
-
 		  *json_out_str_tmp = ']';
 		  json_out_str_tmp++;
 	       }
@@ -467,8 +820,6 @@ namespace neweraHPC
 	       object_status_current = (object_status_t *)stack->search(stack->ret_count());
 	       if(object_status_current && object_status_current->elements_done < object_status_current->elements)
 	       {
-		  //json_out = json_out + ",";
-		  
 		  *json_out_str_tmp = ',';
 		  json_out_str_tmp++;
 	       }

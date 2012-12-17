@@ -43,6 +43,9 @@ void *operator new(std::size_t size) throw (std::bad_alloc)
       new_p = malloc(_size);
       memset(new_p, 0, _size);
       
+      size_t *alloc_size = (size_t *)new_p;
+      *alloc_size = size;
+      
       size_t *str_len = (size_t *)new_p;
       *str_len = size;
       

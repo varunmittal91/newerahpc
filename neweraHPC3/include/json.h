@@ -22,27 +22,85 @@
 
 #include "rbtree.h"
 
-#define JSON_END 0
-#define JSON_INCOMPLETE -1
-
 namespace neweraHPC
 {
+   extern const char* JSON_OBJECT_STRINGS[5];
+   
    enum json_object
    {
+      JSON_INCOMPLETE,
+      JSON_END,
+      JSON_ARRAY,
+      JSON_OBJECT,
+      JSON_OBJECT_NOT_FOUND,
       JSON_STRING,
       JSON_NUMBER,
       JSON_TRUE,
       JSON_FALSE,
       JSON_NULL,
-      JSON_OBJECT,
-      JSON_ARRAY
+      JSON_OBJECT_CLOSE, // Not to be used, for internal structure only
+      JSON_ARRAY_CLOSE   // Not to be used, for internal structure only
    };
    
-   enum json_mide
+   enum json_mode
    {
       JSON_INSERT,
       JSON_UPDATE
    };
+   
+   class json_object_t
+   {
+   private:
+      key_pair_t *root_key_pair;
+      rbtree_t *search_queue;
+      
+   public:
+      json_object_t(key_pair_t *_root_key_pair);
+      
+      const char *operator[](const char *key);
+      const char *operator[](int key);
+   };
+   
+   class json_t
+   {
+   private:
+      struct key_pair_t
+      {
+	 char     *key;
+	 char	  *value;
+	 int	  json_object;
+	 rbtree_t *branch;
+	 rbtree_t *branch_object;  // special branch for rbtree in string modes
+      };
+      struct search_elem_t
+      {
+	 rbtree_t *branch;
+	 int      position;
+      };
+      
+      rbtree_t   *root;
+      key_pair_t *root_key_pair;
+      key_pair_t *current_key_pair;
+      
+      int json_length;
+
+      int traverse(key_pair_t **_key_pair);
+      rbtree_t *search_queue;
+   public:
+      json_t();
+      ~json_t();
+      
+      nhpc_status_t add_element(int json_object, const char *input1 = NULL, const char *input2 = NULL);
+      nhpc_status_t close_element();
+      
+      /* json object search utility */
+      const char *operator[](const char *key);
+      const char *operator[](int key);
+      void reinitialize_search();
+      
+      void print();
+   };
+   
    
    class nhpc_json_t
    {

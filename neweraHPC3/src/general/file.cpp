@@ -129,24 +129,24 @@ namespace neweraHPC
 	 return NHPC_FAIL;
       }
       
-      const char *final_target;
+      const char *final_target = NULL;
       if(target_dir != NULL)
       {
-	 nhpc_strcpy((char **)&final_target, target_dir);
-	 string_t *string = nhpc_substr(final_target, '/');
-	 nhpc_string_delete((char *)final_target);
-	 
-	 final_target = nhpc_strconcat("/", string->strings[0]);
+	 string_t *string = nhpc_substr(target_dir, '/');
 	 
 	 const char *tmp_str;
-	 
-	 for(int i = 1; i < string->count; i++)
+	 for(int i = 0; i < string->count; i++)
 	 {
-	    tmp_str = nhpc_strconcat(final_target, "/");
-	    nhpc_string_delete((char *)final_target);
-	    
-	    final_target = nhpc_strconcat(tmp_str, string->strings[i]);
-	    nhpc_string_delete((char *)tmp_str);
+	    if(final_target)
+	    {
+	       final_target = nhpc_strconcat("/", string->strings[i]);
+	    }
+	    else 
+	    {
+	       tmp_str = nhpc_strconcat(final_target, "/", string->strings[i]);
+	       nhpc_string_delete((char *)final_target);
+	       final_target = tmp_str;
+	    }
 	 }
 	 
 	 nhpc_string_delete(string);

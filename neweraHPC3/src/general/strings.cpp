@@ -160,7 +160,6 @@ namespace neweraHPC{
       else if(*str_len_string == 0)
       {
 	 LOG_ERROR("Not in strings pool");
-	 
 	 return;
       }
       else 
@@ -181,7 +180,10 @@ namespace neweraHPC{
 	 
 	 LOG_DEBUG("ADDING STRING TO FREE POOL erased with return status " << ret << " Allocated bytes: " << allocated_bytes << " Free bytes: "<< free_bytes);
       }
-      
+      else 
+      {
+	 LOG_ERROR("String not erased");
+      }
       LOG_DEBUG("Free count: " << free_count << " Allocated count: " << allocated_count);
       
       thread_mutex_unlock(mutex_allocated, NHPC_THREAD_LOCK_WRITE);

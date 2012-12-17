@@ -129,20 +129,12 @@ int main(int argc, char **argv)
 {
    neweraHPC_init(argc, argv);
 
-   nhpc_json_t *json = new nhpc_json_t;
-   json->add_element(JSON_ARRAY, "key");
-   json->add_element(JSON_STRING, "test", "string");
-   json->add_element(JSON_STRING, "test", "string2");
-   json->close_element();
-   json->close_element();
-   
-   cout << json->get_stream() << endl;
-   
-   
    nhpc_status_t nrv;   
    
    http_init();
    web_ui_init();
+
+   /* 
    web_ui_register("Desktop", (fnc_ptr_nhpc_two_t)func_trigger);
    
    web_ui_register("Calculator", (fnc_ptr_nhpc_two_t)func_trigger_calculator);   
@@ -150,27 +142,8 @@ int main(int argc, char **argv)
    web_ui_register("Dock", (fnc_ptr_nhpc_two_t)func_trigger_dock);
    
    web_ui_register("System_info", (fnc_ptr_nhpc_two_t)func_trigger_system_status);
+    */
 
-   cout << "creating json" << endl;
-   
-   nhpc_json_t *nhpc_json = new nhpc_json_t; 
-   nhpc_json->add_element(JSON_ARRAY, "test_array");
-   nhpc_json->add_element(JSON_OBJECT);
-   nhpc_json->add_element(JSON_STRING, "str1", "string");
-   nhpc_json->add_element(JSON_STRING, "str2", "string");
-   nhpc_json->close_element();
-   
-   nhpc_json->add_element(JSON_OBJECT);
-   nhpc_json->add_element(JSON_STRING, "str1", "string");
-   nhpc_json->add_element(JSON_STRING, "str2", "string");
-   nhpc_json->close_element();
-   
-   nhpc_json->close_element();
-   
-   nhpc_json->close_element();
-   
-   delete nhpc_json;
-   
    nhpc_grid_server_t grid_server;
    nrv = grid_server.grid_server_init();
    

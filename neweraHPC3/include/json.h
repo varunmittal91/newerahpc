@@ -75,17 +75,27 @@ namespace neweraHPC
       struct search_elem_t
       {
 	 rbtree_t *branch;
-	 int      position;
+	 int       position;
       };
       
       rbtree_t   *root;
       key_pair_t *root_key_pair;
       key_pair_t *current_key_pair;
       
-      int json_length;
+      int   final_json_length;
+      char *final_json_string;
 
       int traverse(key_pair_t **_key_pair);
       rbtree_t *search_queue;
+      
+      void initialize();
+      void reinitialize();
+      
+      /* json object search utility internal mechanism */
+      key_pair_t *search(int json_object, int *key_num, const char *key_str, const char **response);
+      
+      /* json object update utility internal mechanism */
+      nhpc_status_t update_value(key_pair_t *key_pair, const char *input);
    public:
       json_t();
       ~json_t();
@@ -98,6 +108,14 @@ namespace neweraHPC
       const char *operator[](int key);
       void reinitialize_search();
       
+      /* json object update utility */
+      nhpc_status_t update(int key,         const char *input = NULL);
+      nhpc_status_t update(const char *key, const char *input = NULL);
+      
+      nhpc_status_t build_structure(const char *json_string);
+      const char *get_string();
+      
+      bool is_delimiter(char in_char);
       void print();
    };
    

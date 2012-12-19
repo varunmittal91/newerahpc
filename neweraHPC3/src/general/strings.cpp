@@ -405,6 +405,7 @@ namespace neweraHPC{
       const char *tmp_s1 = s1;
       int position = 0;
       
+      old_position--;
       while(*tmp_s1 != '\0' && old_position != 0)
       {
 	 tmp_s1++;

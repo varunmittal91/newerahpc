@@ -106,6 +106,7 @@ namespace neweraHPC
       /* json object search utility */
       const char *operator[](const char *key);
       const char *operator[](int key);
+      int count();
       void reinitialize_search();
       
       /* json object update utility */

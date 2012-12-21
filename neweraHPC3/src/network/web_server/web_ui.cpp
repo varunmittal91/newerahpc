@@ -44,12 +44,12 @@ namespace neweraHPC
       
       http_handler_register("app", (fnc_ptr_nhpc_t)web_ui_handler);
       
-      nrv = nhpc_create_tmp_file_or_dir(&ui_temp_dir, HTTP_ROOT, NHPC_DIRECTORY, "ui_temp");
+      nrv = nhpc_create_tmp_file_or_dir(&ui_temp_dir, HTTP_ROOT, NHPC_DIRECTORY, "jdesktop");
       
       return nrv;
    }
    
-   nhpc_status_t web_ui_register(const char *app_name, fnc_ptr_nhpc_two_t func_trigger)
+   nhpc_status_t web_ui_register(const char *app_name, const char *app_type, fnc_ptr_nhpc_two_t func_trigger)
    {
       app_details_t *app_details = new app_details_t;
       app_details->func_trigger_local = func_trigger;
@@ -58,7 +58,8 @@ namespace neweraHPC
       app_details->web_ui_elements = new web_ui_elements_t;
       nhpc_strcpy(&(app_details->web_ui_elements->app_name), app_name);
 
-      nhpc_strcpy(&(app_details->app_name), app_name);
+      nhpc_strcpy((char **)&(app_details->app_name), app_name);
+      nhpc_strcpy((char **)&(app_details->app_type), app_type);
       cout << "Registered: " << app_details->app_name << endl;
       
       nhpc_status_t rv = app_handlers->insert(app_details, app_name);
@@ -66,11 +67,17 @@ namespace neweraHPC
       return rv;
    }
    
+   nhpc_status_t web_ui_init_app(app_details_t *app_details)
+   {
+      //app_details->func_trigger_local();
+   }
+   
    nhpc_status_t web_ui_handler(http_data_t *http_data)
    {
       if(nhpc_strcmp(http_data->request_page, "*.json") == NHPC_SUCCESS)
       {
 	 int str_pos = nhpc_strfind(http_data->request_page, '.');
+	 
 	 char *request_page = nhpc_substr(http_data->request_page, 1, str_pos - 1);
 	 delete[] (http_data->request_page);
 	 http_data->request_page = request_page;
@@ -81,7 +88,7 @@ namespace neweraHPC
       {
 	 int url_pos = nhpc_strfind(http_data->request_page, '/', 2);
 	 char *base_url = nhpc_substr(http_data->request_page, url_pos + 1, strlen(http_data->request_page));
-	 char *new_request_page = nhpc_strconcat("/ui_temp/", base_url);
+	 char *new_request_page = nhpc_strconcat("/jdesktop/", base_url);
 
 	 nhpc_string_delete(http_data->request_page);
 	 http_data->request_page = new_request_page;
@@ -91,7 +98,7 @@ namespace neweraHPC
       else 
       {
 	 delete[] (http_data->request_page);
-	 http_data->request_page = nhpc_strconcat("/ui_temp", "/standard.html");
+	 http_data->request_page = nhpc_strconcat("/jdesktop", "/standard.html");
       }
    }
    
@@ -130,11 +137,19 @@ namespace neweraHPC
       web_ui_elements->http_data = http_data;
       web_ui_elements->instance_id = instance_count;
       
-      web_ui_elements->elements->add_element(JSON_STRING, "appname", app_name);
-      web_ui_elements->elements->add_element(JSON_OBJECT, "app_attributes");
-	 web_ui_elements->elements->add_element(JSON_STRING, "instance_id", nhpc_itostr(instance_count));
-	 web_ui_elements->elements->add_element(JSON_STRING, "type", "window");
-      web_ui_elements->elements->close_element();      
+      if(!(web_ui_elements->is_ready))
+      {
+	 web_ui_elements->elements->add_element(JSON_STRING, "appname", app_name);
+	 web_ui_elements->elements->add_element(JSON_OBJECT, "app_attributes");
+	    web_ui_elements->elements->add_element(JSON_STRING, "instance_id", nhpc_itostr(instance_count));
+	    web_ui_elements->elements->add_element(JSON_STRING, "apptype", app_details->app_type);
+	 web_ui_elements->elements->close_element();      
+      }
+      else 
+      {
+	 (*(web_ui_elements->elements))["app_attributes"];
+	 (*(web_ui_elements->elements)).update("instance_id", nhpc_itostr(instance_count));
+      }
       
       (*(app_details->func_trigger_local))(sock, web_ui_elements);
       
@@ -147,13 +162,13 @@ namespace neweraHPC
    
    nhpc_status_t web_ui_generate(web_ui_elements_t *web_ui_elements, char *file_path)
    {
-      web_ui_elements->http_data->custom_response_data = (char *)web_ui_elements->elements->get_stream();
+      web_ui_elements->http_data->custom_response_data = (char *)web_ui_elements->elements->get_string();
       web_ui_elements->http_data->custom_response_type = NHPC_FILE;
    }
    
    web_ui_elements_t::web_ui_elements_t()
    {
-      elements = new nhpc_json_t;
+      elements = new json_t;
       elements_tree = new rbtree_t(NHPC_RBTREE_STR);
    }
    

@@ -42,10 +42,6 @@ namespace neweraHPC
 	 delete (http_data->status_str);
       if(http_data->http_version)
 	 delete (http_data->http_version);
-      if(http_data->custom_response_data)
-	 delete (http_data->custom_response_data);
-      if(http_data->custom_response_mime)
-	 delete (http_data->custom_response_mime);
 	 
       delete http_data;
       

@@ -42,35 +42,41 @@ namespace neweraHPC
    class web_ui_elements_t
    {
    public:
-      nhpc_json_t *elements;
+      json_t *elements;
       rbtree_t *elements_tree;
-      //web_ui_elements_t(const char *_working_dir, const char *_app_xml);
       web_ui_elements_t();
       ~web_ui_elements_t();
       
       char *app_name;
+      char *app_type;
       char *working_dir;
       char *app_xml;
       char *app_xml_public;
-      int instance_id;
+      int  instance_id;
+
       http_data_t *http_data;
       
       nhpc_status_t add_element(const char *element, const char *property);
       nhpc_status_t add_public_data();
+
+      bool is_ready;
    };
    
    struct app_details_t
    {
+      const char *app_name;
+      const char *app_type;
+
+      rbtree_t           *instances;
       fnc_ptr_nhpc_two_t func_trigger_local;
-      rbtree_t *instances;
-      char *app_name;
-      web_ui_elements_t *web_ui_elements;
+      web_ui_elements_t  *web_ui_elements;
    };
    
    nhpc_status_t web_ui_init();
+   nhpc_status_t web_ui_init_app(app_details_t *app_details);
    nhpc_status_t web_ui_handler(http_data_t *http_data);
    nhpc_status_t web_ui_init_request(http_data_t *http_data);
-   nhpc_status_t web_ui_register(const char *app_name, fnc_ptr_nhpc_two_t func_trigger);
+   nhpc_status_t web_ui_register(const char *app_name, const char *app_type, fnc_ptr_nhpc_two_t func_trigger);
    nhpc_status_t web_ui_generate(web_ui_elements_t *web_ui_elements, char *file_path);
 };
 

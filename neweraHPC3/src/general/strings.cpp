@@ -397,7 +397,7 @@ namespace neweraHPC{
    
    int nhpc_strfind(const char *s1, const char s2)
    {
-      return nhpc_strfind(s1, s2, 0);
+      return nhpc_strfind(s1, s2, 1);
    }
    
    int nhpc_strfind(const char *s1, const char s2, int old_position)

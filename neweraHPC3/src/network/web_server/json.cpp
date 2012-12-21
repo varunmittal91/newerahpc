@@ -329,6 +329,7 @@ namespace neweraHPC
       int level = root->ret_count();
       if(level > 0)
       {
+	 cout << JSON_OBJECT_STRINGS[JSON_INCOMPLETE] << endl;
 	 return;
       }
       
@@ -397,12 +398,14 @@ namespace neweraHPC
    
    json_t::key_pair_t *json_t::search(int json_object, int *key_num, const char *key_str, const char **response)
    {
+      /*
       int level = root->ret_count();
       if(level > 0)
       {
 	 *response = JSON_OBJECT_STRINGS[JSON_INCOMPLETE];
 	 return NULL;
       }
+       */
       
       *response = NULL;
       
@@ -482,6 +485,17 @@ namespace neweraHPC
       {
 	 return key_pair->value;
       }
+   }
+   
+   int json_t::count()
+   {
+      if(current_key_pair == NULL)
+	 current_key_pair = root_key_pair;
+      
+      if(current_key_pair->json_object == JSON_OBJECT)
+	 return current_key_pair->branch->ret_count();
+      else 
+	 return (current_key_pair->branch->ret_count() - 1);
    }
    
    nhpc_status_t json_t::update_value(key_pair_t *key_pair, const char *input)

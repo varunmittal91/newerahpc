@@ -37,7 +37,7 @@ namespace neweraHPC
       
       *instruct_set = new nhpc_instruction_set_t;
       memset((*instruct_set), 0, sizeof(nhpc_instruction_set_t));
-      (*instruct_set)->arguments = new rbtree_t;
+      (*instruct_set)->arguments = new rbtree;
             
       if(host_grid_uid)
       {
@@ -55,7 +55,7 @@ namespace neweraHPC
    {
       if(instruct_set->arguments)
       {
-	 int count = instruct_set->arguments->ret_count();
+	 int count = instruct_set->arguments->length();
 	 
 	 for(int i = 1; i <= count; i++)
 	 {
@@ -79,7 +79,7 @@ namespace neweraHPC
       delete instruct_set;
    }
    
-   nhpc_status_t nhpc_generate_instruction(nhpc_instruction_set_t **instruction_set, rbtree_t *headers)
+   nhpc_status_t nhpc_generate_instruction(nhpc_instruction_set_t **instruction_set, rbtree *headers)
    {
       nhpc_status_t nrv = NHPC_SUCCESS;
             
@@ -111,7 +111,7 @@ namespace neweraHPC
    } 
    
    nhpc_status_t nhpc_generate_general_instruction(nhpc_instruction_set_t **instruction_set,
-						   rbtree_t *headers)
+						   rbtree *headers)
    {
       nhpc_status_t nrv = NHPC_SUCCESS;
       

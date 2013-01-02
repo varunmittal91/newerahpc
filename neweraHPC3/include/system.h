@@ -50,18 +50,18 @@ namespace neweraHPC
       struct child_process_t
       {
 	 char *service_name;
-	 bool active;
-	 int pid;
+	 bool  active;
+	 int   pid;
       };
       
-      thread_manager_t **thread_manager;
-      nhpc_systeminfo_t *systeminfo;
-      nhpc_mutex_t mutex;
+      thread_manager_t  **thread_manager;
+      nhpc_systeminfo_t  *systeminfo;
+      nhpc_mutex_t        mutex;
       
-      nhpc_mutex_t mutex_chld;
-      rbtree_t *child_processes;
-      rbtree_t *child_handlers;
-      int terminated[MAX_TERMINATED_KEYS];
+      nhpc_mutex_t  mutex_chld;
+      rbtree       *child_processes;
+      rbtree       *child_handlers;
+      int           terminated[MAX_TERMINATED_KEYS];
       
    public:
       nhpc_system_t();

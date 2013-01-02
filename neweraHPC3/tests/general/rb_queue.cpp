@@ -7,6 +7,6 @@ using namespace neweraHPC;
 
 int main(){
 
-   rbtree_t *tree = new rbtree_t[10];
+   rbtree *tree = new rbtree[10];
    return 0;
 }

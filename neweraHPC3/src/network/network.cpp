@@ -52,13 +52,13 @@ namespace neweraHPC
    
    void network_t::network_init()
    {
-      client_connections = new rbtree_t;
+      client_connections = new rbtree;
       mutex = new pthread_mutex_t;   
       mutex_addons = new pthread_mutex_t;
       pthread_mutex_init(mutex, NULL);
       pthread_mutex_init(mutex_addons, NULL);
       
-      network_addons = new rbtree_t(NHPC_RBTREE_STR);
+      network_addons = new rbtree(RBTREE_STR);
       server_sock = NULL;    
       network = this;
       accept_thread_id = 0;
@@ -79,15 +79,12 @@ namespace neweraHPC
       LOG_INFO("Closing all active sockets\t");
       nhpc_socket_t *client_sock;
       int key;
-      while(1)
+      int client_count = (*client_connections).length();
+      for(int i = 1; i <= client_count; i++)
       {
-	 client_sock = (nhpc_socket_t *)(*client_connections).search_first(&key);
-	 if(!client_sock)
-	    break;
-	 
+	 client_sock = (nhpc_socket_t *)(*client_connections)[i];
 	 socket_close(client_sock);
 	 socket_delete(client_sock);
-	 (*client_connections).erase(key);
       }
       
       delete client_connections;
@@ -248,7 +245,7 @@ namespace neweraHPC
       
       thread_manager_t *thread_manager = main_thread->thread_manager;
       nhpc_socket_t *server_sock = main_thread->sock;
-      rbtree_t *client_socks = main_thread->client_socks;
+      rbtree *client_socks = main_thread->client_socks;
       
       struct pollfd *fds = new pollfd;
       int timeout        = (3 * 60 * 1000);
@@ -318,12 +315,9 @@ namespace neweraHPC
 	    client_socks->insert(client_sock, new_sd);
 	    pthread_mutex_unlock(&mutex);
 	    
-	    
-	     (*thread_manager).init_thread(&(client_sock->thread_id), NULL);
-	     (*thread_manager).create_thread(&(client_sock->thread_id), NULL, (void* (*)(void*))read_communication, 
-	     client_sock, NHPC_THREAD_DETACH);	
-	    
-	    //read_communication(client_sock);
+	    (*thread_manager).init_thread(&(client_sock->thread_id), NULL);
+	    (*thread_manager).create_thread(&(client_sock->thread_id), NULL, (void* (*)(void*))read_communication, 
+					    client_sock, NHPC_THREAD_DETACH);	
 	 }while(new_sd != -1);
       }while(true);
    }
@@ -332,7 +326,7 @@ namespace neweraHPC
    {    
       if(client_sock != NULL)
       {
-	 rbtree_t *client_socks = client_sock->server_details->client_socks;
+	 rbtree *client_socks = client_sock->server_details->client_socks;
 	 pthread_mutex_t *mutex = client_sock->server_details->mutex;
 	 thread_manager_t *thread_manager = client_sock->server_details->thread_manager;
 	 

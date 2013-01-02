@@ -38,10 +38,10 @@ namespace neweraHPC
    
    grid_scheduler_t::grid_scheduler_t(thread_manager_t **_thread_manager)
    {
-      peers = new rbtree_t;
-      jobs = new rbtree_t(NHPC_RBTREE_STR);
-      queued_instructions = new rbtree_t;
-      child_processes = new rbtree_t;
+      peers = new rbtree;
+      jobs = new rbtree(RBTREE_STR);
+      queued_instructions = new rbtree;
+      child_processes = new rbtree;
       
       mutex = new pthread_mutex_t;
       mutex_child_processes = new pthread_mutex_t;
@@ -58,35 +58,27 @@ namespace neweraHPC
       
       peer_details_t *peer;
       int key;
-      while(1)
+      int peer_count = (*peers).length();
+      for(int i = 1; i <= peer_count; i++)
       {
 	 lock();
-	 peer = (peer_details_t *)(*peers).search_first(&key);
+	 peer = (peer_details_t *)(*peers).search_inorder(i, &key); 
 	 unlock();
 	 
-	 if(!peer)
-	    break;
-	 
 	 remove_peer(key);
-      }
+      }      
       delete peers;
       
       delete jobs;
       delete child_processes;
       
       nhpc_instruction_set_t *instruction_set;
-      while(1)
+      int instruction_set_count = (*queued_instructions).length();
+      for(int i = 1; i <= instruction_set_count; i++)
       {
 	 lock();
-	 instruction_set = (nhpc_instruction_set_t *)(*queued_instructions).search_first(&key);
-	 unlock();
-	 
-	 if(!instruction_set)
-	    break;
-	 
-	 lock();
-	 (*queued_instructions).erase(key);
-	 nhpc_delete_instruction(instruction_set);
+	 instruction_set = (nhpc_instruction_set_t *)(*queued_instructions).search_inorder(i, &key);	 
+	 nhpc_delete_instruction(instruction_set);	 
 	 unlock();
       }
       
@@ -116,7 +108,7 @@ namespace neweraHPC
    int grid_scheduler_t::cores()
    {
       lock();
-      int count = peers->ret_count();
+      int count = peers->length();
       int cores = 0;
       for(int i = 1; i <= count; i++)
       {
@@ -171,7 +163,7 @@ namespace neweraHPC
    {
       peer_details_t *peer_details = NULL;
       
-      int count = peers->ret_count();
+      int count = peers->length();
       
       for(int i = 1; i <= count; i++)
       {
@@ -266,7 +258,7 @@ namespace neweraHPC
 	 goto exit_thread;
       }
        
-      argument_count = instruction_set->arguments->ret_count();
+      argument_count = instruction_set->arguments->length();
       for(int i = 1; i < argument_count; i++)
       {
 	 char *argument = (char *)instruction_set->arguments->search(i);
@@ -407,7 +399,7 @@ namespace neweraHPC
       while(1)
       {
 	 lock();
-	 instruction_set = (nhpc_instruction_set_t *)queued_instructions->search_first(&id);
+	 instruction_set = (nhpc_instruction_set_t *)(*queued_instructions).search_inorder(1, &id);
 	 unlock();
 
 	 if(!instruction_set)
@@ -438,8 +430,8 @@ namespace neweraHPC
       
    void grid_scheduler_t::monitor_jobs_pending(grid_scheduler_t *grid_scheduler)
    {
-      rbtree_t *queued_instructions = grid_scheduler->queued_instructions;
-      rbtree_t *child_processes = grid_scheduler->child_processes;
+      rbtree *queued_instructions = grid_scheduler->queued_instructions;
+      rbtree *child_processes = grid_scheduler->child_processes;
       struct rusage r_usage;
       pid_t pid;
       
@@ -448,7 +440,7 @@ namespace neweraHPC
 	 int id;
 
 	 grid_scheduler->lock();
-	 nhpc_instruction_set_t *instruction_set = (nhpc_instruction_set_t *)queued_instructions->search_first(&id);
+	 nhpc_instruction_set_t *instruction_set = (nhpc_instruction_set_t *)(*queued_instructions).search_inorder(1, &id);
 	 grid_scheduler->unlock();
 	 
 	 int core_count = grid_scheduler->cores();

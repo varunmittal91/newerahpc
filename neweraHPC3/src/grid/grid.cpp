@@ -38,7 +38,7 @@ namespace neweraHPC
    nhpc_grid_server_t::nhpc_grid_server_t(const char *in_host, const char *in_cpu_time) 
    : network_t(&thread_manager), plugin_manager_t(&thread_manager), grid_scheduler_t(&thread_manager)
    {
-      clients = new rbtree_t(NHPC_RBTREE_STR);
+      clients = new rbtree(RBTREE_STR);
       thread_manager = new thread_manager_t;
       
       string_t *string = nhpc_substr(in_host, ':');
@@ -68,7 +68,7 @@ namespace neweraHPC
    nhpc_grid_server_t::nhpc_grid_server_t() 
    : network_t(&thread_manager), plugin_manager_t(&thread_manager), grid_scheduler_t(&thread_manager)
    {
-      clients = new rbtree_t(NHPC_RBTREE_STR);
+      clients = new rbtree(RBTREE_STR);
       thread_manager = new thread_manager_t;
     
       host_cpu_time = 0;
@@ -101,22 +101,25 @@ namespace neweraHPC
       char *cpu_time = NULL;
       bool daemon = false;      
       
-      key_pair_t *key_pair;
+      char       *data;
+      const char *key;
+
+      int argument_count = cmdline_arguments.length();
       
-      for(int i = 1; i <= cmdline_arguments.ret_count(); i++)
+      for(int i = 1; i <= argument_count; i++)
       {
-	 key_pair = (key_pair_t *)cmdline_arguments.search_str(i);
+	 data = (char *)cmdline_arguments.search_inorder(i, &key);
 	 
-	 switch(*(key_pair->key))
+	 switch(*key)
 	 {
 	    case 'c':
-	       cpu_time = (char *)key_pair->data;
+	       cpu_time = data;
 	       break;
 	    case 'l':
-	       host = (char *)key_pair->data;
+	       host = data;
 	       break;
 	    case 'r':
-	       controller = (char *)key_pair->data;
+	       controller = data;
 	       break;
 	    case 'h':
 	       print_help();
@@ -125,7 +128,7 @@ namespace neweraHPC
 	       daemon = true;
 	       break;
 	    default:
-	       LOG_ERROR("Invalid command line option: " << *(key_pair->key));
+	       LOG_ERROR("Invalid command line option: " << key);
 	       print_help();
 	 }	 
       }
@@ -202,7 +205,7 @@ namespace neweraHPC
 	 rv = dup(i);
       }  
       
-      jobs = new rbtree_t(NHPC_RBTREE_STR);
+      jobs = new rbtree(RBTREE_STR);
       
       nhpc_system.init_system();
       plugin_manager_init();
@@ -230,18 +233,16 @@ namespace neweraHPC
       nhpc_string_delete(host_addr);
       nhpc_string_delete(host_port);
       
-      char *tmp_host_addr;
-      const char *key_str;
       LOG_INFO("Deleting grid client details");
-      while(1)
+
+      char       *tmp_host_addr;
+      const char *key_str;
+
+      int client_count = (*clients).length();
+      for(int i = 1; i <= client_count; i++)
       {
-	 tmp_host_addr = (char *)(*clients).search_first(&key_str);
-	 
-	 if(!tmp_host_addr)
-	    break;
-	 
-	 nhpc_string_delete(tmp_host_addr);
-	 (*clients).erase(key_str);
+	 tmp_host_addr = (char *)(*clients)[i];
+	 delete[] tmp_host_addr;
       }
       
       delete clients;
@@ -281,7 +282,7 @@ namespace neweraHPC
 	    LOG_DEBUG("My Max Cpu time: " << grid_server->host_cpu_time);
 	    
 	    nhpc_instruction_set_t *instruction_set;
-	    nrv = nhpc_generate_instruction(&instruction_set, sock->headers);
+	    nrv = nhpc_generate_instruction(&instruction_set, (rbtree *)sock->headers);
 	    nrv = grid_server->grid_execute(instruction_set, sock, &uid);
 	 }
 	 else if(nhpc_strcmp(fnc_str, "SUBMISSION") == NHPC_SUCCESS)
@@ -337,7 +338,7 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_grid_server_t::grid_node_registration(nhpc_socket_t *sock)
    {
-      rbtree_t *headers = sock->headers;
+      rbtree *headers = (rbtree *)sock->headers;
       char *node_addr = (char *)headers->search("Node-Addr");
       char *node_port = (char *)headers->search("Node-Port");
       char *node_cores = (char *)headers->search("Node-Cores");

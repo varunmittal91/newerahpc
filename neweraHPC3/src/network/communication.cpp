@@ -24,7 +24,6 @@
 #include <config.h>
 #endif
 #include <include/network.h>
-//#include <include/neweraHPC.h>
 #include <include/strings_pool.h>
 #include <include/error.h>
 
@@ -98,8 +97,8 @@ namespace neweraHPC
       int old_pos = 0;
       
       if(sock->headers == NULL)
-	 sock->headers = new rbtree_t(NHPC_RBTREE_STR);
-      rbtree_t *headers = sock->headers;
+	 sock->headers = new rbtree(RBTREE_STR);
+      rbtree *headers = sock->headers;
       
       for(int cntr = 0; cntr < *len; cntr++)
       {
@@ -142,23 +141,23 @@ namespace neweraHPC
    
    void nhpc_display_headers(nhpc_socket_t *sock)
    {
-      rbtree_t *headers = sock->headers;
+      rbtree *headers = sock->headers;
       
       if(headers == NULL)
 	 return;
       
       const char *string;
-      key_pair_t *key_pair;
+      const char *key;
+
+      int count = (*headers).length();
       
-      LOG_INFO("Headers found in the message:"<<(*headers).ret_count());
-      for(int cntr = 1; cntr <= (*headers).ret_count(); cntr++)
+      LOG_INFO("Headers found in the message:" << count);
+      for(int cntr = 1; cntr <= count; cntr++)
       {
-	 key_pair = (key_pair_t *)(*headers).search_str(cntr);
-	 int width = strlen((char *)key_pair->data);
-	 if(key_pair != NULL)
-	 {
-	    LOG_INFO(setw(20)<<key_pair->key<<setw(10)<<"\t"<<(char *)(key_pair->data));
-	 }
+	 string = (const char *)(*headers).search_inorder(cntr, &key);
+	 
+	 int width = strlen(string);
+	 LOG_INFO(setw(20) << key << setw(10) << "\t" << string);
       }
    }
 };

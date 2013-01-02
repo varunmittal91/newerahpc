@@ -48,10 +48,10 @@ namespace neweraHPC
 	 peer_details_t *peer_details;
       };
       
-      rbtree_t *peers;
-      rbtree_t *jobs;
-      rbtree_t *queued_instructions;
-      rbtree_t *child_processes;
+      rbtree *peers;
+      rbtree *jobs;
+      rbtree *queued_instructions;
+      rbtree *child_processes;
       pthread_mutex_t *mutex;
       thread_manager_t **thread_manager;
       pthread_mutex_t *mutex_child_processes;

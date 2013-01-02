@@ -30,7 +30,7 @@ namespace neweraHPC
    class nhpc_headers_t
    {
    private:
-      rbtree_t *headers;
+      rbtree *headers;
    public:
       nhpc_headers_t();
       ~nhpc_headers_t();
@@ -41,8 +41,8 @@ namespace neweraHPC
       nhpc_status_t write(nhpc_socket_t *sock);
    };
    
-   nhpc_status_t nhpc_headers_insert_param(rbtree_t *headers, const char *str);
-   void nhpc_delete_headers(rbtree_t *headers);
+   nhpc_status_t nhpc_headers_insert_param(rbtree *headers, const char *str);
+   void nhpc_delete_headers(rbtree *headers);
 }
 
 #endif

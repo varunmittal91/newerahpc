@@ -33,14 +33,14 @@ using namespace std;
 
 namespace neweraHPC
 {
-   rbtree_t *app_handlers;
+   rbtree *app_handlers;
    const char *ui_temp_dir;
    
    nhpc_status_t web_ui_init()
    {
       nhpc_status_t nrv;
 
-      app_handlers = new rbtree_t(NHPC_RBTREE_STR);
+      app_handlers = new rbtree(RBTREE_STR);
       
       http_handler_register("app", (fnc_ptr_nhpc_t)web_ui_handler);
       
@@ -53,7 +53,7 @@ namespace neweraHPC
    {
       app_details_t *app_details = new app_details_t;
       app_details->func_trigger_local = func_trigger;
-      app_details->instances = new rbtree_t(NHPC_RBTREE_NUM);
+      app_details->instances = new rbtree(RBTREE_NUM);
 
       app_details->web_ui_elements = new web_ui_elements_t;
       nhpc_strcpy(&(app_details->web_ui_elements->app_name), app_name);
@@ -74,6 +74,8 @@ namespace neweraHPC
    
    nhpc_status_t web_ui_handler(http_data_t *http_data)
    {
+      cout << http_data->request_page << endl;
+      
       if(nhpc_strcmp(http_data->request_page, "*.json") == NHPC_SUCCESS)
       {
 	 int str_pos = nhpc_strfind(http_data->request_page, '.');
@@ -88,7 +90,7 @@ namespace neweraHPC
       {
 	 int url_pos = nhpc_strfind(http_data->request_page, '/', 2);
 	 char *base_url = nhpc_substr(http_data->request_page, url_pos + 1, strlen(http_data->request_page));
-	 char *new_request_page = nhpc_strconcat("/jdesktop/", base_url);
+	 char *new_request_page = nhpc_strconcat("/nuiDesktop/", base_url);
 
 	 nhpc_string_delete(http_data->request_page);
 	 http_data->request_page = new_request_page;
@@ -98,14 +100,14 @@ namespace neweraHPC
       else 
       {
 	 delete[] (http_data->request_page);
-	 http_data->request_page = nhpc_strconcat("/jdesktop", "/standard.html");
+	 http_data->request_page = nhpc_strconcat("/nuiDesktop", "/standard.html");
       }
    }
    
    nhpc_status_t web_ui_init_request(http_data_t *http_data)
    {
       nhpc_socket_t *sock = http_data->sock;
-      rbtree_t *ui_details;
+      rbtree *ui_details;
       char *file_path;
       
       string_t *app_details_str = nhpc_substr(http_data->request_page, '/');
@@ -125,7 +127,7 @@ namespace neweraHPC
       
       nhpc_strcpy(&(http_data->custom_response_mime), "Content-Type: application/json");
       
-      int instance_count = app_details->instances->ret_count();
+      int instance_count = app_details->instances->length();
       app_instance_t *app_instance = new app_instance_t;
       app_instance->instance_id = instance_count + 1;
       app_details->instances->insert(app_instance);
@@ -169,7 +171,7 @@ namespace neweraHPC
    web_ui_elements_t::web_ui_elements_t()
    {
       elements = new json_t;
-      elements_tree = new rbtree_t(NHPC_RBTREE_STR);
+      elements_tree = new rbtree(RBTREE_STR);
    }
    
    nhpc_status_t web_ui_elements_t::add_element(const char *element, const char *property)

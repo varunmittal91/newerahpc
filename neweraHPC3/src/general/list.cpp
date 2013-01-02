@@ -150,7 +150,7 @@ namespace neweraHPC
       pthread_mutex_unlock(mutex);
    }   
    
-   int list_t::ret_count()
+   int list_t::length()
    {
       int _count;
       

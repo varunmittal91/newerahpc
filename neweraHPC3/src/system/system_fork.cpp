@@ -118,7 +118,7 @@ namespace neweraHPC
    void nhpc_system_t::clean_inactive_children()
    {
       thread_mutex_lock(&mutex_chld, NHPC_THREAD_LOCK_READ);	 
-      int count = child_processes->ret_count();
+      int count = child_processes->length();
       thread_mutex_unlock(&mutex_chld, NHPC_THREAD_LOCK_READ);	 
             
       for(int i = 1; i <= count; i++)
@@ -158,8 +158,5 @@ namespace neweraHPC
    
    void system_prefork_routine()
    {
-#ifdef ENABLE_GARBAGE_COLLECTOR
-      garbage_collector_ready = false;
-#endif
    }
 };

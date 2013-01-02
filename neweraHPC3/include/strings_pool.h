@@ -34,8 +34,8 @@ namespace neweraHPC
    class strings_pool_t
    {
    private:
-      rbtree_t *strings_free;
-      rbtree_t *strings_allocated;
+      rbtree *strings_free;
+      rbtree *strings_allocated;
       nhpc_mutex_t *mutex_free;
       nhpc_mutex_t *mutex_allocated;
       

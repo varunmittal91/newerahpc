@@ -48,7 +48,7 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
-   nhpc_status_t read_headers(rbtree_t *headers, http_data_t **http_data)
+   nhpc_status_t read_headers(rbtree *headers, http_data_t **http_data)
    {
       char *command = (char *)headers->search("command");
       
@@ -103,9 +103,7 @@ namespace neweraHPC
       }
       nhpc_string_delete(command_str);
       
-      //(*http_data) = new http_data_t;
       http_data_t *local_data = (*http_data);
-      //memset(local_data, 0, sizeof(http_data_t));
       
       if(content_length)
       {
@@ -127,7 +125,7 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
-   nhpc_status_t http_content_length(rbtree_t *headers, nhpc_size_t *size)
+   nhpc_status_t http_content_length(rbtree *headers, nhpc_size_t *size)
    {
       char *file_size_str = (char *)headers->search("Content-Length");
       if(file_size_str)

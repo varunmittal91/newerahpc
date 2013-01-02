@@ -35,8 +35,8 @@ namespace neweraHPC
    plugin_manager_t::plugin_manager_t(thread_manager_t **in_thread_manager)
    {
       thread_manager = in_thread_manager;
-      plugins_installed = new rbtree_t(NHPC_RBTREE_STR);
-      plugins_requested = new rbtree_t(NHPC_RBTREE_STR);
+      plugins_installed = new rbtree(RBTREE_STR);
+      plugins_requested = new rbtree(RBTREE_STR);
       mutex = new pthread_mutex_t;
       nhpc_mutex = new nhpc_mutex_t;
 

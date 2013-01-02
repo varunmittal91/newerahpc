@@ -36,34 +36,34 @@ namespace neweraHPC
    struct nhpc_server_details_t
    {
       pthread_mutex_t  *mutex;
-      rbtree_t         *client_socks;
+      rbtree         *client_socks;
       thread_manager_t *thread_manager;
       network_t        *main_network;
    };
 
    struct nhpc_socket_t
    {
-      int sockfd;
-      int sockopt;
-      int family;
-      int incomplete_operation;
-      time_t timeout;
-      char host[16];
-      char port[6];
-      addrinfo *hints;
-      addrinfo *hints_res;
-      rbtree_t *headers;
-      bool have_headers;
-      nhpc_server_details_t *server_details;
-      char partial_content[BUFFER_SIZE_HEADER];
-      nhpc_size_t partial_content_len;
-      int thread_id;
+      int                     sockfd;
+      int                     sockopt;
+      int                     family;
+      int                     incomplete_operation;
+      time_t                  timeout;
+      char                    host[16];
+      char                    port[6];
+      addrinfo               *hints;
+      addrinfo		     *hints_res;
+      rbtree                 *headers;
+      bool                    have_headers;
+      nhpc_server_details_t  *server_details;
+      char		      partial_content[BUFFER_SIZE_HEADER];
+      nhpc_size_t             partial_content_len;
+      int                     thread_id;
    };
    
    struct header_t
    {
-      char *string;
-      size_t len;
+      char   *string;
+      size_t  len;
    };
 };
 

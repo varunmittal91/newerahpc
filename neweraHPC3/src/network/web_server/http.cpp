@@ -41,7 +41,7 @@ namespace neweraHPC
       "HTTP_RESPONSE_POST"
    };
    
-   rbtree_t *http_handlers;
+   rbtree *http_handlers;
    void sig_action(int);
    
    nhpc_status_t http_handler_register(const char *handler_string, fnc_ptr_nhpc_t handler_function)
@@ -57,7 +57,7 @@ namespace neweraHPC
    void http_init()
    {
       LOG_INFO("Initialize http handler");
-      http_handlers = new rbtree_t(NHPC_RBTREE_STR);
+      http_handlers = new rbtree(RBTREE_STR);
    }
    
    void http_init(nhpc_socket_t *sock)

@@ -32,16 +32,17 @@ namespace neweraHPC
 {
    nhpc_headers_t::nhpc_headers_t()
    {
-      headers = new rbtree_t;
+      headers = new rbtree;
    }
    
    nhpc_headers_t::~nhpc_headers_t()
    {
-      for(int i = 1; i <= headers->ret_count(); i++)
+      int header_count = (*headers).length();
+      
+      for(int i = 1; i <= header_count; i++)
       {
-	 char *tmp_string = (char *)headers->search(i);
+	 char *tmp_string = (char *)(*headers)[i];
 	 nhpc_string_delete(tmp_string);
-	 headers->erase(i);
       }
       
       delete headers;
@@ -71,7 +72,7 @@ namespace neweraHPC
    
    int nhpc_headers_t::count()
    {
-      return headers->ret_count();
+      return (*headers).length();
    }
    
    nhpc_status_t nhpc_headers_t::write(nhpc_socket_t *sock)
@@ -79,7 +80,7 @@ namespace neweraHPC
       nhpc_size_t size;
       nhpc_status_t nrv;
       
-      int count = headers->ret_count();
+      int count = (*headers).length();
       
       for(int i = 1; i <= count; i++)
       {
@@ -98,11 +99,11 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
-   nhpc_status_t nhpc_headers_insert_param(rbtree_t *headers, const char *str)
+   nhpc_status_t nhpc_headers_insert_param(rbtree *headers, const char *str)
    {
       char *argument;
       
-      if(headers->ret_count() == 0)
+      if(headers->length() == 0)
       {
 	 nhpc_strcpy(&argument, str);
 	 headers->insert(argument, "command");
@@ -128,7 +129,6 @@ namespace neweraHPC
 	 for(int i = 2; i < count; i++)
 	 {
 	    char *tmp_str_2 = nhpc_strconcat(tmp_str, ":", string->strings[i]);
-	    //nhpc_deallocate_str(tmp_str);
 	    delete[] tmp_str;
 	    tmp_str = tmp_str_2;
 	 }
@@ -146,20 +146,17 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
-   void nhpc_delete_headers(rbtree_t *headers)
+   void nhpc_delete_headers(rbtree *headers)
    {
       const char *key;
       char *string;
       
-      do 
+      int count = (*headers).length();
+      
+      while((string = (char *)(*headers).search_inorder(1, &key)))
       {
-	 string = (char *)headers->search_first(&key);
-	 if(string)
-	 {
-	    //nhpc_deallocate_str(string);
-	    delete[] string;
-	    headers->erase(key);
-	 }
-      }while(string);
+	 (*headers).erase(key);
+	 delete[] string;
+      }
    }
 }

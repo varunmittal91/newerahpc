@@ -164,7 +164,7 @@ namespace neweraHPC
       }
       
       nhpc_headers_t *headers = new nhpc_headers_t;
-      int argument_count = instruction_set->arguments->ret_count();
+      int argument_count = instruction_set->arguments->length();
       
       char *argument_count_str = nhpc_itostr(argument_count);
       headers->insert("GRID INSTRUCTION 2.90");
@@ -217,13 +217,13 @@ namespace neweraHPC
       char *grid_uid = instruction_set->grid_uid;
       char *plugin_name = instruction_set->plugin_name;
       char *host_grid_uid = instruction_set->host_grid_uid;
-      int argument_count = instruction_set->arguments->ret_count();
+      int argument_count = instruction_set->arguments->length();
       bool *execute = &(instruction_set->execute);
       char *host_peer_addr = instruction_set->host_peer_addr;
       char *host_peer_port = instruction_set->host_peer_port;
 
       char *peer_id_str = nhpc_itostr(instruction_set->host_peer_id);
-      char *argument_count_str = nhpc_itostr(instruction_set->arguments->ret_count());
+      char *argument_count_str = nhpc_itostr(instruction_set->arguments->length());
       
       nhpc_socket_t *sock;
       

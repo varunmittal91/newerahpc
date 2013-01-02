@@ -48,8 +48,8 @@ namespace neweraHPC
 	 fnc_ptr_nhpc_t      file_download;
       };
       
-      rbtree_t *functions_rbtree;
-      rbtree_t *clients;
+      rbtree *functions_rbtree;
+      rbtree *clients;
       functions_t *functions;
       fnc_ptr_t ptr;
       nhpc_status_t grid_client_gen_uid(const char *client_addr, const char **uid);
@@ -65,7 +65,7 @@ namespace neweraHPC
             
       thread_manager_t *thread_manager;
       
-      rbtree_t *jobs;
+      rbtree *jobs;
    public:
       nhpc_grid_server_t(const char *in_host, const char *in_cpu_time);   
       nhpc_grid_server_t();

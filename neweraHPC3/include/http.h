@@ -54,18 +54,18 @@ namespace neweraHPC
       short int    custom_response_type;
       char        *custom_response_mime;
       char	  *host;
-      rbtree_t    *headers;
+      rbtree      *headers;
       nhpc_socket_t *sock;
    };
    
-   extern rbtree_t *http_handlers;
+   extern rbtree *http_handlers;
    void http_init();
 
    nhpc_status_t http_handler_register(const char *handler_string, fnc_ptr_nhpc_t handler_function);
    
    void http_init(nhpc_socket_t *sock);
    
-   nhpc_status_t read_headers(rbtree_t *headers, http_data_t **http_data);
+   nhpc_status_t read_headers(rbtree *headers, http_data_t **http_data);
    nhpc_status_t delete_http_headers(http_data_t *http_data);
    
    void http_request(http_data_t *sock);
@@ -73,7 +73,7 @@ namespace neweraHPC
    
    nhpc_status_t http_get_file(const char **file_path, nhpc_socket_t *sock, const char *target_file, const char *host_addr);
 
-   nhpc_status_t http_content_length(rbtree_t *headers, nhpc_size_t *size);
+   nhpc_status_t http_content_length(rbtree *headers, nhpc_size_t *size);
 };
 
 #endif

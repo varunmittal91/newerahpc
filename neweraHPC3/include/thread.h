@@ -23,6 +23,7 @@
 #include <signal.h>
 
 #include "rbtree.h"
+#include "constants.h"
 
 //! Create thread with default state
 #define NHPC_THREAD_DEFAULT 0
@@ -54,9 +55,9 @@ namespace neweraHPC
    private:
       //! Active threads
       /*! RBTree data type keeping information of running threads 
-       \sa rbtree_t
+       \sa rbtree
        */
-      rbtree_t *active_threads;
+      rbtree *active_threads;
       
       //! Mutex varibale
       nhpc_mutex_t mutex_count;
@@ -94,13 +95,13 @@ namespace neweraHPC
 				  void *(*start_routine)(void*), void *arg, int thread_state);
       //! Thread data deletion
       /*! Delete any data allocated for the thread */
-      void delete_thread_data(int rbtree_t_id);
+      void delete_thread_data(int rbtree_id);
       
       nhpc_status_t join_thread(int thread_id);
       nhpc_status_t detach_thread(int thread_id);
 
       //! Thread cancelation routine
-      nhpc_status_t cancel_thread(int rbtree_t_id);
+      nhpc_status_t cancel_thread(int rbtree_id);
 
       //! Thread kill
       int kill_thread(int rbtrr_id);

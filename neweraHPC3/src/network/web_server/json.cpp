@@ -31,14 +31,15 @@ namespace neweraHPC
    
    json_t::json_t()
    {
-      root = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+      root = new rbtree(RBTREE_NUM);
       
       key_pair_t *key_pair = new key_pair_t;
       memset(key_pair, 0, sizeof(key_pair_t));
 
-      key_pair->branch        = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
-      key_pair->branch_object = new rbtree_t(NHPC_RBTREE_STR);
-      key_pair->json_object   = JSON_OBJECT;
+      key_pair->value_pair.branches.branch        = new rbtree(RBTREE_NUM);
+      key_pair->value_pair.branches.branch_object = new rbtree(RBTREE_STR);
+      key_pair->json_object                       = JSON_OBJECT;
+      key_pair->value_string                      = false;
 
       root_key_pair = key_pair;
       root->insert(key_pair);
@@ -57,14 +58,15 @@ namespace neweraHPC
    
    void json_t::initialize()
    {
-      root = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+      root = new rbtree(RBTREE_NUM);
       
       key_pair_t *key_pair = new key_pair_t;
       memset(key_pair, 0, sizeof(key_pair_t));
       
-      key_pair->branch        = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
-      key_pair->branch_object = new rbtree_t(NHPC_RBTREE_STR);
-      key_pair->json_object   = JSON_OBJECT;
+      key_pair->value_pair.branches.branch        = new rbtree(RBTREE_NUM);
+      key_pair->value_pair.branches.branch_object = new rbtree(RBTREE_STR);
+      key_pair->json_object                       = JSON_OBJECT;
+      key_pair->value_string                      = false;
       
       root_key_pair = key_pair;
       root->insert(key_pair);
@@ -84,7 +86,7 @@ namespace neweraHPC
       if(search_queue)
       {
 	 search_elem_t *search_elem;
-	 int search_queue_count = search_queue->ret_count();
+	 int search_queue_count = search_queue->length();
 	 
 	 for(int i = 1; i <= search_queue_count; i++)
 	 {
@@ -100,19 +102,20 @@ namespace neweraHPC
       {
 	 key_pair_t *key_pair, *key_pair2;
 
-	 rbtree_t *backtrack = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+	 rbtree *backtrack = new rbtree(RBTREE_NUM);
 	 backtrack->insert(root_key_pair);
-	 rbtree_t *temp;
+	 rbtree *temp;
 	 
-	 while(backtrack->ret_count() > 0)
+	 while(backtrack->length() > 0)
 	 {
 	    key_pair = (key_pair_t *)backtrack->search(1);
 	    
-	    rbtree_t *temp = key_pair->branch;
+	    rbtree *temp;
+	    temp = key_pair->value_pair.branches.branch;
 	    
-	    for(int i = 1; i <= temp->ret_count(); i++)
+	    for(int i = 1; i <= temp->length(); i++)
 	    {
-	       key_pair2 = (key_pair_t *)temp->search(i);
+	       key_pair2 = (key_pair_t *)(*temp)[i];
 	       
 	       if(key_pair2->json_object == JSON_ARRAY || key_pair2->json_object == JSON_OBJECT)
 	       {
@@ -122,24 +125,24 @@ namespace neweraHPC
 	       {
 		  if(key_pair2->key)
 		     delete[] key_pair2->key;
-		  if(key_pair2->value)
-		     delete[] key_pair2->value;
+		  if(key_pair2->value_string)
+		     delete[] key_pair2->value_pair.value;
 		  
 		  delete key_pair2;
 	       }
 	    }
 	    
-	    delete key_pair->branch;
+	    delete key_pair->value_pair.branches.branch;
 
-	    if(key_pair->branch_object)
+	    if(key_pair->value_pair.branches.branch_object)
 	    {
-	       delete key_pair->branch_object;
+	       delete key_pair->value_pair.branches.branch_object;
 	    }
 	    
 	    if(key_pair->key)
 	       delete[] key_pair->key;
-	    if(key_pair->value)
-	       delete[] key_pair->value;
+	    if(key_pair->value_string)
+	       delete[] key_pair->value_pair.value;
 	    
 	    delete key_pair;
 	    
@@ -155,7 +158,7 @@ namespace neweraHPC
    
    int json_t::traverse(key_pair_t **_key_pair)
    {
-      int level = root->ret_count();
+      int level = root->length();
       if(level > 0)
       {
 	 cout << "json not complete" << endl;
@@ -168,17 +171,17 @@ namespace neweraHPC
       
       if(search_queue == NULL)
       {
-	 search_queue = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+	 search_queue = new rbtree(RBTREE_NUM);
 	 search_elem = new search_elem_t;
 	 memset(search_elem, 0, sizeof(search_elem_t));
 	 
 	 search_elem->position = 1;
-	 search_elem->branch = root_key_pair->branch;
+	 search_elem->branch = root_key_pair->value_pair.branches.branch;
 	 search_queue->insert(search_elem);
       }
       else 
       {
-	 search_queue_count = search_queue->ret_count();
+	 search_queue_count = search_queue->length();
 	 search_elem = (search_elem_t *)search_queue->search(search_queue_count);
 	 
 	 if(search_elem == NULL)
@@ -205,7 +208,7 @@ namespace neweraHPC
 	    search_elem = new search_elem_t;
 	    memset(search_elem, 0, sizeof(search_elem_t));
 	    
-	    search_elem->branch = key_pair->branch;
+	    search_elem->branch = key_pair->value_pair.branches.branch;
 	    search_elem->position = 1;
 	    search_queue->insert(search_elem);
 	 }  
@@ -217,7 +220,7 @@ namespace neweraHPC
    
    const char *json_t::get_string()
    {
-      int level = root->ret_count();
+      int level = root->length();
       if(level > 0)
 	 return NULL;
       
@@ -239,10 +242,10 @@ namespace neweraHPC
       
       while((json_status = traverse(&key_pair)) != JSON_END)
       {
-	 search_elem      = (search_elem_t *)search_queue->search(search_queue->ret_count());
-	 search_elem_old  = (search_elem_t *)search_queue->search(search_queue->ret_count() - 1);
+	 search_elem      = (search_elem_t *)search_queue->search(search_queue->length());
+	 search_elem_old  = (search_elem_t *)search_queue->search(search_queue->length() - 1);
 	 current_position = (search_elem->position);
-	 element_count    = search_elem->branch->ret_count();
+	 element_count    = search_elem->branch->length();
 	 
 	 if(key_pair->json_object == JSON_OBJECT_CLOSE || key_pair->json_object == JSON_ARRAY_CLOSE)
 	 {
@@ -259,7 +262,7 @@ namespace neweraHPC
 	    if(search_elem_old)
 	    {
 	       current_position = search_elem_old->position;
-	       element_count    = search_elem_old->branch->ret_count();
+	       element_count    = search_elem_old->branch->length();
 	       
 	       if(current_position < element_count)
 	       {
@@ -280,21 +283,23 @@ namespace neweraHPC
 	    memcpy(tmp_json_string, ": ", 2);
 	    tmp_json_string += 2;
 	 }
-	 if(key_pair->value)
+	 if(key_pair->value_string)
 	 {
-	    nhpc_size_t value_len = strlen(key_pair->value);
+	    char *value = key_pair->value_pair.value;
+	    
+	    nhpc_size_t value_len = strlen(value);
 	    
 	    if(key_pair->json_object == JSON_STRING)
 	    {
 	       *tmp_json_string = '"';
-	       memcpy((tmp_json_string + 1), key_pair->value, value_len);
+	       memcpy((tmp_json_string + 1), value, value_len);
 	       tmp_json_string += (value_len + 1);
 	       *tmp_json_string = '"';
 	       tmp_json_string++;
 	    }
 	    else 
 	    {
-	       memcpy(tmp_json_string, key_pair->value, value_len);
+	       memcpy(tmp_json_string, value, value_len);
 	       tmp_json_string += value_len;
 	    }
 	 }
@@ -326,7 +331,7 @@ namespace neweraHPC
    
    void json_t::print()
    {
-      int level = root->ret_count();
+      int level = root->length();
       if(level > 0)
       {
 	 cout << JSON_OBJECT_STRINGS[JSON_INCOMPLETE] << endl;
@@ -343,10 +348,10 @@ namespace neweraHPC
       
       while((json_status = traverse(&key_pair)) != JSON_END)
       {
-	 search_elem      = (search_elem_t *)search_queue->search(search_queue->ret_count());
-	 search_elem_old  = (search_elem_t *)search_queue->search(search_queue->ret_count() - 1);
+	 search_elem      = (search_elem_t *)search_queue->search(search_queue->length());
+	 search_elem_old  = (search_elem_t *)search_queue->search(search_queue->length() - 1);
 	 current_position = (search_elem->position);
-	 element_count    = search_elem->branch->ret_count();
+	 element_count    = search_elem->branch->length();
 	 
 	 if(key_pair->json_object == JSON_OBJECT_CLOSE || key_pair->json_object == JSON_ARRAY_CLOSE)
 	 {
@@ -362,7 +367,7 @@ namespace neweraHPC
 	    if(search_elem_old)
 	    {
 	       current_position = search_elem_old->position;
-	       element_count    = search_elem_old->branch->ret_count();
+	       element_count    = search_elem_old->branch->length();
 	    
 	       if(current_position < element_count)
 		  cout << ",";
@@ -373,12 +378,14 @@ namespace neweraHPC
 	 
 	 if(key_pair->key)
 	    cout << key_pair->key << ": ";
-	 if(key_pair->value)
+	 if(key_pair->value_string)
 	 {
+	    char *value = key_pair->value_pair.value;
+	    
 	    if(key_pair->json_object == JSON_STRING)
-	       cout << '"' <<key_pair->value << '"';
+	       cout << '"' << value << '"';
 	    else 
-	       cout << key_pair->value;
+	       cout << value;
 	 }
 	 if(key_pair->json_object == JSON_ARRAY || key_pair->json_object == JSON_OBJECT)
 	 {
@@ -399,7 +406,7 @@ namespace neweraHPC
    json_t::key_pair_t *json_t::search(int json_object, int *key_num, const char *key_str, const char **response)
    {
       /*
-      int level = root->ret_count();
+      int level = root->length();
       if(level > 0)
       {
 	 *response = JSON_OBJECT_STRINGS[JSON_INCOMPLETE];
@@ -423,13 +430,18 @@ namespace neweraHPC
 	 return NULL;
       }
       
+      rbtree *branch;
       if(json_object == JSON_ARRAY)
       {
-	 key_pair = (key_pair_t *)current_key_pair->branch->search(*key_num);
+	 branch = current_key_pair->value_pair.branches.branch;
+	 
+	 key_pair = (key_pair_t *)branch->search(*key_num);
       }
       else 
       {
-	 key_pair = (key_pair_t *)current_key_pair->branch_object->search(key_str);
+	 branch = current_key_pair->value_pair.branches.branch_object;
+
+	 key_pair = (key_pair_t *)branch->search(key_str);
       }
       
       if(key_pair)
@@ -466,7 +478,7 @@ namespace neweraHPC
       }
       else 
       {
-	 return key_pair->value;
+	 return key_pair->value_pair.value;
       }
    }
    
@@ -483,7 +495,7 @@ namespace neweraHPC
       }
       else 
       {
-	 return key_pair->value;
+	 return key_pair->value_pair.value;
       }
    }
    
@@ -492,17 +504,18 @@ namespace neweraHPC
       if(current_key_pair == NULL)
 	 current_key_pair = root_key_pair;
       
+      rbtree *branch = current_key_pair->value_pair.branches.branch;
       if(current_key_pair->json_object == JSON_OBJECT)
-	 return current_key_pair->branch->ret_count();
+	 return branch->length();
       else 
-	 return (current_key_pair->branch->ret_count() - 1);
+	 return (branch->length() - 1);
    }
    
    nhpc_status_t json_t::update_value(key_pair_t *key_pair, const char *input)
    {
       int *json_object = &(key_pair->json_object);
       
-      nhpc_size_t len_original = strlen(key_pair->value);
+      nhpc_size_t len_original = strlen(key_pair->value_pair.value);
       nhpc_size_t len_new      = strlen(input);
       
       if(final_json_string)
@@ -514,8 +527,8 @@ namespace neweraHPC
       if(len_new != len_original)
 	 final_json_length += (len_new - len_original);
       
-      delete[] (key_pair->value);
-      nhpc_strcpy(&(key_pair->value), input);
+      delete[] (key_pair->value_pair.value);
+      nhpc_strcpy(&(key_pair->value_pair.value), input);
       
       return NHPC_SUCCESS;
    }
@@ -559,7 +572,7 @@ namespace neweraHPC
    
    nhpc_status_t json_t::close_element()
    {
-      int level = root->ret_count();
+      int level = root->length();
       if(level == 0)
 	 return NHPC_FAIL;
 
@@ -579,7 +592,7 @@ namespace neweraHPC
       else 
 	 LOG_ERROR("Invalid close");
       
-      last_key_pair->branch->insert(key_pair);
+      last_key_pair->value_pair.branches.branch->insert(key_pair);
       
       root->erase(level);
       
@@ -588,7 +601,7 @@ namespace neweraHPC
    
    nhpc_status_t json_t::add_element(int json_object, const char *input1, const char *input2)
    {
-      int level = root->ret_count();
+      int level = root->length();
       if(level == 0)
 	 return NHPC_FAIL;
 
@@ -705,20 +718,22 @@ namespace neweraHPC
       }
       if(copy_value)
       {
-	 nhpc_strcpy(&(key_pair->value), value);  
+	 nhpc_strcpy(&(key_pair->value_pair.value), value);  
 	 final_json_length += strlen(value);
 	 
 	 if(copy_key)
 	    final_json_length += 2;
 	 if(copy_value_quotes)
 	    final_json_length += 2;
+	 
+	 key_pair->value_string = true;
       }
       
       if(create_object)
       {
-	 key_pair->branch = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+	 key_pair->value_pair.branches.branch = new rbtree(RBTREE_NUM);
 	 if(json_object == JSON_OBJECT)
-	    key_pair->branch_object = new rbtree_t(NHPC_RBTREE_STR);
+	    key_pair->value_pair.branches.branch_object = new rbtree(RBTREE_STR);
 	 
 	 root->insert(key_pair);
 	 
@@ -726,13 +741,14 @@ namespace neweraHPC
 	 if(copy_key)
 	    final_json_length += 2;
       }
-      last_key->branch->insert(key_pair);
+      
+      last_key->value_pair.branches.branch->insert(key_pair);
       if(last_key->json_object == JSON_OBJECT)
       {
-	 last_key->branch_object->insert(key_pair, key);
+	 last_key->value_pair.branches.branch_object->insert(key_pair, key);
       }
       
-      if(last_key->branch->ret_count() > 1)
+      if(last_key->value_pair.branches.branch->length() > 1)
       {
 	 final_json_length += 1;
       }
@@ -790,7 +806,7 @@ namespace neweraHPC
 		     add_element(JSON_OBJECT);
 	       }
 	       
-	       last_key = (key_pair_t *)(*root).search(root->ret_count());
+	       last_key = (key_pair_t *)(*root).search(root->length());
 	       
 	       json_string_ptr++;
 	    }
@@ -800,7 +816,7 @@ namespace neweraHPC
 	    case ']':
 	    {
 	       close_element();
-	       last_key = (key_pair_t *)(*root).search(root->ret_count());
+	       last_key = (key_pair_t *)(*root).search(root->length());
 	       
 	       json_string_ptr++;
 	    }
@@ -959,7 +975,7 @@ namespace neweraHPC
 	 }
       }
       
-      if((*root).ret_count() >0)
+      if((*root).length() >0)
 	 goto error_state;
       
       return NHPC_SUCCESS;
@@ -992,8 +1008,8 @@ namespace neweraHPC
       
       stream_length = 2;
       
-      nodes = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
-      backtrack = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+      nodes = new rbtree(RBTREE_NUM);
+      backtrack = new rbtree(RBTREE_NUM);
       search_queue = NULL;
       
       backtrack->insert(nodes);
@@ -1001,14 +1017,14 @@ namespace neweraHPC
    
    nhpc_json_t::~nhpc_json_t()
    {
-      rbtree_t *temp = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+      rbtree *temp = new rbtree(RBTREE_NUM);
       temp->insert(nodes);
       
    loop:
-      rbtree_t *current = (rbtree_t *)temp->search(1);
+      rbtree *current = (rbtree *)temp->search(1);
       if(current)
       {
-	 for(int i = 1; i <= current->ret_count(); i++)
+	 for(int i = 1; i <= current->length(); i++)
 	 {
 	    key_pair_t *key_pair = (key_pair_t *)current->search(i);
 	    if(key_pair->key)
@@ -1054,16 +1070,16 @@ namespace neweraHPC
    {      
       bool is_arrayobject = false;
       
-      rbtree_t *current = (rbtree_t *)backtrack->search(backtrack->ret_count());
+      rbtree *current = (rbtree *)backtrack->search(backtrack->length());
       if(current == NULL)
       {
 	 return NHPC_FAIL;
       }
       
-      key_pair_t *key_pair_last = (key_pair_t *)current->search(current->ret_count());
+      key_pair_t *key_pair_last = (key_pair_t *)current->search(current->length());
        
       int stream_length_new = stream_length;
-      if(current->ret_count() > 0)
+      if(current->length() > 0)
 	 stream_length_new += 1;
       
       key_pair_t *key_pair = new key_pair_t;
@@ -1109,7 +1125,7 @@ namespace neweraHPC
       }      
       else if(json_object == JSON_ARRAY)
       {
-	 rbtree_t *new_child = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+	 rbtree *new_child = new rbtree(RBTREE_NUM);
 	 key_pair->value = new_child;
 	 backtrack->insert(new_child);
 	 stream_length_new += 2;
@@ -1118,7 +1134,7 @@ namespace neweraHPC
       }
       else if(json_object == JSON_OBJECT)
       {
-	 rbtree_t *new_child = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+	 rbtree *new_child = new rbtree(RBTREE_NUM);
 	 key_pair->value = new_child;
 	 backtrack->insert(new_child);
 	 stream_length_new += 2;
@@ -1143,7 +1159,7 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_json_t::close_element()
    {
-      nhpc_status_t nrv = backtrack->erase(backtrack->ret_count());
+      nhpc_status_t nrv = backtrack->erase(backtrack->length());
       if(nrv == NHPC_SUCCESS)
       {
 	 current_level--;
@@ -1156,7 +1172,7 @@ namespace neweraHPC
    {
       *_key_pair = NULL;
       
-      if(backtrack->ret_count() != 0)
+      if(backtrack->length() != 0)
       {
 	 return JSON_INCOMPLETE;
       }
@@ -1167,7 +1183,7 @@ namespace neweraHPC
       
       if(search_queue == NULL)
       {
-	 search_queue = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+	 search_queue = new rbtree(RBTREE_NUM);
 	 search_elem = new search_elem_t;
 	 memset(search_elem, 0, sizeof(search_elem_t));
 	 
@@ -1177,7 +1193,7 @@ namespace neweraHPC
       }
       else 
       {
-	 search_queue_count = search_queue->ret_count();
+	 search_queue_count = search_queue->length();
 	 
 	 search_elem = (search_elem_t *)search_queue->search(search_queue_count);
 	 if(search_elem == NULL)
@@ -1204,12 +1220,12 @@ namespace neweraHPC
 	    search_elem = new search_elem_t;
 	    memset(search_elem, 0, sizeof(search_elem_t));
 	    
-	    search_elem->branch = (rbtree_t *)key_pair->value;
+	    search_elem->branch = (rbtree *)key_pair->value;
 	    search_elem->position = 1;
 	    search_queue->insert(search_elem);
 
 	    if(child_count)
-	       *child_count = search_elem->branch->ret_count();
+	       *child_count = search_elem->branch->length();
 	 }  
 	 
 	 *(_key_pair) = key_pair;
@@ -1219,17 +1235,17 @@ namespace neweraHPC
    
    const char *nhpc_json_t::get_stream()
    {
-      if(backtrack->ret_count() > 0)
+      if(backtrack->length() > 0)
 	 return NULL;
       
       struct object_status_t
       {
-	 rbtree_t *tree;
+	 rbtree *tree;
 	 int elements_done;
 	 int elements;
 	 int json_object;
       };
-      rbtree_t *stack = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+      rbtree *stack = new rbtree(RBTREE_NUM);
       
       key_pair_t *key_pair = NULL;
       key_pair_t *key_pair_current;
@@ -1246,7 +1262,7 @@ namespace neweraHPC
       
       object_status->tree = nodes;
       object_status->elements_done = 0;
-      object_status->elements = nodes->ret_count();
+      object_status->elements = nodes->length();
       object_status->json_object = JSON_OBJECT;
       stack->insert(object_status);
       
@@ -1260,7 +1276,7 @@ namespace neweraHPC
       
       do 
       {
-	 object_status_t *object_status_current = (object_status_t *)stack->search(stack->ret_count());
+	 object_status_t *object_status_current = (object_status_t *)stack->search(stack->length());
 	 
 	 if(key_pair)
 	 {
@@ -1272,9 +1288,9 @@ namespace neweraHPC
 	       object_status_t *object_status = new object_status_t;
 	       memset(object_status, 0, sizeof(object_status_t));
 	       
-	       object_status->tree = (rbtree_t *)(key_pair->value);
+	       object_status->tree = (rbtree *)(key_pair->value);
 	       object_status->elements_done = 0;
-	       object_status->elements = ((rbtree_t *)(key_pair->value))->ret_count();
+	       object_status->elements = ((rbtree *)(key_pair->value))->length();
 	       object_status->json_object = key_pair->json_object;
 	       stack->insert(object_status);
 	       
@@ -1360,7 +1376,7 @@ namespace neweraHPC
 	    
 	    while(object_status_current && object_status_current->elements_done == object_status_current->elements)
 	    {
-	       stack->erase(stack->ret_count());
+	       stack->erase(stack->length());
 	       
 	       if(object_status_current->json_object == JSON_OBJECT)
 	       {
@@ -1373,7 +1389,7 @@ namespace neweraHPC
 		  json_out_str_tmp++;
 	       }
 	       
-	       object_status_current = (object_status_t *)stack->search(stack->ret_count());
+	       object_status_current = (object_status_t *)stack->search(stack->length());
 	       if(object_status_current && object_status_current->elements_done < object_status_current->elements)
 	       {
 		  *json_out_str_tmp = ',';
@@ -1569,7 +1585,7 @@ namespace neweraHPC
       if(*json_string_ptr == '}')
 	 close_element();
       
-      if(backtrack->ret_count() != 0)
+      if(backtrack->length() != 0)
       {
 	 goto error_state;
       }

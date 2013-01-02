@@ -32,7 +32,7 @@ namespace neweraHPC
 {
    thread_manager_t::thread_manager_t()
    {          
-      active_threads = new rbtree_t;
+      active_threads = new rbtree;
       
       thread_count = 0;
       thread_mutex_init(&mutex_count);
@@ -44,21 +44,20 @@ namespace neweraHPC
       LOG_INFO("Shuting Down Thread Manager");
       
       pthread_t *thread;
-      int thread_id;      
-      while(1)
+      int thread_id, thread_count;
+      
+      lock(&mutex, NHPC_THREAD_LOCK_WRITE);
+
+      thread_count = (*active_threads).length();
+      for(int i = 1; i <= thread_count; i++)
       {
-	 lock(&mutex, NHPC_THREAD_LOCK_READ);
-	 thread = (pthread_t *)(*active_threads).search_first(&thread_id);
-	 unlock(&mutex, NHPC_THREAD_LOCK_READ);
-	 
-	 if(!thread)
-	    break;
-	 
+	 thread = (pthread_t *)(*active_threads)[i];
 	 cancel_thread(thread_id);
 	 delete_thread_data(thread_id);
       }
-      
       delete active_threads;
+      
+      unlock(&mutex, NHPC_THREAD_LOCK_WRITE);
    }
    
    inline void thread_manager_t::lock(nhpc_mutex_t *in_mutex, int lock_mode)
@@ -180,12 +179,12 @@ namespace neweraHPC
       return NHPC_SUCCESS;      
    }
    
-   void thread_manager_t::delete_thread_data(int rbtree_t_id)
+   void thread_manager_t::delete_thread_data(int rbtree_id)
    {
       lock(&mutex, NHPC_THREAD_LOCK_WRITE);
-      pthread_t *thread = (pthread_t *)(*active_threads).search(rbtree_t_id);
+      pthread_t *thread = (pthread_t *)(*active_threads).search(rbtree_id);
       if(thread){
-	 (*active_threads).erase(rbtree_t_id);
+	 (*active_threads).erase(rbtree_id);
 	 delete thread;
       }      
       
@@ -194,12 +193,12 @@ namespace neweraHPC
       unlock(&mutex, NHPC_THREAD_LOCK_WRITE);
    }
    
-   nhpc_status_t thread_manager_t::cancel_thread(int rbtree_t_id)
+   nhpc_status_t thread_manager_t::cancel_thread(int rbtree_id)
    {
       nhpc_status_t nrv;
       
       lock(&mutex, NHPC_THREAD_LOCK_READ);
-      pthread_t *thread = (pthread_t *)(*active_threads).search(rbtree_t_id);
+      pthread_t *thread = (pthread_t *)(*active_threads).search(rbtree_id);
       unlock(&mutex, NHPC_THREAD_LOCK_READ);
       
       if(!thread)

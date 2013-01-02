@@ -36,7 +36,7 @@ typedef struct queue_struct{
 }queue_t;
 
 queue_t *q;
-rbtree_t *tree;
+rbtree *tree;
 
 void func_sleep(void)
 {
@@ -84,13 +84,13 @@ int dequeue(int id)
 
 int find_min(int length)
 {
-   int min = tree[0].ret_count();
+   int min = tree[0].length();
    int pos = 0;
    int i;
    for(i=1; i<length; i++)
-      if(tree[i].ret_count() < min)
+      if(tree[i].length() < min)
       {
-          min = tree[i].ret_count();
+          min = tree[i].length();
           pos = i;
       }
    return pos;
@@ -105,7 +105,7 @@ void rbqueue()
    //cin>>number;
    number = 4;
    q = new queue_t[number];
-   tree = new rbtree_t[number];
+   tree = new rbtree[number];
    for(int i=0; i<number; i++)
    {
       q[i].front = q[i].rear = -1;
@@ -122,21 +122,21 @@ void rbqueue()
    cout<<"enqueue task to sys 2: "<<enqueue(15, 2)<<endl;
    cout<<"enqueue task to sys 3: "<<enqueue(15, 3)<<endl;
    cout<<"enqueue task to sys 1: "<<enqueue(15, 1)<<endl;
-   //cout<<"ret_count() = "<<tree[1].ret_count()<<endl;
+   //cout<<"length() = "<<tree[1].length()<<endl;
    //cout<<"dequeue: "<<dequeue(1)<<endl;
-   //cout<<"ret_count() = "<<tree[1].ret_count()<<endl;
+   //cout<<"length() = "<<tree[1].length()<<endl;
    int next = find_min(number);
    cout<<endl<<"System State:"<<endl;
    for(int i=0; i<number; i++)
    {
-      cout<<"System "<<i<<":= Task Running - "<<tree[i].ret_count()<<"; Total Jobs - "<<q[i].task_total<<"; Jobs Completed - "<<q[i].task_completed<<endl;
+      cout<<"System "<<i<<":= Task Running - "<<tree[i].length()<<"; Total Jobs - "<<q[i].task_total<<"; Jobs Completed - "<<q[i].task_completed<<endl;
    }
    cout<<endl<<"next task should go to sys "<<next<<endl;
 }
 
 void rbmulti_test()
 {
-   rbtree_t *tree = new rbtree_t[5];
+   rbtree *tree = new rbtree[5];
    int cntr=0, cnt=0, temp;
    do
    {
@@ -145,7 +145,7 @@ void rbmulti_test()
      {
 	temp = rand()%50;
         cout<<"Inserting "<<temp<<" to tree["<<i<<"] : \treturn: "<<tree[i].insert(&temp, cntr);
-        cout<<"\tcount: "<<tree[i].ret_count()<<endl;
+        cout<<"\tcount: "<<tree[i].length()<<endl;
         cntr++;
      }
      cnt++;
@@ -159,7 +159,7 @@ void rbmulti_test()
 
      for(int i=0; i<5; i++)
      {
-        cout<<"Remove key["<<cntr<<"] from tree["<<i<<"] : \treturn: "<<tree[i].erase(cntr)<<"\tcount: "<<tree[i].ret_count()<<endl;
+        cout<<"Remove key["<<cntr<<"] from tree["<<i<<"] : \treturn: "<<tree[i].erase(cntr)<<"\tcount: "<<tree[i].length()<<endl;
         cntr++;
      }
      cnt++;
@@ -173,10 +173,10 @@ void rbmulti_test()
 
 int main()
 {   
-   cout<<"This program is mainly build built for testing the efficiency of rbtree_t module used in the neweraHPC library"<<endl;
+   cout<<"This program is mainly build built for testing the efficiency of rbtree module used in the neweraHPC library"<<endl;
    cout<<"Please use some tool to test for memory leaks\n"<<"Attach the binary to some tool and then press any key"<<endl;
    
-   rbtree_t *test_tree = new rbtree_t;
+   rbtree *test_tree = new rbtree;
    
    int *a,*b,*c,*d;
    a = new int[122];
@@ -200,7 +200,7 @@ int main()
    delete[] c; 
    delete[] d;
    
-   test_tree = new rbtree_t(NHPC_RBTREE_STR);
+   test_tree = new rbtree(RBTREE_STR);
    cout<<endl;
    cout<<test_tree->insert(a, "1")<<endl;
    cout<<test_tree->insert(b, "2")<<endl;
@@ -219,7 +219,7 @@ int main()
    delete test_tree;
    
    cout<<"\n\ntesting [] operator"<<endl;
-   test_tree = new rbtree_t;
+   test_tree = new rbtree;
 
    cout<<a<<endl; 
    cout<<b<<endl;
@@ -233,7 +233,7 @@ int main()
    
    (*test_tree).erase(2);
    
-   int count = (*test_tree).ret_count();
+   int count = (*test_tree).length();
    for(int i = 1; i <= count; i++)
    {
       a = (int *)(*test_tree)[i];
@@ -244,7 +244,7 @@ int main()
    
    cout<<"\n\nTesting managed mode"<<endl;
 
-   test_tree = new rbtree_t(NHPC_RBTREE_NUM_MANAGED);
+   test_tree = new rbtree(NHPC_RBTREE_NUM_MANAGED);
    cout<<"Inserting: "<<(*test_tree).insert(a)<<endl;
    cout<<"Inserting: "<<(*test_tree).insert(b)<<endl;
    cout<<"Inserting: "<<(*test_tree).insert(c)<<endl;
@@ -254,9 +254,9 @@ int main()
    (*test_tree).erase(2);
    cout<<"Inserting: "<<(*test_tree).insert(b)<<endl;
    
-   cout<<"Count: "<<(*test_tree).ret_count()<<endl;
+   cout<<"Count: "<<(*test_tree).length()<<endl;
    
-   for(int i = 1; i <= (*test_tree).ret_count(); i++)
+   for(int i = 1; i <= (*test_tree).length(); i++)
    {
       void *test = (*test_tree).search(i);
       //(*test_tree).erase(i);
@@ -267,7 +267,7 @@ int main()
    delete test_tree;
    
    
-   test_tree = new rbtree_t(NHPC_RBTREE_NUM_HASH);
+   test_tree = new rbtree(NHPC_RBTREE_NUM_HASH);
    cout<<(*test_tree).insert(a, 1)<<endl;
    cout<<(*test_tree).insert(b, 1)<<endl;
    cout<<(*test_tree).insert(c, 1)<<endl;

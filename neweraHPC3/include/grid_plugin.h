@@ -41,8 +41,8 @@ namespace neweraHPC
          int status;
       };
 
-      rbtree_t *plugins_installed;
-      rbtree_t *plugins_requested;
+      rbtree *plugins_installed;
+      rbtree *plugins_requested;
       thread_manager_t **thread_manager;
       pthread_mutex_t *mutex;
       nhpc_status_t install_plugin_dll(const char *dll_path, plugin_details_t **plugin_details);

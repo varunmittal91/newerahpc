@@ -52,8 +52,8 @@ namespace neweraHPC
       
       thread_mutex_init(&mutex_chld);
       
-      child_processes = new rbtree_t(NHPC_RBTREE_NUM);
-      child_handlers  = new rbtree_t(NHPC_RBTREE_STR);
+      child_processes = new rbtree(RBTREE_NUM);
+      child_handlers  = new rbtree(RBTREE_STR);
    }
    
    nhpc_system_t::nhpc_system_t(thread_manager_t **_thread_manager)
@@ -62,8 +62,8 @@ namespace neweraHPC
       
       systeminfo = new nhpc_systeminfo_t;
 
-      child_processes = new rbtree_t(NHPC_RBTREE_NUM);
-      child_handlers  = new rbtree_t(NHPC_RBTREE_STR);
+      child_processes = new rbtree(RBTREE_NUM);
+      child_handlers  = new rbtree(RBTREE_STR);
    }
    
    nhpc_system_t::~nhpc_system_t()

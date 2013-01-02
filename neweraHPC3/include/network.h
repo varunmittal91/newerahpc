@@ -57,7 +57,7 @@ namespace neweraHPC
 	 network_t        *network;
 	 thread_manager_t *thread_manager;
 	 nhpc_socket_t    *sock;
-	 rbtree_t         *client_socks;
+	 rbtree         *client_socks;
       };
       
       struct nhpc_thrad_details_t *server_thread_details;      
@@ -66,7 +66,7 @@ namespace neweraHPC
       pthread_mutex_t *mutex;
       pthread_mutex_t *mutex_addons;
       
-      rbtree_t *client_connections;
+      rbtree *client_connections;
       thread_manager_t **thread_manager;
       nhpc_socket_t *server_sock;
       int accept_thread_id;
@@ -88,7 +88,7 @@ namespace neweraHPC
       nhpc_status_t create_server(const char *host_addr, const char *host_port,
 				  int family, int type, int protocol);
       
-      rbtree_t *network_addons;
+      rbtree *network_addons;
       void lock_addons();
       void unlock_addons();
    };

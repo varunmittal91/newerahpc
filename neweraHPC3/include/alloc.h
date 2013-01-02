@@ -28,15 +28,18 @@
 
 #include "error.h"
 #include "strings_pool.h"
+#include "heap.h"
 
 using namespace neweraHPC;
 
-#ifdef ENABLE_GARBAGE_COLLECTOR
+//#ifdef ENABLE_GARBAGE_COLLECTOR
+extern GarbageCollector garbagecollector;
+
 void *operator new(std::size_t size) throw (std::bad_alloc);
 void *operator new[](std::size_t size) throw (std::bad_alloc);
 
 void operator delete(void *ptr) throw ();
 void operator delete[](void *ptr) throw ();
-#endif
+//#endif
 
 #endif

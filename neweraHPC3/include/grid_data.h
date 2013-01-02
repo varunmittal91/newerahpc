@@ -108,7 +108,7 @@ namespace neweraHPC
       void *data;
       nhpc_size_t data_len;
       int host_peer_id;
-      rbtree_t *arguments;
+      rbtree *arguments;
       int argument_count;
       char *grid_uid;
       char *host_grid_uid;

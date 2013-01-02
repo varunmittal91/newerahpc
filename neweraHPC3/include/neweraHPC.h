@@ -36,7 +36,7 @@
 
 #include <iostream>
 
-extern neweraHPC::rbtree_t cmdline_arguments;
+extern neweraHPC::rbtree cmdline_arguments;
 
 using namespace std;
 

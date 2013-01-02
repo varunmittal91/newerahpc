@@ -21,6 +21,8 @@
 #define _JSON_H_
 
 #include "rbtree.h"
+#include "constants.h"
+#include "strings.h"
 
 namespace neweraHPC
 {
@@ -52,7 +54,7 @@ namespace neweraHPC
    {
    private:
       key_pair_t *root_key_pair;
-      rbtree_t *search_queue;
+      rbtree *search_queue;
       
    public:
       json_object_t(key_pair_t *_root_key_pair);
@@ -67,18 +69,30 @@ namespace neweraHPC
       struct key_pair_t
       {
 	 char     *key;
-	 char	  *value;
 	 int	  json_object;
-	 rbtree_t *branch;
-	 rbtree_t *branch_object;  // special branch for rbtree in string modes
+	 
+	 union value_pair_t
+	 {
+	    struct branches_t
+	    {
+	       rbtree *branch;
+	       rbtree *branch_object;
+	    };
+	    
+	    char       *value;
+	    branches_t  branches;
+	 };
+	 
+	 bool         value_string;
+	 value_pair_t value_pair;
       };
       struct search_elem_t
       {
-	 rbtree_t *branch;
+	 rbtree *branch;
 	 int       position;
       };
       
-      rbtree_t   *root;
+      rbtree   *root;
       key_pair_t *root_key_pair;
       key_pair_t *current_key_pair;
       
@@ -86,7 +100,7 @@ namespace neweraHPC
       char *final_json_string;
 
       int traverse(key_pair_t **_key_pair);
-      rbtree_t *search_queue;
+      rbtree *search_queue;
       
       void initialize();
       void reinitialize();
@@ -126,7 +140,7 @@ namespace neweraHPC
    private:
       struct search_elem_t
       {
-	 rbtree_t *branch;
+	 rbtree *branch;
 	 int position;
       };  
       struct stream_elem_t
@@ -136,9 +150,9 @@ namespace neweraHPC
       
       int stream_length;
       int current_level;
-      rbtree_t *nodes;
-      rbtree_t *backtrack;
-      rbtree_t *search_queue;
+      rbtree *nodes;
+      rbtree *backtrack;
+      rbtree *search_queue;
    public:
       struct key_pair_t
       {

@@ -45,7 +45,7 @@ namespace neweraHPC
       void display();
       void add_elem(int number);
       int pop_elem();
-      int ret_count();
+      int length();
    };
 };
 

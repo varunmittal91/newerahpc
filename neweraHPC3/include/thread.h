@@ -42,8 +42,6 @@ namespace neweraHPC
    struct nhpc_mutex_t
    {
       pthread_rwlock_t lock;
-      
-      pthread_mutex_t lock_write;
    };
    
    //! Thread Manager

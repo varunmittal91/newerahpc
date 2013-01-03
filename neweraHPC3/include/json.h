@@ -135,6 +135,7 @@ namespace neweraHPC
    };
    
    
+   /*
    class nhpc_json_t
    {
    private:
@@ -175,6 +176,7 @@ namespace neweraHPC
       bool is_delimiter(char in_char);
       void print();
    };
+    */
 };
 
 #endif

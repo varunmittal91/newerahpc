@@ -330,7 +330,7 @@ namespace neweraHPC
 	 pthread_mutex_t *mutex = client_sock->server_details->mutex;
 	 thread_manager_t *thread_manager = client_sock->server_details->thread_manager;
 	 
-	 pthread_mutex_lock(mutex);
+	 pthread_mutex_lock(mutex);	 
 	 client_socks->erase(client_sock->sockfd);
 	 pthread_mutex_unlock(mutex);
 	 

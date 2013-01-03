@@ -36,7 +36,7 @@ namespace neweraHPC
    struct nhpc_server_details_t
    {
       pthread_mutex_t  *mutex;
-      rbtree         *client_socks;
+      rbtree           *client_socks;
       thread_manager_t *thread_manager;
       network_t        *main_network;
    };

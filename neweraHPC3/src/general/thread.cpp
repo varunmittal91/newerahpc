@@ -221,16 +221,20 @@ namespace neweraHPC
    
    nhpc_status_t thread_mutex_lock(nhpc_mutex_t *mutex, int for_read)
    {
+      /*
       if(for_read)
 	 pthread_rwlock_rdlock(&(mutex->lock));
       else 
 	 pthread_rwlock_wrlock(&(mutex->lock));
+       */
+      pthread_mutex_lock(&(mutex->lock_write));
 	 
       return NHPC_SUCCESS;
    }
    
    nhpc_status_t thread_mutex_unlock(nhpc_mutex_t *mutex, int for_read)
    {
-      pthread_rwlock_unlock(&(mutex->lock));
+      //pthread_rwlock_unlock(&(mutex->lock));
+      pthread_mutex_unlock(&(mutex->lock_write));
    }
 };

@@ -22,7 +22,7 @@ namespace neweraHPC
       mem_page->size = size - sizeof(mem_page_t);
       size_allocated = sizeof(mem_page_t);
 
-      //pthread_create(&maintinance_thread, NULL, (void* (*)(void*))maintain_thread, this);
+      pthread_create(&maintinance_thread, NULL, (void* (*)(void*))maintain_thread, this);
       
       pthread_mutex_unlock(&mutex);
    }
@@ -34,11 +34,12 @@ namespace neweraHPC
    
    void GarbageCollector::status()
    {
+      LOG_DEBUG("Memory block status:");
       mem_page_t *tmp_mem_page = mem_page;
       int pageno = 0;
       while(tmp_mem_page)
       {
-	 LOG_DEBUG(pageno << " Address:" << tmp_mem_page << " Prev address:" << tmp_mem_page->prev 
+	 LOG_DEBUG("\t" << pageno << " Address:" << tmp_mem_page << " Prev address:" << tmp_mem_page->prev 
 		   << " Next address:" << tmp_mem_page->next << " Size:" << tmp_mem_page->size 
 		   << " Status:" << tmp_mem_page->address);
 	 tmp_mem_page = tmp_mem_page->next;
@@ -127,7 +128,7 @@ namespace neweraHPC
       }
       else 
       {
-	 LOG_ERROR("Memory Exhausted");
+	 LOG_ERROR("HEAP: Memory Exhausted");
 	 return NULL;
       }
    }
@@ -136,7 +137,7 @@ namespace neweraHPC
    {
       if(_address < memory_space || _address > end_address)
       {
-	 LOG_ERROR("Out of range address requested");
+	 LOG_ERROR("HEAP: Out of range address requested");
 	 exit(1);
       }
       
@@ -144,13 +145,12 @@ namespace neweraHPC
       mem_page_t *in_mem_page   = (mem_page_t *)((char *)_address - sizeof(mem_page_t));
       if(!(in_mem_page->address))
       {
-	 cout << "Resource already deallocated" << endl;
+	 LOG_ERROR("HEAP: Resource already deallocated");
 	 return;
       }
       
-      LOG_DEBUG("\t\tDelete requested on page size:" << in_mem_page->size);
+      LOG_DEBUG("HEAP: \t\tDelete requested on page size:" << in_mem_page->size);
 
-      memset(in_mem_page->address, 0, in_mem_page->size);
       in_mem_page->address = NULL;
       
       pthread_mutex_unlock(&mutex);

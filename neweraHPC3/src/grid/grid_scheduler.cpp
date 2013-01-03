@@ -62,7 +62,7 @@ namespace neweraHPC
       for(int i = 1; i <= peer_count; i++)
       {
 	 lock();
-	 peer = (peer_details_t *)(*peers).search_inorder(i, &key); 
+	 peer = (peer_details_t *)(*peers).search_inorder_num(i, &key); 
 	 unlock();
 	 
 	 remove_peer(key);
@@ -77,7 +77,7 @@ namespace neweraHPC
       for(int i = 1; i <= instruction_set_count; i++)
       {
 	 lock();
-	 instruction_set = (nhpc_instruction_set_t *)(*queued_instructions).search_inorder(i, &key);	 
+	 instruction_set = (nhpc_instruction_set_t *)(*queued_instructions).search_inorder_num(i, &key);	 
 	 nhpc_delete_instruction(instruction_set);	 
 	 unlock();
       }
@@ -399,7 +399,7 @@ namespace neweraHPC
       while(1)
       {
 	 lock();
-	 instruction_set = (nhpc_instruction_set_t *)(*queued_instructions).search_inorder(1, &id);
+	 instruction_set = (nhpc_instruction_set_t *)(*queued_instructions).search_inorder_num(1, &id);
 	 unlock();
 
 	 if(!instruction_set)
@@ -440,7 +440,7 @@ namespace neweraHPC
 	 int id;
 
 	 grid_scheduler->lock();
-	 nhpc_instruction_set_t *instruction_set = (nhpc_instruction_set_t *)(*queued_instructions).search_inorder(1, &id);
+	 nhpc_instruction_set_t *instruction_set = (nhpc_instruction_set_t *)(*queued_instructions).search_inorder_num(1, &id);
 	 grid_scheduler->unlock();
 	 
 	 int core_count = grid_scheduler->cores();

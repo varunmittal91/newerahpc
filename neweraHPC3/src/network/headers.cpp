@@ -153,7 +153,7 @@ namespace neweraHPC
       
       int count = (*headers).length();
       
-      while((string = (char *)(*headers).search_inorder(1, &key)))
+      while((string = (char *)(*headers).search_inorder_str(1, &key)))
       {
 	 (*headers).erase(key);
 	 delete[] string;

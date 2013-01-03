@@ -23,6 +23,7 @@
 #include <include/rbtree.h>
 #include <include/constants.h>
 #include <include/strings.h>
+#include <include/error.h>
 
 using namespace std;
 
@@ -62,16 +63,6 @@ namespace neweraHPC
       rb_node **node = &(root), *parent = NULL;
       int key;
       
-      if(root == NULL)
-      {
-	 root = new_node;
-	 rb_set_black(root);
-	 
-	 count++;
-	 
-	 return NHPC_SUCCESS;
-      }
-      
       while(*node)
       {
 	 parent = *node;
@@ -86,7 +77,10 @@ namespace neweraHPC
 	 else if(key > 0)
 	    node = &((*node)->rb_right);
 	 else 
+	 {
+	    LOG_ERROR("RBTREE Insertion Failed, Key Exists");
 	    return NHPC_FAIL;
+	 }
       }
       
       rb_link_node(new_node, parent, node);
@@ -117,6 +111,14 @@ namespace neweraHPC
 	    break;
       }
       
+      if(!node)
+      {
+	 if(key_str)
+	    LOG_DEBUG("RBTREE Search Failed, Key:" << *key_str);
+	 else 
+	    LOG_DEBUG("RBTREE Search Failed, Key:" << *key_num);	    
+      }
+      
       return node;
    }
    
@@ -130,6 +132,9 @@ namespace neweraHPC
 	 else 
 	    node = rb_next(node);
       }
+      
+      if(!node)
+	 LOG_DEBUG("RBTREE Inorder Search Failed, Position:" << pos);
       
       return node;
    }
@@ -226,7 +231,7 @@ namespace neweraHPC
 	 return NULL;      
    }
    
-   void *rbtree::search_inorder(int pos, const char **key)
+   void *rbtree::search_inorder_str(int pos, const char **key)
    {
       if(operation_mode != RBTREE_STR)
 	 return NULL;
@@ -243,7 +248,7 @@ namespace neweraHPC
 	 return NULL;
    }
    
-   void *rbtree::search_inorder(int pos, int *key)
+   void *rbtree::search_inorder_num(int pos, int *key)
    {
       if(operation_mode == RBTREE_STR)
 	 return NULL;
@@ -301,32 +306,232 @@ namespace neweraHPC
    
    nhpc_status_t rbtree::erase_inorder(int pos)
    {
+      rb_node *node = search_node(pos);
       
+      if(node)
+      {
+	 erase_node(node);
+	 return NHPC_SUCCESS;
+      }
+      
+      return NHPC_FAIL;
    }
    
    void rbtree::rb_link_node(rb_node *new_node, rb_node *parent, rb_node **rb_link)
    {
-      new_node->rb_color  = parent->rb_color;
-      new_node->rb_parent = parent;
+      if(parent)
+      {
+	 new_node->rb_parent = parent;
+      }
       
       *rb_link = new_node;
    }
    
-   void rbtree::rb_erase(rb_node *node)
+   void rbtree::__rb_rotate_left(struct rb_node *node)
    {
-      rb_node   *child, *parent;
-      short int  color;
+      struct rb_node *right = node->rb_right;
+      struct rb_node *parent = rb_parent(node);
       
-      if(!(node->rb_left))
-	 child = node->rb_right;
-      else if(!(node->rb_right))
-	 child = node->rb_left;
-      else 
+      if ((node->rb_right = right->rb_left))
+	 rb_set_parent(right->rb_left, node);
+      right->rb_left = node;
+      
+      rb_set_parent(right, parent);
+      
+      if (parent)
       {
-	 rb_node *old = node, *left;
+	 if (node == parent->rb_left)
+	    parent->rb_left = right;
+	 else
+	    parent->rb_right = right;
+      }
+      else
+	 root = right;
+      rb_set_parent(node, right);
+   }
+   
+   void rbtree::__rb_rotate_right(struct rb_node *node)
+   {
+      struct rb_node *left = node->rb_left;
+      struct rb_node *parent = rb_parent(node);
+      
+      if ((node->rb_left = left->rb_right))
+	 rb_set_parent(left->rb_right, node);
+      left->rb_right = node;
+      
+      rb_set_parent(left, parent);
+      
+      if (parent)
+      {
+	 if (node == parent->rb_right)
+	    parent->rb_right = left;
+	 else
+	    parent->rb_left = left;
+      }
+      else
+	 root = left;
+      rb_set_parent(node, left);
+   }
+   
+   void rbtree::rb_insert_color(struct rb_node *node)
+   {
+      struct rb_node *parent, *gparent;
+      
+      while ((parent = rb_parent(node)) && rb_is_red(parent))
+      {
+	 gparent = rb_parent(parent);
+	 
+	 if (parent == gparent->rb_left)
+	 {
+	    {
+	       register struct rb_node *uncle = gparent->rb_right;
+	       if (uncle && rb_is_red(uncle))
+	       {
+		  rb_set_black(uncle);
+		  rb_set_black(parent);
+		  rb_set_red(gparent);
+		  node = gparent;
+		  continue;
+	       }
+	    }
+	    
+	    if (parent->rb_right == node)
+	    {
+	       register struct rb_node *tmp;
+	       __rb_rotate_left(parent);
+	       tmp = parent;
+	       parent = node;
+	       node = tmp;
+	    }
+	    
+	    rb_set_black(parent);
+	    rb_set_red(gparent);
+	    __rb_rotate_right(gparent);
+	 } else {
+	    {
+	       register struct rb_node *uncle = gparent->rb_left;
+	       if (uncle && rb_is_red(uncle))
+	       {
+		  rb_set_black(uncle);
+		  rb_set_black(parent);
+		  rb_set_red(gparent);
+		  node = gparent;
+		  continue;
+	       }
+	    }
+	    
+	    if (parent->rb_left == node)
+	    {
+	       register struct rb_node *tmp;
+	       __rb_rotate_right(parent);
+	       tmp = parent;
+	       parent = node;
+	       node = tmp;
+	    }
+	    
+	    rb_set_black(parent);
+	    rb_set_red(gparent);
+	    __rb_rotate_left(gparent);
+	 }
+      }
+      
+      rb_set_black(root);
+   }
+   
+   void rbtree::rb_erase_color(struct rb_node *node, struct rb_node *parent)
+   {
+      struct rb_node *other;
+      
+      while ((!node || rb_is_black(node)) && node != root)
+      {
+	 if (parent->rb_left == node)
+	 {
+	    other = parent->rb_right;
+	    if (rb_is_red(other))
+	    {
+	       rb_set_black(other);
+	       rb_set_red(parent);
+	       __rb_rotate_left(parent);
+	       other = parent->rb_right;
+	    }
+	    if ((!other->rb_left || rb_is_black(other->rb_left)) &&
+		(!other->rb_right || rb_is_black(other->rb_right)))
+	    {
+	       rb_set_red(other);
+	       node = parent;
+	       parent = rb_parent(node);
+	    }
+	    else
+	    {
+	       if (!other->rb_right || rb_is_black(other->rb_right))
+	       {
+		  rb_set_black(other->rb_left);
+		  rb_set_red(other);
+		  __rb_rotate_right(other);
+		  other = parent->rb_right;
+	       }
+	       rb_set_color(other, rb_color(parent));
+	       rb_set_black(parent);
+	       rb_set_black(other->rb_right);
+	       __rb_rotate_left(parent);
+	       node = root;
+	       break;
+	    }
+	 }
+	 else
+	 {
+	    other = parent->rb_left;
+	    if (rb_is_red(other))
+	    {
+	       rb_set_black(other);
+	       rb_set_red(parent);
+	       __rb_rotate_right(parent);
+	       other = parent->rb_left;
+	    }
+	    if ((!other->rb_left || rb_is_black(other->rb_left)) &&
+		(!other->rb_right || rb_is_black(other->rb_right)))
+	    {
+	       rb_set_red(other);
+	       node = parent;
+	       parent = rb_parent(node);
+	    }
+	    else
+	    {
+	       if (!other->rb_left || rb_is_black(other->rb_left))
+	       {
+		  rb_set_black(other->rb_right);
+		  rb_set_red(other);
+		  __rb_rotate_left(other);
+		  other = parent->rb_left;
+	       }
+	       rb_set_color(other, rb_color(parent));
+	       rb_set_black(parent);
+	       rb_set_black(other->rb_left);
+	       __rb_rotate_right(parent);
+	       node = root;
+	       break;
+	    }
+	 }
+      }
+      if (node)
+	 rb_set_black(node);
+   }
+   
+   void rbtree::rb_erase(struct rb_node *node)
+   {
+      struct rb_node *child, *parent;
+      int color;
+      
+      if (!node->rb_left)
+	 child = node->rb_right;
+      else if (!node->rb_right)
+	 child = node->rb_left;
+      else
+      {
+	 struct rb_node *old = node, *left;
 	 
 	 node = node->rb_right;
-	 while((left = node->rb_left) != NULL)
+	 while ((left = node->rb_left) != NULL)
 	    node = left;
 	 
 	 if (rb_parent(old)) {
@@ -341,11 +546,10 @@ namespace neweraHPC
 	 parent = rb_parent(node);
 	 color = rb_color(node);
 	 
-	 if(parent == old)
+	 if (parent == old) {
 	    parent = node;
-	 else 
-	 {
-	    if(child)
+	 } else {
+	    if (child)
 	       rb_set_parent(child, parent);
 	    parent->rb_left = child;
 	    
@@ -353,21 +557,22 @@ namespace neweraHPC
 	    rb_set_parent(old->rb_right, node);
 	 }
 	 
-	 node->rb_color = old->rb_color;
-	 node->rb_left  = old->rb_left;
+	 rb_set_parent(node, rb_parent(old));
+	 rb_set_color(node, rb_color(old));
+	 node->rb_left = old->rb_left;
 	 rb_set_parent(old->rb_left, node);
 	 
-	 goto erase_color;
+	 goto color;
       }
       
       parent = rb_parent(node);
-      color  = rb_color(node);
+      color = rb_color(node);
       
-      if(child)
+      if (child)
 	 rb_set_parent(child, parent);
-      if(parent)
+      if (parent)
       {
-	 if(parent->rb_left == node)
+	 if (parent->rb_left == node)
 	    parent->rb_left = child;
 	 else
 	    parent->rb_right = child;
@@ -375,207 +580,9 @@ namespace neweraHPC
       else
 	 root = child;
       
-   erase_color:
-      if(color == RB_BLACK)
-      {
+   color:
+      if (color == RB_BLACK)
 	 rb_erase_color(child, parent);
-      }
-   }
-   
-   void rbtree::rb_insert_color(rb_node *new_node)
-   {
-      rb_set_red(new_node);
-      rb_node *parent, *gparent;
-
-      while((parent = rb_parent(new_node)) && rb_is_red(parent))
-      {
-	 gparent = rb_parent(parent);
-	 cout << "Parent:" << parent << " Gparent:" << gparent << endl;
-	 
-	 if(parent == gparent->rb_left)
-	 {
-	    {
-	       rb_node *uncle = gparent->rb_right;
-	       if(uncle && rb_is_red(uncle))
-	       {
-		  rb_set_black(uncle);
-		  rb_set_black(parent);
-		  rb_set_red(gparent);
-		  new_node          = gparent;
-		  continue;
-	       }
-	    }
-	    if(parent->rb_right == new_node)
-	    {
-	       __rb_rotate_left(parent);
-	       rb_node *tmp;
-	       tmp      = parent;
-	       parent   = new_node;
-	       new_node = tmp;
-	    }
-	    
-	    rb_set_black(parent);
-	    rb_set_red(gparent);
-	    __rb_rotate_right(gparent);
-	 }
-	 else 
-	 {
-	    {
-	       rb_node *uncle = gparent->rb_left;
-	       if(uncle && rb_is_red(uncle))
-	       {
-		  rb_set_black(uncle);
-		  rb_set_black(parent);
-		  rb_set_red(gparent);
-		  new_node          = gparent;
-		  continue;
-	       }	       
-	    }
-	    if(parent->rb_left == new_node)
-	    {
-	       __rb_rotate_right(parent);
-	       rb_node *tmp;
-	       tmp      = parent;
-	       parent   = new_node;
-	       new_node = tmp;
-	    }
-	    
-	    rb_set_black(parent);
-	    rb_set_red(gparent);
-	    __rb_rotate_left(gparent);
-	 }
-      }
-      
-      rb_set_black(root);
-   }
-      
-   void rbtree::rb_erase_color(rb_node *node, rb_node *parent)
-   {
-      rb_node *other;
-      
-      while((!node || rb_is_black(node)) && node != root)
-      {
-	 if(parent->rb_left == node)
-	 {
-	    other = parent->rb_right;
-	    if(rb_is_red(other))
-	    {
-	       rb_set_black(other);
-	       rb_set_red(parent);
-	       __rb_rotate_left(parent);
-	       other = parent->rb_right;
-	    }
-	    if((!other->rb_left || rb_is_black(other->rb_left)) &&
-		(!other->rb_right || rb_is_black(other->rb_right)))
-	    {
-	       rb_set_red(other);
-	       node = parent;
-	       parent = rb_parent(node);
-	    }
-	    else
-	    {
-	       if(!other->rb_right || rb_is_black(other->rb_right))
-	       {
-		  rb_set_black(other->rb_left);
-		  rb_set_red(other);
-		  __rb_rotate_right(other);
-		  other = parent->rb_right;
-	       }
-	       other->rb_color = rb_color(parent);
-	       rb_set_black(parent);
-	       rb_set_black(other->rb_right);
-	       __rb_rotate_left(parent);
-	       node = root;
-	       break;
-	    }
-	 }
-	 else
-	 {
-	    other = parent->rb_left;
-	    if(rb_is_red(other))
-	    {
-	       rb_set_black(other);
-	       rb_set_red(parent);
-	       __rb_rotate_right(parent);
-	       other = parent->rb_left;
-	    }
-	    if((!other->rb_left || rb_is_black(other->rb_left)) &&
-		(!other->rb_right || rb_is_black(other->rb_right)))
-	    {
-	       rb_set_red(other);
-	       node = parent;
-	       parent = rb_parent(node);
-	    }
-	    else
-	    {
-	       if(!other->rb_left || rb_is_black(other->rb_left))
-	       {
-		  rb_set_black(other->rb_right);
-		  rb_set_red(other);
-		  __rb_rotate_left(other);
-		  other = parent->rb_left;
-	       }
-	       other->rb_color = rb_color(parent);
-	       rb_set_black(parent);
-	       rb_set_black(other->rb_left);
-	       __rb_rotate_right(parent);
-	       node = root;
-	       break;
-	    }
-	 }
-      }
-      if(node)
-	 rb_set_black(node);
-   }
-   
-   void rbtree::__rb_rotate_right(rb_node *node)
-   {
-      rb_node *left   = node->rb_left;
-      rb_node *parent = node->rb_parent;
-      
-      if((node->rb_left = left->rb_right))
-	 rb_set_parent(left->rb_right, node);
-      left->rb_right = node;
-      
-      rb_set_parent(left, parent);
-      
-      if(parent)
-      {
-	 if(node == parent->rb_right)
-	    parent->rb_right = left;
-	 else 
-	    parent->rb_left = left;
-      }
-      else 
-      {
-	 root = left;
-      }
-      
-      rb_set_parent(node, left);
-   }
-   
-   void rbtree::__rb_rotate_left(rb_node *node)
-   {
-      rb_node *right  = node->rb_right;
-      rb_node *parent = node->rb_parent;
-      
-      if((node->rb_right = right->rb_left))
-	 rb_set_parent(right->rb_left, node);
-      right->rb_left = node;
-      
-      rb_set_parent(right, parent);
-      
-      if(parent)
-      {
-	 if(node == parent->rb_left)
-	    parent->rb_left = right;
-	 else 
-	    parent->rb_right = right;
-      }
-      else 
-	 root = right;
-      
-      rb_set_parent(node, right);      
    }
    
    rb_node *rbtree::rb_first()

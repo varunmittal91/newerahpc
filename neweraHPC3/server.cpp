@@ -77,35 +77,8 @@ nhpc_status_t func_trigger_desktop(nhpc_socket_t *sock, web_ui_elements_t *web_u
 
 int main(int argc, char **argv)
 {   
-   /*
    rbtree *test_tree1 = new rbtree;
-   
-   for(int i = 0; i < 100000; i++)
-   {
-      (*test_tree1).insert(test_tree1);
-   }
-   cout << "tree created" << endl;
-   
-   cout << (*test_tree1).length() << endl;
-   
-   for(int i = 0; i < 100; i++)
-      (*test_tree1).erase(i);
-   cout << (*test_tree1).length() << endl;
-   
-   //cout << (*test_tree1).search(1) << endl;
-   
-   delete test_tree1;
-   
-   cout << "deleting tree" << endl;
-   
-   while(1)
-   {
-      sleep(1);
-   }
-   
-   exit(0);
-    */
-   
+      
    neweraHPC_init(argc, argv);
 
    nhpc_status_t nrv;   

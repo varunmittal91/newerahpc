@@ -43,13 +43,14 @@ namespace neweraHPC
       key_t key;
    };
    
-#define rb_color(r)         ((r)->rb_color)
-#define rb_is_red(r)        (!rb_color(r))
-#define rb_is_black(r)      rb_color(r)
-#define rb_set_red(r)       ((r)->rb_color = RB_RED)
-#define rb_set_black(r)     ((r)->rb_color = RB_BLACK)
-#define rb_parent(r)        ((r)->rb_parent)
-#define rb_set_parent(r, p) ((r)->rb_parent = p)    
+#define rb_color(r)            ((r)->rb_color)
+#define rb_is_red(r)           (!rb_color(r))
+#define rb_is_black(r)         rb_color(r)
+#define rb_set_red(r)          ((r)->rb_color = RB_RED)
+#define rb_set_black(r)        ((r)->rb_color = RB_BLACK)
+#define rb_parent(r)           ((r)->rb_parent)
+#define rb_set_parent(r, p)    ((r)->rb_parent = p)    
+#define rb_set_color(r, color) ((r)->rb_color) = color
   
    enum RBTREE_MODES
    {
@@ -95,8 +96,8 @@ namespace neweraHPC
       
       void *search(int key);
       void *search(const char *key);
-      void *search_inorder(int pos, const char **key);
-      void *search_inorder(int pos, int *key);
+      void *search_inorder_str(int pos, const char **key);
+      void *search_inorder_num(int pos, int *key);
       void *operator[](int pos);
 
       int length();

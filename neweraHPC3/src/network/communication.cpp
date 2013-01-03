@@ -154,7 +154,7 @@ namespace neweraHPC
       LOG_INFO("Headers found in the message:" << count);
       for(int cntr = 1; cntr <= count; cntr++)
       {
-	 string = (const char *)(*headers).search_inorder(cntr, &key);
+	 string = (const char *)(*headers).search_inorder_str(cntr, &key);
 	 
 	 int width = strlen(string);
 	 LOG_INFO(setw(20) << key << setw(10) << "\t" << string);

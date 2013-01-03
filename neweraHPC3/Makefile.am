@@ -1,9 +1,9 @@
 ACLOCAL_AMFLAGS= -I m4
 
-SUBDIRS = src tests
+SUBDIRS = src
 
 bin_PROGRAMS   = server
-server_SOURCES = server.cpp
+server_SOURCES = server.cpp src/neweraHPC.la
 server_LDADD   = src/libneweraHPC.la -ldl 
 
 library_includedir      = $(includedir)/neweraHPC

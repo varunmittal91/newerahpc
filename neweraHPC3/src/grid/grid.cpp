@@ -108,7 +108,7 @@ namespace neweraHPC
       
       for(int i = 1; i <= argument_count; i++)
       {
-	 data = (char *)cmdline_arguments.search_inorder(i, &key);
+	 data = (char *)cmdline_arguments.search_inorder_str(i, &key);
 	 
 	 switch(*key)
 	 {

@@ -133,50 +133,6 @@ namespace neweraHPC
       bool is_delimiter(char in_char);
       void print();
    };
-   
-   
-   /*
-   class nhpc_json_t
-   {
-   private:
-      struct search_elem_t
-      {
-	 rbtree *branch;
-	 int position;
-      };  
-      struct stream_elem_t
-      {
-	 int json_object;
-      };
-      
-      int stream_length;
-      int current_level;
-      rbtree *nodes;
-      rbtree *backtrack;
-      rbtree *search_queue;
-   public:
-      struct key_pair_t
-      {
-	 char *key;
-	 void *value;
-	 int json_object;
-	 int level;
-      };
-
-      nhpc_json_t();
-      ~nhpc_json_t();
-      nhpc_status_t add_element(int json_object, const char *key = NULL, const void *value = NULL);
-      nhpc_status_t close_element();
-      int search(key_pair_t **key_pair, int *child_count = NULL);
-
-      nhpc_status_t search(const char *key);
-      
-      const char *get_stream();
-      nhpc_status_t build_structure(const char *json_string);
-      bool is_delimiter(char in_char);
-      void print();
-   };
-    */
 };
 
 #endif

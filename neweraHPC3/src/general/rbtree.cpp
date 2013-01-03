@@ -29,12 +29,12 @@ using namespace std;
 
 namespace neweraHPC
 {
-   rbtree::rbtree(int _operation_mode)
+   rbtree::rbtree(rb_node_mode _rb_mode)
    {
       root		= NULL;      
       count             = 0;
       last_assigned_key = 0;
-      operation_mode    = _operation_mode;
+      rb_mode           = _rb_mode;
    }
    
    rbtree::~rbtree()
@@ -67,7 +67,7 @@ namespace neweraHPC
       {
 	 parent = *node;
 	 
-	 if(operation_mode == RBTREE_STR)
+	 if(rb_mode_is_str(rb_mode))
 	    key = strcmp(new_node->key.str, ((*node)->key.str));
 	 else 
 	    key = (new_node->key.num) - (*node)->key.num;
@@ -78,7 +78,10 @@ namespace neweraHPC
 	    node = &((*node)->rb_right);
 	 else 
 	 {
-	    LOG_ERROR("RBTREE Insertion Failed, Key Exists");
+	    if(rb_mode_is_str(rb_mode))
+	       LOG_ERROR("RBTREE Insertion Failed, Key Exists KEY:" << new_node->key.str);
+	    else 
+	       LOG_ERROR("RBTREE Insertion Failed, Key Exists KEY:" << new_node->key.num);	       
 	    return NHPC_FAIL;
 	 }
       }
@@ -141,9 +144,21 @@ namespace neweraHPC
    
    void rbtree::erase_node(rb_node *node)
    {
+      if(rb_mode_is_num_managed(rb_mode))
+      {
+	 rb_node *tmp = node;
+	 while((tmp = rb_next(tmp)))
+	 {
+	    cout << "Readjusting:" << tmp->key.num << " to:" << (tmp->key.num - 1) << endl;
+	    tmp->key.num -= 1;
+	 }
+	 
+	 last_assigned_key--;
+      }
+      
       rb_erase(node);
       
-      if(operation_mode == RBTREE_STR)
+      if(rb_mode_is_str(rb_mode))
 	 delete[] node->key.str;
       count--;
       
@@ -152,18 +167,15 @@ namespace neweraHPC
    
    nhpc_status_t rbtree::insert(void *data)
    {
-      if(operation_mode == RBTREE_STR)
+      if(rb_mode_is_str(rb_mode))
 	 return NHPC_FAIL;
             
-      if(operation_mode == RBTREE_STR)
-	 return NHPC_FAIL;
-      
       return insert(data, (last_assigned_key + 1));
    }
    
    nhpc_status_t rbtree::insert(void *data, int key)
    {
-      if(operation_mode == RBTREE_STR)
+      if(rb_mode_is_str(rb_mode))
 	 return NHPC_FAIL;
       
       rb_node *new_node = new rb_node;
@@ -187,7 +199,7 @@ namespace neweraHPC
    
    nhpc_status_t rbtree::insert(void *data, const char *key)
    {
-      if(operation_mode != RBTREE_STR)
+      if(!rb_mode_is_str(rb_mode))
 	 return NHPC_FAIL;
             
       rb_node *new_node = new rb_node;
@@ -209,7 +221,7 @@ namespace neweraHPC
    
    void *rbtree::search(int key)
    {
-      if(operation_mode == RBTREE_STR)
+      if(rb_mode_is_str(rb_mode))
 	 return NULL;
       
       rb_node *node = search_node(&key, NULL);
@@ -221,7 +233,7 @@ namespace neweraHPC
    
    void *rbtree::search(const char *key)
    {
-      if(operation_mode != RBTREE_STR)
+      if(!rb_mode_is_str(rb_mode))
 	 return NULL;
       
       rb_node *node = search_node(NULL, &key);
@@ -233,7 +245,7 @@ namespace neweraHPC
    
    void *rbtree::search_inorder_str(int pos, const char **key)
    {
-      if(operation_mode != RBTREE_STR)
+      if(!rb_mode_is_str(rb_mode))
 	 return NULL;
       
       rb_node *node = search_node(pos);
@@ -250,7 +262,7 @@ namespace neweraHPC
    
    void *rbtree::search_inorder_num(int pos, int *key)
    {
-      if(operation_mode == RBTREE_STR)
+      if(rb_mode_is_str(rb_mode))
 	 return NULL;
       
       rb_node *node = search_node(pos);
@@ -276,7 +288,7 @@ namespace neweraHPC
    
    nhpc_status_t rbtree::erase(int key)
    {
-      if(operation_mode == RBTREE_STR)
+      if(rb_mode_is_str(rb_mode))
 	 return NHPC_FAIL;
       
       rb_node *node = search_node(&key, NULL);
@@ -291,7 +303,7 @@ namespace neweraHPC
    
    nhpc_status_t rbtree::erase(const char *key)
    {
-      if(operation_mode != RBTREE_STR)
+      if(!rb_mode_is_str(rb_mode))
 	 return NHPC_FAIL;
       
       rb_node *node = search_node(NULL, &key);
@@ -332,15 +344,15 @@ namespace neweraHPC
       struct rb_node *right = node->rb_right;
       struct rb_node *parent = rb_parent(node);
       
-      if ((node->rb_right = right->rb_left))
+      if((node->rb_right = right->rb_left))
 	 rb_set_parent(right->rb_left, node);
       right->rb_left = node;
       
       rb_set_parent(right, parent);
       
-      if (parent)
+      if(parent)
       {
-	 if (node == parent->rb_left)
+	 if(node == parent->rb_left)
 	    parent->rb_left = right;
 	 else
 	    parent->rb_right = right;
@@ -377,15 +389,15 @@ namespace neweraHPC
    {
       struct rb_node *parent, *gparent;
       
-      while ((parent = rb_parent(node)) && rb_is_red(parent))
+      while((parent = rb_parent(node)) && rb_is_red(parent))
       {
 	 gparent = rb_parent(parent);
 	 
-	 if (parent == gparent->rb_left)
+	 if(parent == gparent->rb_left)
 	 {
 	    {
 	       register struct rb_node *uncle = gparent->rb_right;
-	       if (uncle && rb_is_red(uncle))
+	       if(uncle && rb_is_red(uncle))
 	       {
 		  rb_set_black(uncle);
 		  rb_set_black(parent);
@@ -395,7 +407,7 @@ namespace neweraHPC
 	       }
 	    }
 	    
-	    if (parent->rb_right == node)
+	    if(parent->rb_right == node)
 	    {
 	       register struct rb_node *tmp;
 	       __rb_rotate_left(parent);
@@ -407,10 +419,12 @@ namespace neweraHPC
 	    rb_set_black(parent);
 	    rb_set_red(gparent);
 	    __rb_rotate_right(gparent);
-	 } else {
+	 } 
+	 else 
+	 {
 	    {
 	       register struct rb_node *uncle = gparent->rb_left;
-	       if (uncle && rb_is_red(uncle))
+	       if(uncle && rb_is_red(uncle))
 	       {
 		  rb_set_black(uncle);
 		  rb_set_black(parent);
@@ -420,7 +434,7 @@ namespace neweraHPC
 	       }
 	    }
 	    
-	    if (parent->rb_left == node)
+	    if(parent->rb_left == node)
 	    {
 	       register struct rb_node *tmp;
 	       __rb_rotate_right(parent);
@@ -442,19 +456,19 @@ namespace neweraHPC
    {
       struct rb_node *other;
       
-      while ((!node || rb_is_black(node)) && node != root)
+      while((!node || rb_is_black(node)) && node != root)
       {
-	 if (parent->rb_left == node)
+	 if(parent->rb_left == node)
 	 {
 	    other = parent->rb_right;
-	    if (rb_is_red(other))
+	    if(rb_is_red(other))
 	    {
 	       rb_set_black(other);
 	       rb_set_red(parent);
 	       __rb_rotate_left(parent);
 	       other = parent->rb_right;
 	    }
-	    if ((!other->rb_left || rb_is_black(other->rb_left)) &&
+	    if((!other->rb_left || rb_is_black(other->rb_left)) &&
 		(!other->rb_right || rb_is_black(other->rb_right)))
 	    {
 	       rb_set_red(other);
@@ -463,7 +477,7 @@ namespace neweraHPC
 	    }
 	    else
 	    {
-	       if (!other->rb_right || rb_is_black(other->rb_right))
+	       if(!other->rb_right || rb_is_black(other->rb_right))
 	       {
 		  rb_set_black(other->rb_left);
 		  rb_set_red(other);
@@ -481,14 +495,14 @@ namespace neweraHPC
 	 else
 	 {
 	    other = parent->rb_left;
-	    if (rb_is_red(other))
+	    if(rb_is_red(other))
 	    {
 	       rb_set_black(other);
 	       rb_set_red(parent);
 	       __rb_rotate_right(parent);
 	       other = parent->rb_left;
 	    }
-	    if ((!other->rb_left || rb_is_black(other->rb_left)) &&
+	    if((!other->rb_left || rb_is_black(other->rb_left)) &&
 		(!other->rb_right || rb_is_black(other->rb_right)))
 	    {
 	       rb_set_red(other);
@@ -497,7 +511,7 @@ namespace neweraHPC
 	    }
 	    else
 	    {
-	       if (!other->rb_left || rb_is_black(other->rb_left))
+	       if(!other->rb_left || rb_is_black(other->rb_left))
 	       {
 		  rb_set_black(other->rb_right);
 		  rb_set_red(other);
@@ -513,7 +527,7 @@ namespace neweraHPC
 	    }
 	 }
       }
-      if (node)
+      if(node)
 	 rb_set_black(node);
    }
    
@@ -522,19 +536,20 @@ namespace neweraHPC
       struct rb_node *child, *parent;
       int color;
       
-      if (!node->rb_left)
+      if(!node->rb_left)
 	 child = node->rb_right;
-      else if (!node->rb_right)
+      else if(!node->rb_right)
 	 child = node->rb_left;
       else
       {
 	 struct rb_node *old = node, *left;
 	 
 	 node = node->rb_right;
-	 while ((left = node->rb_left) != NULL)
+	 while((left = node->rb_left) != NULL)
 	    node = left;
 	 
-	 if (rb_parent(old)) {
+	 if(rb_parent(old))
+	 {
 	    if (rb_parent(old)->rb_left == old)
 	       rb_parent(old)->rb_left = node;
 	    else
@@ -546,9 +561,12 @@ namespace neweraHPC
 	 parent = rb_parent(node);
 	 color = rb_color(node);
 	 
-	 if (parent == old) {
+	 if (parent == old)
+	 {
 	    parent = node;
-	 } else {
+	 } 
+	 else 
+	 {
 	    if (child)
 	       rb_set_parent(child, parent);
 	    parent->rb_left = child;
@@ -568,9 +586,9 @@ namespace neweraHPC
       parent = rb_parent(node);
       color = rb_color(node);
       
-      if (child)
+      if(child)
 	 rb_set_parent(child, parent);
-      if (parent)
+      if(parent)
       {
 	 if (parent->rb_left == node)
 	    parent->rb_left = child;
@@ -581,7 +599,7 @@ namespace neweraHPC
 	 root = child;
       
    color:
-      if (color == RB_BLACK)
+      if(color == RB_BLACK)
 	 rb_erase_color(child, parent);
    }
    
@@ -637,7 +655,7 @@ namespace neweraHPC
       if(node->rb_left)
 	 __rb_print(node->rb_left);
       
-      if(operation_mode == RBTREE_STR)
+      if(rb_mode_is_str(rb_mode))
 	 cout << "Value:" << node->key.str;
       else 
 	 cout << "Value:" << node->key.num;

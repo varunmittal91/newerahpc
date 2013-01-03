@@ -22,12 +22,15 @@
 
 #include "constants.h"
 
+typedef unsigned char rb_node_color;
+typedef unsigned char rb_node_mode;
+
 namespace neweraHPC
 {
    struct rb_node
    {
       rb_node        *rb_parent;
-      short int       rb_color;
+      rb_node_color   rb_color;
 #define RB_RED               0
 #define RB_BLACK             1
       struct rb_node *rb_right;
@@ -52,22 +55,22 @@ namespace neweraHPC
 #define rb_set_parent(r, p)    ((r)->rb_parent = p)    
 #define rb_set_color(r, color) ((r)->rb_color) = color
   
-   enum RBTREE_MODES
-   {
-      RBTREE_NUM,
-      RBTREE_STR,
-      RBTREE_NUM_MANAGED,
-      RBTREE_NUM_HASH
-   };
-
+#define RBTREE_NUM         1
+#define RBTREE_NUM_MANAGED 2
+#define RBTREE_STR         4
+   
+#define rb_mode_is_num(m)         (m & 1)
+#define rb_mode_is_num_managed(m) ((m >> 1) & 1)
+#define rb_mode_is_str(m)         ((m >> 2) & 1)
+   
    class rbtree
    {
    private:
       rb_node *root;
       
-      int count;
-      int last_assigned_key;
-      int operation_mode;
+      int          count;
+      int          last_assigned_key;
+      rb_node_mode rb_mode;
       
       static inline void rb_link_node(rb_node *new_node, rb_node *parent, rb_node **rb_link);
       void rb_erase(rb_node *node);
@@ -87,7 +90,7 @@ namespace neweraHPC
       rb_node *rb_last();
       rb_node *rb_next(const rb_node *node);
    public:
-       rbtree(int _operation_mode = RBTREE_NUM);
+       rbtree(rb_node_mode _rb_mode = RBTREE_NUM);
       ~rbtree();
       
       nhpc_status_t insert(void *data);

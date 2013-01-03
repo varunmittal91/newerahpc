@@ -47,7 +47,7 @@ nhpc_status_t func_trigger_desktop(nhpc_socket_t *sock, web_ui_elements_t *web_u
       json->add_element(JSON_OBJECT, "icon_grid");
       json->add_element(JSON_ARRAY, "data");
       
-      
+      /*
       for(int i = 1; i <= app_handlers->length(); i++)
       {
 	 app_details_t *app_details = (app_details_t *)(*app_handlers)[i];
@@ -61,6 +61,7 @@ nhpc_status_t func_trigger_desktop(nhpc_socket_t *sock, web_ui_elements_t *web_u
 	 web_ui_elements->elements->add_element(JSON_STRING, "id", (app_details->app_name));
 	 web_ui_elements->elements->close_element();
       }
+       */
       json->close_element();
       json->close_element();
       json->close_element();
@@ -77,17 +78,15 @@ nhpc_status_t func_trigger_desktop(nhpc_socket_t *sock, web_ui_elements_t *web_u
 
 int main(int argc, char **argv)
 {   
-   rbtree *test_tree1 = new rbtree;
-      
    neweraHPC_init(argc, argv);
 
    nhpc_status_t nrv;   
    
    http_init();
-   //web_ui_init();
+   web_ui_init();
    
-   //web_ui_register("Desktop" , "NuiDesktop", (fnc_ptr_nhpc_two_t)func_trigger_desktop);   
-   //web_ui_register("Explorer", "NuiWindow" , NULL);
+   web_ui_register("Desktop" , "NuiDesktop", (fnc_ptr_nhpc_two_t)func_trigger_desktop);   
+   web_ui_register("Explorer", "NuiWindow" , NULL);
 
    nhpc_grid_server_t grid_server;
    nrv = grid_server.grid_server_init();

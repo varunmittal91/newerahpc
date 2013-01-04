@@ -77,7 +77,7 @@ nhpc_status_t func_trigger_desktop(nhpc_socket_t *sock, web_ui_elements_t *web_u
 }
 
 int main(int argc, char **argv)
-{   
+{      
    neweraHPC_init(argc, argv);
 
    nhpc_status_t nrv;   

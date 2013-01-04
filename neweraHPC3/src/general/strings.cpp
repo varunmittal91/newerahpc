@@ -310,68 +310,42 @@ namespace neweraHPC{
       delete[] string;
    }
    
-   char *nhpc_strconcat(const char *s1, const char *s2)
+   char *nhpc_strconcat_va(const char *fmt, ...)
    {
-      char *string = NULL;
+      nhpc_size_t len = 0;
+
+      const char *s;
+      char       *string = NULL;      
+      va_list     ap;
       
-      if(s1 == NULL || s2 == NULL)
-	 return NULL;
-      
-      nhpc_size_t len_s1 = strlen(s1);
-      nhpc_size_t len_s2 = strlen(s2);
-      
-      if((len_s1 == 0) && (len_s2 == 0))
-	 return NULL;
-      else if(len_s1 == 0)
+      va_start(ap, fmt);      
+      while((s = va_arg(ap, const char *)))
       {
-	 string = new char [len_s2 + 1];
-	 memcpy(string, s2, len_s2);
-	 string[len_s2] = '\0';
+	 len += strlen(s);
       }
-      else if(len_s2 == 0)
+      va_end(ap);
+      
+      if(len == 0)
       {
-	 string = new char [len_s1 + 1];
-	 memcpy(string, s1, len_s1);
-	 string[len_s1] = '\0';
-      }
-      else 
-      {
-	 nhpc_size_t len = strlen(s1) + strlen(s2);
-	 
-	 string = new char [len + 1];
-	 memcpy(string, s1, len_s1);
-	 memcpy(string + len_s1, s2, len_s2);
-	 string[len] = '\0';
-      }
-      
-      return string;
-   }
-   
-   char *nhpc_strconcat(const char *s1, const char *s2, const char *s3)
-   {
-      char *string = NULL;
-      
-      if(s1 == NULL || s2 == NULL || s3 == NULL)
 	 return NULL;
-      
-      nhpc_size_t len_s1 = strlen(s1);
-      nhpc_size_t len_s2 = strlen(s2);
-      nhpc_size_t len_s3 = strlen(s3);
-      
-      if((len_s1 == 0) && (len_s2 == 0) && (len_s3 == 0))
-	 return NULL;
-      
-      nhpc_size_t len = strlen(s1) + strlen(s2) + strlen(s3);
-      
+      }
       string = new char [len + 1];
-      memcpy(string, s1, len_s1);
-      memcpy(string + len_s1, s2, len_s2);
-      memcpy(string + (len_s1 + len_s2), s3, len_s3);
       string[len] = '\0';
+
+      char  *tmp = string;
+      
+      va_start(ap, fmt);
+      while((s = va_arg(ap, const char *)))
+      {
+	 len = strlen(s);
+	 memcpy((void *)tmp, s, len * sizeof(char));
+	 tmp += len;
+      }      
+      va_end(ap);
       
       return string;
    }
-   
+
    char *nhpc_itostr(int num)
    {
       int tmp_num = num;

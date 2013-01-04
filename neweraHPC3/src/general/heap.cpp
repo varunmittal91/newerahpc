@@ -84,11 +84,11 @@ namespace neweraHPC
    
    void *GarbageCollector::allocate(size_t size)
    {
-      pthread_mutex_lock(&mutex);
       size += sizeof(mem_page_t);
       
       mem_page_t *tmp = mem_page, *new_page = NULL;
       
+      pthread_mutex_lock(&mutex);
       while(tmp)
       {
 	 if(!(tmp->address) && tmp->size >= size)
@@ -118,7 +118,6 @@ namespace neweraHPC
 	 
 	 tmp = tmp->next;
       }
-      
       pthread_mutex_unlock(&mutex);
 
       if(new_page)
@@ -141,7 +140,6 @@ namespace neweraHPC
 	 exit(1);
       }
       
-      pthread_mutex_lock(&mutex);      
       mem_page_t *in_mem_page   = (mem_page_t *)((char *)_address - sizeof(mem_page_t));
       if(!(in_mem_page->address))
       {
@@ -152,7 +150,5 @@ namespace neweraHPC
       LOG_DEBUG("HEAP: \t\tDelete requested on page size:" << in_mem_page->size);
 
       in_mem_page->address = NULL;
-      
-      pthread_mutex_unlock(&mutex);
    }
 }

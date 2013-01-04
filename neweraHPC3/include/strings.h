@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <string>
+#include <stdarg.h>
 
 #include "constants.h"
 #include "rbtree.h"
@@ -53,8 +54,8 @@ namespace neweraHPC{
    string_t *nhpc_substr(const char *s1, const char s2);
    char *nhpc_substr(const char *s1, int start_pos, int end_pos);
    
-   char *nhpc_strconcat(const char *s1, const char *s2);
-   char *nhpc_strconcat(const char *s1, const char *s2, const char *s3);
+#define nhpc_strconcat(...) nhpc_strconcat_va("", ##__VA_ARGS__, NULL)
+   char *nhpc_strconcat_va(const char *fmt, ...);
    
    char *nhpc_itostr(int num);
    

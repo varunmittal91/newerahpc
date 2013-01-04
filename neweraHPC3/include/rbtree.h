@@ -27,6 +27,8 @@ typedef unsigned char rb_node_mode;
 
 namespace neweraHPC
 {
+   class rbtree;
+   
    struct rb_node
    {
       rb_node        *rb_parent;
@@ -41,7 +43,7 @@ namespace neweraHPC
       union key_t
       {
 	 int	     num;
-	 const char *str;	 
+	 const char *str;
       };
       key_t key;
    };
@@ -58,10 +60,12 @@ namespace neweraHPC
 #define RBTREE_NUM         1
 #define RBTREE_NUM_MANAGED 2
 #define RBTREE_STR         4
+#define RBTREE_HASH        8
    
 #define rb_mode_is_num(m)         (m & 1)
 #define rb_mode_is_num_managed(m) ((m >> 1) & 1)
 #define rb_mode_is_str(m)         ((m >> 2) & 1)
+#define rb_mode_is_hash(m)        ((m >> 3) & 1)
    
    class rbtree
    {
@@ -98,15 +102,21 @@ namespace neweraHPC
       nhpc_status_t insert(void *data, const char *key);
       
       void *search(int key);
+      void *search(int key, int sub_key);
       void *search(const char *key);
+      void *search(const char *key, int sub_key);
       void *search_inorder_str(int pos, const char **key);
       void *search_inorder_num(int pos, int *key);
       void *operator[](int pos);
 
       int length();
+      int length(int key);
+      int length(const char *key);
       
       nhpc_status_t erase(int key);
+      nhpc_status_t erase(int key, int subkey);
       nhpc_status_t erase(const char *key);
+      nhpc_status_t erase(const char *key, int subkey);
       nhpc_status_t erase_inorder(int pos);
 
       void print_tree();

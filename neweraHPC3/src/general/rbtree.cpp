@@ -58,6 +58,30 @@ namespace neweraHPC
       return count;
    }
    
+   int rbtree::length(int key)
+   {
+      if(!rb_mode_is_hash(rb_mode))
+	 return -1;
+      
+      rbtree *hash_table = (rbtree *)search(key);
+      if(hash_table)
+	 return (*hash_table).length();
+      else 
+	 return 0;
+   }
+   
+   int rbtree::length(const char *key)
+   {
+      if(!rb_mode_is_hash(rb_mode))
+	 return -1;
+      
+      rbtree *hash_table = (rbtree *)search(key);
+      if(hash_table)
+	 return (*hash_table).length();
+      else 
+	 return 0;      
+   }
+   
    nhpc_status_t rbtree::insert_node(rb_node *new_node)
    {
       rb_node **node = &(root), *parent = NULL;
@@ -78,7 +102,9 @@ namespace neweraHPC
 	    node = &((*node)->rb_right);
 	 else 
 	 {
-	    if(rb_mode_is_str(rb_mode))
+	    if(rb_mode_is_hash(rb_mode))
+	       break;
+	    else if(rb_mode_is_str(rb_mode))
 	       LOG_ERROR("RBTREE Insertion Failed, Key Exists KEY:" << new_node->key.str);
 	    else 
 	       LOG_ERROR("RBTREE Insertion Failed, Key Exists KEY:" << new_node->key.num);	       
@@ -86,10 +112,41 @@ namespace neweraHPC
 	 }
       }
       
-      rb_link_node(new_node, parent, node);
-      rb_insert_color(new_node);
-      
-      count++;
+      if(rb_mode_is_hash(rb_mode))
+      {
+	 rbtree *hash_table;
+	 void   *data = new_node->data;
+	 
+	 if(!(*node))
+	 {
+	    rb_link_node(new_node, parent, node);
+	    rb_insert_color(new_node);
+	    
+	    count++;
+	    
+	    hash_table = new rbtree(RBTREE_NUM_MANAGED);
+	    new_node->data = (void *)hash_table;
+	 }
+	 else 
+	 {
+	    hash_table = (rbtree *)(*node)->data;
+	    
+	    if(rb_mode_is_str(rb_mode))
+	    {
+	       delete[] new_node->key.str;
+	    }
+	    delete new_node;	    
+	 }
+	 
+	 (*hash_table).insert(data);
+      }
+      else 
+      {
+	 rb_link_node(new_node, parent, node);
+	 rb_insert_color(new_node);
+	 
+	 count++;
+      }
       
       return NHPC_SUCCESS;
    }
@@ -148,10 +205,7 @@ namespace neweraHPC
       {
 	 rb_node *tmp = node;
 	 while((tmp = rb_next(tmp)))
-	 {
-	    cout << "Readjusting:" << tmp->key.num << " to:" << (tmp->key.num - 1) << endl;
 	    tmp->key.num -= 1;
-	 }
 	 
 	 last_assigned_key--;
       }
@@ -160,6 +214,9 @@ namespace neweraHPC
       
       if(rb_mode_is_str(rb_mode))
 	 delete[] node->key.str;
+      if(rb_mode_is_hash(rb_mode))
+	 delete (rbtree *)(node->data);
+
       count--;
       
       delete node;
@@ -231,6 +288,20 @@ namespace neweraHPC
 	 return NULL;
    }
    
+   void *rbtree::search(int key, int subkey)
+   {
+      if(!rb_mode_is_hash(rb_mode))
+	 return NULL;
+      
+      rbtree *hash_table = (rbtree *)search(key);
+      if(!hash_table)
+	 return NULL;
+      
+      void *data = (*hash_table).search(subkey);
+      
+      return data;
+   }
+   
    void *rbtree::search(const char *key)
    {
       if(!rb_mode_is_str(rb_mode))
@@ -241,6 +312,20 @@ namespace neweraHPC
 	 return node->data;
       else 
 	 return NULL;      
+   }
+   
+   void *rbtree::search(const char *key, int subkey)
+   {
+      if(!rb_mode_is_hash(rb_mode))
+	 return NULL;
+      
+      rbtree *hash_table = (rbtree *)search(key);
+      if(!hash_table)
+	 return NULL;
+      
+      void *data = (*hash_table).search(subkey);
+      
+      return data;
    }
    
    void *rbtree::search_inorder_str(int pos, const char **key)
@@ -301,6 +386,18 @@ namespace neweraHPC
       return NHPC_FAIL;
    }
    
+   nhpc_status_t rbtree::erase(int key, int subkey)
+   {
+      if(!rb_mode_is_hash(rb_mode))
+	 return NHPC_FAIL;
+      
+      rbtree *hash_table = (rbtree *)search(key);
+      if(!hash_table)
+	 return NHPC_FAIL;
+      
+      return (*hash_table).erase(subkey);
+   }
+   
    nhpc_status_t rbtree::erase(const char *key)
    {
       if(!rb_mode_is_str(rb_mode))
@@ -316,6 +413,18 @@ namespace neweraHPC
       return NHPC_FAIL;
    }
    
+   nhpc_status_t rbtree::erase(const char *key, int subkey)
+   {
+      if(!rb_mode_is_hash(rb_mode))
+	 return NHPC_FAIL;
+      
+      rbtree *hash_table = (rbtree *)search(key);
+      if(!hash_table)
+	 return NHPC_FAIL;
+      
+      return (*hash_table).erase(subkey);
+   }
+      
    nhpc_status_t rbtree::erase_inorder(int pos)
    {
       rb_node *node = search_node(pos);

@@ -32,14 +32,12 @@
 
 using namespace neweraHPC;
 
-//#ifdef ENABLE_GARBAGE_COLLECTOR
-extern GarbageCollector garbagecollector;
-
+#ifdef ENABLE_GARBAGE_COLLECTOR
 void *operator new(std::size_t size) throw (std::bad_alloc);
 void *operator new[](std::size_t size) throw (std::bad_alloc);
 
 void operator delete(void *ptr) throw ();
 void operator delete[](void *ptr) throw ();
-//#endif
+#endif
 
 #endif

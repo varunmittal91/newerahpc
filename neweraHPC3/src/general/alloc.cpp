@@ -30,11 +30,15 @@
 using namespace std;
 
 #ifdef ENABLE_GARBAGE_COLLECTOR
-GarbageCollector garbagecollector;
+namespace neweraHPC
+{
+   GarbageCollector garbagecollector;
+};
 
 void *operator new(std::size_t size) throw (std::bad_alloc)
 {
    void *new_p = garbagecollector.allocate(size);
+   memset(new_p, 0, size);
 
    return new_p;
 }
@@ -54,5 +58,4 @@ void operator delete[](void *ptr) throw ()
 {
    operator delete(ptr);
 }   
-
 #endif

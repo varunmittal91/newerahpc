@@ -1,3 +1,22 @@
+/*
+ *	(C) 2012 Varun Mittal <varunmittal91@gmail.com>
+ *	NeweraHPC program is distributed under the terms of the GNU General Public License v2
+ *
+ *	This file is part of NeweraHPC.
+ *
+ *	NeweraHPC is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation version 2 of the License.
+ *
+ *	NeweraHPC is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *
+ *	You should have received a copy of the GNU General Public License
+ *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <iostream>
 
 #include <include/alloc.h>
@@ -12,16 +31,15 @@ namespace neweraHPC
       pthread_mutex_lock(&mutex);
       
       size         = _size;    
-      memory_space = malloc(_size);
-      end_address  = (char *)memory_space + size;
-      memset(memory_space, 0, _size);
+            
+      frame_size    = size - (sizeof(mem_frame_t) + sizeof(mem_page_t));
+      frame_root    = (mem_frame_t *)malloc(size);
+      frame_current = frame_root;
       
-      mem_page	    = (mem_page_t *)memory_space;
-      last_mem_page = mem_page;
-      memset(mem_page, 0, sizeof(mem_page_t));
-      mem_page->size = size - sizeof(mem_page_t);
-      size_allocated = sizeof(mem_page_t);
-
+      frame_root->page_first  = (mem_page_t *)((char *)frame_root + sizeof(mem_frame_t));
+      page_set_size(frame_root->page_first, frame_size);
+      pthread_mutex_init(&(frame_root->mutex), NULL);
+      
       pthread_create(&maintinance_thread, NULL, (void* (*)(void*))maintain_thread, this);
       
       pthread_mutex_unlock(&mutex);
@@ -29,44 +47,75 @@ namespace neweraHPC
 
    GarbageCollector::~GarbageCollector()
    {
-      free(memory_space);
+      mem_frame_t *frame = frame_root;
+      mem_frame_t *next_frame;
+      while(frame)
+      {
+	 next_frame = frame->frame_next;
+	 free(frame);
+	 frame = next_frame;
+      }
    }
-   
+      
    void GarbageCollector::status()
    {
       LOG_DEBUG("Memory block status:");
-      mem_page_t *tmp_mem_page = mem_page;
-      int pageno = 0;
-      while(tmp_mem_page)
+
+      mem_frame_t *frame = frame_root;
+      mem_page_t  *page;
+      int          pageno = 0;
+      int          frameno = 0;
+      
+      while(frame)
       {
-	 LOG_DEBUG("\t" << pageno << " Address:" << tmp_mem_page << " Prev address:" << tmp_mem_page->prev 
-		   << " Next address:" << tmp_mem_page->next << " Size:" << tmp_mem_page->size 
-		   << " Status:" << tmp_mem_page->address);
-	 tmp_mem_page = tmp_mem_page->next;
-	 pageno++;
+	 page = frame->page_first;
+	 
+	 LOG_DEBUG("\t " << frameno << " Frame Address:" << frame);
+	 while(page)
+	 {
+	    LOG_DEBUG("\t\t " << pageno << " Address:" << page << " Prev Address:" << page->prev << " Next Address:" << page->next << 
+		      " Size:" << page_get_size(page) << " Status:" << page_status(page));
+	    page = page->next;
+	    pageno++;
+	 }
+	 
+	 frame = frame->frame_next;
+	 
+	 frameno++;
       }
    }
    
    void GarbageCollector::clean_pages()
    {
-      mem_page_t *in_mem_page = mem_page;
-      mem_page_t *next_mem_page;
-
-      while(in_mem_page)
+      mem_frame_t *frame = frame_root;
+      
+      while(frame)
       {
-	 next_mem_page = in_mem_page->next;
+	 pthread_mutex_lock(&(frame->mutex));
 	 
-	 if(!(in_mem_page->address) && next_mem_page && !(next_mem_page->address))
+	 mem_page_t *in_mem_page = frame->page_first;;
+	 mem_page_t *next_mem_page;
+
+	 while(in_mem_page)
 	 {
-	    in_mem_page->size += (sizeof(mem_page_t) + next_mem_page->size);
-	    in_mem_page->next =  next_mem_page->next;
-	    memset((next_mem_page), 0, (sizeof(mem_page_t) + next_mem_page->size));
+	    next_mem_page = in_mem_page->next;
+	 
+	    if(page_is_empty(in_mem_page) && next_mem_page && page_is_empty(next_mem_page))
+	    {
+	       nhpc_size_t in_mem_page_size = page_get_size(in_mem_page) + sizeof(mem_page_t) + page_get_size(next_mem_page);
+	       page_set_size(in_mem_page, in_mem_page_size);
+	       in_mem_page->next =  next_mem_page->next;
+	       memset((next_mem_page), 0, (sizeof(mem_page_t) + page_get_size(next_mem_page)));
 	    
-	    if(next_mem_page->next)
-	       next_mem_page->next->prev = in_mem_page;
+	       if(next_mem_page->next)
+		  next_mem_page->next->prev = in_mem_page;
+	    }
+	    else 
+	       in_mem_page = in_mem_page->next;
 	 }
-	 else 
-	    in_mem_page = in_mem_page->next;
+
+	 pthread_mutex_unlock(&(frame->mutex));
+	 frame = frame->frame_next;
       }
    }
    
@@ -74,81 +123,114 @@ namespace neweraHPC
    {
       while(1)
       {
-	 pthread_mutex_lock(&(object->mutex));
 	 (*object).clean_pages();
 	 (*object).status();
-	 pthread_mutex_unlock(&(object->mutex));
 	 sleep(1);
       }
    }
    
-   void *GarbageCollector::allocate(size_t size)
+   GarbageCollector::mem_frame_t * GarbageCollector::frame_create()
    {
+      mem_frame_t *new_frame = (mem_frame_t *)malloc(size);
+      memset(new_frame, 0, size);
+      new_frame->frame_next = NULL;
+      new_frame->page_first = (mem_page_t *)((char *)new_frame + sizeof(mem_frame_t));
+      page_set_size(new_frame->page_first, frame_size);
+      pthread_mutex_init(&(new_frame->mutex), NULL);  
+      
+      mem_frame_t *frame = frame_root;
+      while(frame->frame_next)
+	 frame = frame->frame_next;
+      frame->frame_next = new_frame;
+      
+      frame_current = new_frame;
+      
+      return new_frame;
+   }
+   
+   GarbageCollector::mem_page_t *GarbageCollector::page_get(nhpc_size_t size)
+   {
+      mem_frame_t *frame;
+      mem_page_t  *page;
+      mem_page_t  *new_page = NULL;
+      nhpc_size_t  page_size;
+      
       size += sizeof(mem_page_t);
       
-      mem_page_t *tmp = mem_page, *new_page = NULL;
-      
       pthread_mutex_lock(&mutex);
-      while(tmp)
+      frame = frame_root;
+      while(frame)
       {
-	 if(!(tmp->address) && tmp->size >= size)
+	 pthread_mutex_lock(&(frame->mutex));
+	 page = frame->page_first;
+	 page_size = page_get_size(page);
+
+	 if(page_is_empty(page) && page_size >= size)
 	 {
-	    if(tmp->size > (size + sizeof(mem_page_t)))
+	    if(page_size > (size + sizeof(mem_page_t)))
 	    {
-	       new_page = (mem_page_t *)((char *)tmp + sizeof(mem_page_t) + tmp->size - size);
+	       new_page = (mem_page_t *)((char *)page + sizeof(mem_page_t) + page_get_size(page) - size);
 	       memset(new_page, 0, sizeof(mem_page_t));
 	       
-	       new_page->prev = tmp;
-	       new_page->next = tmp->next;
-	       new_page->size = size - sizeof(mem_page_t);
-	       tmp->next = new_page;
-	       tmp->size -= size;
+	       new_page->prev = page;
+	       new_page->next = page->next;
+	       page_set_size(new_page, (size - sizeof(mem_page_t)));
+	       page->next     = new_page;
+	       page_size -= size;
+	       page_set_size(page, page_size);
 	       
 	       if(new_page->next)
 		  new_page->next->prev = new_page;
 	    }
 	    else 
 	    {
-	       new_page = tmp;
+	       new_page = page;
 	    }
 	    
-	    new_page->address = (char *)new_page + sizeof(mem_page_t);
+	    page_set_occupied(new_page);
+	    pthread_mutex_unlock(&(frame->mutex));
 	    break;
 	 }
+	 pthread_mutex_unlock(&(frame->mutex));
 	 
-	 tmp = tmp->next;
+	 if(!new_page)
+	 {
+	    if(frame->frame_next)
+	       frame = frame->frame_next;
+	    else 
+	       frame = frame_create();
+	 }
       }
       pthread_mutex_unlock(&mutex);
-
-      if(new_page)
+      
+      return new_page;
+   }
+   
+   void *GarbageCollector::allocate(size_t size)
+   {
+      mem_page_t *page = page_get(size);
+      void       *address = NULL;
+      
+      if(page)
       {
-	 memset((new_page->address), 0, new_page->size);
-	 return new_page->address;
+	 address = (void *)((char *)page + sizeof(mem_page_t));
+	 memset(address, 0, size);
       }
-      else 
-      {
-	 LOG_ERROR("HEAP: Memory Exhausted");
-	 return NULL;
-      }
+      
+      return address;
    }
    
    void GarbageCollector::deallocate(void *_address)
    {
-      if(_address < memory_space || _address > end_address)
-      {
-	 LOG_ERROR("HEAP: Out of range address requested");
-	 exit(1);
-      }
-      
       mem_page_t *in_mem_page   = (mem_page_t *)((char *)_address - sizeof(mem_page_t));
-      if(!(in_mem_page->address))
+      if(page_is_empty(in_mem_page))
       {
 	 LOG_ERROR("HEAP: Resource already deallocated");
 	 return;
       }
       
+      page_set_empty(in_mem_page);
+      
       LOG_DEBUG("HEAP: \t\tDelete requested on page size:" << in_mem_page->size);
-
-      in_mem_page->address = NULL;
    }
 }

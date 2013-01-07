@@ -17,28 +17,24 @@
  *	along with jarvis.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string>
-#include <neweraHPC/neweraHPC.h>
+#ifndef _MORPHOLOGICAL_RULES_H_
+#define _MORPHOLOGICAL_RULES_H_
 
-#include <include/jarvis.h>
-#include <include/jarvis_data.h>
-#include <include/parse_index.h>
-
-using namespace std;
-using namespace neweraHPC;
-using namespace jarvis;
+#include <neweraHPC/rbtree.h>
 
 namespace jarvis
 {
-   thread_manager_t *thread_manager;
+   extern neweraHPC::rbtree *morphological_rules;
    
-   void jarvis_init(int argc, char **argv)
+   struct jv_morphological_rule
    {
-      neweraHPC::neweraHPC_init(argc, argv);
-      thread_manager = new thread_manager_t;
-      
-      init_jarvis_data();
-      
-      jv_get_word_def("human");
-   }
-}
+      const char *suffix;
+      const char *replacement;
+   }; 
+
+#define jv_get_morphological_rule(pos, i)   (jv_morphological_rule *)((*morphological_rules).search(pos, i))
+   
+   void init_morphological_rules();
+};
+
+#endif

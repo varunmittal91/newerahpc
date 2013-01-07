@@ -30,8 +30,6 @@ namespace neweraHPC
 {
    list_t::list_t(short int _mode)
    {
-      cout << "I am starting list out" << endl;
-      
       mutex = new pthread_mutex_t;
       pthread_mutex_init(mutex, NULL);
       

@@ -46,7 +46,6 @@ namespace neweraHPC
 	 nhpc_size_t  size;
 	 mem_page_t  *next;
 	 mem_page_t  *prev;
-	 void        *address;
       };
       struct mem_frame_t
       {

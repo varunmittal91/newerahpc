@@ -21,6 +21,7 @@
 #define _THREAD_H_
 
 #include <signal.h>
+#include <pthread.h>
 
 #include "rbtree.h"
 #include "constants.h"

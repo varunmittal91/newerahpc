@@ -31,9 +31,6 @@
 using namespace std;
 using namespace neweraHPC;
 
-GarbageCollector garbagecollector;
-list_t list(0);
-
 nhpc_status_t func_trigger_desktop(nhpc_socket_t *sock, web_ui_elements_t *web_ui_elements)
 {
    if(!(web_ui_elements->is_ready))
@@ -81,11 +78,6 @@ nhpc_status_t func_trigger_desktop(nhpc_socket_t *sock, web_ui_elements_t *web_u
 
 int main(int argc, char **argv)
 {      
-   cout << "hi" << endl;
-   //int *a = new int;
-   //int *b = new int;
-   //exit(0);
-   
    neweraHPC_init(argc, argv);
 
    nhpc_status_t nrv;   

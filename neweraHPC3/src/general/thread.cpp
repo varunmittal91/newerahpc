@@ -153,7 +153,7 @@ namespace neweraHPC
       if(!thread)
 	 return NHPC_FAIL;
       
-      nrv = pthread_detach(*thread);
+      nrv = pthread_join(*thread, NULL);
       if(nrv != 0)
 	 return errno;
       

@@ -229,7 +229,7 @@ namespace neweraHPC
    {
       LOG_INFO("Shuting Down Grid Server");
       
-
+      nhpc_system_destroy();
       nhpc_string_delete(host_addr);
       nhpc_string_delete(host_port);
       

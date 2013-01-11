@@ -94,6 +94,10 @@ namespace neweraHPC
       nhpc_system = new nhpc_system_t;
       (*nhpc_system).init_system();
    }
+   static void nhpc_system_destroy()
+   {
+      delete nhpc_system;
+   }
    
    void child_prepare();
 };

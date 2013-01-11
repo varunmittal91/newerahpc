@@ -95,11 +95,16 @@ namespace neweraHPC
 	 
 	 mem_page_t *in_mem_page = frame->page_first;;
 	 mem_page_t *next_mem_page;
+	 mem_page_t **page_recovered = &(frame->page_recovered);
+	 mem_page_t *check_recovered = NULL;
 
 	 while(in_mem_page)
 	 {
 	    next_mem_page = in_mem_page->next;
 	 
+	    if(page_is_empty(in_mem_page))
+	       check_recovered = in_mem_page;
+	    
 	    if(page_is_empty(in_mem_page) && next_mem_page && page_is_empty(next_mem_page))
 	    {
 	       nhpc_size_t in_mem_page_size = page_get_size(in_mem_page) + sizeof(mem_page_t) + page_get_size(next_mem_page);
@@ -112,6 +117,18 @@ namespace neweraHPC
 	    }
 	    else 
 	       in_mem_page = in_mem_page->next;
+	    
+	    if(check_recovered && check_recovered != frame->page_first)
+	    {
+	       if(!*page_recovered)
+		  *page_recovered = check_recovered;
+	       else if(!page_is_empty(*page_recovered))
+		  *page_recovered = check_recovered;
+	       else if(page_get_size(check_recovered) > page_get_size(*page_recovered)) 
+		  *page_recovered = check_recovered;
+	       
+	       check_recovered = NULL;
+	    }
 	 }
 
 	 pthread_mutex_unlock(&(frame->mutex));
@@ -148,11 +165,31 @@ namespace neweraHPC
       return new_frame;
    }
    
+   void GarbageCollector::page_create(mem_page_t *parent, nhpc_size_t child_size)
+   {
+      nhpc_size_t parent_size = page_get_size(parent);
+
+      mem_page_t *child_page = (mem_page_t *)((char *)parent  + sizeof(mem_page_t) + parent_size - child_size);
+      memset(child_page, 0, sizeof(mem_page_t));
+      
+      parent_size -= child_size;
+      page_set_size(parent, parent_size);
+      
+      child_page->prev = parent;
+      child_page->next = parent->next;
+      page_set_size(child_page, (child_size - sizeof(mem_page_t)));
+      parent->next = child_page;
+      
+      if(child_page->next)
+	 child_page->next->prev = child_page;
+   }
+   
    GarbageCollector::mem_page_t *GarbageCollector::page_get(nhpc_size_t size)
    {
       mem_frame_t *frame;
       mem_page_t  *page;
       mem_page_t  *new_page = NULL;
+      mem_page_t  **page_recovered;
       nhpc_size_t  page_size;
       
       size += sizeof(mem_page_t);
@@ -164,36 +201,35 @@ namespace neweraHPC
 	 pthread_mutex_lock(&(frame->mutex));
 	 page = frame->page_first;
 	 page_size = page_get_size(page);
-
-	 if(page_is_empty(page) && page_size >= size)
+	 page_recovered = &(frame->page_recovered);
+	 
+	 if(*page_recovered && page_is_empty(*page_recovered) && page_get_size(*page_recovered) >= size)
+	 {
+	    if(page_get_size(*page_recovered) > (size + sizeof(mem_page_t)))
+	    {
+	       page_create(*page_recovered, size);
+	       new_page = (*page_recovered)->next;
+	    }
+	    else 
+	       new_page = *page_recovered;
+	 }
+	 else if(page_is_empty(page) && page_size >= size)
 	 {
 	    if(page_size > (size + sizeof(mem_page_t)))
 	    {
-	       new_page = (mem_page_t *)((char *)page + sizeof(mem_page_t) + page_get_size(page) - size);
-	       memset(new_page, 0, sizeof(mem_page_t));
-	       
-	       new_page->prev = page;
-	       new_page->next = page->next;
-	       page_set_size(new_page, (size - sizeof(mem_page_t)));
-	       page->next     = new_page;
-	       page_size -= size;
-	       page_set_size(page, page_size);
-	       
-	       if(new_page->next)
-		  new_page->next->prev = new_page;
+	       page_create(page, size);
+	       new_page = page->next;
 	    }
 	    else 
-	    {
 	       new_page = page;
-	    }
-	    
-	    page_set_occupied(new_page);
-	    pthread_mutex_unlock(&(frame->mutex));
-	    break;
 	 }
 	 pthread_mutex_unlock(&(frame->mutex));
-	 
-	 if(!new_page)
+	 if(new_page)
+	 {
+	    page_set_occupied(new_page);  
+	    break;
+	 }
+	 else 
 	 {
 	    if(frame->frame_next)
 	       frame = frame->frame_next;

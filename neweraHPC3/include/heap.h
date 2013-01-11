@@ -51,6 +51,7 @@ namespace neweraHPC
       {
 	 mem_frame_t      *frame_next;
 	 mem_page_t       *page_first;
+	 mem_page_t       *page_recovered;
 	 pthread_mutex_t   mutex;
       };
       
@@ -66,6 +67,7 @@ namespace neweraHPC
       mem_frame_t *frame_create();
       mem_frame_t *frame_get(nhpc_size_t);
       mem_page_t  *page_get(nhpc_size_t);
+      void page_create(mem_page_t *parent, nhpc_size_t child_size); 
       
       void clean_pages();
       static void *maintain_thread(GarbageCollector *object);

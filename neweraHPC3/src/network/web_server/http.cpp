@@ -20,6 +20,7 @@
 #include <iostream>
 #include <fstream>
 #include <sys/stat.h>
+#include <stdlib.h>
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>

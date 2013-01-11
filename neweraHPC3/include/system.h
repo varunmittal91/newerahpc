@@ -88,7 +88,12 @@ namespace neweraHPC
    
    void system_prefork_routine();
    
-   extern nhpc_system_t nhpc_system;
+   extern nhpc_system_t *nhpc_system;
+   static void nhpc_system_init()
+   {
+      nhpc_system = new nhpc_system_t;
+      (*nhpc_system).init_system();
+   }
    
    void child_prepare();
 };

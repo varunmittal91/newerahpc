@@ -20,6 +20,7 @@
 #include <errno.h>
 #include <iostream>
 #include <iomanip>
+#include <stdio.h>
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -311,9 +312,9 @@ namespace neweraHPC
 	    
 	    delete client_sockaddr;
 	    
-	    //pthread_mutex_lock(&mutex);
-	    //client_socks->insert(client_sock, new_sd);
-	    //pthread_mutex_unlock(&mutex);
+	    pthread_mutex_lock(&mutex);
+	    client_socks->insert(client_sock, new_sd);
+	    pthread_mutex_unlock(&mutex);
 	    
 	    (*thread_manager).init_thread(&(client_sock->thread_id), NULL);
 	    (*thread_manager).create_thread(&(client_sock->thread_id), NULL, (void* (*)(void*))read_communication, 
@@ -330,9 +331,9 @@ namespace neweraHPC
 	 pthread_mutex_t *mutex = client_sock->server_details->mutex;
 	 thread_manager_t *thread_manager = client_sock->server_details->thread_manager;
 	 
-	 //pthread_mutex_lock(mutex);	 
-	 //client_socks->erase(client_sock->sockfd);
-	 //pthread_mutex_unlock(mutex);
+	 pthread_mutex_lock(mutex);	 
+	 client_socks->erase(client_sock->sockfd);
+	 pthread_mutex_unlock(mutex);
 	 
 	 thread_manager->delete_thread_data(client_sock->thread_id);
 	 

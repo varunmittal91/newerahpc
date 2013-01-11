@@ -33,14 +33,14 @@ using namespace std;
 
 namespace neweraHPC
 {
-   nhpc_system_t nhpc_system;
+   nhpc_system_t *nhpc_system;
    
    void child_handler(int signum)
    {
       if(signum != SIGCHLD)
 	 return;
       
-      nhpc_system.free_child_process();
+      (*nhpc_system).free_child_process();
    }
 
    nhpc_system_t::nhpc_system_t()

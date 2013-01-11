@@ -88,7 +88,7 @@ namespace neweraHPC
    
    void grid_scheduler_t::grid_scheduler_init()
    {
-      extern_system = &(nhpc_system);
+      extern_system = nhpc_system;
       
       pthread_mutex_init(&mutex_handler, NULL);
       
@@ -102,7 +102,7 @@ namespace neweraHPC
       (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))grid_scheduler_t::refresh_node_status, 
 				       this, NHPC_THREAD_DEFAULT);
 
-      nhpc_system.register_trigger_child_process((char *)"GRID", (fnc_ptr_int_t)child_exit_trigger);
+      (*nhpc_system).register_trigger_child_process((char *)"GRID", (fnc_ptr_int_t)child_exit_trigger);
    }
    
    int grid_scheduler_t::cores()

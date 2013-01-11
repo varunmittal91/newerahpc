@@ -207,7 +207,7 @@ namespace neweraHPC
       
       jobs = new rbtree(RBTREE_STR);
       
-      nhpc_system.init_system();
+      nhpc_system_init();
       plugin_manager_init();
       grid_scheduler_init();
             

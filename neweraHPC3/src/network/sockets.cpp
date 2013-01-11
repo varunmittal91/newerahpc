@@ -21,6 +21,7 @@
  or connecting to other machines on given port */
 
 #include <iostream>
+#include <stdio.h>
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>

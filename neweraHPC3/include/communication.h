@@ -20,8 +20,7 @@
 #ifndef _COMMUNICATION_H_
 #define _COMMUNICATION_H_
 
-#include "network.h"
-#include "headers.h"
+#include "network_data.h"
 
 namespace neweraHPC
 {

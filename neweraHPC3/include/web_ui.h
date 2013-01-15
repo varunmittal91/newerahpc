@@ -20,9 +20,9 @@
 #ifndef _WEB_UI_H_
 #define _WEB_UI_H_
 
-#include "network_data.h"
-#include "json.h"
 #include "nui.h"
+#include "http.h"
+#include "json.h"
 
 namespace neweraHPC
 {

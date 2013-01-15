@@ -59,7 +59,10 @@ namespace neweraHPC
       {
 	 char *argument = (char *)instruction_set->arguments->search(i);
 	 
+	 cout << argument << endl;
+	 
 	 string_t *string = nhpc_substr(argument, ',');
+	 cout << string->count << endl;
 	 int option = nhpc_strtoi(string->strings[0]);
 	 
 	 switch(option)

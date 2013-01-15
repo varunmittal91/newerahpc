@@ -22,7 +22,6 @@
 
 #include "rbtree.h"
 #include "constants.h"
-#include "strings.h"
 
 namespace neweraHPC
 {

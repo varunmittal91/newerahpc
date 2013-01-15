@@ -22,6 +22,7 @@
 
 #include <include/json.h>
 #include <include/error.h>
+#include <include/strings.h>
 
 using namespace std;
 

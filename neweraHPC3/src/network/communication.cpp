@@ -23,9 +23,10 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <include/network.h>
-#include <include/strings_pool.h>
+#include <include/communication.h>
 #include <include/error.h>
+#include <include/network.h>
+#include <include/http.h>
 
 using namespace std;
 

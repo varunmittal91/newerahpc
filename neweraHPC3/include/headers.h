@@ -25,6 +25,8 @@
 #include "containers.h"
 #include "network_data.h"
 
+#define network_headers_get_param(h, p)   ((char *)h->search(p));
+
 namespace neweraHPC
 {
    class nhpc_headers_t

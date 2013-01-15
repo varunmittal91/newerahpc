@@ -29,6 +29,8 @@
 #define BUFFER_SIZE_HEADER 1000
 #define BUFFER_SIZE        10000
 
+#define network_get_headers(s)  (s->headers);
+
 namespace neweraHPC
 {
    class network_t;

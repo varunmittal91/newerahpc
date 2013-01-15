@@ -40,7 +40,6 @@
 #include "sockets.h"
 #include "sockopts.h"
 #include "communication.h"
-#include "http.h"
 
 namespace neweraHPC
 {  

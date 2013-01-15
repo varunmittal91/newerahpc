@@ -24,7 +24,7 @@
 #endif
 #include <include/headers.h>
 #include <include/sockets.h>
-#include <include/strings_pool.h>
+#include <include/strings.h>
 
 using namespace std;
 

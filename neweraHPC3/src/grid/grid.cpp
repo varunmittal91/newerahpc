@@ -338,11 +338,10 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_grid_server_t::grid_node_registration(nhpc_socket_t *sock)
    {
-      rbtree *headers = (rbtree *)sock->headers;
-      char *node_addr = (char *)headers->search("Node-Addr");
-      char *node_port = (char *)headers->search("Node-Port");
-      char *node_cores = (char *)headers->search("Node-Cores");
-      char *node_cpu_time = (char *)headers->search("Node-Cpu-Time");
+      char *node_addr     = network_headers_get_param(sock->headers, "Node-Addr");
+      char *node_port     = network_headers_get_param(sock->headers, "Node-Port");
+      char *node_cores    = network_headers_get_param(sock->headers, "Node-Cores");
+      char *node_cpu_time = network_headers_get_param(sock->headers, "Node-Cpu-Time");
       
       if(!node_addr || !node_port || !node_cores || !node_cpu_time)
 	 return NHPC_FAIL;
@@ -384,9 +383,10 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_grid_server_t::grid_file_download(nhpc_socket_t *sock, const char **grid_uid)
    {
-      char *file_name     = (char *)sock->headers->search("File-Name");
-      char *file_type     = (char *)sock->headers->search("File-Type");
-      char *file_size_str = (char *)sock->headers->search("Content-Length");
+      char *file_name     = network_headers_get_param(sock->headers, "File-Name");
+      char *file_type     = network_headers_get_param(sock->headers, "File-Type");
+      char *file_size_str = network_headers_get_param(sock->headers, "Content-Length");
+						  
 
       if(!file_name || !file_type || !file_size_str)
 	 return NHPC_FAIL;
@@ -398,13 +398,8 @@ namespace neweraHPC
       nhpc_status_t nrv;
       nhpc_size_t size;
       
-      const char *grid_path = nhpc_strconcat("/www/grid/", *grid_uid);
-      const char *tmp_path = nhpc_strconcat(grid_path, "/");
-      const char *final_path = nhpc_strconcat(tmp_path, file_name);
+      const char *final_path = nhpc_strconcat("/www/grid/", *grid_uid, "/", file_name);
 
-      nhpc_string_delete((char *)grid_path);
-      nhpc_string_delete((char *)tmp_path);
-      
       int fd = -1;
       int retry_count = 0;
       do 

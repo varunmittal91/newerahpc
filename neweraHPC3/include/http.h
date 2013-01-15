@@ -21,7 +21,7 @@
 #define _HTTP_H_
 
 #include "constants.h"
-#include "network.h"
+#include "network_data.h"
 
 #define HTTP_ROOT "/www"
 

@@ -226,69 +226,76 @@ namespace neweraHPC{
    }
    
    string_t *nhpc_substr(const char *s1, const char s2)
-   {
-      nhpc_size_t s1_len = strlen(s1);
-      
-      string_t *string = NULL;
-      char **strings = NULL;
-      int count = 0;
-      
-      const char *tmp_s1 = s1;
-      int old_pos = 1;
-      int current_pos = 1;
-      size_t len = 0;
-      
-      while(current_pos <= s1_len)
-      {
-	 if(*tmp_s1 == s2 || (current_pos == s1_len && current_pos > old_pos))
-	 {
-	    len = current_pos - old_pos;
+   {      
+      string_t  *string      = new string_t;
+      int       *count       = &(string->count);
+      char     **strings     = NULL;
+      char     **tmp_strings = NULL;
 
-	    if(current_pos == s1_len)
-	       len++;
-	       
-	    if(len != 0)
+      const char *tmp_s1 = s1;
+      
+      int tmp_len = 0;
+      
+      while(*tmp_s1 != '\0')
+      {
+	 if(*tmp_s1 == s2)
+	 {
+	    if(tmp_len > 0)
 	    {
-	       char *extracted_string = new char [len + 1];
-	       memcpy(extracted_string, s1 + old_pos - 1, sizeof(char) * len);
-	       extracted_string[len] = '\0';
+	       char *new_string = new char [tmp_len + 1];
+	       memcpy(new_string, (tmp_s1 - tmp_len), tmp_len);
+	       new_string[tmp_len] = '\0';
+	       (*count)++;
 	       
-	       char **tmp_strings = new char* [count + 1];
-	       memset(tmp_strings, 0, sizeof(char *) * (count + 1));
-	       if(strings != NULL)
+	       if(!strings)
 	       {
-		  memcpy(tmp_strings, strings, (sizeof(char *) * count));
-		  delete[] strings;
+		  strings = new char* [2];
+		  strings[0] = new_string;
+		  strings[1] = NULL;
 	       }
-	       strings = tmp_strings;
-	       strings[count] = extracted_string;
-	       count++;
-	       
-	       old_pos = current_pos;
+	       else 
+	       {
+		  tmp_strings = strings;
+		  strings = new char* [*count + 1];
+		  memcpy(strings, tmp_strings, (sizeof(char*) * (*count - 1)));
+		  strings[*count - 1] = new_string;
+		  strings[*count] = NULL;
+		  delete[] tmp_strings;
+	       }
 	    }
 	    
-	    while(*tmp_s1 == s2)
-	    {
-	       tmp_s1++;
-	       current_pos++;
-	       old_pos++;
-	    }
+	    tmp_len = -1;
 	 }
 	 
+	 tmp_len++;
 	 tmp_s1++;
-	 current_pos++;
       }
-
-      if(count > 0)
+      
+      if(tmp_len > 0)
       {
-	 string = new string_t;
-	 string->strings = new char* [count + 1];
-	 string->count = count;
+	 char *new_string = new char[tmp_len + 1];
+	 memcpy(new_string, (tmp_s1 - tmp_len), tmp_len);
+	 new_string[tmp_len] = '\0';
+	 (*count)++;
 	 
-	 memcpy((string->strings), strings, sizeof(char*) * count);
-	 string->strings[count] = NULL;
-	 delete[] strings;
+	 if(!strings)
+	 {
+	    strings = new char* [2];
+	    strings[0] = new_string;
+	    strings[1] = NULL;
+	 }
+	 else 
+	 {
+	    tmp_strings = strings;
+	    strings = new char* [*count + 1];
+	    memcpy(strings, tmp_strings, (sizeof(char*) * (*count - 1)));
+	    strings[*count - 1] = new_string;
+	    strings[*count] = NULL;
+	    delete[] tmp_strings;
+	 }	 
       }
+      
+      string->strings = strings;
       
       return string;
    }

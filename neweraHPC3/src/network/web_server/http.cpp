@@ -25,9 +25,9 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <include/network.h>
+#include <include/http.h>
 #include <include/general.h>
-#include <include/web_ui.h>
+#include <include/network.h>
 
 using namespace std;
 

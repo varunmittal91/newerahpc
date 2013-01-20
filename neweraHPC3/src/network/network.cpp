@@ -27,6 +27,7 @@
 #endif
 #include <include/network.h>
 #include <include/error.h>
+#include <include/neweraHPC.h>
 
 using namespace std;
 
@@ -113,6 +114,7 @@ namespace neweraHPC
    
    void exit_handler(int signum)
    {
+      neweraHPC_destruct();
       network->network_quit();
    }
    

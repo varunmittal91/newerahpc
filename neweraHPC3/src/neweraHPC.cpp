@@ -28,12 +28,14 @@
 
 using namespace std;
 
-neweraHPC::rbtree cmdline_arguments(RBTREE_STR);
+neweraHPC::rbtree *cmdline_arguments;
 
 namespace neweraHPC
 {
    void neweraHPC_init(int argc, char **argv)
    {      
+      cmdline_arguments = new rbtree(RBTREE_STR);
+      
       char **tmp_argv = argv + 1;
       
       while(*tmp_argv != NULL)
@@ -46,7 +48,7 @@ namespace neweraHPC
 	    exit(0);
 	 }
 	 
-	 cmdline_arguments.insert((*(tmp_argv + 1)), (arg + 1));
+	 nhpc_insert_cmdline_argument((*(tmp_argv + 1)), (arg + 1));
 
 	 if(*(tmp_argv + 1))
 	 {
@@ -61,7 +63,7 @@ namespace neweraHPC
 	 }
       }
       
-      const char *test_verbose = (const char *)cmdline_arguments.search("v");
+      const char *test_verbose = nhpc_get_cmdline_argument("v");
       if(test_verbose != NULL)
       {
 	 memset(log_on, false, sizeof(bool) * 3);
@@ -77,7 +79,12 @@ namespace neweraHPC
 	 else 
 	    LOG_ERROR("Verbose option invalid");
 	 
-	 cmdline_arguments.erase("v");	 
+	 nhpc_delete_cmdline_argument("v");
       }
+   }
+   
+   void neweraHPC_destruct()
+   {
+      delete cmdline_arguments;
    }
 };

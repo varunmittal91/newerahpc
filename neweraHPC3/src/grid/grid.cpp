@@ -28,6 +28,7 @@
 #include <include/network.h>
 #include <include/thread.h>
 #include <include/file.h>
+#include <include/system.h>
 
 using namespace std;
 
@@ -104,11 +105,11 @@ namespace neweraHPC
       char       *data;
       const char *key;
 
-      int argument_count = cmdline_arguments.length();
+      int argument_count = nhpc_get_cmdline_argument_count();
       
       for(int i = 1; i <= argument_count; i++)
       {
-	 data = (char *)cmdline_arguments.search_inorder_str(i, &key);
+	 data = nhpc_get_cmdline_argument_key(i, key);
 	 
 	 switch(*key)
 	 {

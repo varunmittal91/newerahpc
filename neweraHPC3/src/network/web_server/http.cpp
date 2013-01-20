@@ -93,14 +93,18 @@ namespace neweraHPC
 	    cout<<sock->partial_content<<endl;
 	 
 	 string_t *tmp_str = nhpc_substr(http_data->request_page, '/');
-	 char *app_name = tmp_str->strings[0];
-	 
-	 LOG_INFO("Checking for: " << app_name);
-	 fnc_ptr_nhpc_t *func_trigger_local = (fnc_ptr_nhpc_t *)http_handlers->search(app_name);
-	 if(func_trigger_local != NULL)
+
+	 if(tmp_str->count > 0)
 	 {
-	    LOG_INFO("Found http handler: " << app_name);
-	    nhpc_status_t nrv = (*func_trigger_local)(http_data);
+	    char *app_name = tmp_str->strings[0];
+	 
+	    LOG_INFO("Checking for: " << app_name);
+	    fnc_ptr_nhpc_t *func_trigger_local = (fnc_ptr_nhpc_t *)http_handlers->search(app_name);
+	    if(func_trigger_local != NULL)
+	    {
+	       LOG_INFO("Found http handler: " << app_name);
+	       nhpc_status_t nrv = (*func_trigger_local)(http_data);
+	    }
 	 }
 	 
 	 nhpc_string_delete(tmp_str);

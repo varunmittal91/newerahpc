@@ -42,7 +42,10 @@ namespace neweraHPC
       if(!plugin_details)
 	 return NHPC_FAIL;
       
+      cout << plugin_details << endl;
+      
       nhpc_status_t nrv = NHPC_FAIL;
+      cout << "Plugin details:" << plugin_details->plugin_name << endl;
       
       if(instruction_set->execute)
       {

@@ -59,11 +59,16 @@ namespace neweraHPC
        of the algorith in plugin */
       fnc_ptr_nhpc_plugin_t fnc_processor;
       
+      fnc_ptr_nhpc_plugin_t fnc_map_reduce;
+      
+      /* Target directory */
+      const char *plugin_dir;
+      
       /* Path of plugin on the server */
-      char *path_plugin;
+      const char *path_plugin;
       
       /* Path of nxi file for plugin on server */
-      char *path_nxi;
+      const char *path_nxi;
    };
    
    /* Peer details maintained at the server */

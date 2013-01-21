@@ -225,9 +225,14 @@ namespace neweraHPC
       accept_thread->network        = this;
       (**thread_manager).init_thread(&accept_thread_id, NULL);
       (**thread_manager).create_thread(&accept_thread_id, NULL, (void * (*)(void *))network_t::accept_connection, 
-				       (void *)accept_thread, NHPC_THREAD_JOIN);
+				       (void *)accept_thread, NHPC_THREAD_DEFAULT);
       
       return NHPC_SUCCESS;      
+   }
+   
+   void network_t::join_accept_thread()
+   {
+      (**thread_manager).join_thread(accept_thread_id);
    }
    
    void sig_action(int sig)

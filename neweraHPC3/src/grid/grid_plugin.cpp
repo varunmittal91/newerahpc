@@ -49,6 +49,29 @@ namespace neweraHPC
    plugin_manager_t::~plugin_manager_t()
    {
       LOG_INFO("Shuting down plugin manager");
+
+      int plugin_count = (*plugins_installed).length();
+      plugin_details_t *tmp;
+      const char       *plugin_dir;
+      const char       *plugin_nxi;
+      const char       *plugin_dll;
+      for(int i = 1; i <= plugin_count; i++)
+      {
+	 tmp = (plugin_details_t *)(*plugins_installed).search_inorder_str(i, NULL);
+	 if((plugin_dir) = tmp->plugin_dir)
+	 {
+	    plugin_nxi = tmp->path_nxi;
+	    plugin_dll = tmp->path_plugin;
+	    
+	    if(plugin_nxi)
+	       nhpc_delete_file_dir(plugin_nxi);
+	    if(plugin_dll)
+	       nhpc_delete_file_dir(plugin_dll);
+	    
+	    nhpc_delete_file_dir(plugin_dir);
+	 }
+      }
+      
       delete plugins_requested;
       delete plugins_installed;
       
@@ -135,12 +158,9 @@ namespace neweraHPC
 	    }
 	    
 	    if(dll_path_new != NULL)
-	    {
-	       nhpc_strcpy(&(new_plugin->path_nxi), dll_path_new);
-	       nhpc_string_delete(dll_path_new);
-	    }
+	       new_plugin->path_nxi = dll_path_new;
 	    else 
-	       nhpc_strcpy(&(new_plugin->path_nxi), file_path);
+	       new_plugin->path_nxi = file_path;
 	 }
 	 
 	 nrv = copy_filetogrid(dll_path, &base_dir, &dll_path_new);
@@ -150,24 +170,24 @@ namespace neweraHPC
 	    lock();
 	    plugins_installed->erase(new_plugin->plugin_name);
 	    unlock();
-	    nhpc_string_delete(new_plugin->path_nxi);
+	    nhpc_string_delete((char *)new_plugin->path_nxi);
 	    delete new_plugin;
 	    
 	    return nrv;
 	 }
 	 
+	 new_plugin->plugin_dir = nhpc_strconcat(grid_directory, base_dir);
 	 if(dll_path_new != NULL)
-	 {
-	    nhpc_strcpy(&(new_plugin->path_plugin), dll_path_new);
-	    nhpc_string_delete(dll_path_new);
-	 }
+	    new_plugin->path_plugin = dll_path_new;
 	 else 
-	    nhpc_strcpy(&(new_plugin->path_nxi), dll_path);
+	    new_plugin->path_plugin = file_path;
 
-	 LOG_DEBUG("New plugin details:");
-	 LOG_DEBUG("\t"<<new_plugin->plugin_name);
-	 LOG_DEBUG("\t"<<new_plugin->path_nxi);
-	 LOG_DEBUG("\t"<<new_plugin->path_plugin);
+	 LOG_INFO("New plugin details:");
+	 LOG_INFO("\t" << new_plugin->plugin_name);
+	 if(new_plugin->path_nxi)
+	    LOG_INFO("\t" << new_plugin->path_nxi);
+	 LOG_INFO("\t" << new_plugin->path_plugin);
+	 LOG_INFO("\t" << new_plugin->plugin_dir);
       }
       
       return nrv;
@@ -178,39 +198,43 @@ namespace neweraHPC
       void *dll = dlopen(dll_path, RTLD_NOW);
       if(!dll)
       {
-	 dlerror();
+	 LOG_ERROR("GRID PLUGIN:" << dlerror());
+	 return NHPC_FAIL;
+      }
+      
+      fnc_ptr_nhpc_t  plugin_init_fnc    = (fnc_ptr_nhpc_t)dlsym(dll, "plugin_init");  
+      if(!plugin_init_fnc)
+      {
+	 LOG_ERROR("GRID_PLUGIN:" << dlerror());
 	 return NHPC_FAIL;
       }
       
       *plugin_details = new plugin_details_t;
+      memset(*plugin_details, 0, sizeof(plugin_details_t));
       
-      (*plugin_details)->fnc_init        = (fnc_ptr_nhpc_plugin_t)dlsym(dll, "plugin_init");      
-      (*plugin_details)->fnc_exec        = (fnc_ptr_nhpc_plugin_t)dlsym(dll, "plugin_exec");
-      (*plugin_details)->fnc_client_exec = (fnc_ptr_nhpc_plugin_t)dlsym(dll, "plugin_exec_client");
-      (*plugin_details)->fnc_processor   = (fnc_ptr_nhpc_plugin_t)dlsym(dll, "plugin_processor");
+      nhpc_status_t   plugin_init_status = (nhpc_status_t)plugin_init_fnc(plugin_details);
+      char           *plugin_name;
+      
+      if(plugin_init_status != NHPC_SUCCESS)
+      {
+	 LOG_ERROR("GRID PLUGIN:Plugin initialization failed");
+	 return NHPC_FAIL;
+      }
       
       if(!(*plugin_details)->fnc_init && !(*plugin_details)->fnc_exec 
 	 && !(*plugin_details)->fnc_client_exec && !(*plugin_details)->fnc_processor)
       {
-	 dlerror();
-	 dlclose(dll);
-	 delete plugin_details;
-	 return NHPC_FAIL;
-      }
-      
-      char *plugin_name = (char *)(*plugin_details)->fnc_init(NULL, NULL, NULL, NULL);
-      if(!plugin_name)
-      {
-	 dlerror();
+	 LOG_ERROR("GRID_PLUGIN:Plugin symbols not found");
 	 delete (*plugin_details);
-	 dlclose(dll);
 	 return NHPC_FAIL;
       }
+      plugin_name = (*plugin_details)->plugin_name;
       
       void *test_installed = plugins_installed->search(plugin_name);
       {
 	 if(test_installed != NULL)
 	 {
+	    LOG_ERROR("Plugin installation test failed");
 	    dlclose(dll);
 	    delete (*plugin_details);
 	    return NHPC_FAIL;
@@ -218,7 +242,7 @@ namespace neweraHPC
       }
       
       lock();
-      nhpc_status_t nrv = plugins_installed->insert(plugin_details, plugin_name);
+      nhpc_status_t nrv = plugins_installed->insert(*plugin_details, plugin_name);
       unlock();
       if(nrv == NHPC_FAIL)
       {

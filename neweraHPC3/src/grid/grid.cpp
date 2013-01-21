@@ -214,8 +214,8 @@ namespace neweraHPC
             
       mkdir("/tmp/neweraHPC", 0777);
       
-      fnc_ptr_t *grid_request_handler = (fnc_ptr_t *)nhpc_grid_server_t::grid_request_init;
-      int rv = network_addons->insert((void *)&grid_request_handler, "GRID");
+      fnc_ptr_t grid_request_handler = (fnc_ptr_t)nhpc_grid_server_t::grid_request_init;
+      int rv = network_addons->insert((void *)grid_request_handler, "GRID");
 
       add_peer(host_addr, host_port, host_cores, host_cpu_time);
 
@@ -224,6 +224,11 @@ namespace neweraHPC
       nrv = create_server(host_addr, host_port, AF_INET, SOCK_STREAM, 0);  
       if(nrv != NHPC_SUCCESS)
 	 return nrv;
+   }
+   
+   void nhpc_grid_server_t::grid_server_join()
+   {
+      join_accept_thread();
    }
    
    nhpc_grid_server_t::~nhpc_grid_server_t()
@@ -284,6 +289,9 @@ namespace neweraHPC
 	    
 	    nhpc_instruction_set_t *instruction_set;
 	    nrv = nhpc_generate_instruction(&instruction_set, (rbtree *)sock->headers);
+	    
+	    
+	    cout << "Executing instruction" << endl;
 	    nrv = grid_server->grid_execute(instruction_set, sock, &uid);
 	 }
 	 else if(nhpc_strcmp(fnc_str, "SUBMISSION") == NHPC_SUCCESS)

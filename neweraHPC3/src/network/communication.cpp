@@ -74,12 +74,12 @@ namespace neweraHPC
 	 }
 	 else if(nhpc_strcmp(command, "*GRID*") == NHPC_SUCCESS)
 	 {
-	    fnc_ptr_t *grid_request_init = (fnc_ptr_t *)network->network_addons->search("GRID");
+	    fnc_ptr_t grid_request_init = (fnc_ptr_t)network->network_addons->search("GRID");
 	    if(!grid_request_init)
 	    {
 	       return;
 	    }
-	    (*grid_request_init)((nhpc_socket_t *)sock);
+	    grid_request_init(sock);
 	 }
       }
       

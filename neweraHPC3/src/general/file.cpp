@@ -20,12 +20,14 @@
 #include <sys/stat.h>
 #include <iostream>
 #include <dirent.h>
+#include <unistd.h>
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 #include <include/file.h>
 #include <include/strings.h>
+#include <include/error.h>
 
 using namespace std;
 
@@ -109,11 +111,17 @@ namespace neweraHPC
       
       if(nrv == NHPC_FILE)
       {
-	 
+	 if((unlink(target_path)) == -1)
+	 {
+	    LOG_ERROR("Removing file:" << target_path);
+	 }
       }
       else if(nrv == NHPC_DIRECTORY)
       {
-	 
+	 if((rmdir(target_path)) == -1)
+	 {
+	    LOG_ERROR("Removing directory:" << target_path);
+	 }
       }
       
       return NHPC_FAIL;

@@ -93,6 +93,8 @@ int main(int argc, char **argv)
    
    if(nrv != NHPC_SUCCESS)
       LOG_ERROR("Grid initialization failed");
+   else 
+      grid_server.grid_server_join();
    
    return 0;
 }

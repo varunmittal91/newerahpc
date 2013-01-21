@@ -86,6 +86,7 @@ namespace neweraHPC
 			    const char *host_port, int family, int type, int protocol);
       nhpc_status_t create_server(const char *host_addr, const char *host_port,
 				  int family, int type, int protocol);
+      void join_accept_thread();
       
       rbtree *network_addons;
       void lock_addons();

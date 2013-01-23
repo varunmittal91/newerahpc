@@ -86,7 +86,8 @@ namespace neweraHPC
       }
       
       const char *file_type;
-      if((nhpc_strcmp(file_path, "*.so") == NHPC_SUCCESS) || (nhpc_strcmp(file_path, "*.nxi") == NHPC_SUCCESS))
+      if((nhpc_strcmp(file_path, "*.so") == NHPC_SUCCESS) || (nhpc_strcmp(file_path, "*.nxi") == NHPC_SUCCESS) || 
+	 (nhpc_strcmp(file_path, "*.dylib")))
 	 file_type = "plugin";
       else 
 	 file_type = "regular";

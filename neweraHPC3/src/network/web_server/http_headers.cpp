@@ -26,7 +26,7 @@
 #endif
 #include <include/http.h>
 #include <include/rbtree.h>
-#include <include/alloc.h>
+#include <include/strings.h>
 
 using namespace std;
 

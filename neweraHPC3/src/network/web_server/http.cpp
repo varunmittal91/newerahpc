@@ -17,19 +17,19 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-#include <fstream>
-#include <sys/stat.h>
+//#include <sys/stat.h>
 #include <stdlib.h>
+#include <errno.h>
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+#include <include/error.h>
+#include <include/strings.h>
+#include <include/file.h>
 #include <include/http.h>
-#include <include/general.h>
-#include <include/network.h>
-
-using namespace std;
+#include <include/headers.h>
+#include <include/sockets.h>
 
 namespace neweraHPC
 {
@@ -66,12 +66,6 @@ namespace neweraHPC
       http_data_t *http_data = new http_data_t;
       memset(http_data, 0, sizeof(http_data_t));
       nhpc_status_t nrv = read_headers(sock->headers, &http_data);
-
-      if(!http_data)
-      {
-	 cout << "server crashing" << endl;
-	 exit(0);
-      }
       
       http_data->sock = sock;
       if(nrv == NHPC_SUCCESS)
@@ -90,7 +84,7 @@ namespace neweraHPC
       if((http_data->request_type) == HTTP_REQUEST_GET || (http_data->request_type) == HTTP_REQUEST_POST)
       {
 	 if(((http_data->request_type) == HTTP_REQUEST_POST) == NHPC_SUCCESS)
-	    cout<<sock->partial_content<<endl;
+	    LOG_INFO("Partial Content:" << sock->partial_content);
 	 
 	 string_t *tmp_str = nhpc_substr(http_data->request_page, '/');
 
@@ -163,7 +157,7 @@ namespace neweraHPC
 	       FILE *fp = fopen(file_path, "r");
 	       if(!fp)
 	       {
-		  cout << "Error opening file" << endl;
+		  LOG_ERROR("Error opening file");
 		  exit(0);
 	       }
 
@@ -258,8 +252,6 @@ namespace neweraHPC
 	 
 	 size_downloaded += (size - header_size);
       }while(nrv != NHPC_EOF && size_downloaded != file_size);
-      
-      cout<<"Size Downloaded: "<<size_downloaded<<endl;
       
       fclose(fp);
       

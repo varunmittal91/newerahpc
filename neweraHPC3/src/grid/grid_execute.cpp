@@ -40,12 +40,18 @@ namespace neweraHPC
       plugin_details_t *plugin_details;
       search_plugin(plugin, &plugin_details);
       if(!plugin_details)
+      {
+	 int peer_id = nhpc_grid_get_peer_id(sock);
+	 cout << nhpc_grid_get_peer_id(sock) << endl;
+	 request_plugin(nhpc_grid_get_peer_host_instruction(instruction_set),
+			nhpc_grid_get_peer_port_instruction(instruction_set),
+			plugin);
+      }      
+      search_plugin(plugin, &plugin_details);
+      if(!plugin_details)
 	 return NHPC_FAIL;
       
-      cout << plugin_details << endl;
-      
       nhpc_status_t nrv = NHPC_FAIL;
-      cout << "Plugin details:" << plugin_details->plugin_name << endl;
       
       if(instruction_set->execute)
       {

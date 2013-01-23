@@ -20,8 +20,9 @@
 #ifndef _NHPC_HEAP_H_
 #define _NHPC_HEAP_H_
 
-#include "list.h"
-#include "neweraHPC.h"
+#include <pthread.h>
+
+#include "constants.h"
 
 #define heap_set_end_page
 

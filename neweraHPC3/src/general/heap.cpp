@@ -17,9 +17,11 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
+#include <string.h>
 
+#include <include/heap.h>
 #include <include/alloc.h>
+#include <include/error.h>
 
 using namespace std;
 

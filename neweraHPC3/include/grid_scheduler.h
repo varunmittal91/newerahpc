@@ -70,6 +70,7 @@ namespace neweraHPC
       void grid_scheduler_init();
       int cores();
       void add_peer(const char *host, const char *port, int processors, int cpu_time);
+      peer_details_t *get_peer(int peed_id);
       void remove_peer(int peer_id);
       peer_details_t *schedule();
       void free_peer(int id);
@@ -97,6 +98,17 @@ namespace neweraHPC
    };   
    
    void child_handler(int signum);
+   
+   static int nhpc_grid_get_peer_id(nhpc_socket_t *sock)
+   {
+      int peer_id;
+
+      const char *peer_id_str = (const char *)sock->headers->search("Peer");
+      if(!peer_id_str)
+	 return -1;
+      
+      return nhpc_strtoi(peer_id_str);
+   }
 };
 
 #endif

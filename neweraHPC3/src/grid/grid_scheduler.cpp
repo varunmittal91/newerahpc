@@ -133,6 +133,13 @@ namespace neweraHPC
       peer_details->id = peers->insert(peer_details);
    }
    
+   peer_details_t *grid_scheduler_t::get_peer(int peer_id)
+   {
+      peer_details_t *peer_details = (peer_details_t *)peers->search(peer_id);
+      
+      return peer_details;
+   }
+   
    void grid_scheduler_t::remove_peer(int peer_id)
    {
       lock();

@@ -100,12 +100,18 @@ namespace neweraHPC
       int threads;
    };
    
+   typedef unsigned char plugin_request_status;
    struct plugin_request_t
    {
-      int peer_id;
-      int remote_plugin_id;
-      bool status;
+      char  *plugin;
+      char  *peer_host;
+      char  *peer_port;
+      plugin_request_status  status;
    };   
+#define nhpc_grid_set_plugin_request_sent(p)      ((p)->status |= 1)
+#define nhpc_grid_set_plugin_request_complete(p)  ((p)->status |= 2)
+#define nhpc_grid_is_plugin_request_sent(p)       ((p)->status & 1)
+#define nhpc_grid_is_plugin_request_complete(p)   (((p)->status >> 1) & 1)
    
    struct nhpc_instruction_set_t
    {
@@ -121,6 +127,10 @@ namespace neweraHPC
       char *host_peer_port;
       bool execute;
    };
+#define nhpc_grid_get_peer_host_instruction(i)  (i->host_peer_addr)
+#define nhpc_grid_get_peer_port_instruction(i)  (i->host_peer_port)
+#define nhpc_grid_get_peer_host_socket(s)       (s->host)
+#define nhpc_grid_get_peer_port_socket(s)       (s->port)
 };
 
 #endif

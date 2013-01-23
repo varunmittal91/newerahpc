@@ -20,10 +20,10 @@
 #ifndef _CONSTANTS_H_
 #define _CONSTANTS_H_
 
-#include <unistd.h>
+#include <cstddef>
 
-typedef int    nhpc_status_t;
-typedef size_t nhpc_size_t;
+typedef int         nhpc_status_t;
+typedef std::size_t nhpc_size_t;
 
 #define NHPC_SUCCESS 1
 #define NHPC_FAIL 0

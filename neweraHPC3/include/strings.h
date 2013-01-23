@@ -22,7 +22,6 @@
 
 #include <unistd.h>
 #include <string.h>
-#include <string>
 #include <stdarg.h>
 
 #include "constants.h"

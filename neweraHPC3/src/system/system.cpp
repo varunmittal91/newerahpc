@@ -17,7 +17,6 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
 #include <sys/types.h>
 
 #ifdef HAVE_CONFIG_H
@@ -26,8 +25,6 @@
 #include <include/alloc.h>
 #include <include/system.h>
 #include <include/error.h>
-#include <include/strings_pool.h>
-#include <include/grid.h>
 
 using namespace std;
 

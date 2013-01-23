@@ -83,9 +83,13 @@ namespace neweraHPC
       nhpc_status_t grid_node_registration(nhpc_socket_t *sock);
 
       static void grid_request_init(nhpc_socket_t *sock);
+      
+      static void grid_plugin_request_thread(nhpc_grid_server_t *grid_server);
    };
    
    nhpc_status_t nhpc_grid_file_download(nhpc_socket_t *sock, const char **file_path);
+   
+#define nhpc_grid_is_plugin_request(req_str)  (nhpc_strcmp(req_str, "PLUGIN_REQUEST") == NHPC_SUCCESS)
 };
 
 #endif

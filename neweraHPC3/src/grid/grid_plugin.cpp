@@ -27,6 +27,7 @@
 #include <include/network.h>
 #include <include/file.h>
 #include <include/error.h>
+#include <include/http.h>
 
 using namespace std;
 
@@ -84,11 +85,6 @@ namespace neweraHPC
    
    void plugin_manager_t::plugin_manager_init()
    {
-      int thread_id;
-      (*thread_manager)->init_thread(&thread_id, NULL);
-      (*thread_manager)->create_thread(&thread_id, NULL, (void* (*)(void*))nhpc_plugin_request_thread, 
-				       this, NHPC_THREAD_DEFAULT);
-      
       plugin_details_t *nhpc_plugin;
       nhpc_grid_range_plugin_init(&nhpc_plugin);
       (*plugins_installed).insert(nhpc_plugin, nhpc_plugin->plugin_name);
@@ -243,6 +239,10 @@ namespace neweraHPC
       
       lock();
       nhpc_status_t nrv = plugins_installed->insert(*plugin_details, plugin_name);
+      plugin_request_t *plugin_request = (plugin_request_t *)plugins_requested->search(plugin_name);
+      if(plugin_request)
+	 nhpc_grid_set_plugin_request_complete(plugin_request);
+      
       unlock();
       if(nrv == NHPC_FAIL)
       {
@@ -312,8 +312,10 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
-   nhpc_status_t plugin_manager_t::request_plugin(int peer_id, char *plugin_name)
+   nhpc_status_t plugin_manager_t::request_plugin(char *peer_host, char *peer_port, char *plugin_name)
    {
+      LOG_INFO("Requesting plugin:" << plugin_name << " from:" << peer_host);
+      
       plugin_request_t *plugin_request;
 
       thread_mutex_lock(nhpc_mutex, NHPC_THREAD_LOCK_READ);      
@@ -335,22 +337,53 @@ namespace neweraHPC
       else
       {
          plugin_request = new plugin_request_t;
-         plugin_request->peer_id = peer_id;
-         thread_mutex_lock(nhpc_mutex, NHPC_THREAD_LOCK_WRITE);      
+	 nhpc_strcpy(&(plugin_request->plugin), plugin_name);
+	 nhpc_strcpy(&(plugin_request->peer_host), peer_host);
+	 nhpc_strcpy(&(plugin_request->peer_port), peer_port);
+	 thread_mutex_lock(nhpc_mutex, NHPC_THREAD_LOCK_WRITE);      
          plugins_requested->insert(plugin_request, plugin_name);
-         thread_mutex_lock(nhpc_mutex, NHPC_THREAD_LOCK_WRITE);       
+         thread_mutex_unlock(nhpc_mutex, NHPC_THREAD_LOCK_WRITE); 
+	 
+	 while(1)
+	 {
+	    sleep(1);
+	    
+	    if(nhpc_grid_is_plugin_request_complete(plugin_request))
+	    {
+	       cout << "Request complete" << endl;
+	       break;
+	    }
+	 }
       }
    }
 
+   plugin_request_t *plugin_manager_t::return_plugin_request()
+   {
+      thread_mutex_lock(nhpc_mutex, NHPC_THREAD_LOCK_WRITE);
+      
+      plugin_request_t *plugin_request = NULL;
+      int plugin_request_count = plugins_requested->length();
+      for(int i = 1; i <= plugin_request_count; i++)
+      {
+	 plugin_request = (plugin_request_t *)plugins_requested->search_inorder_str(i, NULL);
+	 
+	 if(!nhpc_grid_is_plugin_request_sent(plugin_request))
+	 {
+	    nhpc_grid_set_plugin_request_sent(plugin_request);
+	    break;
+	 }
+	 
+	 plugin_request = NULL;
+      }
+      
+      thread_mutex_unlock(nhpc_mutex, NHPC_THREAD_LOCK_WRITE);
+      
+      return plugin_request;
+   }
+   
    nhpc_status_t plugin_manager_t::recieve_plugin(const char *plugin_name, const char *plugin_type, 
 						  const char *file_path)
    {
 
-   }
-
-
-   void *nhpc_plugin_request_thread(plugin_manager_t *plugin_manager)
-   {
-      
    }
 };

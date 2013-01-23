@@ -33,13 +33,6 @@ namespace neweraHPC
    class plugin_manager_t
    {
    private:
-      struct plugin_request_t
-      {
-         int peer_id;
-         int request_sent;
-         int status;
-      };
-
       rbtree *plugins_installed;
       rbtree *plugins_requested;
       thread_manager_t **thread_manager;
@@ -58,13 +51,13 @@ namespace neweraHPC
       void unlock();
       nhpc_status_t search_plugin(const char *plugin_name, plugin_details_t **plugin_details);
 
-      nhpc_status_t request_plugin(int peer_id, char *plugin_name);
+      nhpc_status_t request_plugin(char *peer_host, char *peer_port, char *plugin_name);
       nhpc_status_t recieve_plugin(const char *plugin_name, const char *plugin_type, const char *file_path);
 
       nhpc_status_t install_plugin(const char *file_path, const char *base_dir = NULL);
+      
+      plugin_request_t *return_plugin_request();
    };
-   
-   void *nhpc_plugin_request_thread(plugin_manager_t *plugin_manager);
    
    nhpc_status_t nhpc_check_nxi(const char *file_path);
    nhpc_status_t nhpc_nxitodll(const char **dll_path, const char *file_path);

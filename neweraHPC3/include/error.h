@@ -28,8 +28,6 @@ using namespace std;
 
 namespace neweraHPC
 {
-   //void nhpc_perror(nhpc_status_t status, const char *message);
-      
    class Log
    {
    public:

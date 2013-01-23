@@ -23,6 +23,8 @@
 #define LIST_MIN_FIRST 0
 #define LIST_MAX_FIRST 1
 
+#include "thread.h"
+
 namespace neweraHPC
 {
    class list_t

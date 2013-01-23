@@ -20,19 +20,15 @@
 #ifndef _ALLOC_H_
 #define _ALLOC_H_
 
+#ifdef ENABLE_GARBAGE_COLLECTOR
+
 #include <errno.h>
 #ifdef linux
 #include <malloc.h>
 #endif
-#include <stdlib.h>
 
-#include "error.h"
-#include "strings_pool.h"
-#include "heap.h"
+#include <new>
 
-using namespace neweraHPC;
-
-#ifdef ENABLE_GARBAGE_COLLECTOR
 void *operator new(std::size_t size) throw (std::bad_alloc);
 void *operator new[](std::size_t size) throw (std::bad_alloc);
 

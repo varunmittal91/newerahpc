@@ -18,8 +18,6 @@
  */
 
 #include <fstream>
-#include <cstring>
-#include <cstdlib>
 
 #ifdef __APPLE__
 #include <mach/vm_statistics.h>

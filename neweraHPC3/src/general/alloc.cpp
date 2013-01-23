@@ -30,10 +30,7 @@
 using namespace std;
 
 #ifdef ENABLE_GARBAGE_COLLECTOR
-namespace neweraHPC
-{
-   GarbageCollector garbagecollector;
-};
+neweraHPC::GarbageCollector garbagecollector;
 
 void *operator new(std::size_t size) throw (std::bad_alloc)
 {

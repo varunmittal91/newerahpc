@@ -25,6 +25,7 @@
 #include <include/grid.h>
 #include <include/network.h>
 #include <include/system.h>
+#include <include/error.h>
 
 using namespace std;
 

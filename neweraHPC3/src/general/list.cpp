@@ -26,6 +26,8 @@
 #include <include/alloc.h>
 #include <include/list.h>
 
+using namespace std;
+
 namespace neweraHPC
 {
    list_t::list_t(short int _mode)

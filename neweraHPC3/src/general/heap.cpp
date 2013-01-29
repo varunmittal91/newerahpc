@@ -19,6 +19,10 @@
 
 #include <string.h>
 
+#ifdef __linux__
+#include <malloc.h>
+#endif
+
 #include <include/heap.h>
 #include <include/alloc.h>
 #include <include/error.h>

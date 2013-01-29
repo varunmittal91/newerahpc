@@ -226,6 +226,18 @@ namespace neweraHPC
       if(nrv != NHPC_SUCCESS)
 	 return nrv;
       
+      grid_communication_handlers = new rbtree(RBTREE_STR);
+      (*grid_communication_handlers).insert((void *)(nhpc_grid_server_t::grid_client_registration_handler), 
+					    nhpc_grid_get_communication_code_status_mssg(GRID_CLIENT_REGISTRATION));
+      (*grid_communication_handlers).insert((void *)(nhpc_grid_server_t::grid_node_registration_handler), 
+					    nhpc_grid_get_communication_code_status_mssg(GRID_NODE_REGISTRATION));
+      (*grid_communication_handlers).insert((void *)(nhpc_grid_server_t::grid_plugin_request_handler), 
+					    nhpc_grid_get_communication_code_status_mssg(GRID_PLUGIN_REQUEST));
+      (*grid_communication_handlers).insert((void *)(nhpc_grid_server_t::grid_file_exchange_request_handler), 
+					    nhpc_grid_get_communication_code_status_mssg(GRID_FILE_EXCHANGE));
+      (*grid_communication_handlers).insert((void *)(nhpc_grid_server_t::grid_instruction_request_handler), 
+					    nhpc_grid_get_communication_code_status_mssg(GRID_INSTRUCTION));
+      
       int plugin_request_thread_id;
       thread_manager->init_thread(&plugin_request_thread_id, NULL);
       thread_manager->create_thread(&plugin_request_thread_id, NULL, (void* (*)(void*))nhpc_grid_server_t::grid_plugin_request_thread, 
@@ -275,79 +287,17 @@ namespace neweraHPC
       nhpc_status_t  nrv     = NHPC_FAIL;
       const char    *fnc_str = string->strings[1];
       
-      if(nhpc_strcmp(fnc_str, "CLIENT_REGISTRATION") == NHPC_SUCCESS)
-	 nrv = (*grid_server).grid_client_registration(sock);
-      else if(nhpc_strcmp(fnc_str, "NODE_REGISTRATION") == NHPC_SUCCESS)
-	 nrv = (*grid_server).grid_node_registration(sock);
-      else 
+      fnc_ptr_nhpc_two_t fnc_ptr =(fnc_ptr_nhpc_two_t)grid_communication_handlers->search(fnc_str);
+      
+      if(fnc_ptr)
       {
-//	 if(uid == NULL || grid_server->grid_client_verify_uid(uid) != NHPC_SUCCESS)
-	 if(uid == NULL)
-	 {
-	    nhpc_string_delete(string);
-	    return;
-	 }
-	 else if(nhpc_grid_is_plugin_request(fnc_str))
-	 {
-	    char       *plugin    = network_headers_get_param(sock->headers, "Plugin");
-	    const char *peer_host = network_headers_get_param(sock->headers, "Peer-Host");
-	    const char *peer_port = network_headers_get_param(sock->headers, "Peer-Port");
-
-	    plugin_details_t *plugin_details;
-	    grid_server->search_plugin(plugin, &plugin_details);
-	    
-	    if(!plugin_details)
-	       nrv = NHPC_FAIL;
-	    else 
-	    {
-	       const char *src_path;
-	       
-	       if(plugin_details->path_nxi)
-		  src_path = plugin_details->path_nxi;
-	       else 
-		  src_path = plugin_details->path_plugin;
-	       
-	       nrv = nhpc_send_file(uid, peer_host, peer_port, src_path);
-	    }
-	 }
-	 else if(nhpc_strcmp(fnc_str, "FILE_EXCHANGE") == NHPC_SUCCESS)
-	    nrv = grid_server->grid_file_download(sock, &uid);
-	 else if(nhpc_strcmp(fnc_str, "INSTRUCTION") == NHPC_SUCCESS)
-	 {
-	    LOG_DEBUG("My Max Cpu time: " << grid_server->host_cpu_time);
-	    
-	    nhpc_instruction_set_t *instruction_set;
-	    nrv = nhpc_generate_instruction(&instruction_set, (rbtree *)sock->headers);
-	    
-	    cout << "Executing instruction" << endl;
-	    nrv = grid_server->grid_execute(instruction_set, sock, &uid);
-	 }
-	 else if(nhpc_strcmp(fnc_str, "SUBMISSION") == NHPC_SUCCESS)
-	 {
-	    char *peer_id = (char *)sock->headers->search("Peer");
-	    int peer_id_n = nhpc_strtoi(peer_id);
-	    
-	    if(sock->partial_content)
-	    {
-	       task_t *task = (task_t *)sock->partial_content;
-	       nhpc_systeminfo_t *systeminfo = &(task->systeminfo);
-	       
-	       LOG_DEBUG("Node:load_avg_max: " << systeminfo->cpuinfo.load_avg_max);
-	       LOG_DEBUG("Node:meminfo: " << systeminfo->meminfo.free_mem);
-	       
-	       grid_server->free_peer(nhpc_strtoi(peer_id), systeminfo->cpuinfo.load_avg_max, &(systeminfo->meminfo));
-	    }
-	    else 
-	       grid_server->free_peer(nhpc_strtoi(peer_id));
-	    
-	    nrv = NHPC_SUCCESS;
-	 }
-	 
-	 char *response   = nhpc_itostr(nrv);
-	 nhpc_size_t size = strlen(response);
-	 socket_sendmsg(sock, response, &size);
-	 nhpc_string_delete(response);
+	 nrv = fnc_ptr(grid_server, sock);
       }
+
+      char        *response = nhpc_itostr(nrv);
+      nhpc_size_t  size     = strlen(response);
+      socket_sendmsg(sock, response, &size);
+      nhpc_string_delete(response);
       
       LOG_INFO("Executed function with status: " << nrv);
       
@@ -417,80 +367,7 @@ namespace neweraHPC
       
       return NHPC_SUCCESS;
    }
-   
-   nhpc_status_t nhpc_grid_server_t::grid_file_download(nhpc_socket_t *sock, const char **grid_uid)
-   {
-      LOG_INFO("Downloading file");
       
-      char *file_name     = network_headers_get_param(sock->headers, "File-Name");
-      char *file_type     = network_headers_get_param(sock->headers, "File-Type");
-      char *file_size_str = network_headers_get_param(sock->headers, "Content-Length");
-						  
-
-      if(!file_name || !file_type || !file_size_str)
-      {
-	 LOG_ERROR("Error downloading file");
-	 return NHPC_FAIL;
-      }
-      
-      nhpc_size_t file_size = nhpc_strtoi(file_size_str);
-      
-      nhpc_size_t size_downloaded = 0;
-      char buffer[10000];
-      nhpc_status_t nrv;
-      nhpc_size_t size;
-      
-      const char *final_path = nhpc_strconcat("/www/grid/", *grid_uid, "/", file_name);
-
-      int fd = -1;
-      int retry_count = 0;
-      do 
-      {
-	 fd = open (final_path, O_WRONLY | O_CREAT | O_NONBLOCK | O_NOCTTY,
-		    S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-	 retry_count++;
-      }while(fd == -1 && retry_count < 5);
-      
-      if(fd == -1 && close(fd) < 0)
-      {
-	 nhpc_string_delete((char *)final_path);
-	 return NHPC_FAIL;
-      }
-      
-      FILE *fp = fopen(final_path, "wb");
-
-      if(sock->partial_content != NULL)
-      {
-	 fwrite(sock->partial_content, 1, sock->partial_content_len, fp);
-	 size_downloaded += sock->partial_content_len;
-      }
-      
-      do 
-      {
-	 bzero(buffer, sizeof(buffer));
-	 size = sizeof(buffer);
-	 nrv = socket_recv(sock, buffer, &size); 
-	 fwrite(buffer, 1, size, fp);	 
-	 size_downloaded += size;
-      }while((nrv != NHPC_EOF) && file_size != size_downloaded);
-      
-      fclose(fp);
-      
-      if(nhpc_strcmp(file_type, "plugin") == NHPC_SUCCESS)
-      {
-	 nrv = install_plugin(final_path, *grid_uid);
-	 if(nrv != NHPC_SUCCESS)
-	 {
-	    nhpc_string_delete((char *)final_path);
-	    return NHPC_FAIL;
-	 }
-      }
-      
-      nhpc_string_delete((char *)final_path);
-      
-      return NHPC_SUCCESS;
-   }
-   
    void nhpc_grid_server_t::grid_plugin_request_thread(nhpc_grid_server_t *grid_server)
    {
       plugin_manager_t plugin_manager = (plugin_manager_t)(*grid_server);
@@ -510,6 +387,12 @@ namespace neweraHPC
 	 {
 	    peer_host = plugin_request->peer_host;
 	    peer_port = plugin_request->peer_port;
+	    
+	    grid_communication_t *grid_communication;
+	    nhpc_grid_communication_init(&grid_communication, GRID_PLUGIN_REQUEST);
+	    nhpc_grid_communication_add_dest(grid_communication, peer_host, peer_port);
+	    nhpc_grid_communication_add_peer(grid_communication, grid_server);
+	    nhpc_grid_communication_send(grid_communication);
 	    
 	    nhpc_register_to_server(&grid_uid, peer_host, peer_port);
 	    if(!grid_uid)

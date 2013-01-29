@@ -30,6 +30,7 @@
 #include "grid_instruction_set.h"
 #include "grid_client.h"
 #include "grid_server.h"
+#include "grid_communication.h"
 
 namespace neweraHPC 
 {
@@ -57,8 +58,6 @@ namespace neweraHPC
       char *grid_controller_addr;
       char *grid_controller_port;
       
-      char *host_addr;
-      char *host_port;
       int host_cores;
       int host_cpu_time;
             
@@ -66,6 +65,9 @@ namespace neweraHPC
       
       rbtree *jobs;
    public:
+      char *host_addr;
+      char *host_port;
+
       nhpc_grid_server_t(const char *in_host, const char *in_cpu_time);   
       nhpc_grid_server_t();
       
@@ -73,7 +75,6 @@ namespace neweraHPC
       nhpc_status_t grid_server_init();
       void grid_server_join();
       
-      nhpc_status_t grid_file_download(nhpc_socket_t *sock, const char **grid_uid);
       nhpc_status_t grid_execute(nhpc_socket_t *sock, const char **grid_uid);
       nhpc_status_t grid_execute(nhpc_instruction_set_t *instruction_set, 
 				 nhpc_socket_t *sock, const char **grid_uid);
@@ -85,11 +86,16 @@ namespace neweraHPC
       static void grid_request_init(nhpc_socket_t *sock);
       
       static void grid_plugin_request_thread(nhpc_grid_server_t *grid_server);
+      
+      static nhpc_status_t grid_client_registration_handler(nhpc_grid_server_t *grid_server, nhpc_socket_t *socket);
+      static nhpc_status_t grid_node_registration_handler(nhpc_grid_server_t *grid_server, nhpc_socket_t *socket);
+      static nhpc_status_t grid_plugin_request_handler(nhpc_grid_server_t *grid_server, nhpc_socket_t *socket);
+      static nhpc_status_t grid_file_exchange_request_handler(nhpc_grid_server_t *grid_server, nhpc_socket_t *socket);
+      static nhpc_status_t grid_instruction_request_handler(nhpc_grid_server_t *grid_server, nhpc_socket_t *socket);
+      static nhpc_status_t grid_submission_request_handler(nhpc_grid_server_t *grid_server, nhpc_socket_t *socket);
    };
    
    nhpc_status_t nhpc_grid_file_download(nhpc_socket_t *sock, const char **file_path);
-   
-#define nhpc_grid_is_plugin_request(req_str)  (nhpc_strcmp(req_str, "PLUGIN_REQUEST") == NHPC_SUCCESS)
 };
 
 #endif

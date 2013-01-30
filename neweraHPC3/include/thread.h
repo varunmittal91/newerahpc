@@ -33,7 +33,9 @@
 //! Create thread and reclaim resources of thread after it dies
 #define NHPC_THREAD_DETACH  2
 
+//! Lock thread for exclusive read, allow simultaneous reads
 #define NHPC_THREAD_LOCK_READ  1
+//! Lock thread for exclusive write, allow only one write
 #define NHPC_THREAD_LOCK_WRITE 0
 
 #define MAX_THREADS 50
@@ -59,8 +61,9 @@ namespace neweraHPC
       rbtree *active_threads;
       
       //! Mutex varibale
-      nhpc_mutex_t mutex_count;
       nhpc_mutex_t mutex;
+      //! Mutex variable count
+      nhpc_mutex_t mutex_count;
       
       int thread_count;      
    public:  
@@ -109,6 +112,8 @@ namespace neweraHPC
       int exit_thread();
    };
    
+   //! Mutex creation & initiation
+   /*! Initialize nhpc_mutex */
    nhpc_status_t thread_mutex_init(nhpc_mutex_t *mutex);
    nhpc_status_t thread_mutex_lock(nhpc_mutex_t *mutex, int for_read);
    nhpc_status_t thread_mutex_unlock(nhpc_mutex_t *mutex, int for_read);

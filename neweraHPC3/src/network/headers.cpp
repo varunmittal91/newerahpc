@@ -51,7 +51,6 @@ namespace neweraHPC
    void nhpc_headers_t::insert(const char *string)
    {
       char *new_str = nhpc_strconcat(string, "\r\n");
-      
       headers->insert(new_str);
    }
    
@@ -60,13 +59,11 @@ namespace neweraHPC
       char *tmp_property = nhpc_strconcat(property, ": ", argument);
       insert(tmp_property);
       delete[] tmp_property;
-      //nhpc_deallocate_str(tmp_property);
    }
    
    const char *nhpc_headers_t::operator[](int id)
    {
       const char *tmp_str = (const char *)headers->search(id + 1);
-      
       return tmp_str;
    }
    

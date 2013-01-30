@@ -33,12 +33,14 @@ namespace neweraHPC
 #define GRID_SUBMISSION            4
 #define GRID_PLUGIN_REQUEST        5
    
+#define GRID_COMMUNICATION_REGISTER 1
+   
    static struct _GRID_STATUS_MSSGS
    {
       const char        *MSSGS_STRINGS;
    }GRID_STATUS_MSSGS[6] = {"CLIENT_REGISTRATION", "NODE_REGISTRATION", "FILE_EXCHANGE",
       "INSTRUCTION", "SUBMISSION", "PLUGIN_REQUEST"};
-#define nhpc_grid_get_communication_status_code(gc)      ((gc->request_type) >> 1)
+#define nhpc_grid_get_communication_status_code(gc)      ((gc->request_type) >> 5)
 #define nhpc_grid_get_communication_status_mssg(gc)      (GRID_STATUS_MSSGS[nhpc_grid_get_communication_status_code(gc)].MSSGS_STRINGS)
 #define nhpc_grid_get_communication_code_status_mssg(c)  (GRID_STATUS_MSSGS[c].MSSGS_STRINGS)
    
@@ -52,9 +54,13 @@ namespace neweraHPC
       const char        *peer_addr;
       const char        *peer_port;
    };
-#define nhpc_grid_is_communication_complete(gc)  ((gc->request_type) | 1)
-#define nhpc_grid_set_communication_complete(gc) ((gc->request_type) |= 1)
-#define nhpc_grid_set_communication_type(gc, c)  ((gc->request_type) |= (c << 1))
+#define nhpc_grid_is_communication_complete(gc)    ((gc->request_type) | 1)
+#define nhpc_grid_set_communication_complete(gc)   ((gc->request_type) |= 1)
+#define nhpc_grid_set_communication_type(gc, c)    ((gc->request_type) |= (c << 5))
+#define nhpc_grid_set_communication_header(gc,h,v) ((gc->headers->insert(h, v)))
+
+#define nhpc_grid_set_communication_opt(gc, o)      ((gc->request_type) |= (o << 1)) 
+#define nhpc_grid_communication_opt_is_register(gc) (1 & (gc->request_type) >> 1)
    
    static void nhpc_grid_communication_init(grid_communication_t **gc, grid_request_type c)
    {
@@ -62,6 +68,15 @@ namespace neweraHPC
       memset((*gc), 0, sizeof(grid_communication_t));
       nhpc_grid_set_communication_type((*gc), c);
    }
+   static void nhpc_grid_communication_destruct(grid_communication_t *grid_communication)
+   {
+      if(grid_communication->dest_addr)
+	 delete[] grid_communication->dest_addr;
+      if(grid_communication->dest_port)
+	 delete[] grid_communication->dest_port;
+      
+      delete grid_communication;
+   }   
    
    static void nhpc_grid_communication_add_dest(grid_communication_t *grid_commuincation, const char *dest_addr, const char *dest_port)
    {
@@ -71,6 +86,7 @@ namespace neweraHPC
 #define nhpc_grid_communication_add_peer(gc, g)  (gc->peer_addr = g->host_addr, gc->peer_port = g->host_port);
    
    nhpc_status_t nhpc_grid_communication_send(grid_communication_t *grid_communication);
+   nhpc_status_t nhpc_grid_communication_push(grid_communication_t *grid_communication);
 }
 
 #endif

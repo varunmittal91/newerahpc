@@ -19,6 +19,7 @@
 */
 
 #include <iostream>
+#include <fstream>
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -35,34 +36,24 @@ namespace neweraHPC
 					     int host_cpu_time)
    {
       nhpc_status_t nrv;
-      nhpc_socket_t *sock;
-      
-      nrv = socket_connect(&sock, grid_controller_addr, grid_controller_port, AF_INET, SOCK_STREAM, 0);
-      
-      if(nrv != NHPC_SUCCESS)
-      {
-	 return errno;
-      }      
       
       char *node_cores_str = nhpc_itostr(host_core_count);
       char *node_cpu_time_str = nhpc_itostr(host_cpu_time);
       
-      nhpc_headers_t *headers = new nhpc_headers_t;
-      headers->insert("GRID NODE_REGISTRATION 2.90");
-      headers->insert("Node-Addr", host_addr);
-      headers->insert("Node-Port", host_port);
-      headers->insert("Node-Cores", node_cores_str);
-      headers->insert("Node-Cpu-Time", node_cpu_time_str);
-      headers->write(sock);
+      grid_communication_t *grid_communication;
+      nhpc_grid_communication_init(&grid_communication, GRID_NODE_REGISTRATION);
+      nhpc_grid_communication_add_dest(grid_communication, grid_controller_addr, grid_controller_port);
+      nhpc_grid_communication_add_peer(grid_communication, grid_server);
+      nhpc_grid_communication_send(grid_communication);
+      nhpc_grid_set_communication_header(grid_communication, "Node-Cores", node_cores_str);
+      nhpc_grid_set_communication_header(grid_communication, "Node-Cpu-Time", node_cpu_time_str);
+      nrv = nhpc_grid_communication_push(grid_communication);
+      nhpc_grid_communication_destruct(grid_communication);
       
-      nhpc_string_delete(node_cores_str);
-      nhpc_string_delete(node_cpu_time_str);
-      delete headers;
+      delete[] node_cores_str;
+      delete[] node_cpu_time_str;
       
-      socket_close(sock);
-      socket_delete(sock);
-   
-      return NHPC_SUCCESS;
+      return nrv;
    }
    
    nhpc_status_t nhpc_grid_server_t::grid_client_registration_handler(nhpc_grid_server_t *grid_server,
@@ -173,26 +164,17 @@ namespace neweraHPC
       nhpc_size_t size;
       
       const char *final_path = nhpc_strconcat("/www/grid/", uid, "/", file_name);
-      
-      int fd = -1;
-      int retry_count = 0;
-      do 
+            
+      FILE *fp = fopen(final_path, "wb");
+      if(!fp)
       {
-	 fd = open (final_path, O_WRONLY | O_CREAT | O_NONBLOCK | O_NOCTTY,
-		    S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-	 retry_count++;
-      }while(fd == -1 && retry_count < 5);
-      
-      if(fd == -1 && close(fd) < 0)
-      {
-	 nhpc_string_delete((char *)final_path);
+	 perror("GRID_FILE_EXCHANGE");
 	 return NHPC_FAIL;
       }
-      
-      FILE *fp = fopen(final_path, "wb");
-      
+            
       if(socket->partial_content != NULL)
       {
+	 
 	 fwrite(socket->partial_content, 1, socket->partial_content_len, fp);
 	 size_downloaded += socket->partial_content_len;
       }

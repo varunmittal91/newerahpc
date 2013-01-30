@@ -95,6 +95,8 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_grid_server_t::grid_server_init()
    {
+      grid_server = this;
+      
       nhpc_status_t nrv;
       
       char *host = NULL;
@@ -220,8 +222,6 @@ namespace neweraHPC
 
       add_peer(host_addr, host_port, host_cores, host_cpu_time);
 
-      grid_server = this;
-
       nrv = create_server(host_addr, host_port, AF_INET, SOCK_STREAM, 0);  
       if(nrv != NHPC_SUCCESS)
 	 return nrv;
@@ -293,11 +293,6 @@ namespace neweraHPC
       {
 	 nrv = fnc_ptr(grid_server, sock);
       }
-
-      char        *response = nhpc_itostr(nrv);
-      nhpc_size_t  size     = strlen(response);
-      socket_sendmsg(sock, response, &size);
-      nhpc_string_delete(response);
       
       LOG_INFO("Executed function with status: " << nrv);
       
@@ -325,8 +320,8 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_grid_server_t::grid_node_registration(nhpc_socket_t *sock)
    {
-      char *node_addr     = network_headers_get_param(sock->headers, "Node-Addr");
-      char *node_port     = network_headers_get_param(sock->headers, "Node-Port");
+      char *node_addr     = network_headers_get_param(sock->headers, "Peer-Host");
+      char *node_port     = network_headers_get_param(sock->headers, "Peer-Port");
       char *node_cores    = network_headers_get_param(sock->headers, "Node-Cores");
       char *node_cpu_time = network_headers_get_param(sock->headers, "Node-Cpu-Time");
       
@@ -352,7 +347,7 @@ namespace neweraHPC
 	 
 	 tmp_client_addr = (char *)clients->search(random_string);
       }while(tmp_client_addr != NULL);
-
+      
       *uid = random_string;
       nhpc_strcpy(&tmp_client_addr, client_addr);
       clients->insert((void *)tmp_client_addr, random_string);
@@ -390,26 +385,18 @@ namespace neweraHPC
 	    
 	    grid_communication_t *grid_communication;
 	    nhpc_grid_communication_init(&grid_communication, GRID_PLUGIN_REQUEST);
+	    nhpc_grid_set_communication_opt(grid_communication, GRID_COMMUNICATION_REGISTER);
 	    nhpc_grid_communication_add_dest(grid_communication, peer_host, peer_port);
 	    nhpc_grid_communication_add_peer(grid_communication, grid_server);
 	    nhpc_grid_communication_send(grid_communication);
 	    
-	    nhpc_register_to_server(&grid_uid, peer_host, peer_port);
-	    if(!grid_uid)
-	    {
+	    grid_communication->headers->insert("Plugin", plugin_request->plugin);
+	    
+	    nrv = nhpc_grid_communication_push(grid_communication);
+	    if(nrv == NHPC_SUCCESS)
 	       nhpc_grid_set_plugin_request_complete(plugin_request);
-	       continue;	       
-	    }
 	    
-	    nrv = socket_connect(&sock, peer_host, peer_port, AF_INET, SOCK_STREAM, 0);
-	    
-	    headers = new nhpc_headers_t;
-	    headers->insert("GRID PLUGIN_REQUEST 2.90");
-	    headers->insert("Grid-Uid", grid_uid);
-	    headers->insert("Plugin", plugin_request->plugin);
-	    headers->insert("Peer-Host", grid_server->host_addr);
-	    headers->insert("Peer-Port", grid_server->host_port);
-	    nrv = headers->write(sock);	    
+	    nhpc_grid_communication_destruct(grid_communication);
 	 }
 	 sleep(1); 
       }

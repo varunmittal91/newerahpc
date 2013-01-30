@@ -74,6 +74,7 @@ namespace neweraHPC
 	 delete[] grid_communication->dest_addr;
       if(grid_communication->dest_port)
 	 delete[] grid_communication->dest_port;
+      delete grid_communication->headers;
       
       delete grid_communication;
    }   

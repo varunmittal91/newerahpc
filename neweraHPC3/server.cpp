@@ -31,51 +31,6 @@
 using namespace std;
 using namespace neweraHPC;
 
-nhpc_status_t func_trigger_desktop(nhpc_socket_t *sock, web_ui_elements_t *web_ui_elements)
-{
-   if(!(web_ui_elements->is_ready))
-   {
-      json_t *json = web_ui_elements->elements;
-      
-      json->add_element(JSON_STRING, "apptype", "NuiDesktop");
-      
-      json->add_element(JSON_ARRAY, "requires");
-      json->add_element(JSON_STRING, "Dock");
-      json->close_element();
-      
-      json->add_element(JSON_OBJECT, "NuiDesktop");      
-      json->add_element(JSON_OBJECT, "icon_grid");
-      json->add_element(JSON_ARRAY, "data");
-      
-      /*
-      for(int i = 1; i <= app_handlers->length(); i++)
-      {
-	 app_details_t *app_details = (app_details_t *)(*app_handlers)[i];
-	 json_t *appJson            = app_details->web_ui_elements->elements;
-	 
-	 cout << (*appJson)["app_attributes"] << endl;
-	 const char *app_type = (*appJson)["apptype"];
-	 cout << app_details->app_name << ":" << app_type << endl;
-	 
-	 web_ui_elements->elements->add_element(JSON_OBJECT);
-	 web_ui_elements->elements->add_element(JSON_STRING, "id", (app_details->app_name));
-	 web_ui_elements->elements->close_element();
-      }
-       */
-      json->close_element();
-      json->close_element();
-      json->close_element();
-      
-      json->close_element();
-      
-      json->print();
-      
-      web_ui_elements->is_ready = true;
-   }
-   
-   return NHPC_SUCCESS;
-}
-
 int main(int argc, char **argv)
 {      
    neweraHPC_init(argc, argv);
@@ -83,10 +38,6 @@ int main(int argc, char **argv)
    nhpc_status_t nrv;   
    
    http_init();
-   web_ui_init();
-   
-   web_ui_register("Desktop" , "NuiDesktop", (fnc_ptr_nhpc_two_t)func_trigger_desktop);   
-   web_ui_register("Explorer", "NuiWindow" , NULL);
 
    nhpc_grid_server_t grid_server;
    nrv = grid_server.grid_server_init();

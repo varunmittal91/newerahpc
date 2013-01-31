@@ -38,6 +38,7 @@ namespace neweraHPC
 {
    extern const char *request_type_strings[];
    
+#define nhpc_http_request_is_post(h) (h->request_type == HTTP_RESPONSE_POST)
    struct http_data_t
    {
       char        *user_agent;

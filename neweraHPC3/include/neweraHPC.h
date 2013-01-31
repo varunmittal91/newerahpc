@@ -31,7 +31,6 @@
 #include "system.h"
 #include "alloc.h"
 #include "http.h"
-#include "web_ui.h"
 #include "json.h"
 
 #include <iostream>

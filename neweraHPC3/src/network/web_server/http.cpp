@@ -83,7 +83,7 @@ namespace neweraHPC
       
       if((http_data->request_type) == HTTP_REQUEST_GET || (http_data->request_type) == HTTP_REQUEST_POST)
       {
-	 if(((http_data->request_type) == HTTP_REQUEST_POST) == NHPC_SUCCESS)
+	 if((http_data->request_type) == HTTP_REQUEST_POST)
 	    LOG_INFO("Partial Content:" << sock->partial_content);
 	 
 	 string_t *tmp_str = nhpc_substr(http_data->request_page, '/');

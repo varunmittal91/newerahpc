@@ -29,16 +29,16 @@ namespace jarvis
       const char *word;
       jv_pos      pos;
       rbtree     *pointers;
-      list_t     *data_offsets;
+      rbtree     *data_offsets;
    };
 #define jv_set_index_record_word(r, w)           ((r)->word = w)
 #define jv_set_index_record_pos(r, p)            ((r)->pos |= p)
 #define jv_set_index_record_pointer(r, cp)       ((r)->pointers->insert(cp))
-#define jv_set_index_record_offset(r, offset)    ((r)->data_offsets->add_elem(nhpc_strtoi(offset)))
+#define jv_set_index_record_offset(r, offset)    ((r)->data_offsets->insert(NULL, nhpc_strtoi(offset)))
 #define jv_get_index_record_pointer_count(r)     ((r)->pointers->length())
 #define jv_get_index_record_sense_count(r)       ((r)->data_offsets->length())
 #define jv_get_index_record_pointer(r, i)        (char *)((r)->pointers->search(i))
-#define jv_get_index_record_offset(r)            ((r)->data_offsets->pop_elem())
+#define jv_get_index_record_offset(r, i)         ((r)->data_offsets->search(&i))
    
    void jv_get_index_record(search_param_t *search_param);
    index_record_t *jv_analyze_index_record(search_param_t *search_param, string_t *record_parts);

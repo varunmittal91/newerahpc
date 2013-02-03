@@ -42,7 +42,7 @@ namespace jarvis
    
    struct _pos_codes
    {
-      int         int_value;
+      jv_pos	  int_value;
       char        ascii_value;
       const char *file_suffix;
    };
@@ -50,12 +50,14 @@ namespace jarvis
    
    struct word_def_t
    {
-      const char **word;
+      const char  *word;
       jv_pos       pos;
+      rbtree      *pointers;
+      rbtree      *offsets;
    };
    
 #define jv_get_pos_ascii_code(pos)  ((pos_codes[pos]).ascii_value) 
-#define jv_get_pos_int_value(pos)   ((pos_codes[pos]).int_value)
+#define jv_get_pos_int_code(pos)    ((pos_codes[pos]).int_value)
 #define jv_get_pos_file_suffix(pos) ((pos_codes[pos]).file_suffix)
 #define jv_set_pos(p, pos)          (p |= pos)
 #define jv_pos_is_ADV(pos)          ((pos) & 1)
@@ -72,6 +74,19 @@ namespace jarvis
 #define jv_word_is_VERB(w)         (jv_pos_is_VERB(jv_get_word_pos(w)))
 #define jv_word_is_ADJ_SAT(w)      (jv_pos_is_ADJ_SAT(jv_get_word_pos(w)))
       
+   static int jv_get_pos_int_value(jv_pos pos)
+   {
+      int i = -1;
+      
+      do 
+      {
+	 i++;
+	 pos = pos >> 1;
+      }while(pos != 0);
+      
+      return (i);
+   }
+   
    struct ptr_symbol_set_t
    {
       int   ptr_symbol_num;

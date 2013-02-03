@@ -51,7 +51,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = main$(EXEEXT)
+bin_PROGRAMS = main$(EXEEXT) jarvis_grid$(EXEEXT) \
+	jarvis_grid_client$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in $(srcdir)/config.h.in \
@@ -69,12 +70,28 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_main_OBJECTS = main.$(OBJEXT)
-main_OBJECTS = $(am_main_OBJECTS)
-main_DEPENDENCIES = src/libjarvis.la
+am_jarvis_grid_OBJECTS = jarvis_grid.$(OBJEXT)
+jarvis_grid_OBJECTS = $(am_jarvis_grid_OBJECTS)
+jarvis_grid_LDADD = $(LDADD)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
+jarvis_grid_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(jarvis_grid_LDFLAGS) $(LDFLAGS) -o $@
+am_jarvis_grid_client_OBJECTS = jarvis_grid_client.$(OBJEXT)
+jarvis_grid_client_OBJECTS = $(am_jarvis_grid_client_OBJECTS)
+jarvis_grid_client_LDADD = $(LDADD)
+jarvis_grid_client_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(jarvis_grid_client_LDFLAGS) \
+	$(LDFLAGS) -o $@
+am_main_OBJECTS = main.$(OBJEXT)
+main_OBJECTS = $(am_main_OBJECTS)
+main_DEPENDENCIES = src/libjarvis.la
+main_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(main_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -101,8 +118,10 @@ am__v_CXXLD_0 = @echo "  CXXLD " $@;
 AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(main_SOURCES)
-DIST_SOURCES = $(main_SOURCES)
+SOURCES = $(jarvis_grid_SOURCES) $(jarvis_grid_client_SOURCES) \
+	$(main_SOURCES)
+DIST_SOURCES = $(jarvis_grid_SOURCES) $(jarvis_grid_client_SOURCES) \
+	$(main_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -284,7 +303,12 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = src
 main_SOURCES = main.cpp src/libjarvis.la
-main_LDADD = src/libjarvis.la
+main_LDADD = src/libjarvis.la 
+main_LDFLAGS = -lneweraHPC
+jarvis_grid_SOURCES = jarvis_grid.cpp
+jarvis_grid_LDFLAGS = -lneweraHPC -L/Users/varun/neweraHPC/src/.libs
+jarvis_grid_client_SOURCES = jarvis_grid_client.cpp
+jarvis_grid_client_LDFLAGS = -lneweraHPC -L/Users/varun/neweraHPC/src/.libs
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -385,9 +409,15 @@ clean-binPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+jarvis_grid$(EXEEXT): $(jarvis_grid_OBJECTS) $(jarvis_grid_DEPENDENCIES) $(EXTRA_jarvis_grid_DEPENDENCIES) 
+	@rm -f jarvis_grid$(EXEEXT)
+	$(AM_V_CXXLD)$(jarvis_grid_LINK) $(jarvis_grid_OBJECTS) $(jarvis_grid_LDADD) $(LIBS)
+jarvis_grid_client$(EXEEXT): $(jarvis_grid_client_OBJECTS) $(jarvis_grid_client_DEPENDENCIES) $(EXTRA_jarvis_grid_client_DEPENDENCIES) 
+	@rm -f jarvis_grid_client$(EXEEXT)
+	$(AM_V_CXXLD)$(jarvis_grid_client_LINK) $(jarvis_grid_client_OBJECTS) $(jarvis_grid_client_LDADD) $(LIBS)
 main$(EXEEXT): $(main_OBJECTS) $(main_DEPENDENCIES) $(EXTRA_main_DEPENDENCIES) 
 	@rm -f main$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(main_OBJECTS) $(main_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(main_LINK) $(main_OBJECTS) $(main_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -395,6 +425,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jarvis_grid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jarvis_grid_client.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 
 .cpp.o:

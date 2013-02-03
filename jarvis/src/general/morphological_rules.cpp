@@ -17,12 +17,19 @@
  *	along with jarvis.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
+#include <fstream>
+#include <string>
+
 #include <neweraHPC/strings.h>
 #include <string.h>
 
 #include <include/morphological_rules.h>
+#include <include/parse.h>
 #include <include/words.h>
+#include <include/jarvis_data.h>
 
+using namespace std;
 using namespace neweraHPC;
 
 namespace jarvis
@@ -114,5 +121,96 @@ namespace jarvis
       morphological_rules->insert(morphological_pairs[19], ADJ);     
       
       delete[] morphological_pairs;
+   }
+   
+   char *morphological_word_search(search_param_t *search_param, jv_morphic_status *search_status)
+   {
+      char *morphic_word = NULL;
+      
+      jv_pos pos        = jv_get_search_param_pos(search_param);
+      int pos_int       = jv_get_pos_int_value(jv_get_search_param_pos(search_param));
+      int morphic_count = jv_get_morphic_status_count(*search_status);
+      const char *word  = jv_get_search_param_word(search_param);
+
+      if(morphic_count == 0)
+      {
+	 cout << "Reading exc file:" << jv_get_wordnet_exc_file(pos_int) << endl;
+	 
+	 ifstream     exc_file(jv_get_wordnet_exc_file(pos_int));
+	 string       line;
+	 const char  *line_str;
+	 string_t    *exc_parts;
+	 int          compare_value;
+	 const char  *src_word;
+	 while(getline(exc_file, line))
+	 {
+	    line_str  = line.c_str();
+	    exc_parts = nhpc_substr(line_str, ' ');
+	    src_word = exc_parts->strings[0];
+
+	    compare_value = strcmp(word, src_word);
+	    if(compare_value == 0)
+	       break;
+	    else 
+	    {
+	       nhpc_string_delete(exc_parts);
+	       exc_parts = NULL;
+	       
+	       if(compare_value < 0)
+		  break;
+	    }
+	 }
+	 exc_file.close();
+	 
+	 morphic_count++;
+      }
+      if(!morphic_word)
+      {
+	 jv_morphological_rule *morphic_rule;
+	 
+	 while(!morphic_word && (morphic_rule = jv_get_morphological_rule(pos, morphic_count)) != NULL)
+	 {	    
+	    //cout << "Current search_status:" << morphic_count << endl;
+	    morphic_count++;   
+	    
+	    const char *suffix     = jv_get_morphological_rule_suffix(morphic_rule);
+	    const char *replacement = jv_get_morphological_rule_replacement(morphic_rule);
+	    
+	    /*
+	    cout << "Found Morphc rule:" << endl;
+	    cout << "\tSuffix:" << morphic_rule->suffix << endl;
+	    if(morphic_rule->replacement)
+	       cout << "\tRepacement:" << morphic_rule->replacement << endl;
+	     */
+	    
+	    if(nhpc_strcmp(word, suffix) == NHPC_SUCCESS)
+	    {
+	       int suffix_len = strlen(suffix) - 1;
+	       int morphic_word_len = strlen(word) - suffix_len;
+	       if(replacement)
+		  morphic_word_len += strlen(replacement);
+	       
+	       morphic_word = new char [morphic_word_len + 1];
+	       memcpy(morphic_word, word, strlen(word) - suffix_len);
+	       char *tmp_word = morphic_word + strlen(word) - suffix_len;
+	       if(replacement)
+		  memcpy(tmp_word, replacement, strlen(replacement));
+	       morphic_word[morphic_word_len] = '\0';
+	       
+	       break;
+	    }
+	 }
+	 
+	 if(!morphic_rule)
+	 {
+	    jv_set_morphic_status_failed(*search_status);
+	    //cout << "Setting search failed" << endl;
+	 }
+      }
+      
+      
+      jv_set_morphic_status_count(*search_status, morphic_count);
+      
+      return morphic_word;
    }
 };

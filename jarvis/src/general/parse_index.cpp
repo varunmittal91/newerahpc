@@ -24,6 +24,7 @@
 #include <neweraHPC/strings.h>
 
 #include <include/parse_index.h>
+#include <include/morphological_rules.h>
 #include <include/jarvis_data.h>
 #include <include/jarvis.h>
 
@@ -35,11 +36,18 @@ namespace jarvis
    {
       ifstream index_file(jv_get_search_param_sources(search_param));
       
+      const char *word = jv_get_search_param_word(search_param);
+
       string      line;
       const char *line_str;
       string_t   *record_parts;
       int         compare_value;
       
+      jv_morphic_status morphic_search_status = 0;
+      
+   search:
+      index_file.seekg(0);
+      getline(index_file, line);
       while(getline(index_file, line))
       {
 	 line_str = line.c_str();
@@ -47,7 +55,7 @@ namespace jarvis
 	 record_parts = nhpc_substr(line_str, ' ');
 
 	 const char *src_word = record_parts->strings[0];
-	 compare_value = strcmp(jv_get_search_param_word(search_param), src_word);
+	 compare_value = strcmp(word, src_word);
 	 if(compare_value == 0)
 	    break;
 	 else 
@@ -59,16 +67,26 @@ namespace jarvis
 	       break;
 	 }
       }
-      index_file.close();      
-      jv_set_search_complete(search_param);
-      
       if(!record_parts)
-	 return;
+      {
+	 if(jv_morphic_status_is_on(morphic_search_status))
+	 {
+	    word = morphological_word_search(search_param, &morphic_search_status);
+	    if(word)
+	       goto search;
+	 }
+      }
+      else 
+      {
+	 cout << "Found word:" << word << " in:" << jv_get_search_param_sources(search_param) << endl;
+	 index_record_t *index_record = jv_analyze_index_record(search_param, record_parts);
+	 search_param->result = (void *)index_record;
+	 
+	 nhpc_string_delete(record_parts);
+      }
       
-      index_record_t *index_record = jv_analyze_index_record(search_param, record_parts);
-      search_param->result = (void *)index_record;
-      
-      nhpc_string_delete(record_parts);
+      index_file.close();      
+      jv_set_search_complete(search_param);      
    }
    
    index_record_t *jv_analyze_index_record(search_param_t *search_param ,string_t *record_parts)
@@ -77,7 +95,7 @@ namespace jarvis
       int pointer_count = nhpc_strtoi(record_parts->strings[3]);
       
       index_record_t *index_record = new index_record_t;
-      index_record->data_offsets   = new list_t(LIST_MIN_FIRST);
+      index_record->data_offsets   = new rbtree(RBTREE_NUM);
       index_record->pointers       = new rbtree(RBTREE_NUM);
 
       jv_set_index_record_word(index_record, jv_get_search_param_word(search_param));
@@ -114,7 +132,7 @@ namespace jarvis
 	 search_param = &(search_params[i]);
 	 memset(search_param, 0, sizeof(search_param_t));
 	 
-	 pos         = jv_get_pos_int_value(i);
+	 pos         = jv_get_pos_int_code(i);
 	 source_file = wordnet_index_files[i];
 
 	 jv_set_search_param_pos(search_param, pos);

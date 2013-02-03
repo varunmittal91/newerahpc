@@ -91,14 +91,11 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libjarvis_la_DEPENDENCIES = general/libgeneral.la
-am_libjarvis_la_OBJECTS = jarvis.lo jarvis_data.lo
+am_libjarvis_la_OBJECTS = jarvis.lo jarvis_data.lo grid_plugin.lo
 libjarvis_la_OBJECTS = $(am_libjarvis_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
-libjarvis_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(libjarvis_la_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -294,8 +291,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = general
 lib_LTLIBRARIES = libjarvis.la
-libjarvis_la_SOURCES = jarvis.cpp jarvis_data.cpp
-libjarvis_la_LDFLAGS = -lneweraHPC
+libjarvis_la_SOURCES = jarvis.cpp jarvis_data.cpp grid_plugin.cpp
 libjarvis_la_LIBADD = general/libgeneral.la
 all: all-recursive
 
@@ -364,7 +360,7 @@ clean-libLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libjarvis.la: $(libjarvis_la_OBJECTS) $(libjarvis_la_DEPENDENCIES) $(EXTRA_libjarvis_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libjarvis_la_LINK) -rpath $(libdir) $(libjarvis_la_OBJECTS) $(libjarvis_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK) -rpath $(libdir) $(libjarvis_la_OBJECTS) $(libjarvis_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -372,6 +368,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_plugin.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jarvis.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jarvis_data.Plo@am__quote@
 

@@ -22,6 +22,8 @@
 
 #include <neweraHPC/rbtree.h>
 
+#include "parse_index.h"
+
 namespace jarvis
 {
    extern neweraHPC::rbtree *morphological_rules;
@@ -32,9 +34,20 @@ namespace jarvis
       const char *replacement;
    }; 
 
-#define jv_get_morphological_rule(pos, i)   (jv_morphological_rule *)((*morphological_rules).search(pos, i))
+   typedef unsigned char jv_morphic_status;
+#define jv_get_morphic_status_count(s)    (int)(s >> 1)
+#define jv_get_morphic_status(s)          (s & 1)
+#define jv_set_morphic_status_count(s, c) (s |= (c << 1))
+#define jv_set_morphic_status_failed(s)   (s |= 1)
+#define jv_morphic_status_is_failed(s)    (jv_get_morphic_status(s))
+#define jv_morphic_status_is_on(s)        (!(jv_get_morphic_status(s)))
+
+#define jv_get_morphological_rule(pos, i)         (jv_morphological_rule *)((*morphological_rules).search(pos, i))
+#define jv_get_morphological_rule_suffix(r)       ((const char *)r->suffix)
+#define jv_get_morphological_rule_replacement(r)  ((const char *)r->replacement)
    
    void init_morphological_rules();
+   char *morphological_word_search(search_param_t *search_param, jv_morphic_status *search_status);
 };
 
 #endif

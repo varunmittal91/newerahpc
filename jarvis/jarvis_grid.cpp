@@ -1,5 +1,5 @@
 /*
- *	(C) 2012 Varun Mittal <varunmittal91@gmail.com> & Uday Vir Singh <udayvirsingh@gmail.com>
+ *	(C) 2013 Varun Mittal <varunmittal91@gmail.com> & Uday Vir Singh <udayvirsingh@gmail.com>
  *	jarvis program is distributed under the terms of the GNU General Public License v3
  *
  *	This file is part of jarvis.
@@ -17,28 +17,26 @@
  *	along with jarvis.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-#include <fstream>
-#include <string>
 #include <neweraHPC/neweraHPC.h>
 
-#include <include/parse_index.h>
-#include <include/jarvis.h>
-
 using namespace std;
-using namespace jarvis;
+using namespace neweraHPC;
 
 int main(int argc, char **argv)
 {
-   jarvis_init(argc, argv);
+   neweraHPC_init(argc, argv);
+   nhpc_status_t nrv;
    
-   const char *word = nhpc_get_cmdline_argument("word");
-   if(word)
+   nhpc_grid_server_t grid_server;
+   nrv = grid_server.grid_server_init();
+   
+   if(nrv != NHPC_SUCCESS)
+      LOG_ERROR("Failed to start grid server");
+   else 
    {
-      cout << "Word:" << word << endl;
-      jv_get_word_def(word);
+      cout << grid_server.install_plugin("src/.libs/libjarvis.dylib", NULL) << endl;
+      grid_server.grid_server_join();
    }
    
-   while(1)
-      sleep(1);
+   return 0;
 }

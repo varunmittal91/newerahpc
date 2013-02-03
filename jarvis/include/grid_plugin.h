@@ -1,5 +1,5 @@
 /*
- *	(C) 2012 Varun Mittal <varunmittal91@gmail.com>
+ *	(C) 2013 Varun Mittal <varunmittal91@gmail.com>
  *	jarvis program is distributed under the terms of the GNU General Public License v3
  *
  *	This file is part of jarvis.
@@ -17,35 +17,24 @@
  *	along with jarvis.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _JARVIS_DATA_H_
-#define _JARVIS_DATA_H_
-
-#include "words.h"
-
-#include <neweraHPC/rbtree.h>
-#include <neweraHPC/thread.h>
-#include <neweraHPC/error.h>
+#include <neweraHPC/grid.h>
 
 using namespace neweraHPC;
 
 namespace jarvis
 {
-#define WORDNET_ROOT_DIR "data/dict"
-   
-   extern const char *wordnet_index_files[INDEXED_POS_COUNT];
-   extern const char *wordnet_data_files[INDEXED_POS_COUNT];
-   extern const char *wordnet_exc_files[INDEXED_POS_COUNT];
-#define jv_get_wordnet_index_file(i)  ((const char *)wordnet_index_files[i])
-#define jv_get_wordnet_data_file(i)   ((const char *)wordnet_data_files[i])
-#define jv_get_wordnet_exc_file(i)    ((const char *)wordnet_exc_files[i])
-   
-   void init_jarvis_data();
-   
-   class jarvis_data_t
+#ifdef __cplusplus
+   extern "C" 
    {
-   private:
-   public:
-   };
-};
-
+   nhpc_status_t jarvis_grid_plugin_register();
+   
+   nhpc_status_t plugin_init(plugin_details_t **plugin_details);
+   nhpc_status_t plugin_exec(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
+					 nhpc_socket_t *sock, char **grid_uid);
+   nhpc_status_t plugin_client_exec(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
+						nhpc_socket_t *sock, char **grid_uid);
+   nhpc_status_t plugin_processor(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
+				  nhpc_socket_t *sock, char **grid_uid);
+   }
 #endif
+};

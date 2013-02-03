@@ -23,6 +23,7 @@
 #include <include/jarvis.h>
 #include <include/jarvis_data.h>
 #include <include/parse_index.h>
+#include <include/morphological_rules.h>
 
 using namespace std;
 using namespace neweraHPC;
@@ -38,7 +39,5 @@ namespace jarvis
       thread_manager = new thread_manager_t;
       
       init_jarvis_data();
-      
-      jv_get_word_def("human");
    }
 }

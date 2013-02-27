@@ -240,9 +240,10 @@ namespace neweraHPC
       
       const char *host_addr;
       const char *host_port;
-      const char *grid_uid;
+      const char *grid_uid      = (const char *)instruction_set->grid_uid;
       const char *host_grid_uid = (const char *)instruction_set->host_grid_uid;
-      const char *base_dir = nhpc_strconcat("/www/grid/", host_grid_uid, "/");
+      const char *base_dir;
+      base_dir = nhpc_strconcat("/www/grid/", host_grid_uid, "/");
       
       int argument_count = 0;
             

@@ -53,7 +53,8 @@ namespace neweraHPC
       
       nhpc_status_t nrv = NHPC_FAIL;
       
-      if(instruction_set->execute)
+      //if(instruction_set->execute)
+      if(nhpc_grid_instruction_is_executable(instruction_set))
       {
 	 nrv = plugin_details->fnc_processor(this, instruction_set, sock, (void **)grid_uid);
       }

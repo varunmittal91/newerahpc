@@ -106,7 +106,8 @@ namespace neweraHPC
 								  nhpc_socket_t *socket)
    {
       nhpc_status_t  nrv;
-      const char    *uid = network_headers_get_param(socket->headers, "Grid-Uid");
+      const char  *uid           = network_headers_get_param(socket->headers, "Grid-Uid");
+      const char  *host_grid_uid = network_headers_get_param(socket->headers, "Host-Grid-Uid"); 
       
       nhpc_instruction_set_t *instruction_set;
       

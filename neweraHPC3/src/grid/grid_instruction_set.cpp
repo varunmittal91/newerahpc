@@ -145,9 +145,15 @@ namespace neweraHPC
       nhpc_strcpy(&((*instruction_set)->host_peer_port), peer_port);
       
       if(execution_state)
-	 (*instruction_set)->execute = true;
+      {
+	 nhpc_grid_instruction_set_executable(*instruction_set, 1);
+	 //(*instruction_set)->execute = true;
+      }
       else 
-	 (*instruction_set)->execute = false;  
+      {
+	 nhpc_grid_instruction_set_executable(*instruction_set, 0);
+	 //(*instruction_set)->execute = false;  
+      }
       
       if(nrv != NHPC_SUCCESS)
 	 return nrv;

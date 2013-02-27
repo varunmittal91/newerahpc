@@ -219,7 +219,7 @@ namespace neweraHPC
       char *plugin_name = instruction_set->plugin_name;
       char *host_grid_uid = instruction_set->host_grid_uid;
       int argument_count = instruction_set->arguments->length();
-      bool *execute = &(instruction_set->execute);
+      //bool *execute = &(instruction_set->execute);
       char *host_peer_addr = instruction_set->host_peer_addr;
       char *host_peer_port = instruction_set->host_peer_port;
 
@@ -249,7 +249,9 @@ namespace neweraHPC
 	 headers->insert("Grid-Uid", grid_uid);
       if(host_grid_uid)
 	 headers->insert("Host-Grid-Uid", host_grid_uid);
-      if(*execute)
+      //if(*execute)
+	 //headers->insert("Execution-State: Ready");
+      if(nhpc_grid_instruction_is_executable(instruction_set))
 	 headers->insert("Execution-State: Ready");
       
       for(int i = 1; i <= argument_count; i++)

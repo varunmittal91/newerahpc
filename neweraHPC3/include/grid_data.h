@@ -24,80 +24,66 @@
 #define grid_conf_file "/etc/grid.conf"
 #define GRID_RANGE_PLUGIN "nhpc_plugin_range"
 
+typedef unsigned char grid_arg_type;
 enum GRID_ARG_TYPE
 {
    RANGE,
    VALUE,
    LITERAL,
    COMMAND,
-   GRID_FILE
+   GRID_FILE,
+   MEMORY_BLOCK
 };
 
-#define ARG_RANGE "0"
-#define ARG_VALUE "1"
-#define ARG_LITERAL "2"
-#define ARG_COMMAND "3"
-#define ARG_GRID_FILE "4"
+#define ARG_RANGE        "0"
+#define ARG_VALUE        "1"
+#define ARG_LITERAL      "2"
+#define ARG_COMMAND      "3"
+#define ARG_GRID_FILE    "4"
+#define ARG_MEMORY_BLOCK "5"
+
+#define _grid_arg_type (g, t)    (1 & g >> t)
+#define _grid_arg_is_range(g)    (_grid_arg_type(g, RANGE))
+#define _grid_arg_is_value(g)    (_grid_arg_type(g, VALUE))
+#define _grid_arg_is_literal(g)  (_grid_arg_type(g, LITERAL))
+#define _grid_arg_is_command(g)  (_grid_arg_type(g, COMMAND))
+#define _grid_arg_is_file(g)     (_grid_arg_type(g, GRID_FILE))
+static void grid_set_arg_type(grid_arg_type *grid_arg, int arg)
+{
+   *grid_arg = 1;
+   
+   for(; arg > 0; arg--)
+   {
+      (*grid_arg) = (*grid_arg) << 1; 
+   }
+}
 
 namespace neweraHPC
 {
-   /* Plugin details for the modules that are added to be run in a grid */
    struct plugin_details_t
    {
-      char *plugin_name;
-      
-      /* Address of the base plugin function that server will run*/
-      fnc_ptr_nhpc_plugin_t fnc_init;
-      
-      /* Address of the plugin function that client will run 
-       for assembly of data and other purposes */
-      fnc_ptr_nhpc_plugin_t fnc_client_exec;
-      
-      fnc_ptr_nhpc_plugin_t fnc_exec;
-
-      /* Address of processing function for actual implementation 
-       of the algorith in plugin */
-      fnc_ptr_nhpc_plugin_t fnc_processor;
-      
-      fnc_ptr_nhpc_plugin_t fnc_map_reduce;
-      
-      /* Target directory */
+      char       *plugin_name;
       const char *plugin_dir;
-      
-      /* Path of plugin on the server */
       const char *path_plugin;
-      
-      /* Path of nxi file for plugin on server */
       const char *path_nxi;
+      fnc_ptr_nhpc_plugin_t fnc_init;
+      fnc_ptr_nhpc_plugin_t fnc_client_exec;
+      fnc_ptr_nhpc_plugin_t fnc_exec;
+      fnc_ptr_nhpc_plugin_t fnc_processor;
+      fnc_ptr_nhpc_plugin_t fnc_map_reduce;
    };
    
-   /* Peer details maintained at the server */
    struct peer_details_t
    {
-      /* Unique Peer id */
-      int id;
-      
-      /* Port for peer server */
       char *port;
-      
-      /* Address for peer server */
       char *host;
-      
-      /* Number of processors on perr server */
-      int processors;
-      
-      /* Weight of the peer server, calculated on the basis
-       of processors and network latency */
-      int weight;
-      
-      /* Status of peer server, wether busy or available */
-      bool status;
-      
-      bool dynamic;
-      
-      int processor_time;
-      
-      int threads;
+      int   id;
+      int   threads;
+      int   weight;
+      int   processors;
+      int   processor_time;
+      bool  status;      
+      bool  dynamic;
    };
    
    typedef unsigned char plugin_request_status;
@@ -113,20 +99,52 @@ namespace neweraHPC
 #define nhpc_grid_is_plugin_request_sent(p)       ((p)->status & 1)
 #define nhpc_grid_is_plugin_request_complete(p)   (((p)->status >> 1) & 1)
    
+   struct nhpc_result_t
+   {
+      void          *data;
+      nhpc_size_t    content_len;
+      grid_arg_type  arg_type;
+   };
+   
+   typedef unsigned char instruction_status;
    struct nhpc_instruction_set_t
    {
       char *plugin_name;
-      void *data;
-      nhpc_size_t data_len;
-      int host_peer_id;
-      rbtree *arguments;
-      int argument_count;
       char *grid_uid;
       char *host_grid_uid;
       char *host_peer_addr;
       char *host_peer_port;
-      bool execute;
+      int   host_peer_id;
+      
+      rbtree        *arguments;
+      int	     argument_count;
+      void          *data;
+      nhpc_size_t    data_len;
+      nhpc_result_t *result;
+
+      //bool execute;
+#define GRID_INSTRUCTION_STATUS_EXECUTABLE 1  
+      instruction_status status;
    };
+#define nhpc_grid_set_result_type(r, t) (grid_set_arg_type(&(r->arg_type), t))
+#define nhpc_grid_add_result_data(i, r) (i->result = (void *)r)
+   static void nhpc_grid_add_result(nhpc_instruction_set_t *instruction_set)
+   {
+      instruction_set->result = new nhpc_result_t;
+      memset((instruction_set->result), 0, sizeof(nhpc_result_t));
+   }
+   static void nhpc_grid_instruction_set_opt(nhpc_instruction_set_t *instruction_set, instruction_status option, bool enable)
+   {
+      if(enable)
+	 instruction_set->status |= option;
+      else 
+	 instruction_set->status &= ~option;
+   }
+#define nhpc_grid_instruction_erase_opt(i)           (i->status &= 0)
+#define nhpc_grid_instruction_is_opt(i, o)           (i->status & o)
+#define nhpc_grid_instruction_set_executable(i, on)  (nhpc_grid_instruction_set_opt(i, GRID_INSTRUCTION_STATUS_EXECUTABLE, on))
+#define nhpc_grid_instruction_is_executable(i)       (nhpc_grid_instruction_is_opt(i, GRID_INSTRUCTION_STATUS_EXECUTABLE))
+
 #define nhpc_grid_get_peer_host_instruction(i)  (i->host_peer_addr)
 #define nhpc_grid_get_peer_port_instruction(i)  (i->host_peer_port)
 #define nhpc_grid_get_peer_host_socket(s)       (s->host)

@@ -43,9 +43,6 @@
 
 namespace neweraHPC
 {  
-   //class network_t;
-   class nhpc_grid_server_t;
-   
    void *get_in_addr(struct sockaddr *sa);
    
    class network_t

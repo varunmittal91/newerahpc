@@ -25,28 +25,12 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <include/rbtree.h>
-#include <include/grid.h>
-#include <include/neweraHPC.h>
+
+#include <neweraHPC/neweraHPC.h>
 
 using namespace std;
 using namespace neweraHPC;
 
 int main(int argc, char **argv)
 {      
-   neweraHPC_init(argc, argv);
-
-   nhpc_status_t nrv;   
-   
-   http_init();
-
-   nhpc_grid_server_t grid_server;
-   nrv = grid_server.grid_server_init();
-   
-   if(nrv != NHPC_SUCCESS)
-      LOG_ERROR("Grid initialization failed");
-   else 
-      grid_server.grid_server_join();
-   
-   return 0;
 }

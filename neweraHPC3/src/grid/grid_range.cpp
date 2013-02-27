@@ -102,7 +102,8 @@ namespace neweraHPC
 	    }
 	 }
 	 
-	 new_instruction_set->execute = true;
+	 nhpc_grid_instruction_set_executable(new_instruction_set, 1);
+	 //new_instruction_set->execute = true;
 	 grid_server->queue_job(new_instruction_set);
 	 LOG_INFO("queueing job no: " << i);
       }

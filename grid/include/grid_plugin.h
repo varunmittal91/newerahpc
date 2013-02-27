@@ -30,8 +30,6 @@
 
 namespace neweraHPC 
 {
-   class nhpc_grid_server_t;
-   
    class plugin_manager_t
    {
    private:

@@ -38,15 +38,33 @@ int main(int argc, char **argv)
 
    nhpc_status_t nrv;   
    
-   http_init();
-
-   nhpc_grid_server_t grid_server;
-   nrv = grid_server.grid_server_init();
-   
-   if(nrv != NHPC_SUCCESS)
-      LOG_ERROR("Grid initialization failed");
+   const char *host_addr, *host_port;
+   const char *host = nhpc_get_cmdline_argument("l");
+   if(host)
+   {
+      string_t *host_parts = nhpc_substr(host, ':');
+      nhpc_strcpy((char **)&host_addr, host_parts->strings[0]);
+      if(host_parts->count == 1)
+      {
+	 host_port = "8080";
+      }
+      else 
+	 nhpc_strcpy((char **)&host_port, host_parts->strings[1]);	 
+      
+      nhpc_string_delete(host_parts);
+   }
    else 
-      grid_server.grid_server_join();
+   {
+      host_addr = "localhost";
+      host_port = "8080";
+   }
    
+   network_t *network = new network_t;
+   (*network).network_init();
+   http_init(network);
+   nrv = (*network).create_server(host_addr, host_port, AF_INET, SOCK_STREAM, 0);
+   if(nrv == NHPC_SUCCESS)
+      (*network).join_accept_thread();
+
    return 0;
 }

@@ -95,7 +95,7 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libneweraHPC_la_DEPENDENCIES = network/libnetwork.la \
 	general/libgeneral.la poll/libpoll.la ai/libai.la \
-	grid/libgrid.la system/libsystem.la
+	system/libsystem.la
 am_libneweraHPC_la_OBJECTS = neweraHPC.lo
 libneweraHPC_la_OBJECTS = $(am_libneweraHPC_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -298,10 +298,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = network general poll ai grid system
+SUBDIRS = network general poll ai system
 lib_LTLIBRARIES = libneweraHPC.la
 libneweraHPC_la_SOURCES = neweraHPC.cpp 
-libneweraHPC_la_LIBADD = network/libnetwork.la general/libgeneral.la poll/libpoll.la ai/libai.la grid/libgrid.la system/libsystem.la
+libneweraHPC_la_LIBADD = network/libnetwork.la general/libgeneral.la poll/libpoll.la ai/libai.la system/libsystem.la
 libneweraHPC_la_LDFLAGS = -version-info 2:90 -ldl -lpthread 
 libneweraHPC_la_CFLAGS = $(AM_CFLAGS)
 all: all-recursive

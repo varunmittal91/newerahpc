@@ -1,5 +1,5 @@
 /*
- *	(C) 2013 Varun Mittal <varunmittal91@gmail.com> & Varun Dhawan <varundhawan5792@gmail.com>
+ *	(C) 2013 Varun Mittal <varunmittal91@gmail.com>
  *	NeweraHPC program is distributed under the terms of the GNU General Public License v2
  *
  *	This file is part of NeweraHPC.

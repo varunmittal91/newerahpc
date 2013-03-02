@@ -34,8 +34,8 @@
 
 #include <iostream>
 
-#define nhpc_get_cmdline_argument(v)           ((char *)(*cmdline_arguments).search(v));
-#define nhpc_get_cmdline_argument_key(i, key)  ((char *)(*cmdline_arguments).search_inorder_str(i, &key));
+#define nhpc_get_cmdline_argument(v)           ((const char *)(*cmdline_arguments).search(v));
+#define nhpc_get_cmdline_argument_key(i, key)  ((const char *)(*cmdline_arguments).search_inorder_str(i, &key));
 #define nhpc_get_cmdline_argument_count()      ((*cmdline_arguments).length());
 #define nhpc_insert_cmdline_argument(v, key)   (*cmdline_arguments).insert(v, key);
 #define nhpc_delete_cmdline_argument(v)        (*cmdline_arguments).erase(v);

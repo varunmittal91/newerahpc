@@ -30,6 +30,7 @@
 #include <include/http.h>
 #include <include/headers.h>
 #include <include/sockets.h>
+#include <include/network.h>
 
 namespace neweraHPC
 {
@@ -55,13 +56,15 @@ namespace neweraHPC
       return rv;      
    }
    
-   void http_init()
+   void http_init(network_t *network)
    {
       LOG_INFO("Initialize http handler");
       http_handlers = new rbtree(RBTREE_STR);
+      fnc_ptr_t http_handler = (fnc_ptr_t)http_request_handler;
+      (*network).network_addons->insert((void *)http_handler, "HTTP");
    }
    
-   void http_init(nhpc_socket_t *sock)
+   void http_request_handler(nhpc_socket_t *sock)
    {
       http_data_t *http_data = new http_data_t;
       memset(http_data, 0, sizeof(http_data_t));

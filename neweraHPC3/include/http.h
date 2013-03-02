@@ -60,11 +60,11 @@ namespace neweraHPC
    };
    
    extern rbtree *http_handlers;
-   void http_init();
+   void http_init(network_t *network);
 
    nhpc_status_t http_handler_register(const char *handler_string, fnc_ptr_nhpc_t handler_function);
    
-   void http_init(nhpc_socket_t *sock);
+   void http_request_handler(nhpc_socket_t *sock);
    
    nhpc_status_t read_headers(rbtree *headers, http_data_t **http_data);
    nhpc_status_t delete_http_headers(http_data_t *http_data);

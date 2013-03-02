@@ -64,23 +64,24 @@ namespace neweraHPC
       char *command = (char *)sock->headers->search("command");
       if(command != NULL)
       {
-	 network_t *network = sock->server_details->main_network;
+	 const char *handler_keyword = NULL;
+	 network_t  *network = sock->server_details->main_network;
+	 fnc_ptr_t   request_init;
 	 
 	 if(nhpc_strcmp(command, "*HTTP*") == NHPC_SUCCESS)
-	 {
-	    LOG_DEBUG("\nCOMMUNICATION: STARTING HTTP PROCESSING\n");
+	    handler_keyword = "HTTP";
+	 else if(nhpc_strcmp(command, "*GRID*"))
+	    handler_keyword = "GRID";
+	 
+	 if(handler_keyword)
+	    request_init = (fnc_ptr_t)network->network_addons->search(handler_keyword);
+	 else 
+	    request_init = (fnc_ptr_t)network->network_addons->search(command);
 	    
-	    http_init(sock);
-	 }
-	 else if(nhpc_strcmp(command, "*GRID*") == NHPC_SUCCESS)
-	 {
-	    fnc_ptr_t grid_request_init = (fnc_ptr_t)network->network_addons->search("GRID");
-	    if(!grid_request_init)
-	    {
-	       return;
-	    }
-	    grid_request_init(sock);
-	 }
+	 if(!request_init)
+	    LOG_DEBUG("NETWORK COMMAND:" << command << " NOT FOUND");
+	 else 
+	    request_init(sock);
       }
       
       nhpc_socket_cleanup(sock);

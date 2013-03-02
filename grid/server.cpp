@@ -28,9 +28,12 @@
 
 #include <neweraHPC/neweraHPC.h>
 
+#include <include/grid_server.h>
+
 using namespace std;
 using namespace neweraHPC;
 
 int main(int argc, char **argv)
 {      
+   nhpc_status_t nrv = grid_server_init(argc, argv);
 }

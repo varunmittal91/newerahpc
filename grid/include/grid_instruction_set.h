@@ -1,5 +1,5 @@
 /*
- *	(C) 2011 Varun Mittal <varunmittal91@gmail.com> & Varun Dhawan <varundhawan5792@gmail.com>
+ *	(C) 2013 Varun Mittal <varunmittal91@gmail.com>
  *	NeweraHPC program is distributed under the terms of the GNU General Public License v2
  *
  *	This file is part of NeweraHPC.
@@ -24,14 +24,80 @@
 
 namespace neweraHPC
 {
-   nhpc_status_t nhpc_create_instruction(nhpc_instruction_set_t **instruct_set, const char *plugin_name,
-					 const char *host_grid_uid = NULL);   
-   nhpc_status_t nhpc_generate_instruction(nhpc_instruction_set_t **instruction_set, rbtree *headers);
-   nhpc_status_t nhpc_generate_general_instruction(nhpc_instruction_set_t **instruction_set,
-						   rbtree *headers);
-   nhpc_status_t nhpc_delete_instruction(nhpc_instruction_set_t *instruct_set);
-   nhpc_status_t nhpc_add_argument(nhpc_instruction_set_t *instruction, enum GRID_ARG_TYPE option, 
-				   const void *arg1, const void *arg2 = NULL);
+   typedef unsigned char instruction_status_t;
+   struct instruction_t
+   {
+      const char *plugin_name;
+      const char *grid_uid;
+      const char *referer_grid_uid;
+      const char *peer_addr;
+      const char *peer_port;
+      int         peer_id;
+      
+      grid_data_t *input_data;
+      grid_data_t *result_data;
+      
+      instruction_status_t instruction_status;
+   };
+#define instruction_get_input_data(i)       (i->input_data)
+#define instruction_get_result_data(i)      (i->result_data)
+#define instruction_get_plugin_name(i)      (i->plugin_name)
+#define instruction_get_peer_id(i)          (i->peer_id)
+#define instruction_set_peer_id(i, p)       (i->peer_id = p)
+#define instruction_get_peer_addr(i)        (i->peer_addr)
+#define instruction_get_peer_port(i)        (i->peer_port)
+#define instruction_get_grid_uid(i)         (i->grid_uid)
+#define instruction_get_referer_grid_uid(i) (i->referer_grid_uid)
+   static void instruction_init(instruction_t **instruction)
+   {
+      (*instruction) = new instruction_t;
+      memset((*instruction), 0, sizeof(instruction_t));
+      
+      instruction_t *tmp = (*instruction);
+      grid_data_init(&(instruction_get_input_data(tmp)));
+      grid_data_init(&(instruction_get_result_data(tmp)));
+   }
+   static void instruction_destruct(instruction_t *instruction)
+   {
+      if(instruction_get_plugin_name(instruction))
+	 delete[] instruction_get_plugin_name(instruction);
+      if(instruction_get_grid_uid(instruction))
+	 delete[] instruction_get_grid_uid(instruction);
+      if(instruction_get_referer_grid_uid(instruction))
+	 delete[] instruction_get_referer_grid_uid(instruction);
+      if(instruction_get_peer_addr(instruction))
+	 delete[] instruction_get_peer_addr(instruction);
+      if(instruction_get_peer_port(instruction))
+	 delete[] instruction_get_peer_port(instruction);
+      if(instruction_get_input_data(instruction))
+      {
+	 grid_data_destruct(instruction_get_input_data(instruction));
+	 delete instruction_get_input_data(instruction);
+      }
+      if(instruction_get_result_data(instruction))
+      {
+	 grid_data_destruct(instruction_get_result_data(instruction));
+	 delete instruction_get_result_data(instruction);
+      }
+   }
+   static void instruction_set_plugin_name(instruction_t *instruction, const char *plugin_name)
+   {
+      nhpc_strcpy((char **)&(instruction_get_plugin_name(instruction)), plugin_name);
+   }
+   static void instruction_set_peer(instruction_t *instruction, int peer_id, const char *peer_addr, const char *peer_port)
+   {
+      instruction_set_peer_id(instruction, peer_id);
+      nhpc_strcpy((char **)&(instruction_get_peer_addr(instruction)), peer_addr);
+      nhpc_strcpy((char **)&(instruction_get_peer_port(instruction)), peer_port);
+   }
+   static void instruction_set_grid_uid(instruction_t *instruction, const char *grid_uid)
+   {
+      nhpc_strcpy((char **)&(instruction_get_grid_uid(instruction)), grid_uid);
+   }
+   static void instruction_set_referer_grid_uid(instruction_t *instruction, const char *referer_grid_uid)
+   {
+      nhpc_strcpy((char **)&(instruction_get_referer_grid_uid(instruction)), referer_grid_uid);      
+   }
 }
 
 #endif

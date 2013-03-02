@@ -1,5 +1,5 @@
 /*
- *	(C) 2011 Varun Mittal <varunmittal91@gmail.com> & Varun Dhawan <varundhawan5792@gmail.com>
+ *	(C) 2013 Varun Mittal <varunmittal91@gmail.com>
  *	NeweraHPC program is distributed under the terms of the GNU General Public License v2
  *
  *	This file is part of NeweraHPC.
@@ -20,117 +20,91 @@
 #ifndef _GRID_DATA_H_
 #define _GRID_DATA_H_
 
-/* Grid configuration file which will contain peer list */
-#define grid_conf_file "/etc/grid.conf"
-#define GRID_RANGE_PLUGIN "nhpc_plugin_range"
-
-enum GRID_ARG_TYPE
-{
-   RANGE,
-   VALUE,
-   LITERAL,
-   COMMAND,
-   GRID_FILE
-};
-
-#define ARG_RANGE "0"
-#define ARG_VALUE "1"
-#define ARG_LITERAL "2"
-#define ARG_COMMAND "3"
-#define ARG_GRID_FILE "4"
-
 namespace neweraHPC
 {
-   /* Plugin details for the modules that are added to be run in a grid */
-   struct plugin_details_t
+#define ARG_RANGE     1
+#define ARG_VALUE     2
+#define ARG_LITERAL   4
+#define ARG_COMMAND   8
+#define ARG_FILE     16
+#define ARG_RANGE_BIT    0
+#define ARG_VALUE_BIT    1
+#define ARG_LITERAL_BIT  2
+#define ARG_COMMAND_BIT  3
+#define ARG_FILE_BIT     4
+   typedef unsigned char arg_t;
+   struct arg_value_t
    {
-      char *plugin_name;
-      
-      /* Address of the base plugin function that server will run*/
-      fnc_ptr_nhpc_plugin_t fnc_init;
-      
-      /* Address of the plugin function that client will run 
-       for assembly of data and other purposes */
-      fnc_ptr_nhpc_plugin_t fnc_client_exec;
-      
-      fnc_ptr_nhpc_plugin_t fnc_exec;
+      arg_t       arg;
+      const char *value;
+   };
+   
+   typedef unsigned char status_t;
+#define STATUS_HAS_ARG       1
+#define STATUS_HAS_FILE      2
+#define STATUS_HAS_MEM_BLOCK 4
+#define STATUS_HAS_ARG_BIT       0
+#define STATUS_HAS_FILE_BIT      1
+#define STATUS_HAS_MEM_BLOCK_BIT 2   
+   struct grid_data_t
+   {
+      arg_t      arg;
+      status_t   status;
+      void      *address;
+      rbtree    *arguments;
+   };
 
-      /* Address of processing function for actual implementation 
-       of the algorith in plugin */
-      fnc_ptr_nhpc_plugin_t fnc_processor;
-      
-      fnc_ptr_nhpc_plugin_t fnc_map_reduce;
-      
-      /* Target directory */
-      const char *plugin_dir;
-      
-      /* Path of plugin on the server */
-      const char *path_plugin;
-      
-      /* Path of nxi file for plugin on server */
-      const char *path_nxi;
-   };
-   
-   /* Peer details maintained at the server */
-   struct peer_details_t
+#define grid_data_get_arguments(g)         (g->arguments) 
+#define grid_data_get_argument_value(g, i) ((arg_value_t *)(*(grid_data_get_arguments(g)))[i])
+#define grid_data_get_status(g)            (g->status)
+#define grid_data_has_opt(g, opt_bit)      (1 & (grid_data_get_status(g) >> opt_bit))
+#define grid_data_has_arguments(g)         (grid_data_has_opt(g, STATUS_HAS_ARG_BIT))
+#define grid_data_has_file(g)              (grid_data_has_opt(g, STATUS_HAS_FILE_BIT))
+#define grid_data_has_mem_block(g)         (grid_data_has_opt(g, STATUS_HAS_MEM_BLOCK_BIT))
+   static void grid_data_set_opt(grid_data_t *data, int opt, bool on)
    {
-      /* Unique Peer id */
-      int id;
-      
-      /* Port for peer server */
-      char *port;
-      
-      /* Address for peer server */
-      char *host;
-      
-      /* Number of processors on perr server */
-      int processors;
-      
-      /* Weight of the peer server, calculated on the basis
-       of processors and network latency */
-      int weight;
-      
-      /* Status of peer server, wether busy or available */
-      bool status;
-      
-      bool dynamic;
-      
-      int processor_time;
-      
-      int threads;
-   };
-   
-   typedef unsigned char plugin_request_status;
-   struct plugin_request_t
+      if(on)
+	 data->status |= opt;
+      else 
+	 data->status &= ~opt;
+   }
+   static int grid_data_get_argument_count(grid_data_t *data)
    {
-      char  *plugin;
-      char  *peer_host;
-      char  *peer_port;
-      plugin_request_status  status;
-   };   
-#define nhpc_grid_set_plugin_request_sent(p)      ((p)->status |= 1)
-#define nhpc_grid_set_plugin_request_complete(p)  ((p)->status |= 2)
-#define nhpc_grid_is_plugin_request_sent(p)       ((p)->status & 1)
-#define nhpc_grid_is_plugin_request_complete(p)   (((p)->status >> 1) & 1)
-   
-   struct nhpc_instruction_set_t
+      if(data->arguments)
+	 return data->arguments->length();
+      else 
+	 return 0;
+   }
+   static void *grid_data_get_block_addr(grid_data_t *data)
    {
-      char *plugin_name;
-      void *data;
-      nhpc_size_t data_len;
-      int host_peer_id;
-      rbtree *arguments;
-      int argument_count;
-      char *grid_uid;
-      char *host_grid_uid;
-      char *host_peer_addr;
-      char *host_peer_port;
-      bool execute;
-   };
-#define nhpc_grid_get_peer_host_instruction(i)  (i->host_peer_addr)
-#define nhpc_grid_get_peer_port_instruction(i)  (i->host_peer_port)
-#define nhpc_grid_get_peer_host_socket(s)       (s->host)
-#define nhpc_grid_get_peer_port_socket(s)       (s->port)
+      if(grid_data_has_mem_block(data))
+	 return data->address;
+   }
+   static const char *grid_data_get_file_addr(grid_data_t *data)
+   {
+      if(grid_data_has_file(data))
+	 return (const char *)data->address;
+   }
+   static void grid_data_init(grid_data_t **data)
+   {
+      (*data) = new grid_data_t;
+      memset((*data), 0, sizeof(grid_data_t));
+   }
+   static void grid_data_destruct(grid_data_t *data)
+   {
+      if(data->arguments)
+      {
+	 arg_value_t *value;
+	 int count = grid_data_get_argument_count(data);
+	 for(int i = 1; i <= count; i++)
+	 {
+	    value = grid_data_get_argument_value(data, i);
+	    delete value;
+	 }
+	 
+	 delete data->arguments;
+      }
+   }   
 };
 
 #endif

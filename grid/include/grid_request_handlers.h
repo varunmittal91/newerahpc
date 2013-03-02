@@ -13,24 +13,16 @@
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *	GNU General Public License for more details.
  *
- *	You should have received a copy of the GNU General Public License
+ * 	You should have received a copy of the GNU General Public License
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GRID_H_
-#define _GRID_H_
-
-#include <unistd.h>
-#include <sys/wait.h>
-
-#include <neweraHPC/network.h>
-
-#include "grid_instruction_set.h"
-#include "grid_communication.h"
-#include "grid_server.h"
-
-namespace neweraHPC 
+namespace neweraHPC
 {
-};
-
-#endif
+   nhpc_status_t grid_client_registration_handler(nhpc_socket_t *socket);
+   nhpc_status_t grid_node_registration_handler(nhpc_socket_t *socket);
+   nhpc_status_t grid_plugin_request_handler(nhpc_socket_t *socket);
+   nhpc_status_t grid_file_exchange_request_handler(nhpc_socket_t *socket);
+   nhpc_status_t grid_instruction_request_handler(nhpc_socket_t *socket);
+   nhpc_status_t grid_submission_request_handler(nhpc_socket_t *socket);   
+}

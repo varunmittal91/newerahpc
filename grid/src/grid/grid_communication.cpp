@@ -91,6 +91,36 @@ namespace neweraHPC
    
    nhpc_status_t grid_request_handler(nhpc_socket_t *socket)
    {
+      char       *command = network_headers_get_param(socket->headers, "command");
+      const char *uid     = network_headers_get_param(socket->headers, "Grid-Uid");
+      string_t   *string  = nhpc_substr(command, ' ');  
       
+      if(string->count < 3)
+      {
+	 nhpc_string_delete(string);
+	 return NHPC_FAIL;
+      }
+
+      nhpc_status_t  nrv     = NHPC_FAIL;
+      const char    *fnc_str = string->strings[1];
+      
+      fnc_ptr_nhpc_t fnc_ptr = (fnc_ptr_nhpc_t)grid_communication_handlers->search(fnc_str);      
+      
+      if(fnc_ptr)
+      {
+	 grid_data_t *grid_data;
+	 grid_data_init(&grid_data);
+	 grid_data_create_from_socket(grid_data, socket);
+	 
+	 nrv = fnc_ptr(grid_data);
+      }      
+      else 
+      {
+	 cout << "No handler found:" << fnc_str << endl;
+      }
+      
+      nhpc_string_delete(string);
+
+      return nrv;
    }
 }

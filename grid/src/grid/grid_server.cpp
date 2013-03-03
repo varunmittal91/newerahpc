@@ -155,9 +155,10 @@ namespace neweraHPC
       _network        = new network_t(&_thread_manager);
       (*_network).network_init();
       
-      fnc_ptr_t grid_request_handler = (fnc_ptr_t)grid_request_handler;
-      int rv = (*_network).network_addons->insert((void *)grid_request_handler, "GRID");
-      
+      int rv;
+      fnc_ptr_t grid_handler = (fnc_ptr_t)grid_request_handler;
+      rv = (*_network).network_addons->insert((void *)grid_handler, "GRID");
+
       nhpc_status_t nrv = (*_network).create_server(_host_addr, _host_port, AF_INET, SOCK_STREAM, 0);  
       if(nrv != NHPC_SUCCESS)
 	 return nrv;  

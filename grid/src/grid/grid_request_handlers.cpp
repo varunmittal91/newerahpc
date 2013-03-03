@@ -17,32 +17,38 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
+
 #include <neweraHPC/network.h>
+
+#include <include/grid_data.h>
+
+using namespace std;
 
 namespace neweraHPC
 {
-   nhpc_status_t grid_client_registration_handler(nhpc_socket_t *socket)
+   nhpc_status_t grid_client_registration_handler(grid_data_t *grid_data)
+   {
+      cout << "Client registration requested" << endl;
+   }
+   
+   nhpc_status_t grid_node_registration_handler(grid_data_t *grid_data)
    {
       
    }
    
-   nhpc_status_t grid_node_registration_handler(nhpc_socket_t *socket)
+   nhpc_status_t grid_plugin_request_handler(grid_data_t *grid_data)
    {
       
    }
    
-   nhpc_status_t grid_plugin_request_handler(nhpc_socket_t *socket)
+   nhpc_status_t grid_file_exchange_request_handler(grid_data_t *grid_data)
    {
       
    }
    
-   nhpc_status_t grid_file_exchange_request_handler(nhpc_socket_t *socket)
+   nhpc_status_t grid_instruction_request_handler(grid_data_t *grid_data)
    {
-      
-   }
-   
-   nhpc_status_t grid_instruction_request_handler(nhpc_socket_t *socket)
-   {
-      
+      cout << "Encounter instruction call" << endl;
    }
 }

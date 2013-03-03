@@ -20,6 +20,11 @@
 #ifndef _GRID_DATA_H_
 #define _GRID_DATA_H_
 
+#include <string.h>
+
+#include <neweraHPC/rbtree.h>
+#include <neweraHPC/network.h>
+
 namespace neweraHPC
 {
 #define ARG_RANGE     1
@@ -48,10 +53,14 @@ namespace neweraHPC
 #define STATUS_HAS_MEM_BLOCK_BIT 2   
    struct grid_data_t
    {
-      arg_t      arg;
-      status_t   status;
-      void      *address;
-      rbtree    *arguments;
+      arg_t       arg;
+      status_t    status;
+      void       *address;
+      rbtree     *arguments;
+      const char *grid_uid;
+      const char *referer_grid_uid;
+      const char *peer_addr;
+      const char *peer_port;
    };
 
 #define grid_data_get_arguments(g)         (g->arguments) 
@@ -105,6 +114,8 @@ namespace neweraHPC
 	 delete data->arguments;
       }
    }   
+   
+   void grid_data_create_from_socket(grid_data_t *data, nhpc_socket_t *socket);
 };
 
 #endif

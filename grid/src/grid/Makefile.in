@@ -67,7 +67,7 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgrid_la_LIBADD =
 am__objects_1 = grid_communication.lo grid_server.lo \
-	grid_request_handlers.lo
+	grid_request_handlers.lo grid_data.lo grid_uid.lo
 am_libgrid_la_OBJECTS = $(am__objects_1)
 libgrid_la_OBJECTS = $(am_libgrid_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -230,7 +230,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SOURCES = grid_communication.cpp grid_server.cpp grid_request_handlers.cpp
+SOURCES = grid_communication.cpp grid_server.cpp grid_request_handlers.cpp grid_data.cpp grid_uid.cpp
 noinst_LTLIBRARIES = libgrid.la
 libgrid_la_SOURCES = $(SOURCES)
 libgrid_la_LDFLAGS = -lpthread -ldl 
@@ -288,8 +288,10 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_communication.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_data.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_request_handlers.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_server.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_uid.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

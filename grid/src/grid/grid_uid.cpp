@@ -13,16 +13,18 @@
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *	GNU General Public License for more details.
  *
- * 	You should have received a copy of the GNU General Public License
+ *	You should have received a copy of the GNU General Public License
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <neweraHPC/strings.h>
+
+#include <include/grid_uid.h>
+
 namespace neweraHPC
 {
-   nhpc_status_t grid_client_registration_handler(grid_data_t *grid_data);
-   nhpc_status_t grid_node_registration_handler(grid_data_t *grid_data);
-   nhpc_status_t grid_plugin_request_handler(grid_data_t *grid_data);
-   nhpc_status_t grid_file_exchange_request_handler(grid_data_t *grid_data);
-   nhpc_status_t grid_instruction_request_handler(grid_data_t *grid_data);
-   nhpc_status_t grid_submission_request_handler(grid_data_t *grid_data);   
+   nhpc_status_t grid_uid_generate(const char **uid, grid_data_t *grid_data)
+   {
+      return NHPC_SUCCESS;      
+   }
 }

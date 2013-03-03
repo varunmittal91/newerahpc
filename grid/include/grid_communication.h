@@ -57,7 +57,7 @@ namespace neweraHPC
       const char        *peer_addr;
       const char        *peer_port;
    };
-#define grid_is_communication_complete(gc)    ((gc->request_type) | 1)
+#define grid_is_communication_complete(gc)    ((gc->request_type) & 1)
 #define grid_set_communication_complete(gc)   ((gc->request_type) |= 1)
 #define grid_set_communication_type(gc, c)    ((gc->request_type) |= (c << 5))
 #define grid_set_communication_header(gc,h,v) ((gc->headers->insert(h, v)))

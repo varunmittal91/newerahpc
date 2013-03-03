@@ -13,16 +13,24 @@
  *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *	GNU General Public License for more details.
  *
- * 	You should have received a copy of the GNU General Public License
+ *	You should have received a copy of the GNU General Public License
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <neweraHPC/rbtree.h>
+#include <neweraHPC/network.h>
+
+#include <include/grid_data.h>
+
 namespace neweraHPC
 {
-   nhpc_status_t grid_client_registration_handler(grid_data_t *grid_data);
-   nhpc_status_t grid_node_registration_handler(grid_data_t *grid_data);
-   nhpc_status_t grid_plugin_request_handler(grid_data_t *grid_data);
-   nhpc_status_t grid_file_exchange_request_handler(grid_data_t *grid_data);
-   nhpc_status_t grid_instruction_request_handler(grid_data_t *grid_data);
-   nhpc_status_t grid_submission_request_handler(grid_data_t *grid_data);   
+   void grid_data_create_from_socket(grid_data_t *data, nhpc_socket_t *socket)
+   {
+      rbtree *headers = socket->headers;
+      const char *peer_addr = nhpc_socket_get_host_port(socket);
+      const char *peer_port = nhpc_socket_get_host_addr(socket);
+      
+      nhpc_strcpy((char **)&(data->peer_addr), peer_addr);
+      nhpc_strcpy((char **)&(data->peer_port), peer_port);
+   }
 }

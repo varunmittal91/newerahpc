@@ -22,6 +22,8 @@
 #include <neweraHPC/network.h>
 
 #include <include/grid_data.h>
+#include <include/grid_node.h>
+#include <include/grid_uid.h>
 
 using namespace std;
 
@@ -29,7 +31,17 @@ namespace neweraHPC
 {
    nhpc_status_t grid_client_registration_handler(grid_data_t *grid_data)
    {
-      cout << "Client registration requested" << endl;
+      nhpc_status_t nrv;
+      
+      const char *client_uid;
+      nrv = grid_uid_generate(&client_uid, grid_data, NODE_TYPE_CLIENT);
+      if(nrv == NHPC_SUCCESS)
+      {
+	 grid_node_t *grid_node;
+	 grid_node_init(&grid_node, NODE_TYPE_CLIENT);
+      }
+
+      return nrv;
    }
    
    nhpc_status_t grid_node_registration_handler(grid_data_t *grid_data)

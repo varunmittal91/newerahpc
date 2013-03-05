@@ -25,6 +25,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+#include <include/grid_node.h>
 #include <include/grid_server.h>
 #include <include/grid_communication.h>
 
@@ -164,6 +165,7 @@ namespace neweraHPC
 	 return nrv;  
       
       grid_communication_handlers_init();
+      grid_node_db_init();
       
       (*_network).join_accept_thread();
    }

@@ -18,13 +18,31 @@
  */
 
 #include <neweraHPC/strings.h>
+#include <iostream>
 
 #include <include/grid_uid.h>
+#include <include/grid_node.h>
+
+using namespace std;
 
 namespace neweraHPC
 {
-   nhpc_status_t grid_uid_generate(const char **uid, grid_data_t *grid_data)
+   nhpc_status_t grid_uid_generate(const char **uid, grid_data_t *grid_data, node_type_t node_mode)
    {
+      rbtree *node_db;
+      if(grid_node_is_type_compute(node_mode))
+	 node_db = registered_nodes;
+      else 
+	 node_db = registered_clients;
+      
+      const char *random_string = nhpc_random_string(8);
+      while((*node_db).search(random_string))
+      {
+	 delete[] random_string;
+	 random_string = nhpc_random_string(8);
+      }
+
+      *uid = random_string;
       return NHPC_SUCCESS;      
    }
 }

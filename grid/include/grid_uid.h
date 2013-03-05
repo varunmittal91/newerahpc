@@ -18,8 +18,9 @@
  */
 
 #include "grid_data.h"
+#include "grid_node.h"
 
 namespace neweraHPC
 {
-   nhpc_status_t grid_uid_generate(const char **uid, grid_data_t *grid_data);
+   nhpc_status_t grid_uid_generate(const char **uid, grid_data_t *grid_data, node_type_t node_mode);
 }

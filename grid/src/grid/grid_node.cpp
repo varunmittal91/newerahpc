@@ -17,11 +17,10 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GRID_CLIENT_H_
-#define _GRID_CLIENT_H_
+#include <neweraHPC/rbtree.h>
 
-namespace neweraHPC 
+namespace neweraHPC
 {
+   rbtree *registered_nodes;
+   rbtree *registered_clients;
 };
-
-#endif

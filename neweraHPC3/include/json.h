@@ -22,6 +22,7 @@
 
 #include "rbtree.h"
 #include "constants.h"
+#include "strings.h"
 
 namespace neweraHPC
 {
@@ -94,6 +95,7 @@ namespace neweraHPC
       rbtree   *root;
       key_pair_t *root_key_pair;
       key_pair_t *current_key_pair;
+      rbtree     *saved_search;
       
       int   final_json_length;
       char *final_json_string;
@@ -131,7 +133,24 @@ namespace neweraHPC
       
       bool is_delimiter(char in_char);
       void print();
+      
+      void save_search()
+      {
+	 saved_search->insert(current_key_pair);
+      }
+      void restore_search()
+      {
+	 int _count = saved_search->length();
+	 if(_count >= 1)
+	 {
+	    current_key_pair = (key_pair_t *)saved_search->search(_count);
+	    saved_search->erase(_count);
+	 }
+      }
    };
+   
+   bool json_check_object_found(const char *response);
+   bool json_check_object_is_array(const char *response);
 };
 
 #endif

@@ -30,6 +30,23 @@ namespace neweraHPC
 {
    const char* JSON_OBJECT_STRINGS[5] = {"{JSON_INCOMPLETE}", "{JSON_END}", "{JSON_ARRAY}", "{JSON_OBJECT}", "{JSON_OBJECT_NOT_FOUND}"};
    
+   bool json_check_object_found(const char *response)
+   {
+      if(nhpc_strcmp(JSON_OBJECT_STRINGS[JSON_OBJECT_NOT_FOUND], response) != NHPC_SUCCESS)
+	 return true;
+      else 
+	 return false;
+   }
+
+   bool json_check_object_is_array(const char *response)
+   {
+      if(nhpc_strcmp(JSON_OBJECT_STRINGS[JSON_ARRAY], response) != NHPC_SUCCESS)
+	 return true;
+      else 
+	 return false;
+   }
+   
+   
    json_t::json_t()
    {
       root = new rbtree(RBTREE_NUM_MANAGED);
@@ -50,6 +67,8 @@ namespace neweraHPC
       
       final_json_length = 2;
       final_json_string = NULL;
+      
+      saved_search = new rbtree(RBTREE_NUM_MANAGED);
    }
    
    json_t::~json_t()
@@ -569,6 +588,8 @@ namespace neweraHPC
    void json_t::reinitialize_search()
    {
       current_key_pair = NULL;
+      delete saved_search;
+      saved_search = new rbtree(RBTREE_NUM_MANAGED);
    }
    
    nhpc_status_t json_t::close_element()

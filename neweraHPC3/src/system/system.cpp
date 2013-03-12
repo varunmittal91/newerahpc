@@ -34,6 +34,17 @@ namespace neweraHPC
 {
    nhpc_system_t *nhpc_system;
    
+   void nhpc_system_init()
+   {
+      nhpc_system = new nhpc_system_t;
+      (*nhpc_system).init_system();
+   }
+   
+   void nhpc_system_destroy()
+   {
+      delete nhpc_system;
+   }   
+   
    void child_handler(int signum)
    {
       if(signum != SIGCHLD)

@@ -70,7 +70,7 @@ namespace neweraHPC
 	 
 	 if(nhpc_strcmp(command, "*HTTP*") == NHPC_SUCCESS)
 	    handler_keyword = "HTTP";
-	 else if(nhpc_strcmp(command, "*GRID*"))
+	 else if(nhpc_strcmp(command, "*GRID*") == NHPC_SUCCESS)
 	    handler_keyword = "GRID";
 	 
 	 if(handler_keyword)

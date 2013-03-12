@@ -61,6 +61,8 @@ namespace neweraHPC
       nhpc_size_t             partial_content_len;
       int                     thread_id;
    };
+#define nhpc_socket_get_host_addr(s) ((const char *)(s->host))
+#define nhpc_socket_get_host_port(s) ((const char *)(s->port))
    
    struct header_t
    {

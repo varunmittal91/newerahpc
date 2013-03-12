@@ -27,6 +27,7 @@ using namespace neweraHPC;
 
 int main(int argc, char **argv)
 {
+   /*
    if(argc < 3)
    {
       cout<<"Usage: ./simple_client server_host server_port file.blend start_frame max_frame\n";
@@ -60,6 +61,6 @@ int main(int argc, char **argv)
    {
       cout<<"Instruction failed"<<endl;
    }
-   
+   */
    return 0;
 }

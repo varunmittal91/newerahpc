@@ -17,7 +17,7 @@
  *	along with jarvis.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <neweraHPC/grid.h>
+//#include <neweraHPC/grid.h>
 
 using namespace neweraHPC;
 
@@ -26,15 +26,17 @@ namespace jarvis
 #ifdef __cplusplus
    extern "C" 
    {
-   nhpc_status_t jarvis_grid_plugin_register();
+/*
+      nhpc_status_t jarvis_grid_plugin_register();
    
-   nhpc_status_t plugin_init(plugin_details_t **plugin_details);
-   nhpc_status_t plugin_exec(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
+      nhpc_status_t plugin_init(plugin_details_t **plugin_details);
+      nhpc_status_t plugin_exec(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
 					 nhpc_socket_t *sock, char **grid_uid);
-   nhpc_status_t plugin_client_exec(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
+      nhpc_status_t plugin_client_exec(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
 						nhpc_socket_t *sock, char **grid_uid);
-   nhpc_status_t plugin_processor(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
+      nhpc_status_t plugin_processor(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
 				  nhpc_socket_t *sock, char **grid_uid);
+ */
    }
 #endif
 };

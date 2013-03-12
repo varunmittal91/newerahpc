@@ -17,16 +17,12 @@
  *	along with jarvis.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-
-#include <include/general.h>
-#include <include/words.h>
-#include <include/jarvis_data.h>
-
-using namespace std;
-using namespace neweraHPC;
+#include "parse.h"
 
 namespace jarvis
 {
+#define _jv_get_search_param_data(s)         ((search_param_t *)jv_get_search_param_data(s))
+#define _jv_get_search_param_index_record(s) ((index_record_t *)(_jv_get_search_param_data(s)->result))
    
+   void jv_get_word_data_record(search_param_t *search_param);
 };

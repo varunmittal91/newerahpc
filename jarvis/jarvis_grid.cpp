@@ -24,6 +24,7 @@ using namespace neweraHPC;
 
 int main(int argc, char **argv)
 {
+   /*
    neweraHPC_init(argc, argv);
    nhpc_status_t nrv;
    
@@ -39,4 +40,5 @@ int main(int argc, char **argv)
    }
    
    return 0;
+    */
 }

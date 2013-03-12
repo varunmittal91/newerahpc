@@ -20,10 +20,13 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+
+#include <neweraHPC/json.h>
 #include <neweraHPC/neweraHPC.h>
 
 #include <include/parse_index.h>
 #include <include/jarvis.h>
+#include <include/compare.h>
 
 using namespace std;
 using namespace jarvis;
@@ -32,11 +35,50 @@ int main(int argc, char **argv)
 {
    jarvis_init(argc, argv);
    
-   const char *word = nhpc_get_cmdline_argument("word");
-   if(word)
+   const char *word1 = nhpc_get_cmdline_argument("word1");
+   const char *word2 = nhpc_get_cmdline_argument("word2");
+   json_t *word_structure1 = NULL, *word_structure2 = NULL;
+   
+   if(word1)
    {
-      cout << "Word:" << word << endl;
-      jv_get_word_def(word);
+      cout << "Word:" << word1 << endl;
+      nhpc_status_t nrv = jv_get_word_def(word1);
+      if(nrv == NHPC_SUCCESS)
+      {
+	 cout << "Word found and loaded" << endl;
+	 jv_extract_word_def(word1);
+	 
+	 word_structure1 = jv_get_json_structure(word1);
+	 (*word_structure1).print();
+      }
+      else 
+      {
+	 speak("Unfortunately word not found");
+	 cout << "word search failed" << endl;
+      }
+   }
+   if(word2)
+   {
+      cout << "Word:" << word2 << endl;
+      nhpc_status_t nrv = jv_get_word_def(word2);
+      if(nrv == NHPC_SUCCESS)
+      {
+	 cout << "Word found and loaded" << endl;
+	 jv_extract_word_def(word2);
+	 
+	 word_structure2 = jv_get_json_structure(word2);
+	 (*word_structure2).print();
+      }
+      else 
+      {
+	 speak("Unfortunately word not found");
+	 cout << "word search failed" << endl;
+      }
+   }
+   if(word_structure1 && word_structure2)
+   {
+      cout << "Words loaded now comparing" << endl;
+      jv_compare_json_structure(word_structure1, word_structure2, word1, word2);
    }
    
    while(1)

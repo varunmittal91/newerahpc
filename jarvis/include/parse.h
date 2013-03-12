@@ -20,13 +20,15 @@
 #ifndef _PARSE_H_
 #define _PARSE_H_
 
-#include "words.h"
+#include "words_data.h"
 
 namespace jarvis
 {
-#define jv_search_status(p)        ((p)->status)
-#define jv_search_is_complete(p)   (jv_search_status(p))
-#define jv_set_search_complete(p)  (jv_search_status(p) |= 1)
+#define jv_search_status(p)         ((p)->status)
+#define jv_search_is_complete(p)    (jv_search_status(p) & 1)
+#define jv_search_is_successful(p)  ((jv_search_status(p) >> 1) & 1)
+#define jv_set_search_successful(p) (jv_search_status(p) |= 2)
+#define jv_set_search_complete(p)   (jv_search_status(p) |= 1)
    
 #define jv_get_search_param_pos(s)           ((s)->pos)
 #define jv_set_search_param_pos(s, pos)      (jv_set_pos(jv_get_search_param_pos(s), pos))
@@ -41,16 +43,29 @@ namespace jarvis
 #define jv_get_search_param_sources(s)       ((s)->source_file)
 #define jv_get_search_param_word(s)          ((s)->word)
 #define jv_get_search_param_thread_id(s)     ((s)->thread_id)
+#define jv_set_search_param_data(s, d)       ((s)->data = (void *)d)
+#define jv_get_search_param_data(s)          (s->data)
    
    struct search_param_t
    {
+      typedef unsigned char status_t;
+
       const char *word;
       const char *source_file;
       void       *result;
-      bool        status;
+      void       *data;
+      status_t    status;
       jv_pos      pos;
       int         thread_id;
    };
+   static void search_param_init(search_param_t **search_param)
+   {
+      (*search_param) = new search_param_t;
+      memset((*search_param), 0, sizeof(search_param_t));
+   }
+   static void search_param_destruct(search_param_t *search_param)
+   {
+   }
 };
 
 #endif

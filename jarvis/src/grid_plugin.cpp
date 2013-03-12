@@ -29,6 +29,7 @@ namespace jarvis
 #ifdef __cplusplus
    extern "C" 
    {
+      /*
       nhpc_status_t jarvis_grid_plugin_register()
       {
       }
@@ -89,6 +90,7 @@ namespace jarvis
 	 
 	 return NHPC_SUCCESS;
       }
+       */
    }
 #endif
 };

@@ -24,6 +24,7 @@
 #include <neweraHPC/strings.h>
 
 #include <include/parse_index.h>
+#include <include/parse_data.h>
 #include <include/morphological_rules.h>
 #include <include/jarvis_data.h>
 #include <include/jarvis.h>
@@ -81,6 +82,7 @@ namespace jarvis
 	 cout << "Found word:" << word << " in:" << jv_get_search_param_sources(search_param) << endl;
 	 index_record_t *index_record = jv_analyze_index_record(search_param, record_parts);
 	 search_param->result = (void *)index_record;
+	 jv_set_search_successful(search_param);
 	 
 	 nhpc_string_delete(record_parts);
       }
@@ -105,7 +107,10 @@ namespace jarvis
 	 jv_set_index_record_pointer(index_record, record_parts->strings[i + 4]);
       
       for(int i = 0; i < sense_count; i++)
+      {
 	 jv_set_index_record_offset(index_record, record_parts->strings[i + 3 + pointer_count + 3]);
+	 cout << "Adding offset:" << record_parts->strings[i + 3 + pointer_count + 3] << endl;
+      }
       
       return index_record;
    }
@@ -118,8 +123,11 @@ namespace jarvis
       }
    }
    
-   void jv_get_word_def(const char *word)
+   nhpc_status_t jv_get_word_def(const char *word)
    {
+      if(jv_get_word(word))
+	 return NHPC_SUCCESS;
+      
       search_param_t  search_params[INDEXED_POS_COUNT];
       search_param_t *search_param;
       
@@ -146,6 +154,7 @@ namespace jarvis
       }
       
       jv_join_threads_search_params(search_params);
+      nhpc_status_t nrv = NHPC_FAIL;
       
       for(int i = 0; i < INDEXED_POS_COUNT; i++)
       {
@@ -153,10 +162,38 @@ namespace jarvis
 	 
 	 if(jv_search_is_complete(search_param))
 	 {
-	    cout << i << " Complete" << endl;
+	    if(jv_search_is_successful(search_param))
+	    {
+	       nrv = NHPC_SUCCESS;
+	       
+	       cout << i << " Complete Status:Success" << endl;
+	       
+	       search_param_t *data_search;
+	       search_param_init(&data_search);
+	       
+	       pos         = jv_get_pos_int_code(i);
+	       source_file = wordnet_data_files[i];
+	       cout << "Searching for data in :" << source_file << endl;
+	       
+	       jv_set_search_param_pos(data_search, pos);
+	       jv_set_search_param_source(data_search, source_file);
+	       jv_set_search_param_word(data_search, word);
+	       jv_set_search_param_data(data_search, search_param);
+	       	       
+	       jv_get_word_data_record(data_search);
+	       
+	       jv_add_word((index_record_t *)search_param->result);
+	       
+	       search_param_destruct(data_search);
+	       delete data_search;
+	    }
+	    else 
+	       cout << i << " Complete Status:Fail" << endl;
 	 }
       }
       cout << "Threads done" << endl;
+      
+      return nrv;
    }
 };
 

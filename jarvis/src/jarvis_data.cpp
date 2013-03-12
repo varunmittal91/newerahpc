@@ -57,6 +57,7 @@ namespace jarvis
    
    void init_jarvis_data()
    {
+      init_jarvis_words_db();
       init_wordnet_files();
       init_morphological_rules();      
    }   

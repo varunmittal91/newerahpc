@@ -80,6 +80,10 @@ int main(int argc, char **argv)
       cout << "Words loaded now comparing" << endl;
       jv_compare_json_structure(word_structure1, word_structure2, word1, word2);
    }
+   if(word_structure1)
+      delete word_structure1;
+   if(word_structure2)
+      delete word_structure2;
    
    while(1)
       sleep(1);

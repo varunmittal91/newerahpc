@@ -240,10 +240,38 @@ namespace jarvis
       speak("The relationship can be defined by the following words,");
       
       int word_count = (*structure1).count();
+      if(word_count > 3)word_count = 3;
       for(int i = 1; i <= word_count; i++)
       {
 	 const char *word = (*structure1)[i];
 	 speak(word);
+      }
+      
+      jv_pos pos_code = jv_get_pos_int_code(pos);
+      if(1)
+      {
+	 (*structure1).reinitialize_search();
+	 (*structure1)[pos_ascii_name];
+	 (*structure1)["senses"];
+	 (*structure1)[sense1];
+	 
+	 for(int i = 1; i <= (level + 1); i++)
+	 {
+	    const char *response = (*structure1)["child"];
+	    if(!json_check_object_found(response))
+	       return;
+	 }
+	 (*structure1)["words"];
+
+	 speak("which is a");
+	 
+	 int word_count = (*structure1).count();
+	 if(word_count > 3)word_count = 3;
+	 for(int i = 1; i <= word_count; i++)
+	 {
+	    const char *word = (*structure1)[i];
+	    speak(word);
+	 }
       }
       
       cout << (*structure1)[1] << endl;

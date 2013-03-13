@@ -88,7 +88,7 @@ namespace jarvis
          string_t *synset_parts = nhpc_substr(synset_str, ' ');
          char *word_count_str = synset_parts->strings[3];
          
-	 int word_count = nhpc_strtoi(word_count_str);
+	 int word_count = nhpc_hexstrtoi(word_count_str);
 	 if(word_count > 50)
 	    cout << line << endl;
          

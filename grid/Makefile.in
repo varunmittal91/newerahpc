@@ -82,15 +82,9 @@ server_DEPENDENCIES = src/libneweraHPC_grid.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
-server_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(server_LDFLAGS) $(LDFLAGS) -o $@
 am_test_client_OBJECTS = test_client.$(OBJEXT)
 test_client_OBJECTS = $(am_test_client_OBJECTS)
 test_client_DEPENDENCIES = src/libneweraHPC_grid.la
-test_client_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(test_client_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -331,10 +325,8 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = src
 server_SOURCES = server.cpp
 server_LDADD = src/libneweraHPC_grid.la -ldl 
-server_LDFLAGS = -lneweraHPC
 test_client_SOURCES = test_client.cpp
 test_client_LDADD = src/libneweraHPC_grid.la -ldl 
-test_client_LDFLAGS = -lneweraHPC
 library_includedir = $(includedir)/neweraHPC
 library_include_HEADERS = include/*.h
 dist_doc_DATA = README
@@ -440,10 +432,10 @@ clean-binPROGRAMS:
 	rm -f $$list
 server$(EXEEXT): $(server_OBJECTS) $(server_DEPENDENCIES) $(EXTRA_server_DEPENDENCIES) 
 	@rm -f server$(EXEEXT)
-	$(AM_V_CXXLD)$(server_LINK) $(server_OBJECTS) $(server_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK) $(server_OBJECTS) $(server_LDADD) $(LIBS)
 test_client$(EXEEXT): $(test_client_OBJECTS) $(test_client_DEPENDENCIES) $(EXTRA_test_client_DEPENDENCIES) 
 	@rm -f test_client$(EXEEXT)
-	$(AM_V_CXXLD)$(test_client_LINK) $(test_client_OBJECTS) $(test_client_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK) $(test_client_OBJECTS) $(test_client_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

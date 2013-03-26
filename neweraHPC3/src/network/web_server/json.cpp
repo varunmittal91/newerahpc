@@ -364,7 +364,7 @@ namespace neweraHPC
       int json_status;
       int current_position, element_count;
       
-      cout << "{";
+      cout << "{" << endl;
       
       while((json_status = traverse(&key_pair)) != JSON_END)
       {
@@ -377,11 +377,11 @@ namespace neweraHPC
 	 {
 	    if(key_pair->json_object == JSON_OBJECT_CLOSE)
 	    {
-	       cout << "}" ;
+	       cout << "}" << endl;
 	    }
 	    else if(key_pair->json_object == JSON_ARRAY_CLOSE)
 	    {
-	       cout << "]";
+	       cout << "]" << endl;
 	    }
 	    
 	    if(search_elem_old)
@@ -410,9 +410,9 @@ namespace neweraHPC
 	 if(key_pair->json_object == JSON_ARRAY || key_pair->json_object == JSON_OBJECT)
 	 {
 	    if(key_pair->json_object == JSON_ARRAY)
-	       cout << "[";
+	       cout << "[" << endl;
 	    if(key_pair->json_object == JSON_OBJECT)
-	       cout << "{";
+	       cout << "{" << endl;
 	 }
 	 
 	 if(current_position < element_count && current_position > 1)

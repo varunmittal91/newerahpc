@@ -272,6 +272,42 @@ namespace jarvis
 	    const char *word = (*structure1)[i];
 	    speak(word);
 	 }
+	 if(level > 1)
+	 {
+	    (*structure1).reinitialize_search();
+	    (*structure1)[pos_ascii_name];
+	    (*structure1)["senses"];
+	    (*structure1)[sense1];
+
+	    (*structure2).reinitialize_search();
+	    (*structure2)[pos_ascii_name];
+	    (*structure2)["senses"];
+	    (*structure2)[level];
+	    
+	    for(int i = 1; i <= (level - 1); i++)
+	    {
+	       const char *response = (*structure1)["child"];
+	       if(!json_check_object_found(response))
+		  return;
+	    }	    
+	    (*structure1)["words"];
+	    
+	    speak("A subset of");
+	    int word_count = (*structure1).count();
+	    if(word_count > 3)word_count = 3;
+	    for(int i = 1; i <= word_count; i++)
+	    {
+	       const char *word = (*structure1)[i];
+	       speak(word);
+	    }	    
+	    
+	    for(int i = 1; i <= (level - 1); i++)
+	    {
+	       const char *response = (*structure2)["child"];
+	       if(!json_check_object_found(response))
+		  return;
+	    }	    
+	 }
       }
       
       cout << (*structure1)[1] << endl;
@@ -305,7 +341,7 @@ namespace jarvis
 	       speak("and");
 	       speak(word2);
 	       speak("complete");
-	       speak("Largest hit found in category");
+	       speak("Probable relation found in");
 	       speak(pos_ascii_name);
 	       jv_speak_results(structure1, structure2, i, level, sense1, sense2);
 	    }

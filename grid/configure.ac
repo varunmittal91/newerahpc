@@ -31,5 +31,6 @@ LT_SUPPORTED_TAG(CXX)
 AC_OUTPUT([Makefile]
           [src/Makefile]
           [src/grid/Makefile]
+	  [src/grid_client/Makefile]
           [tests/grid/Makefile])
 

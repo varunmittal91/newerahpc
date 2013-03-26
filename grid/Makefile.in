@@ -53,7 +53,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = server$(EXEEXT)
+bin_PROGRAMS = server$(EXEEXT) test_client$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(dist_doc_DATA) \
 	$(library_include_HEADERS) $(srcdir)/Makefile.am \
@@ -85,6 +85,12 @@ am__v_lt_0 = --silent
 server_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(server_LDFLAGS) $(LDFLAGS) -o $@
+am_test_client_OBJECTS = test_client.$(OBJEXT)
+test_client_OBJECTS = $(am_test_client_OBJECTS)
+test_client_DEPENDENCIES = src/libneweraHPC_grid.la
+test_client_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(test_client_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -111,8 +117,8 @@ am__v_CXXLD_0 = @echo "  CXXLD " $@;
 AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(server_SOURCES)
-DIST_SOURCES = $(server_SOURCES)
+SOURCES = $(server_SOURCES) $(test_client_SOURCES)
+DIST_SOURCES = $(server_SOURCES) $(test_client_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -323,9 +329,12 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = src
-server_SOURCES = server.cpp src/neweraHPC.la
+server_SOURCES = server.cpp
 server_LDADD = src/libneweraHPC_grid.la -ldl 
 server_LDFLAGS = -lneweraHPC
+test_client_SOURCES = test_client.cpp
+test_client_LDADD = src/libneweraHPC_grid.la -ldl 
+test_client_LDFLAGS = -lneweraHPC
 library_includedir = $(includedir)/neweraHPC
 library_include_HEADERS = include/*.h
 dist_doc_DATA = README
@@ -432,6 +441,9 @@ clean-binPROGRAMS:
 server$(EXEEXT): $(server_OBJECTS) $(server_DEPENDENCIES) $(EXTRA_server_DEPENDENCIES) 
 	@rm -f server$(EXEEXT)
 	$(AM_V_CXXLD)$(server_LINK) $(server_OBJECTS) $(server_LDADD) $(LIBS)
+test_client$(EXEEXT): $(test_client_OBJECTS) $(test_client_DEPENDENCIES) $(EXTRA_test_client_DEPENDENCIES) 
+	@rm -f test_client$(EXEEXT)
+	$(AM_V_CXXLD)$(test_client_LINK) $(test_client_OBJECTS) $(test_client_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -440,6 +452,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_client.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

@@ -17,24 +17,16 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdlib.h>
-#include <iostream>
-#include <iomanip>
-#include <fstream>
+#include <include/grid_response.h>
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include <neweraHPC/neweraHPC.h>
-
-#include <include/grid_server.h>
-#include <include/grid_data.h>
-
-using namespace std;
-using namespace neweraHPC;
-
-int main(int argc, char **argv)
-{      
-   nhpc_status_t nrv = grid_server_init(argc, argv);
+namespace neweraHPC
+{
+   nhpc_status_t grid_response_get(grid_response_t **grid_response, grid_communication_t *grid_communication)
+   {
+      (*grid_response) = new grid_response_t;
+      memset((*grid_response), 0, sizeof(grid_response_t));
+      
+      grid_data_init(&grid_response_get_grid_data((*grid_response)));
+      
+   }   
 }

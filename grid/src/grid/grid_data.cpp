@@ -17,20 +17,25 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
+
 #include <neweraHPC/rbtree.h>
 #include <neweraHPC/network.h>
 
 #include <include/grid_data.h>
+
+using namespace std;
 
 namespace neweraHPC
 {
    void grid_data_create_from_socket(grid_data_t *data, nhpc_socket_t *socket)
    {
       rbtree *headers = socket->headers;
-      const char *peer_addr = nhpc_socket_get_host_port(socket);
-      const char *peer_port = nhpc_socket_get_host_addr(socket);
-      
+      const char *peer_addr = nhpc_socket_get_host_addr(socket);
+      const char *peer_port = nhpc_socket_get_host_port(socket);
       nhpc_strcpy((char **)&(data->peer_addr), peer_addr);
       nhpc_strcpy((char **)&(data->peer_port), peer_port);
+      
+      grid_data_set_socket(data, socket);
    }
 }

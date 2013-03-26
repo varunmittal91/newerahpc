@@ -23,26 +23,28 @@
 #include <neweraHPC/rbtree.h>
 #include <neweraHPC/network.h>
 
+#include "grid_data.h"
+
 namespace neweraHPC
 {
    static rbtree *grid_communication_handlers;
 #define grid_communication_register_handler(h, m) ((*grid_communication_handlers).insert((void *)(h), grid_get_communication_code_status_mssg(m)))
 
-#define GRID_CLIENT_REGISTRATION   0
-#define GRID_NODE_REGISTRATION     1
-#define GRID_FILE_EXCHANGE         2
-#define GRID_INSTRUCTION           3
-#define GRID_SUBMISSION            4
-#define GRID_PLUGIN_REQUEST        5
+#define GRID_CLIENT_REGISTRATION            0
+#define GRID_NODE_REGISTRATION              1
+#define GRID_FILE_EXCHANGE                  2
+#define GRID_INSTRUCTION                    3
+#define GRID_SUBMISSION                     4
+#define GRID_PLUGIN_REQUEST                 5
    
-#define GRID_COMMUNICATION_REGISTER 1
+#define GRID_COMMUNICATION_OPT_REGISTER 1
    
    static struct _GRID_STATUS_MSSGS
    {
       const char        *MSSGS_STRINGS;
    }GRID_STATUS_MSSGS[6] = {"CLIENT_REGISTRATION", "NODE_REGISTRATION", "FILE_EXCHANGE",
       "INSTRUCTION", "SUBMISSION", "PLUGIN_REQUEST"};
-#define grid_get_communication_status_code(gc)      ((gc->request_type) >> 5)
+#define grid_get_communication_status_code(gc)      ((gc->request_type) >> 3)
 #define grid_get_communication_status_mssg(gc)      (GRID_STATUS_MSSGS[grid_get_communication_status_code(gc)].MSSGS_STRINGS)
 #define grid_get_communication_code_status_mssg(c)  (GRID_STATUS_MSSGS[c].MSSGS_STRINGS)
    
@@ -59,7 +61,7 @@ namespace neweraHPC
    };
 #define grid_is_communication_complete(gc)    ((gc->request_type) & 1)
 #define grid_set_communication_complete(gc)   ((gc->request_type) |= 1)
-#define grid_set_communication_type(gc, c)    ((gc->request_type) |= (c << 5))
+#define grid_set_communication_type(gc, c)    ((gc->request_type) |= (c << 3))
 #define grid_set_communication_header(gc,h,v) ((gc->headers->insert(h, v)))
 
 #define grid_set_communication_opt(gc, o)      ((gc->request_type) |= (o << 1)) 

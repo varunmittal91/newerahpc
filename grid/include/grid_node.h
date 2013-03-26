@@ -67,6 +67,15 @@ namespace neweraHPC
       memset((*grid_node), 0, sizeof(grid_node_t));
       grid_node_set_type((*grid_node)->node_type, node_type);
    }
+   static void grid_node_set_peer_details(grid_node_t *grid_node, const char *peer_addr, const char *peer_port)
+   {
+      nhpc_strcpy((char **)&(grid_node->peer_addr), peer_addr);
+      nhpc_strcpy((char **)&(grid_node->peer_port), peer_port);
+   }
+   static void grid_node_set_uid(grid_node_t *grid_node, const char *uid)
+   {
+      nhpc_strcpy((char **)&(grid_node->peer_uid), uid);
+   }
 #define grid_node_get_compute_node_data(n)  (grid_node_compute_t *)(n->data)
 #define grid_node_get_client_node_data(n)   (grid_node_client_t *)(n->data)
 };

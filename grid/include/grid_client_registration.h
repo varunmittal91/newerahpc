@@ -17,24 +17,9 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdlib.h>
-#include <iostream>
-#include <iomanip>
-#include <fstream>
+#include <neweraHPC/constants.h>
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include <neweraHPC/neweraHPC.h>
-
-#include <include/grid_server.h>
-#include <include/grid_data.h>
-
-using namespace std;
-using namespace neweraHPC;
-
-int main(int argc, char **argv)
-{      
-   nhpc_status_t nrv = grid_server_init(argc, argv);
+namespace neweraHPC
+{
+   nhpc_status_t grid_client_register_to_server(const char **uid, const char *host_addr, const char *host_port);
 }

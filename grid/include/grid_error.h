@@ -17,24 +17,13 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdlib.h>
-#include <iostream>
-#include <iomanip>
-#include <fstream>
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include <neweraHPC/neweraHPC.h>
-
-#include <include/grid_server.h>
-#include <include/grid_data.h>
-
-using namespace std;
-using namespace neweraHPC;
-
-int main(int argc, char **argv)
-{      
-   nhpc_status_t nrv = grid_server_init(argc, argv);
-}
+namespace neweraHPC
+{
+   /*
+   struct _grid_response_codes
+   {
+      int	   code;
+      const char  *mssg;
+   }static grid_response_codes[2] = {200, "OK", 401, "RESOURCE NOT FOUND", 403, "ACCESS DENIED"};
+    */
+};

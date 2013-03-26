@@ -24,6 +24,7 @@
 #include <include/grid_data.h>
 #include <include/grid_node.h>
 #include <include/grid_uid.h>
+#include <include/grid_response.h>
 
 using namespace std;
 
@@ -33,13 +34,20 @@ namespace neweraHPC
    {
       nhpc_status_t nrv;
       
+      grid_response_t *grid_response;
+      grid_response_init(&grid_response);
+      grid_response_set_socket(grid_response, grid_data_get_socket(grid_data));
+      
       const char *client_uid;
       nrv = grid_uid_generate(&client_uid, grid_data, NODE_TYPE_CLIENT);
       if(nrv == NHPC_SUCCESS)
       {
 	 grid_node_t *grid_node;
 	 grid_node_init(&grid_node, NODE_TYPE_CLIENT);
+	 grid_node_set_peer_details(grid_node, grid_data_get_peer_addr(grid_data), grid_data_get_peer_port(grid_data));
+	 grid_node_set_uid(grid_node, client_uid);
       }
+      
 
       return nrv;
    }

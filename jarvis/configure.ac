@@ -18,6 +18,12 @@ AM_PROG_LIBTOOL
 AC_CHECK_LIB([pthread],[pthread_create],[],[AC_MSG_ERROR([libpthread not found])])
 #AC_CHECK_LIB([neweraHPC], [neweraHPC_init], [], [AC_MSG_ERROR([neweraHPC library not found])])
 
+AC_ARG_WITH([neweraHPC-lib-path],
+  [AS_HELP_STRING([--with-neweraHPC-lib-path], [location of the neweraHPC core libraries])],
+  [neweraHPC_LIBS="-L$withval -lneweraHPC"],
+  [neweraHPC_LIBS='-lneweraHPC'])
+AC_SUBST([neweraHPC_LIBS])
+
 # Checks for header files.
 AC_CHECK_HEADERS([pthread.h])
 AC_CHECK_HEADERS([neweraHPC.h])

@@ -228,6 +228,8 @@ namespace neweraHPC{
    string_t *nhpc_substr(const char *s1, const char s2)
    {      
       string_t  *string      = new string_t;
+      memset(string, 0, sizeof(string_t));
+      
       int       *count       = &(string->count);
       char     **strings     = NULL;
       char     **tmp_strings = NULL;

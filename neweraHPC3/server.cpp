@@ -28,6 +28,7 @@
 #include <include/rbtree.h>
 #include <include/grid.h>
 #include <include/neweraHPC.h>
+#include <include/heap.h>
 
 using namespace std;
 using namespace neweraHPC;
@@ -35,7 +36,6 @@ using namespace neweraHPC;
 int main(int argc, char **argv)
 {      
    neweraHPC_init(argc, argv);
-
    nhpc_status_t nrv;   
    
    const char *host_addr, *host_port;

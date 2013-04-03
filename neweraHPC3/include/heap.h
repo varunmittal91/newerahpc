@@ -23,6 +23,7 @@
 #include <pthread.h>
 
 #include "constants.h"
+#include "thread.h"
 
 #define heap_set_end_page
 
@@ -31,7 +32,7 @@
 
 #define page_status(p)        ((p)->size & 1)
 #define page_get_size(p)      ((p)->size >> 1)
-#define page_set_size(p, s)   ((p)->size = ((p)->size & 1) | (s << 1))
+#define page_set_size(p, s)   do { (p->size) &= 1; (p->size) |= (s << 1); }while(false) 
 #define page_set_empty(p)     ((p)->size &= ~1)
 #define page_set_occupied(p)  ((p)->size |= 1)
 #define page_is_empty(p)      (!page_status(p))
@@ -39,51 +40,48 @@
 
 namespace neweraHPC
 {
-   class GarbageCollector
+   struct mem_page_t
+   {
+      nhpc_size_t   size;
+      mem_page_t   *next;
+      mem_page_t   *prev;
+      void         *address;
+   };
+   struct mem_frame_t
+   {
+      mem_frame_t  *frame_next;
+      mem_page_t   *page_first;
+      mem_page_t   *page_recovered;
+      nhpc_mutex_t  mutex;
+   };
+   
+   inline void page_empty_data(mem_page_t *page);
+   inline void page_merge(mem_page_t *parent, mem_page_t *victim);
+   
+   class Heap
    {
    private:
-      struct mem_page_t
-      {
-	 nhpc_size_t  size;
-	 mem_page_t  *next;
-	 mem_page_t  *prev;
-      };
-      struct mem_frame_t
-      {
-	 mem_frame_t      *frame_next;
-	 mem_page_t       *page_first;
-	 mem_page_t       *page_recovered;
-	 pthread_mutex_t   mutex;
-      };
+      nhpc_size_t    _default_size;
+      nhpc_size_t    _frame_size;
+      nhpc_mutex_t   frame_mutex;
+      mem_frame_t   *frame_root;
+      mem_frame_t   *frame_current;
+      pthread_t      maintainer_thread;
       
-      nhpc_size_t size;
+      mem_frame_t *_create_frame();
+      mem_page_t  *_create_page(mem_page_t *parent, nhpc_size_t child_size);
+      mem_page_t  *_fetch_page(nhpc_size_t size);
       
-      pthread_mutex_t  mutex;
-      pthread_t        maintinance_thread;
+      void _clean_pages(mem_frame_t *frame);
       
-      mem_frame_t *frame_root;
-      mem_frame_t *frame_current;
-      nhpc_size_t  frame_size;
-      
-      mem_frame_t *frame_create();
-      mem_frame_t *frame_get(nhpc_size_t);
-      mem_page_t  *page_get(nhpc_size_t);
-      void page_create(mem_page_t *parent, nhpc_size_t child_size); 
-      
-      void clean_pages();
-      static void *maintain_thread(GarbageCollector *object);
-   
-      bool heap_ready;
+      static void maintainer(Heap *HeapObject);
+      void        maintain_frame();
    public:
-       GarbageCollector(unsigned int _size = 10485760);
-      ~GarbageCollector();
+      Heap(nhpc_size_t default_size = 10485760);
+      ~Heap();
       
-      void *allocate(size_t size);
+      void *allocate(nhpc_size_t _size);
       void  deallocate(void *_address);
-      
-      void add_elem(int number);
-      
-      void status();
    };
 };
 

@@ -31,11 +31,11 @@
 using namespace std;
 
 #ifdef ENABLE_GARBAGE_COLLECTOR
-neweraHPC::GarbageCollector garbagecollector;
+neweraHPC::Heap heap;
 
 void *operator new(std::size_t size) throw (std::bad_alloc)
 {
-   void *new_p = garbagecollector.allocate(size);
+   void *new_p = heap.allocate(size);
    memset(new_p, 0, size);
 
    return new_p;
@@ -49,7 +49,7 @@ void *operator new[](std::size_t size) throw (std::bad_alloc)
 
 void operator delete(void *ptr) throw ()
 {
-   garbagecollector.deallocate(ptr);
+   heap.deallocate(ptr);
 }
 
 void operator delete[](void *ptr) throw ()

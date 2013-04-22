@@ -36,10 +36,12 @@ namespace neweraHPC
       grid_response_type_t  response_type;
       nhpc_socket_t        *socket;
       nhpc_headers_t       *headers;
-      grid_data_t          *grid_data;
+      void                 *grid_data;
+      nhpc_size_t           grid_data_len;
    };
 
 #define grid_get_response_status_code(gc)      ((gc->response_type) >> 3)
+#define grid_set_response_status_code(gc, c)   ((gc->response_type) |= (c << 3))
 #define grid_get_response_status_mssg(gc)      (GRID_RESPONSE_MSSGS[grid_get_response_status_code(gc)].MSSGS_STRINGS)
 #define grid_get_response_code_status_mssg(c)  (GRID_RESPONSE_MSSGS[c].MSSGS_STRINGS)
 #define grid_is_response_complete(gc)          ((gc->request_type) & 1)
@@ -58,8 +60,12 @@ namespace neweraHPC
    }
    static void grid_response_destruct(grid_response_t *grid_response)
    {
-      
+      delete grid_response->headers;
+      delete grid_response;
    }
+   void grid_response_add_data(grid_response_t *grid_response, void *data, nhpc_size_t data_len);
+   nhpc_status_t grid_response_send(grid_response_t *grid_response);
+   nhpc_status_t grid_response_push(grid_response_t *grid_response);
    
    nhpc_status_t grid_response_get(grid_response_t **grid_response, grid_communication_t *grid_communication);
 }

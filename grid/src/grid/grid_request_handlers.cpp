@@ -42,13 +42,22 @@ namespace neweraHPC
       nrv = grid_uid_generate(&client_uid, grid_data, NODE_TYPE_CLIENT);
       if(nrv == NHPC_SUCCESS)
       {
+	 grid_set_response_status_code(grid_response, GRID_RESPONSE_SUCCESSFUL);
+	 
 	 grid_node_t *grid_node;
 	 grid_node_init(&grid_node, NODE_TYPE_CLIENT);
 	 grid_node_set_peer_details(grid_node, grid_data_get_peer_addr(grid_data), grid_data_get_peer_port(grid_data));
 	 grid_node_set_uid(grid_node, client_uid);
+	 
+	 grid_response_add_data(grid_response, (void *)client_uid, strlen(client_uid));
       }
+      else 
+	 grid_set_response_status_code(grid_response, GRID_RESPONSE_RESOURCE_UNAVAILABLE);
       
-
+      grid_response_send(grid_response);
+      grid_response_push(grid_response);
+      grid_response_destruct(grid_response);
+      
       return nrv;
    }
    

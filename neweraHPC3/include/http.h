@@ -30,12 +30,19 @@ enum request_type
    HTTP_INVALID,
    HTTP_REQUEST_GET,
    HTTP_REQUEST_POST,
-   HTTP_RESPONSE_GET,
-   HTTP_RESPONSE_POST
+   HTTP_RESPONSE,
 };
 
 namespace neweraHPC
 {
+   static struct _http_proxy
+   {
+      const char *host;
+      const char *port;
+   }*http_proxy = NULL;
+#define http_proxy_host http_proxy->host
+#define http_proxy_port http_proxy->port
+   
    extern const char *request_type_strings[];
    
 #define nhpc_http_request_is_post(h) (h->request_type == HTTP_RESPONSE_POST)
@@ -51,6 +58,8 @@ namespace neweraHPC
       char	  *referer;
       char	  *origin;
       char	  *http_version;
+      int          response_code;
+      char        *location;
       char        *custom_response_data;
       short int    custom_response_type;
       char        *custom_response_mime;
@@ -61,6 +70,7 @@ namespace neweraHPC
    
    extern rbtree *http_handlers;
    void http_init(network_t *network);
+   void http_setup();
 
    nhpc_status_t http_handler_register(const char *handler_string, fnc_ptr_nhpc_t handler_function);
    
@@ -72,9 +82,11 @@ namespace neweraHPC
    void http_request(http_data_t *sock);
    void http_response(nhpc_socket_t *sock);
    
-   nhpc_status_t http_get_file(const char **file_path, nhpc_socket_t *sock, const char *target_file, const char *host_addr);
+   nhpc_status_t http_get_file(http_data_t *http_data, const char **file_path, nhpc_socket_t **sock, const char *target_file, 
+			       const char *host_addr, const char *host_port, const char *out_file = NULL);
 
    nhpc_status_t http_content_length(rbtree *headers, nhpc_size_t *size);
+   nhpc_status_t http_response_code(rbtree *headers, int *response_code);
 };
 
 #endif

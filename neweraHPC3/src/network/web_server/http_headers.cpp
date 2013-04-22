@@ -35,21 +35,23 @@ namespace neweraHPC
    nhpc_status_t delete_http_headers(http_data_t *http_data)
    {
       if(http_data->request_page)
-	 delete (http_data->request_page);
+	 delete[] (http_data->request_page);
       if(http_data->request_get)
-	 delete (http_data->request_get);
+	 delete[] (http_data->request_get);
       if(http_data->status_str)
-	 delete (http_data->status_str);
+	 delete[] (http_data->status_str);
       if(http_data->http_version)
-	 delete (http_data->http_version);
-	 
-      delete http_data;
+	 delete[] (http_data->http_version);
+      if(http_data->location)
+	 delete[] (http_data->location);
       
       return NHPC_SUCCESS;
    }
    
    nhpc_status_t read_headers(rbtree *headers, http_data_t **http_data)
    {
+      memset((*http_data), 0, sizeof(http_data_t));
+      
       char *command = (char *)headers->search("command");
       
       char *http_version = NULL;
@@ -63,17 +65,21 @@ namespace neweraHPC
       int request_type;
       char *request_page = NULL;
       char *request_get = NULL;
+      int response_code = 0;
+      char *location = NULL;
       
       string_t *command_str = nhpc_substr(command, ' ');
-      if(command_str->count == 2)
+      if(nhpc_strcmp(command, "HTTP/*") == NHPC_SUCCESS)
       {
-	 /* TODO HTTP SERVER */
-	 request_type = HTTP_INVALID;
-
-	 nhpc_string_delete(command_str);
-	 return NHPC_FAIL;
+	 request_type = HTTP_RESPONSE;
+	 response_code = nhpc_strtoi(command_str->strings[1]);
+	 (*http_data)->response_code = response_code;
 	 
 	 nhpc_strcpy(&http_version, (command_str->strings[0]));
+	 
+	 location = (char *)headers->search("Location");
+	 if(location)
+	    nhpc_strcpy(&((*http_data)->location), location);
       }
       else if(command_str->count == 3)
       {
@@ -137,4 +143,24 @@ namespace neweraHPC
       (*size) = -1;
       return NHPC_FAIL;
    }
+   
+   nhpc_status_t http_response_code(rbtree *headers, int *response_code)
+   {
+      (*response_code) = 0;
+      
+      const char *command = (const char *)headers->search("command");
+      if(!command)
+	 return NHPC_FAIL;
+      
+      int pos  = nhpc_strfind(command, ' ');
+      int pos2 = nhpc_strfind(command, ' ', pos + 1);
+      
+      char *response_code_str = nhpc_substr(command, pos + 1, pos2 - 1);
+      (*response_code) = nhpc_strtoi(response_code_str);
+      delete[] response_code_str;
+      
+      return NHPC_SUCCESS;
+   }
+      
+      
 };

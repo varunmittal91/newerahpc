@@ -31,6 +31,7 @@
 #include <include/headers.h>
 #include <include/sockets.h>
 #include <include/network.h>
+#include <include/neweraHPC.h>
 
 namespace neweraHPC
 {
@@ -58,10 +59,31 @@ namespace neweraHPC
    
    void http_init(network_t *network)
    {
+      http_setup();
+      
       LOG_INFO("Initialize http handler");
       http_handlers = new rbtree(RBTREE_STR);
       fnc_ptr_t http_handler = (fnc_ptr_t)http_request_handler;
       (*network).network_addons->insert((void *)http_handler, "HTTP");
+   }
+   
+   void http_setup()
+   {
+      const char *test_proxy = nhpc_get_cmdline_argument("http-proxy");  
+      
+      if(test_proxy)
+      {
+	 int pos = nhpc_strfind(test_proxy, ':');
+	 if(pos)
+	 {
+	    const char *host = nhpc_substr(test_proxy, 1, pos - 1);
+	    const char *port = nhpc_substr(test_proxy, pos + 1, strlen(test_proxy));
+	    http_proxy = new _http_proxy;
+	    memset(http_proxy, 0, sizeof(_http_proxy));
+	    http_proxy->host = host;
+	    http_proxy->port = port;
+	 }
+      }
    }
    
    void http_request_handler(nhpc_socket_t *sock)
@@ -208,55 +230,118 @@ namespace neweraHPC
       }
    }
    
-   nhpc_status_t http_get_file(const char **file_path, nhpc_socket_t *sock, const char *target_file, const char *host_addr)
+   nhpc_status_t http_get_file(http_data_t *http_data, const char **file_path, nhpc_socket_t **sock, const char *target_file, 
+			       const char *host_addr, const char *host_port, const char *out_file)
    {
-      nhpc_create_tmp_file_or_dir(file_path, "/tmp/neweraHPC", NHPC_FILE);
+      nhpc_status_t nrv;
+
+      if(!(*sock))
+      {
+	 if(http_proxy)
+	 {
+	    nrv = socket_connect(sock, http_proxy_host, http_proxy_port, AF_INET, SOCK_STREAM, 0);
+	    if(nrv != NHPC_SUCCESS)
+	    {
+	       perror("connects");
+	       return nrv;
+	    }
+	    
+	    const char *host    = nhpc_strconcat(host_addr, ":", host_port);
+	    const char *command = nhpc_strconcat("CONNECT ", host, " HTTP/1.1");
+	    
+	    nhpc_headers_t *headers = new nhpc_headers_t;
+	    
+	    headers->insert(command);
+	    headers->insert("Host", host);
+	    headers->write(*sock);
+
+	    delete headers;
+	    delete[] command;
+	    delete[] host;
+	    
+	    char buffer[100];
+	    nhpc_size_t size = sizeof(buffer);
+	    bzero(buffer, sizeof(buffer));
+	    nrv = socket_recv(*sock, buffer, &size);
+	    
+	    if(nrv != NHPC_SUCCESS)
+	    {
+	       socket_close(*sock);
+	       socket_delete(*sock);
+	       
+	       return nrv;
+	    }
+	 }
+	 else 
+	 {
+	    nrv = socket_connect(sock, host_addr, host_port, AF_INET, SOCK_STREAM, 0);
+	    if(nrv != NHPC_SUCCESS)
+	    {
+	       perror("connects");
+	       return nrv;
+	    }
+	 }
+      }
+            
+      if(out_file)
+	 *file_path = out_file;
+      else 
+	 nhpc_create_tmp_file_or_dir(file_path, "/tmp/neweraHPC", NHPC_FILE);
       
       const char *command = nhpc_strconcat("GET /", target_file, " HTTP/1.1");
       nhpc_headers_t *headers = new nhpc_headers_t;
       headers->insert(command);
       headers->insert("User-Agent: neweraHPC");
       headers->insert("Host", host_addr);
-      headers->write(sock);
+      headers->write(*sock);
       delete headers;
       nhpc_string_delete((char *)command);
       
       FILE *fp = fopen(*file_path, "w+");
-      nhpc_status_t nrv;
       nhpc_size_t size;
       nhpc_size_t size_downloaded = 0;
-      nhpc_size_t file_size;
+      nhpc_size_t file_size = 0;
       
       char buffer[10000];
       nhpc_size_t header_size = 0;
+      
+      while((*sock)->have_headers != true)
+      {
+	 size = 10000;
+	 bzero(buffer, size);
+	 
+	 nrv = socket_recv(*sock, buffer, &size);
+	 nhpc_analyze_stream(*sock, buffer, &size, &header_size);
+	 
+	 if(nrv == NHPC_EOF)
+	    break;
+      }                  
+      nhpc_display_headers(*sock);
+      read_headers((*sock)->headers, &http_data);
+      file_size = http_data->content_length;
+
+      if((size - header_size) != 0)
+      {
+	 size_downloaded += (size - header_size);
+	 fwrite((buffer + header_size), 1, (size - header_size), fp);
+      }
       
       do 
       {
 	 bzero(buffer, sizeof(buffer));
 	 size = sizeof(buffer);
-	 header_size = 0;
-	 
-	 do 
-	 {
-	    nrv = socket_recv(sock, buffer, &size);
-	 }while(nrv != NHPC_SUCCESS && nrv != NHPC_EOF);
-	 
-	 if(sock->have_headers == false)
-	 {
-	    nrv = nhpc_analyze_stream(sock, buffer, &size, &header_size);
-	    if(nrv == NHPC_SUCCESS)
-	    {
-	       http_content_length(sock->headers, &file_size);
-	       nhpc_display_headers(sock);
-	    }
-	 }
-	 
-	 fwrite((buffer + header_size), 1, (size - header_size), fp); 
-	 
-	 size_downloaded += (size - header_size);
-      }while(nrv != NHPC_EOF && size_downloaded != file_size);
+	 nrv = socket_recv(*sock, buffer, &size); 
+	 fwrite(buffer, 1, size, fp);	 
+	 size_downloaded += size;
+      }while((nrv != NHPC_EOF) && file_size != size_downloaded);
       
       fclose(fp);
+      
+      if(nrv == EISCONN || nrv == NHPC_EOF)
+	 nrv = NHPC_SUCCESS;
+      
+      socket_close(*sock);
+      socket_delete(*sock);
       
       return nrv;
    }

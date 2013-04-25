@@ -391,6 +391,42 @@ namespace neweraHPC{
       return string;
    }
    
+   char *nhpc_longitostr(long int num)
+   {
+      long int tmp_num = num;
+      int count = 0;
+      
+      if(num <= 0)
+      {
+	 char *string = new char [2];
+	 string[0] = '0';
+	 string[1] = '\0';
+	 return string;
+      }
+      
+      while(tmp_num != 0)
+      {
+	 int digit = tmp_num % 10;
+	 tmp_num = tmp_num / 10;	 
+	 count++;
+      }
+      
+      tmp_num = num;
+      char *string = new char [count + 1];
+      string[count] = '\0';
+      int i = 0;
+      
+      while(tmp_num != 0)
+      {
+	 int digit = tmp_num % 10;
+	 tmp_num = tmp_num / 10;
+	 string[count - i - 1] = digit + 48;
+	 i++;
+      }      
+      
+      return string;      
+   }
+   
    int nhpc_hexstrtoi(const char *str)
    {
       const char *tmp_str = str;

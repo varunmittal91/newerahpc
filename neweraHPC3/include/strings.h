@@ -57,6 +57,7 @@ namespace neweraHPC{
    char *nhpc_strconcat_va(const char *fmt, ...);
    
    char *nhpc_itostr(int num);
+   char *nhpc_longitostr(long int num);
    
    int nhpc_strtoi(const char *str);
    int nhpc_hexstrtoi(const char *str);

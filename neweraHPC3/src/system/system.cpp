@@ -21,6 +21,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef __APPLE__
 #include <mach/vm_statistics.h>
@@ -28,6 +29,8 @@
 #include <mach/mach_init.h>
 #include <mach/mach_host.h>
 #include <sys/sysctl.h>
+#else
+#include <fstream>
 #endif
 
 #ifdef HAVE_CONFIG_H

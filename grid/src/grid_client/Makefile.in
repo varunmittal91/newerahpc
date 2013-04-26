@@ -66,7 +66,9 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgrid_client_la_LIBADD =
-am__objects_1 = grid_client_registration.lo
+am__objects_1 = grid_client_registration.lo \
+	grid_controller_register.lo \
+	grid_client_instruction_generator.lo
 am_libgrid_client_la_OBJECTS = $(am__objects_1)
 libgrid_client_la_OBJECTS = $(am_libgrid_client_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -230,7 +232,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SOURCES = grid_client_registration.cpp
+SOURCES = grid_client_registration.cpp grid_controller_register.cpp grid_client_instruction_generator.cpp
 noinst_LTLIBRARIES = libgrid_client.la
 libgrid_client_la_SOURCES = $(SOURCES)
 libgrid_client_la_LDFLAGS = -lpthread -ldl 
@@ -287,7 +289,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_client_instruction_generator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_client_registration.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_controller_register.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

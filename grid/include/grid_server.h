@@ -24,13 +24,13 @@
 
 namespace neweraHPC
 {
-   static network_t        *_network;
-   static thread_manager_t *_thread_manager;
+   extern network_t        *_network;
+   extern thread_manager_t *_thread_manager;
    
-   static const char *_host_addr;
-   static const char *_host_port;
-   static int _host_core_count;
-   static int _host_cpu_time;
+   extern const char *_host_addr;
+   extern const char *_host_port;
+   extern int _host_core_count;
+   extern int _host_cpu_time;
 #define grid_get_host_addr()        (_host_addr)
 #define grid_get_host_port()        (_host_port)
 #define grid_get_host_core_count()  (_host_core_count)

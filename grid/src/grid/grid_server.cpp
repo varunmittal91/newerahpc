@@ -29,11 +29,20 @@
 #include <include/grid_node.h>
 #include <include/grid_server.h>
 #include <include/grid_communication.h>
+#include <include/grid_controller_register.h>
 
 using namespace std;
 
 namespace neweraHPC
 {
+   network_t        *_network;
+   thread_manager_t *_thread_manager;
+   
+   const char *_host_addr;
+   const char *_host_port;
+   int _host_core_count;
+   int _host_cpu_time;   
+   
    void print_help()
    {
       cout<<"Usage: server \t[-l host_ip:port] [-r remote_ip:port] \n\t\t[-c cpu_time] [-d daemon]"<<endl;
@@ -125,9 +134,12 @@ namespace neweraHPC
 	 const char *controller_port;
 	 
 	 if(string->count == 1)
-	    controller_port = "8080";
+	    nhpc_strcpy((char **)&controller_port, "8080");
 	 else 
-	    controller_port = string->strings[1];
+	    nhpc_strcpy((char **)&controller_port, string->strings[1]);
+	 
+	 const char *grid_uid;
+	 nhpc_status_t nrv = grid_controller_register_to_server(&grid_uid, controller_addr, controller_port);
 	 
 	 nhpc_string_delete(string);
       }      

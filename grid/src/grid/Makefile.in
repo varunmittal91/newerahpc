@@ -68,7 +68,8 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgrid_la_LIBADD =
 am__objects_1 = grid_communication.lo grid_server.lo \
 	grid_request_handlers.lo grid_data.lo grid_uid.lo grid_node.lo \
-	grid_response.lo
+	grid_response.lo grid_instruction_handler.lo \
+	grid_data_download.lo
 am_libgrid_la_OBJECTS = $(am__objects_1)
 libgrid_la_OBJECTS = $(am_libgrid_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -231,7 +232,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SOURCES = grid_communication.cpp grid_server.cpp grid_request_handlers.cpp grid_data.cpp grid_uid.cpp grid_node.cpp grid_response.cpp
+SOURCES = grid_communication.cpp grid_server.cpp grid_request_handlers.cpp grid_data.cpp grid_uid.cpp grid_node.cpp grid_response.cpp grid_instruction_handler.cpp grid_data_download.cpp
 noinst_LTLIBRARIES = libgrid.la
 libgrid_la_SOURCES = $(SOURCES)
 libgrid_la_LDFLAGS = -lpthread -ldl 
@@ -290,6 +291,8 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_communication.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_data.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_data_download.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_instruction_handler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_node.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_request_handlers.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_response.Plo@am__quote@

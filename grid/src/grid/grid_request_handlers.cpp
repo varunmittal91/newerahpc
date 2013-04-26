@@ -43,13 +43,8 @@ namespace neweraHPC
       if(nrv == NHPC_SUCCESS)
       {
 	 grid_set_response_status_code(grid_response, GRID_RESPONSE_SUCCESSFUL);
-	 
-	 grid_node_t *grid_node;
-	 grid_node_init(&grid_node, NODE_TYPE_CLIENT);
-	 grid_node_set_peer_details(grid_node, grid_data_get_peer_addr(grid_data), grid_data_get_peer_port(grid_data));
-	 grid_node_set_uid(grid_node, client_uid);
-	 
-	 grid_response_add_data(grid_response, (void *)client_uid, strlen(client_uid));
+	 	 
+	 grid_response_add_data(grid_response, (void *)client_uid, strlen(client_uid) + 1);
       }
       else 
 	 grid_set_response_status_code(grid_response, GRID_RESPONSE_RESOURCE_UNAVAILABLE);
@@ -63,7 +58,28 @@ namespace neweraHPC
    
    nhpc_status_t grid_node_registration_handler(grid_data_t *grid_data)
    {
+      nhpc_status_t nrv;
       
+      grid_response_t *grid_response;
+      grid_response_init(&grid_response);
+      grid_response_set_socket(grid_response, grid_data_get_socket(grid_data));
+      
+      const char *server_uid;
+      nrv = grid_uid_generate(&server_uid, grid_data, NODE_TYPE_COMPUTE);
+      if(nrv != NHPC_SUCCESS)
+	 grid_set_response_status_code(grid_response, GRID_RESPONSE_RESOURCE_UNAVAILABLE);
+      else 
+      {
+	 grid_set_response_status_code(grid_response, GRID_RESPONSE_SUCCESSFUL);	 
+	 
+	 grid_response_add_data(grid_response, (void *)server_uid, strlen(server_uid) + 1);
+      }
+      
+      grid_response_send(grid_response);
+      grid_response_push(grid_response);
+      grid_response_destruct(grid_response);      
+      
+      return nrv;
    }
    
    nhpc_status_t grid_plugin_request_handler(grid_data_t *grid_data)
@@ -74,10 +90,5 @@ namespace neweraHPC
    nhpc_status_t grid_file_exchange_request_handler(grid_data_t *grid_data)
    {
       
-   }
-   
-   nhpc_status_t grid_instruction_request_handler(grid_data_t *grid_data)
-   {
-      cout << "Encounter instruction call" << endl;
    }
 }

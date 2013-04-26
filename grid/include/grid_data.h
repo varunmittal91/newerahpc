@@ -29,11 +29,12 @@
 
 namespace neweraHPC
 {
-#define ARG_RANGE     1
-#define ARG_NUMBER    2
-#define ARG_LITERAL   4
-#define ARG_COMMAND   8
-#define ARG_FILE     16
+#define ARG_RANGE      1
+#define ARG_NUMBER     2
+#define ARG_LITERAL    4
+#define ARG_COMMAND    8
+#define ARG_FILE      16
+#define ARG_MEM_BLOCK 32
 
    typedef unsigned char arg_t;
    static int _grid_arg_get_int_code(arg_t arg)
@@ -111,12 +112,13 @@ namespace neweraHPC
 #define grid_arg_set_literal(av, l)  (grid_arg_set_literals(av, l, ARG_LITERAL))
 #define grid_arg_set_command(av, l)  (grid_arg_set_literals(av, l, ARG_COMMAND))
 #define grid_arg_set_file(av, l)     (grid_arg_set_literals(av, l, ARG_FILE))
-#define grid_arg_is_type(av, t)  (_grid_arg_is_type(av->arg, t))
-#define grid_arg_is_range(av)    (grid_arg_is_type(av, ARG_RANGE))
-#define grid_arg_is_value(av)    (grid_arg_is_type(av, ARG_VALUE))
-#define grid_arg_is_literal(av)  (grid_arg_is_type(av, ARG_LITERAL))
-#define grid_arg_is_command(av)  (grid_arg_is_type(av, ARG_COMMAND))
-#define grid_arg_is_file(av)     (grid_arg_is_type(av, ARG_FILE))
+#define grid_arg_is_type(av, t)      (_grid_arg_is_type(av->arg, t))
+#define grid_arg_is_range(av)        (grid_arg_is_type(av, ARG_RANGE))
+#define grid_arg_is_value(av)        (grid_arg_is_type(av, ARG_VALUE))
+#define grid_arg_is_literal(av)      (grid_arg_is_type(av, ARG_LITERAL))
+#define grid_arg_is_command(av)      (grid_arg_is_type(av, ARG_COMMAND))
+#define grid_arg_is_file(av)         (grid_arg_is_type(av, ARG_FILE))
+#define grid_arg_is_mem_block(av)    (grid_arg_is_type(av, ARG_MEM_BLOCK))
    
 
    typedef unsigned char status_t;
@@ -136,7 +138,7 @@ namespace neweraHPC
       const char    *peer_port;
       nhpc_socket_t *socket;
 
-      nhpc_size_t    content_length;
+      nhpc_size_t    content_len;
       const char    *content_type;
       void          *content_addr;
    };

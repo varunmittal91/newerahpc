@@ -29,11 +29,41 @@ namespace neweraHPC
 {
    nhpc_status_t grid_uid_generate(const char **uid, grid_data_t *grid_data, node_type_t node_mode)
    {
+      grid_node_t *grid_node = new grid_node_t;
+      
       rbtree *node_db;
       if(grid_node_is_type_compute(node_mode))
+      {
 	 node_db = registered_nodes;
+	 rbtree *headers = grid_data->socket->headers;
+	 
+	 const char *cpu_cores_str = (const char *)headers->search("Core-Count");
+	 const char *total_mem     = (const char *)headers->search("Total-Mem");
+	 const char *free_mem      = (const char *)headers->search("Free-Mem");
+	 const char *peer_addr     = (const char *)headers->search("Peer-Host");
+	 const char *peer_port     = (const char *)headers->search("Peer-Port");
+	 
+	 if(!cpu_cores_str || !total_mem || !free_mem || !peer_addr || !peer_port)
+	    return NHPC_FAIL;
+	 
+	 grid_node_init(&grid_node, NODE_TYPE_COMPUTE);
+	 grid_node_set_peer_details(grid_node, peer_addr, peer_port);
+	 
+	 grid_node_compute_t *grid_node_compute;
+	 grid_node_compute_init(&grid_node_compute);
+	 grid_node_compute_set_logical_cores(grid_node_compute, cpu_cores_str);
+	 grid_node_compute_set_total_mem(grid_node_compute, total_mem);
+	 grid_node_compute_set_free_mem(grid_node_compute, free_mem);
+	 
+	 grid_node_set_compute_node_data(grid_node, grid_node_compute);
+      }
       else 
+      {
 	 node_db = registered_clients;
+	 
+	 grid_node_init(&grid_node, NODE_TYPE_CLIENT);
+	 grid_node_set_peer_details(grid_node, grid_data_get_peer_addr(grid_data), grid_data_get_peer_port(grid_data));
+      }
       
       const char *random_string = nhpc_random_string(8);
       while((*node_db).search(random_string))
@@ -43,6 +73,9 @@ namespace neweraHPC
       }
 
       *uid = random_string;
+      (*node_db).insert(node_db, *uid);
+      grid_node_set_uid(grid_node, *uid);
+
       return NHPC_SUCCESS;      
    }
 }

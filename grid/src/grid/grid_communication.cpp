@@ -26,6 +26,7 @@
 #endif
 #include <include/grid.h>
 #include <include/grid_request_handlers.h>
+#include <include/grid_client_registration.h>
 
 using namespace std;
 
@@ -50,13 +51,11 @@ namespace neweraHPC
       
       if(grid_communication_opt_is_register(grid_communication))
       {
-	 /*
-	 nrv = grid_register_to_server(&grid_uid, grid_communication->dest_addr, grid_communication->dest_port);
+	 nrv = grid_client_register_to_server(&grid_uid, grid_communication->dest_addr, grid_communication->dest_port);
 	 if(nrv == NHPC_FAIL)
 	 {
 	    return nrv;
 	 }
-	  */
       }
       
       const char *header_str = nhpc_strconcat("GRID ", mssg, " 2.90");
@@ -66,8 +65,15 @@ namespace neweraHPC
       {
 	 grid_communication->headers->insert("Grid-Uid", grid_uid);
       }
-      grid_communication->headers->insert("Peer-Host", grid_communication->peer_addr);
-      grid_communication->headers->insert("Peer-Port", grid_communication->peer_port);      
+      if(grid_communication_opt_is_peer_details(grid_communication))
+      {
+	 cout << "Sending peer details" << endl;
+	 
+	 cout << _host_addr << ":" << _host_port << endl;
+	 
+	 grid_communication->headers->insert("Peer-Host", _host_addr);
+	 grid_communication->headers->insert("Peer-Port", _host_port);      
+      }
       
       delete[] header_str;
    }
@@ -82,18 +88,17 @@ namespace neweraHPC
       
       nrv = socket_connect(&socket, dest_addr, dest_port, AF_INET, SOCK_STREAM, 0);
       nrv = headers->write(socket);	          
-      
-      socket_close(socket);
-      socket_delete(socket);
+      grid_communication->socket = socket;
       
       return nrv;
    }
    
    nhpc_status_t grid_request_handler(nhpc_socket_t *socket)
    {
-      char       *command = network_headers_get_param(socket->headers, "command");
-      const char *uid     = network_headers_get_param(socket->headers, "Grid-Uid");
-      string_t   *string  = nhpc_substr(command, ' ');  
+      char       *command         = network_headers_get_param(socket->headers, "command");
+      const char *uid             = network_headers_get_param(socket->headers, "Grid-Uid");
+      const char *content_len_str = network_headers_get_param(socket->headers, "Content-Length");
+      string_t   *string          = nhpc_substr(command, ' ');  
       
       if(string->count < 3)
       {
@@ -113,6 +118,7 @@ namespace neweraHPC
 	 grid_data_create_from_socket(grid_data, socket);
 	 
 	 nrv = fnc_ptr(grid_data);
+	 grid_data_destruct(grid_data);
       }      
       else 
       {

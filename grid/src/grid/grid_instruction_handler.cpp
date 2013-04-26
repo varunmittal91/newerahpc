@@ -1,5 +1,5 @@
 /*
- *	(C) 2011 Varun Mittal <varunmittal91@gmail.com>
+ *	(C) 2013 Varun Mittal <varunmittal91@gmail.com>
  *	NeweraHPC program is distributed under the terms of the GNU General Public License v2
  *
  *	This file is part of NeweraHPC.
@@ -19,36 +19,19 @@
 
 #include <iostream>
 
-#include <neweraHPC/constants.h>
-#include <neweraHPC/neweraHPC.h>
+#include <neweraHPC/network.h>
 
-#include <include/grid_client_registration.h>
+#include <include/grid_data.h>
+#include <include/grid_node.h>
+#include <include/grid_uid.h>
+#include <include/grid_response.h>
 
 using namespace std;
-using namespace neweraHPC;
 
-int main(int argc, char **argv)
+namespace neweraHPC
 {
-   neweraHPC_init(argc, argv);
-   
-   if(argc < 3)
+   nhpc_status_t grid_instruction_request_handler(grid_data_t *grid_data)
    {
-      cout<<"Usage: ./simple_client server_host server_port file.blend start_frame max_frame\n";
-      return 1;
-   }
-   
-   const char *grid_uid;
-   
-   nhpc_status_t nrv = grid_client_register_to_server(&grid_uid, "localhost", "8080");
-   
-   if(nrv != NHPC_SUCCESS)
-   {
-      cout<<"Registration failed with server\n";
-      return 1;
-   }
-   else 
-   {
-      cout<<"Grid registration uid: "<<grid_uid<<endl;
-      cout<<"Registration done\n";
-   }
-}
+      cout << "Encounter instruction call" << endl;
+   }   
+};

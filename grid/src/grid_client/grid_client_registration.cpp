@@ -17,8 +17,13 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
+
 #include <include/grid_communication.h>
+#include <include/grid_response.h>
 #include <include/grid_client_registration.h>
+
+using namespace std;
 
 namespace neweraHPC
 {
@@ -32,11 +37,15 @@ namespace neweraHPC
       grid_communication_add_dest(grid_communication, host_addr, host_port);
       grid_communication_send(grid_communication);
       nrv = grid_communication_push(grid_communication);      
+      if(nrv != NHPC_SUCCESS)
+	 return nrv;
       
-      
+      grid_response_t *grid_response;
+      nrv = grid_response_get(&grid_response, grid_communication);
+      (*grid_uid) = (const char *)grid_response_get_grid_data(grid_response);
       
       grid_communication_destruct(grid_communication);
-
+      
       return nrv;
    }
 }

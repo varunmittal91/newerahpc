@@ -17,6 +17,9 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _GRID_RESPONSE_H_
+#define _GRID_RESPONSE_H_
+
 #include "grid_communication.h"
 
 namespace neweraHPC
@@ -68,4 +71,6 @@ namespace neweraHPC
    nhpc_status_t grid_response_push(grid_response_t *grid_response);
    
    nhpc_status_t grid_response_get(grid_response_t **grid_response, grid_communication_t *grid_communication);
-}
+};
+
+#endif

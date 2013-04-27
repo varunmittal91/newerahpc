@@ -17,6 +17,9 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _GRID_DATA_DOWNLOAD_H_
+#define _GRID_DATA_DOWNLOAD_H_
+
 #include <neweraHPC/constants.h>
 #include <neweraHPC/network_data.h>
 
@@ -25,3 +28,5 @@ namespace neweraHPC
    nhpc_status_t grid_data_download_memory_block(void **dst, nhpc_socket_t *socket, nhpc_size_t *content_len);
    nhpc_status_t grid_data_download_file(const char *dst, nhpc_socket_t *socket, nhpc_size_t *content_len);
 };
+
+#endif

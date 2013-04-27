@@ -30,6 +30,7 @@
 #include <include/grid_server.h>
 #include <include/grid_communication.h>
 #include <include/grid_controller_register.h>
+#include <include/grid_plugin.h>
 
 using namespace std;
 
@@ -179,6 +180,7 @@ namespace neweraHPC
       
       grid_communication_handlers_init();
       grid_node_db_init();
+      grid_plugin_system_init();
       
       (*_network).join_accept_thread();
    }

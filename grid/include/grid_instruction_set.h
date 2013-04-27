@@ -34,8 +34,8 @@ namespace neweraHPC
       const char *peer_port;
       int         peer_id;
       
-      grid_data_t *input_data;
-      grid_data_t *result_data;
+      arg_value_t *input_data;
+      arg_value_t *result_data;
       
       instruction_status_t instruction_status;
    };
@@ -54,8 +54,8 @@ namespace neweraHPC
       memset((*instruction), 0, sizeof(instruction_t));
       
       instruction_t *tmp = (*instruction);
-      grid_data_init(&(instruction_get_input_data(tmp)));
-      grid_data_init(&(instruction_get_result_data(tmp)));
+      grid_arg_init(&(instruction_get_input_data(tmp)));
+      grid_arg_init(&(instruction_get_result_data(tmp)));
    }
    static void instruction_destruct(instruction_t *instruction)
    {
@@ -71,12 +71,12 @@ namespace neweraHPC
 	 delete[] instruction_get_peer_port(instruction);
       if(instruction_get_input_data(instruction))
       {
-	 grid_data_destruct(instruction_get_input_data(instruction));
+	 grid_arg_destruct(instruction_get_input_data(instruction));
 	 delete instruction_get_input_data(instruction);
       }
       if(instruction_get_result_data(instruction))
       {
-	 grid_data_destruct(instruction_get_result_data(instruction));
+	 grid_arg_destruct(instruction_get_result_data(instruction));
 	 delete instruction_get_result_data(instruction);
       }
    }

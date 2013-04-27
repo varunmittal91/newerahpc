@@ -17,6 +17,9 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _GRID_REQUEST_HANDLER_H_
+#define _GRID_REQUEST_HANDLER_H_
+
 namespace neweraHPC
 {
    nhpc_status_t grid_client_registration_handler(grid_data_t *grid_data);
@@ -26,3 +29,5 @@ namespace neweraHPC
    nhpc_status_t grid_instruction_request_handler(grid_data_t *grid_data);
    nhpc_status_t grid_submission_request_handler(grid_data_t *grid_data);   
 }
+
+#endif

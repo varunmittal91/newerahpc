@@ -17,15 +17,16 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GRID_UID_H_
-#define _GRID_UID_H_
-
-#include "grid_data.h"
-#include "grid_node.h"
+#include <include/grid_plugin.h>
 
 namespace neweraHPC
 {
-   nhpc_status_t grid_uid_generate(const char **uid, grid_data_t *grid_data, node_type_t node_mode);
+   rbtree *plugins_installed;
+   rbtree *plugins_requested;
+   
+   void grid_plugin_system_init()
+   {
+      plugins_installed = new rbtree(RBTREE_STR);
+      plugins_requested = new rbtree(RBTREE_STR);
+   }
 };
-
-#endif

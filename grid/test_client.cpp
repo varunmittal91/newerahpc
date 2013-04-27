@@ -23,6 +23,7 @@
 #include <neweraHPC/neweraHPC.h>
 
 #include <include/grid_client_registration.h>
+#include <include/grid_instruction_set.h>
 
 using namespace std;
 using namespace neweraHPC;

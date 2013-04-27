@@ -17,8 +17,13 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _GRID_CLIENT_INSTRUCTION_H_
+#define _GRID_CLIENT_INSTRUCTION_H_
+
 #include <neweraHPC/constants.h>
 
 namespace neweraHPC
 {
-}
+};
+
+#endif

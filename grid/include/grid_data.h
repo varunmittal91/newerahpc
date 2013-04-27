@@ -122,12 +122,6 @@ namespace neweraHPC
    
 
    typedef unsigned char status_t;
-#define STATUS_HAS_ARG       1
-#define STATUS_HAS_FILE      2
-#define STATUS_HAS_MEM_BLOCK 4
-#define STATUS_HAS_ARG_BIT       0
-#define STATUS_HAS_FILE_BIT      1
-#define STATUS_HAS_MEM_BLOCK_BIT 2   
    struct grid_data_t
    {
       status_t       status;
@@ -148,14 +142,10 @@ namespace neweraHPC
 #define grid_data_get_status(g)            (g->status)
 #define grid_data_get_peer_addr(g)         (g->peer_addr)
 #define grid_data_get_peer_port(g)         (g->peer_port)
-#define grid_data_has_opt(g, opt_bit)      (1 & (grid_data_get_status(g) >> opt_bit))
-#define grid_data_has_arguments(g)         (grid_data_has_opt(g, STATUS_HAS_ARG_BIT))
-#define grid_data_has_file(g)              (grid_data_has_opt(g, STATUS_HAS_FILE_BIT))
-#define grid_data_has_mem_block(g)         (grid_data_has_opt(g, STATUS_HAS_MEM_BLOCK_BIT))
 #define grid_data_set_socket(g, s)         (g->socket = s)
 #define grid_data_get_socket(g)            (g->socket)
 
-#define grid_data_set_content_length(g, l) (g->content_length = l)
+#define grid_data_set_content_length(g, l) (g->content_len = l)
 #define grid_data_set_content_addr(g, a)   (g->content_addr = a)
 #define grid_data_set_content_type(g, t)   (nhpc_strcpy((char **)&(g->content_type), t))
    static void grid_data_set_opt(grid_data_t *data, int opt, bool on)
@@ -171,20 +161,6 @@ namespace neweraHPC
 	 return data->arguments->length();
       else 
 	 return 0;
-   }
-   static void *grid_data_get_block_addr(grid_data_t *data)
-   {
-      if(grid_data_has_mem_block(data))
-	 return data->content_addr;
-      else 
-	 return NULL;
-   }
-   static const char *grid_data_get_file_addr(grid_data_t *data)
-   {
-      if(grid_data_has_file(data))
-	 return (const char *)data->content_addr;
-      else 
-	 return NULL;
    }
    static void grid_data_init(grid_data_t **data)
    {

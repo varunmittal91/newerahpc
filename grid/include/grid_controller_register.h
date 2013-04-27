@@ -17,9 +17,14 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _GRID_CONTROLLER_H_
+#define _GRID_CONTROLLER_H_
+
 #include <neweraHPC/constants.h>
 
 namespace neweraHPC
 {
    nhpc_status_t grid_controller_register_to_server(const char **uid, const char *host_addr, const char *host_port);
-}
+};
+
+#endif

@@ -74,14 +74,15 @@ namespace neweraHPC
    
    nhpc_status_t nhpc_headers_t::write(nhpc_socket_t *sock)
    {
-      nhpc_size_t size;
+      char         *str;
+      nhpc_size_t   size;
       nhpc_status_t nrv;
       
       int count = (*headers).length();
       
       for(int i = 1; i <= count; i++)
       {
-	 char *str = (char *)headers->search(i);
+	 str  = (char *)headers->search(i);
 	 size = strlen(str);
 	 
 	 nrv = socket_sendmsg(sock, str, &size);
@@ -110,35 +111,16 @@ namespace neweraHPC
       if(nhpc_strcmp(str, "*: *") == NHPC_FAIL)
 	 return NHPC_FAIL;
       
-      string_t *string = nhpc_substr(str, ':');
-      if((string->count == 1) || (strlen(string->strings[1]) == 1) || string->strings[1][1] == ' ')
-      {
-	 nhpc_string_delete(string);
-	 return NHPC_FAIL;
-      }
-      
-      if(string->count > 2)
-      {
-	 char *tmp_str;
-	 nhpc_strcpy(&tmp_str, string->strings[1]);
-	 int count = string->count;
-	 
-	 for(int i = 2; i < count; i++)
-	 {
-	    char *tmp_str_2 = nhpc_strconcat(tmp_str, ":", string->strings[i]);
-	    delete[] tmp_str;
-	    tmp_str = tmp_str_2;
-	 }
-	 
-	 nhpc_strcpy(&argument, (tmp_str + 1));
-	 nhpc_string_delete(tmp_str);
-      }
-      else 
-	 nhpc_strcpy(&argument, (string->strings[1] + 1));
-      
-      headers->insert(argument, string->strings[0]);
-      
-      nhpc_string_delete(string);
+      int pos  = nhpc_strfind(str, ':');
+      int pos2 = nhpc_strfind(str, ' ', pos);
+      if(pos2 < pos || pos2 == 0)
+	 pos2 = pos;
+
+      char *argument1 = nhpc_substr(str, 1, pos - 1);
+      char *argument2 = nhpc_substr(str, pos2 + 1, strlen(str));
+
+      headers->insert(argument2, argument1);
+      delete[] argument1;
       
       return NHPC_SUCCESS;
    }

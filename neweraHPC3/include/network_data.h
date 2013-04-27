@@ -57,7 +57,7 @@ namespace neweraHPC
       rbtree                 *headers;
       bool                    have_headers;
       nhpc_server_details_t  *server_details;
-      char		      partial_content[BUFFER_SIZE_HEADER];
+      char		     *partial_content;
       nhpc_size_t             partial_content_len;
       int                     thread_id;
    };

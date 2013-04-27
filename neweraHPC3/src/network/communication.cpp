@@ -53,12 +53,6 @@ namespace neweraHPC
 	    break;
       }
       
-      if((size - header_size) != 0)
-      {
-	 sock->partial_content_len = (size - header_size);
-	 memcpy(sock->partial_content, (buffer + header_size), (size - header_size));
-      }
-      
       nhpc_display_headers(sock);
       
       char *command = (char *)sock->headers->search("command");
@@ -109,22 +103,30 @@ namespace neweraHPC
 	    line_len = cntr - old_pos;
 	    if(line_len != 0)
 	    {
-	       //char *line = nhpc_allocate_str(line_len + 1);
 	       char *line = new char [line_len + 1];
 	       memcpy(line, (data + old_pos), (line_len));
 	       line[line_len] = '\0';
 	       
 	       nhpc_headers_insert_param(headers, (const char *)line);
-
-	       nhpc_string_delete(line);
+	       
+	       delete[] line;
 	    }
 	    else 
 	    {
+	       nhpc_size_t tmp_header_size = (cntr + 1);
+	       if(data[cntr + 1] == '\n')
+		  tmp_header_size++;
+	       
 	       if(header_size != NULL)
+		  (*header_size) = tmp_header_size;
+	       
+	       if((*len) > tmp_header_size)
 	       {
-		  (*header_size) = (cntr + 1);
-		  if(data[cntr + 1] == '\n')
-		     (*header_size)++;
+		  char *tmp_buffer = new char [(*len) - tmp_header_size];
+		  memcpy(tmp_buffer, (data + tmp_header_size), ((*len) - tmp_header_size));
+
+		  sock->partial_content_len = *len - tmp_header_size;
+		  sock->partial_content     = tmp_buffer;
 	       }
 	       
 	       sock->have_headers = true;

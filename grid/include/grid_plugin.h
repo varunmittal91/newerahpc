@@ -26,6 +26,7 @@
 #include <string.h>
 
 #include <neweraHPC/rbtree.h>
+#include <neweraHPC/thread.h>
 
 #include "grid_data.h"
 
@@ -35,6 +36,8 @@ namespace neweraHPC
    
    extern rbtree *plugins_installed;
    extern rbtree *plugins_requested;
+   extern nhpc_mutex_t mutex_plugins_requested;
+   extern nhpc_mutex_t mutex_plugins_installed;
    
    typedef nhpc_status_t (*grid_plugin_fnc_ptr_t)(grid_data_t *);
    struct plugin_details_t
@@ -61,8 +64,17 @@ namespace neweraHPC
 #define grid_plugin_details_set_plugin_name(p, n)    (nhpc_strcpy(&(p->plugin_name), n))
 #define grid_plugin_details_set_fnc_exec(p, f)       (p->fnc_exec = f)
 #define grid_plugin_details_set_fnc_processor(p, f)  (p->fnc_processor = f)
+   inline plugin_details_t *grid_plugin_search_installed(const char *plugin_name)
+   {
+      thread_mutex_lock(&mutex_plugins_installed, NHPC_THREAD_LOCK_READ);
+      plugin_details_t *plugin_details = (plugin_details_t *)(*plugins_installed).search(plugin_name);
+      thread_mutex_unlock(&mutex_plugins_installed, NHPC_THREAD_LOCK_READ);
+
+      return plugin_details;
+   }
    
    nhpc_status_t grid_plugin_install_dll(const char *dll_path, plugin_details_t **plugin_details);
+   nhpc_status_t grid_plugin_search(const char *plugin_name, plugin_details_t **plugin_details);
    
    typedef unsigned char plugin_request_status;
    struct plugin_request_t
@@ -77,6 +89,14 @@ namespace neweraHPC
 #define grid_plugin_request_set_complete(p)  ((p)->status |= 2)
 #define grid_plugin_request_is_sent(p)       ((p)->status & 1)
 #define grid_plugin_request_is_complete(p)   (((p)->status >> 1) & 1)
+   inline plugin_request_t *grid_plugin_search_requested(const char *plugin_name)
+   {
+      thread_mutex_lock(&mutex_plugins_installed, NHPC_THREAD_LOCK_READ);
+      plugin_request_t *plugin_request = (plugin_request_t *)(*plugins_requested).search(plugin_name);
+      thread_mutex_unlock(&mutex_plugins_installed, NHPC_THREAD_LOCK_READ);
+      
+      return plugin_request;
+   }
 };
 
 #endif

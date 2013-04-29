@@ -23,7 +23,7 @@
 #include <neweraHPC/neweraHPC.h>
 
 #include <include/grid_client_registration.h>
-#include <include/grid_instruction_set.h>
+#include <include/grid_instruction.h>
 
 using namespace std;
 using namespace neweraHPC;
@@ -31,12 +31,6 @@ using namespace neweraHPC;
 int main(int argc, char **argv)
 {
    neweraHPC_init(argc, argv);
-   
-   if(argc < 3)
-   {
-      cout<<"Usage: ./simple_client server_host server_port file.blend start_frame max_frame\n";
-      return 1;
-   }
    
    const char *grid_uid;
    
@@ -49,6 +43,16 @@ int main(int argc, char **argv)
    }
    else 
    {
+      int a = 12;
+      int b = 13;
+      
+      grid_instruction_t *instruction;
+      grid_instruction_init(&instruction);
+      grid_instruction_set_plugin_name(instruction, "GRID_PLUGIN_RANGE");
+      grid_instruction_set_peer(instruction, "localhost", "8080");
+      grid_instruction_add_argument(instruction, ARG_FILE, "blender");
+      grid_instruction_add_argument(instruction, ARG_RANGE, &a, &b);
+      
       cout<<"Grid registration uid: "<<grid_uid<<endl;
       cout<<"Registration done\n";
    }

@@ -22,6 +22,8 @@
 
 #include <neweraHPC/constants.h>
 
+#include "grid_data.h"
+
 namespace neweraHPC
 {
 };

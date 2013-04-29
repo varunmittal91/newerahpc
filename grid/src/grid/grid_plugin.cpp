@@ -24,9 +24,42 @@ namespace neweraHPC
    rbtree *plugins_installed;
    rbtree *plugins_requested;
    
+   nhpc_mutex_t mutex_plugins_requested;
+   nhpc_mutex_t mutex_plugins_installed;   
+   
    void grid_plugin_system_init()
    {
       plugins_installed = new rbtree(RBTREE_STR);
       plugins_requested = new rbtree(RBTREE_STR);
+      
+      thread_mutex_init(&mutex_plugins_installed);
+      thread_mutex_init(&mutex_plugins_requested);
+   }
+   
+   nhpc_status_t grid_plugin_install_dll(const char *dll_path, plugin_details_t **plugin_details)
+   {
+      
+   }
+   
+   nhpc_status_t grid_plugin_search(const char *plugin_name, plugin_details_t **plugin_details)
+   {
+      (*plugin_details) = grid_plugin_search_installed(plugin_name);
+      if(*plugin_details)
+	 return NHPC_SUCCESS;
+      
+      plugin_request_t *plugin_request = grid_plugin_search_requested(plugin_name);
+      if(plugin_request)
+      {
+	 while(grid_plugin_request_is_complete(plugin_request))
+	 {
+	    sleep(1);
+	 }
+      }
+      
+      (*plugin_details) = grid_plugin_search_installed(plugin_name);
+      if(*plugin_details)
+	 return NHPC_SUCCESS;      
+      
+      return NHPC_FAIL;
    }
 };

@@ -33,7 +33,6 @@ namespace neweraHPC
       
       grid_communication_t *grid_communication;
       grid_communication_init(&grid_communication, GRID_CLIENT_REGISTRATION);
-      grid_set_communication_opt(grid_communication, GRID_COMMUNICATION_OPT_REGISTER);
       grid_communication_add_dest(grid_communication, host_addr, host_port);
       grid_communication_send(grid_communication);
       nrv = grid_communication_push(grid_communication);      

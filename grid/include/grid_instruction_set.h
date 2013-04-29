@@ -25,79 +25,63 @@
 namespace neweraHPC
 {
    typedef unsigned char instruction_status_t;
-   struct instruction_t
+   struct grid_instruction_t
    {
       const char *plugin_name;
+      rbtree     *arguments;
+      
       const char *grid_uid;
-      const char *referer_grid_uid;
       const char *peer_addr;
       const char *peer_port;
-      int         peer_id;
+
+      const char *referer_grid_uid;
+      const char *referer_addr;
+      const char *referer_port;
       
-      arg_value_t *input_data;
-      arg_value_t *result_data;
+      const char *input_data;
+      const char *result_data;
       
       instruction_status_t instruction_status;
    };
-#define instruction_get_input_data(i)       (i->input_data)
-#define instruction_get_result_data(i)      (i->result_data)
-#define instruction_get_plugin_name(i)      (i->plugin_name)
-#define instruction_get_peer_id(i)          (i->peer_id)
-#define instruction_set_peer_id(i, p)       (i->peer_id = p)
-#define instruction_get_peer_addr(i)        (i->peer_addr)
-#define instruction_get_peer_port(i)        (i->peer_port)
-#define instruction_get_grid_uid(i)         (i->grid_uid)
-#define instruction_get_referer_grid_uid(i) (i->referer_grid_uid)
-   static void instruction_init(instruction_t **instruction)
+#define grid_instruction_get_input_data(i)       (i->input_data)
+#define grid_instruction_get_result_data(i)      (i->result_data)
+#define grid_instruction_get_plugin_name(i)      (i->plugin_name)
+#define grid_instruction_get_peer_id(i)          (i->peer_id)
+#define grid_instruction_set_peer_id(i, p)       (i->peer_id = p)
+#define grid_instruction_get_peer_addr(i)        (i->peer_addr)
+#define grid_instruction_get_peer_port(i)        (i->peer_port)
+#define grid_instruction_get_grid_uid(i)         (i->grid_uid)
+#define grid_instruction_get_referer_grid_uid(i) (i->referer_grid_uid)
+   static void grid_instruction_init(grid_instruction_t **instruction)
    {
-      (*instruction) = new instruction_t;
-      memset((*instruction), 0, sizeof(instruction_t));
+      (*instruction) = new grid_instruction_t;
+      memset((*instruction), 0, sizeof(grid_instruction_t));
       
-      instruction_t *tmp = (*instruction);
-      grid_arg_init(&(instruction_get_input_data(tmp)));
-      grid_arg_init(&(instruction_get_result_data(tmp)));
+      grid_instruction_t *tmp = (*instruction);
    }
-   static void instruction_destruct(instruction_t *instruction)
+   static void grid_instruction_destruct(grid_instruction_t *instruction);
+   static void grid_instruction_set_plugin_name(grid_instruction_t *instruction, const char *plugin_name)
    {
-      if(instruction_get_plugin_name(instruction))
-	 delete[] instruction_get_plugin_name(instruction);
-      if(instruction_get_grid_uid(instruction))
-	 delete[] instruction_get_grid_uid(instruction);
-      if(instruction_get_referer_grid_uid(instruction))
-	 delete[] instruction_get_referer_grid_uid(instruction);
-      if(instruction_get_peer_addr(instruction))
-	 delete[] instruction_get_peer_addr(instruction);
-      if(instruction_get_peer_port(instruction))
-	 delete[] instruction_get_peer_port(instruction);
-      if(instruction_get_input_data(instruction))
-      {
-	 grid_arg_destruct(instruction_get_input_data(instruction));
-	 delete instruction_get_input_data(instruction);
-      }
-      if(instruction_get_result_data(instruction))
-      {
-	 grid_arg_destruct(instruction_get_result_data(instruction));
-	 delete instruction_get_result_data(instruction);
-      }
+      nhpc_strcpy((char **)&(grid_instruction_get_plugin_name(instruction)), plugin_name);
    }
-   static void instruction_set_plugin_name(instruction_t *instruction, const char *plugin_name)
+   static void grid_instruction_set_peer(grid_instruction_t *instruction, const char *peer_addr, const char *peer_port)
    {
-      nhpc_strcpy((char **)&(instruction_get_plugin_name(instruction)), plugin_name);
+      nhpc_strcpy((char **)&(grid_instruction_get_peer_addr(instruction)), peer_addr);
+      nhpc_strcpy((char **)&(grid_instruction_get_peer_port(instruction)), peer_port);
    }
-   static void instruction_set_peer(instruction_t *instruction, int peer_id, const char *peer_addr, const char *peer_port)
+   static void grid_instruction_set_grid_uid(grid_instruction_t *instruction, const char *grid_uid)
    {
-      instruction_set_peer_id(instruction, peer_id);
-      nhpc_strcpy((char **)&(instruction_get_peer_addr(instruction)), peer_addr);
-      nhpc_strcpy((char **)&(instruction_get_peer_port(instruction)), peer_port);
+      nhpc_strcpy((char **)&(grid_instruction_get_grid_uid(instruction)), grid_uid);
    }
-   static void instruction_set_grid_uid(instruction_t *instruction, const char *grid_uid)
+   static void grid_instruction_set_referer_grid_uid(grid_instruction_t *instruction, const char *referer_grid_uid)
    {
-      nhpc_strcpy((char **)&(instruction_get_grid_uid(instruction)), grid_uid);
+      nhpc_strcpy((char **)&(grid_instruction_get_referer_grid_uid(instruction)), referer_grid_uid);      
    }
-   static void instruction_set_referer_grid_uid(instruction_t *instruction, const char *referer_grid_uid)
-   {
-      nhpc_strcpy((char **)&(instruction_get_referer_grid_uid(instruction)), referer_grid_uid);      
-   }
+   nhpc_status_t grid_instruction_prepare(grid_instruction_t **instruction, grid_data_t *grid_data);
+
+   nhpc_status_t grid_instruction_add_argument(grid_instruction_t *instruction, const char *arg_value);
+   nhpc_status_t grid_instruction_add_argument(grid_instruction_t *instruction, arg_t arg, 
+					       const void *value1, const void *value2 = NULL);
 }
 
 #endif

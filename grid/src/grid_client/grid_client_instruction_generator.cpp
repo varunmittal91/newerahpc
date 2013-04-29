@@ -24,10 +24,10 @@
 
 #include <include/grid_communication.h>
 #include <include/grid_response.h>
+#include <include/grid_client_instruction_generator.h>
 
 using namespace std;
 
 namespace neweraHPC
 {
-   
 };

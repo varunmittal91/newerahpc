@@ -17,21 +17,10 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GRID_SCHEDULER_H_
-#define _GRID_SCHEDULER_H_
+#ifndef _GRID_INSTRUCTION_H_
+#define _GRID_INSTRUCTION_H_
 
-namespace neweraHPC
-{
-   struct grid_job_t
-   {
-      int     instructions_count;
-      rbtree *instructions_queued;
-   };
-   
-   rbtree *queued_instructions;
-   rbtree *jobs;
-   
-   nhpc_status_t grid_scheduler_find_peer();
-};
+#include "grid_instruction_set.h"
+#include "grid_client_instruction_generator.h"
 
 #endif

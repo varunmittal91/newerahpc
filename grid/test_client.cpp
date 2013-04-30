@@ -34,26 +34,21 @@ int main(int argc, char **argv)
    
    const char *grid_uid;
    
-   nhpc_status_t nrv = grid_client_register_to_server(&grid_uid, "localhost", "8080");
+   int a = 12;
+   int b = 13;
+   nhpc_size_t size = 100;
+      
+   const char *abc = "hi this is the test input data";
+   nhpc_size_t len = strlen(abc) + 1;
    
-   if(nrv != NHPC_SUCCESS)
-   {
-      cout<<"Registration failed with server\n";
-      return 1;
-   }
-   else 
-   {
-      int a = 12;
-      int b = 13;
-      
-      grid_instruction_t *instruction;
-      grid_instruction_init(&instruction);
-      grid_instruction_set_plugin_name(instruction, "GRID_PLUGIN_RANGE");
-      grid_instruction_set_peer(instruction, "localhost", "8080");
-      grid_instruction_add_argument(instruction, ARG_FILE, "blender");
-      grid_instruction_add_argument(instruction, ARG_RANGE, &a, &b);
-      
-      cout<<"Grid registration uid: "<<grid_uid<<endl;
-      cout<<"Registration done\n";
-   }
+   grid_instruction_t *instruction;
+   grid_instruction_init(&instruction);
+   grid_instruction_set_peer(instruction, "localhost", "8080");
+   grid_instruction_set_plugin_name(instruction, "GRID_PLUGIN_RANGE");
+   
+   grid_instruction_add_argument(instruction, ARG_COMMAND, "blender");
+   grid_instruction_add_argument(instruction, ARG_RANGE, &a, &b);
+   grid_instruction_set_input_data(instruction, abc, &len, ARG_MEM_BLOCK);
+   
+   grid_instruction_send(instruction);      
 }

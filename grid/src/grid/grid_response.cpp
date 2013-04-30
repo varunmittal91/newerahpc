@@ -65,6 +65,11 @@ namespace neweraHPC
       response_code = nhpc_strtoi(command_parts->strings[2]);
       grid_set_response_status_code((*grid_response), response_code);
       
+      grid_shared_data_t *grid_shared_data;
+      nrv = grid_shared_data_get_data(&grid_shared_data, socket);
+      if(nrv == NHPC_FAIL)
+	 goto return_response;
+      
       check_content_len = (const char *)socket->headers->search("Content-Length");
       if(check_content_len)
       {
@@ -73,7 +78,7 @@ namespace neweraHPC
 	 void *data;
 	 nrv = grid_data_download_memory_block(&data, socket, &content_len);
 
-	 grid_response_add_data((*grid_response), data, content_len);
+	 grid_response_add_data((*grid_response), data, content_len, ARG_MEM_BLOCK);
       }
       
    return_response:
@@ -83,10 +88,10 @@ namespace neweraHPC
       return nrv;
    }   
    
-   void grid_response_add_data(grid_response_t *grid_response, void *data, nhpc_size_t data_len)
+   void grid_response_add_data(grid_response_t *grid_response, void *data, nhpc_size_t data_len, arg_t arg)
    {
-      grid_response->grid_data     = data;
-      grid_response->grid_data_len = data_len;
+      grid_shared_data_init(&(grid_response->data));
+      grid_shared_data_set_data(grid_response->data, data, &data_len, arg);
    }
    
    nhpc_status_t grid_response_send(grid_response_t *grid_response)
@@ -100,12 +105,9 @@ namespace neweraHPC
       const char *header_string = nhpc_strconcat("GRID/1.1 ", mssg, " ", response_str);
       grid_response->headers    = new nhpc_headers_t;
       grid_response->headers->insert(header_string);
-      if(grid_response->grid_data)
+      if(grid_response->data)
       {
-	 const char *grid_data_len_str = nhpc_itostr(grid_response->grid_data_len);
-	 grid_response->headers->insert("Content-Length", grid_data_len_str);
-
-	 delete[] grid_data_len_str;
+	 grid_shared_data_get_headers((grid_response->data), (grid_response->headers));
       }
       delete[] header_string;
       delete[] response_str;
@@ -119,11 +121,10 @@ namespace neweraHPC
       
       nhpc_socket_t  *socket  = grid_response->socket;
       nhpc_headers_t *headers = grid_response->headers;
-      nhpc_size_t size        = grid_response->grid_data_len;
       
       nrv = headers->write(socket);
-      if(grid_response->grid_data && nrv == NHPC_SUCCESS)
-	 nrv = socket_sendmsg(socket, (const char *)(grid_response->grid_data), &size);
+      if(grid_response->data && nrv == NHPC_SUCCESS)
+	 nrv = grid_shared_data_push_data(grid_response->data, socket);
       
       return nrv;
    }

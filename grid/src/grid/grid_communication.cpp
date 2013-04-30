@@ -49,7 +49,7 @@ namespace neweraHPC
       
       const char *mssg = grid_get_communication_status_mssg(grid_communication);
       
-      if(grid_communication_opt_is_register(grid_communication))
+      if(grid_communication_is_opt_register(grid_communication))
       {
 	 nrv = grid_client_register_to_server(&grid_uid, grid_communication->dest_addr, grid_communication->dest_port);
 	 if(nrv == NHPC_FAIL)
@@ -65,7 +65,7 @@ namespace neweraHPC
       {
 	 grid_communication->headers->insert("Grid-Uid", grid_uid);
       }
-      if(grid_communication_opt_is_peer_details(grid_communication))
+      if(grid_communication_is_opt_send_peer_details(grid_communication))
       {
 	 cout << "Sending peer details" << endl;
 	 
@@ -85,10 +85,20 @@ namespace neweraHPC
       nhpc_status_t   nrv;
       nhpc_socket_t  *socket;
       nhpc_headers_t *headers = grid_communication->headers;
+
+      if(grid_communication->data)
+      {
+	 grid_shared_data_get_headers((grid_communication->data), headers);
+      }      
       
       nrv = socket_connect(&socket, dest_addr, dest_port, AF_INET, SOCK_STREAM, 0);
       nrv = headers->write(socket);	          
       grid_communication->socket = socket;
+
+      if(grid_communication->data)
+      {
+	 grid_shared_data_push_data((grid_communication->data), socket);
+      }            
       
       return nrv;
    }

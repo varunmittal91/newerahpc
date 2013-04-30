@@ -38,8 +38,10 @@ namespace neweraHPC
 #define GRID_SUBMISSION                     4
 #define GRID_PLUGIN_REQUEST                 5
    
-#define GRID_COMMUNICATION_OPT_REGISTER      1
-#define GRID_COMMUNICATION_OPT_PEER_DETAILS  2
+#define GRID_COMMUNICATION_OPT_REGISTER           1
+#define GRID_COMMUNICATION_OPT_SEND_PEER_DETAILS  2
+#define GRID_COMMUNICATION_SENT                   4
+#define GRID_COMMUNICATION_COMPLETE               8
    
    static struct _GRID_STATUS_MSSGS
    {
@@ -49,27 +51,44 @@ namespace neweraHPC
 #define grid_get_communication_status_code(gc)      ((gc->request_type) >> 3)
 #define grid_get_communication_status_mssg(gc)      (GRID_STATUS_MSSGS[grid_get_communication_status_code(gc)].MSSGS_STRINGS)
 #define grid_get_communication_code_status_mssg(c)  (GRID_STATUS_MSSGS[c].MSSGS_STRINGS)
+#define grid_set_communication_type(gc, c)          ((gc->request_type) |= (c << 3))
    
    typedef unsigned char grid_request_type;      
    struct grid_communication_t
    {
       grid_request_type  request_type;
+
       nhpc_headers_t    *headers;
       nhpc_socket_t     *socket;
       const char        *dest_addr;
       const char        *dest_port;
       const char        *peer_addr;
       const char        *peer_port;
+      
+      grid_shared_data_t *data;
    };
-#define grid_is_communication_complete(gc)    ((gc->request_type) & 1)
-#define grid_set_communication_complete(gc)   ((gc->request_type) |= 1)
-#define grid_set_communication_type(gc, c)    ((gc->request_type) |= (c << 3))
-#define grid_set_communication_header(gc,h,v) ((gc->headers->insert(h, v)))
-
-#define grid_set_communication_opt(gc, o)          ((gc->request_type) |= (o << 1)) 
-#define grid_communication_opt_is_register(gc)     (1 & (gc->request_type) >> 1)
-#define grid_communication_opt_is_peer_details(gc) (1 & (gc->request_type) >> 2)
+   static bool grid_communication_is_opt_set(grid_communication_t *grid_communication, int opt)
+   {
+      int bit = 0;
+      while(opt > 1)
+      {
+	 opt /= 2;
+	 bit++;
+      }
+      
+      return (1 & ((grid_communication->request_type) >> bit));      
+   }
+#define grid_communication_set_opt(gc, o)               ((gc->request_type) |= o)
+#define grid_communication_set_complete(gc)             (grid_communication_set_opt(gc, GRID_COMMUNICATION_COMPLETE))
+#define grid_communication_set_sent(gc)                 (grid_communication_set_opt(gc, GRID_COMMUNICATION_SENT))
    
+#define grid_communication_is_complete(gc)              (grid_communication_is_opt_set(gc, GRID_COMMUNICATION_COMPLETE))
+#define grid_communication_is_sent(gc)                  (grid_communication_is_opt_set(gc, GRID_COMMUNICATION_SENT))
+#define grid_communication_is_opt_register(gc)          (grid_communication_is_opt_set(gc, GRID_COMMUNICATION_OPT_REGISTER))
+#define grid_communication_is_opt_send_peer_details(gc) (grid_communication_is_opt_set(gc, GRID_COMMUNICATION_OPT_SEND_PEER_DETAILS))
+
+#define grid_set_communication_header(gc,h,v)      ((gc->headers->insert(h, v)))
+#define grid_communication_set_header(gc,h,v)      ((gc->headers->insert(h, v)))
    static void grid_communication_init(grid_communication_t **gc, grid_request_type c)
    {
       (*gc) = new grid_communication_t;
@@ -98,6 +117,7 @@ namespace neweraHPC
       nhpc_strcpy((char **)&(grid_commuincation->dest_addr), dest_addr);
       nhpc_strcpy((char **)&(grid_commuincation->dest_port), dest_port);
    }
+#define grid_communication_add_data(g, d) (g->data = d)
    
    nhpc_status_t grid_communication_send(grid_communication_t *grid_communication);
    nhpc_status_t grid_communication_push(grid_communication_t *grid_communication);

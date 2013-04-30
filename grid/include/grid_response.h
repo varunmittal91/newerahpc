@@ -39,8 +39,8 @@ namespace neweraHPC
       grid_response_type_t  response_type;
       nhpc_socket_t        *socket;
       nhpc_headers_t       *headers;
-      void                 *grid_data;
-      nhpc_size_t           grid_data_len;
+      
+      grid_shared_data_t   *data;
    };
 
 #define grid_get_response_status_code(gc)      ((gc->response_type) >> 3)
@@ -53,7 +53,7 @@ namespace neweraHPC
 #define grid_set_response_header(gc, h, v)     ((gc->headers->insert(h, v)))
 #define grid_set_grid_data(gr, d)              ((gr->grid_data = d))
 #define grid_response_set_socket(g, s)         (g->socket = s)
-#define grid_response_get_grid_data(g)         (g->grid_data)
+#define grid_response_get_grid_data(g)         (g->data)
    
    static void grid_response_init(grid_response_t **grid_response)
    {
@@ -66,7 +66,7 @@ namespace neweraHPC
       delete grid_response->headers;
       delete grid_response;
    }
-   void grid_response_add_data(grid_response_t *grid_response, void *data, nhpc_size_t data_len);
+   void grid_response_add_data(grid_response_t *grid_response, void *data, nhpc_size_t data_len, arg_t arg);
    nhpc_status_t grid_response_send(grid_response_t *grid_response);
    nhpc_status_t grid_response_push(grid_response_t *grid_response);
    

@@ -25,6 +25,8 @@
 namespace neweraHPC
 {
    typedef unsigned char instruction_status_t;
+#define GRID_INSTRUCTION_SENT      1
+#define GRID_INSTRUCTION_PROCESSED 2
    struct grid_instruction_t
    {
       const char *plugin_name;
@@ -38,13 +40,29 @@ namespace neweraHPC
       const char *referer_addr;
       const char *referer_port;
       
-      const char *input_data;
-      const char *result_data;
-      
+      grid_shared_data_t *input_data;
+      grid_shared_data_t *result_data;
+
       instruction_status_t instruction_status;
    };
+   
+   static bool grid_instrution_opt_is_set(grid_instruction_t *instruction, instruction_status_t opt)
+   {
+      int bit = 0;
+      while(opt > 1)
+      {
+	 opt /= 2;
+	 bit++;
+      }
+      
+      return (1 & ((instruction->instruction_status) >> bit));
+   }
+#define grid_instruction_is_sent(i)       (grid_instruction_opt_is_set(i, GRID_INSTRUCTION_SENT))
+#define grid_instruction_is_processed(i)  (grid_instruction_opt_is_set(i, GRID_INSTRUCTION_PROCESSED))
+   
 #define grid_instruction_get_input_data(i)       (i->input_data)
 #define grid_instruction_get_result_data(i)      (i->result_data)
+   
 #define grid_instruction_get_plugin_name(i)      (i->plugin_name)
 #define grid_instruction_get_peer_id(i)          (i->peer_id)
 #define grid_instruction_set_peer_id(i, p)       (i->peer_id = p)
@@ -52,6 +70,8 @@ namespace neweraHPC
 #define grid_instruction_get_peer_port(i)        (i->peer_port)
 #define grid_instruction_get_grid_uid(i)         (i->grid_uid)
 #define grid_instruction_get_referer_grid_uid(i) (i->referer_grid_uid)
+#define grid_instruction_get_argument_count(i)   (i->arguments->length())
+#define grid_instruction_get_argument(i, n)      ((const char *)i->arguments->search(n))
    static void grid_instruction_init(grid_instruction_t **instruction)
    {
       (*instruction) = new grid_instruction_t;
@@ -82,6 +102,24 @@ namespace neweraHPC
    nhpc_status_t grid_instruction_add_argument(grid_instruction_t *instruction, const char *arg_value);
    nhpc_status_t grid_instruction_add_argument(grid_instruction_t *instruction, arg_t arg, 
 					       const void *value1, const void *value2 = NULL);
+
+   static void grid_instruction_set_data(grid_instruction_t *grid_instruction, void *address, nhpc_size_t *len,
+					 arg_t arg, bool is_input)
+   {
+      grid_shared_data_t **data;
+      
+      if(is_input)
+	 data = &(grid_instruction->input_data);
+      else 
+	 data = &(grid_instruction->result_data);
+      
+      grid_shared_data_init(data);
+      grid_shared_data_set_data((*data), address, len, arg);
+   }
+#define grid_instruction_set_input_data(i, addr, l, a)    (grid_instruction_set_data(i, (void *)addr, l, a, true))
+#define grid_instruction_set_result_data(i, addr, l, a)   (grid_instruction_set_data(i, (void *)addr, l, a, false))
+   
+   nhpc_status_t grid_instruction_send(grid_instruction_t *instruction);
 }
 
 #endif

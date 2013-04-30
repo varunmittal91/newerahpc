@@ -39,7 +39,7 @@ namespace neweraHPC
       
       grid_communication_t *grid_communication;
       grid_communication_init(&grid_communication, GRID_NODE_REGISTRATION);
-      grid_set_communication_opt(grid_communication, GRID_COMMUNICATION_OPT_PEER_DETAILS);
+      grid_communication_set_opt(grid_communication, GRID_COMMUNICATION_OPT_SEND_PEER_DETAILS);
       grid_communication_add_dest(grid_communication, host_addr, host_port);
 
       grid_communication_send(grid_communication);
@@ -65,8 +65,14 @@ namespace neweraHPC
 	    LOG_ERROR("Registration Failed");
 	 else 
 	 {
-	    (*grid_uid) = (const char *)grid_response_get_grid_data(grid_response);	    
-	    cout << "Registration code:" << (*grid_uid) << endl;
+	    grid_shared_data_t *data = grid_response_get_grid_data(grid_response);
+	    if(data)
+	    {
+	       (*grid_uid) = (const char *)grid_shared_data_get_data_address(data);
+	       cout << "Registration code:" << (*grid_uid) << endl;
+	    }
+	    else 
+	       nrv = NHPC_FAIL;
 	 }
       }
       

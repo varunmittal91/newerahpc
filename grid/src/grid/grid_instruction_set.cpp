@@ -20,6 +20,7 @@
 #include <iostream>
 
 #include <include/grid_instruction_set.h>
+#include <include/grid_communication.h>
 
 using namespace std;
 
@@ -44,12 +45,12 @@ namespace neweraHPC
       
       if(grid_instruction_get_input_data(instruction))
       {
-	 delete[] grid_instruction_get_input_data(instruction);
+	 grid_shared_data_destruct(instruction->input_data);
       }
 
       if(grid_instruction_get_result_data(instruction))
       {
-	 delete[] grid_instruction_get_result_data(instruction);
+	 grid_shared_data_destruct(instruction->result_data);
       }
       
       if(instruction->arguments)
@@ -88,8 +89,6 @@ namespace neweraHPC
 					       const void *value1, const void *value2)
    {
       const char *arg_value = NULL;
-      long int    block;
-      nhpc_size_t size;
       
       if(!(instruction->arguments))
 	 instruction->arguments = new rbtree(RBTREE_NUM);
@@ -109,7 +108,6 @@ namespace neweraHPC
 	    
 	 case ARG_LITERAL:
 	 case ARG_COMMAND:
-	 case ARG_FILE:
 	    grid_arg_set_literals(&arg_value, (const char *)value1, arg);
 	    break;
 	    
@@ -119,5 +117,53 @@ namespace neweraHPC
       
       instruction->arguments->insert((void *)arg_value);
       return NHPC_SUCCESS;
-   }   
+   }
+   
+   nhpc_status_t grid_instruction_send(grid_instruction_t *instruction)
+   {
+      const char *peer_addr   = grid_instruction_get_peer_addr(instruction);
+      const char *peer_port   = grid_instruction_get_peer_port(instruction);
+      const char *grid_uid    = grid_instruction_get_grid_uid(instruction);
+      const char *plugin_name = grid_instruction_get_plugin_name(instruction);
+      
+      if(!peer_addr || !peer_port)
+	 return NHPC_FAIL;
+      
+      nhpc_status_t nrv;
+      
+      grid_communication_t *grid_communication;
+      grid_communication_init(&grid_communication, GRID_INSTRUCTION);
+      grid_communication_add_dest(grid_communication, peer_addr, peer_port);
+      grid_communication_set_opt(grid_communication, GRID_COMMUNICATION_OPT_REGISTER);
+      if(grid_instruction_get_input_data(instruction))
+	 grid_communication_add_data(grid_communication, grid_instruction_get_input_data(instruction));
+      grid_communication_send(grid_communication);
+      
+      if(instruction->arguments)
+      {
+	 const char *argument;
+	 const char *argument_headers;
+	 const char *num_str;
+	 
+	 int count = grid_instruction_get_argument_count(instruction);
+	 for(int i = 1; i <= count; i++)
+	 {
+	    num_str          = nhpc_itostr(i);
+	    argument_headers = nhpc_strconcat("Argument", num_str);	    
+	    argument         = grid_instruction_get_argument(instruction, i);
+	    
+	    grid_communication_set_header(grid_communication, argument_headers, argument);
+	    
+	    delete[] argument_headers;
+	    delete[] num_str;
+	 }
+      }      
+      grid_communication_set_header(grid_communication, "Plugin-Name", plugin_name);
+      
+      nrv = grid_communication_push(grid_communication);
+      if(nrv != NHPC_SUCCESS)
+	 return nrv;    
+      
+      return nrv;
+   }
 };

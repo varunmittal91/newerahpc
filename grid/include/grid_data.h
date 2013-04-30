@@ -32,12 +32,14 @@ using namespace std;
 
 namespace neweraHPC
 {
+#define ARG_COUNT      6
 #define ARG_RANGE      1
 #define ARG_NUMBER     2
 #define ARG_LITERAL    4
 #define ARG_COMMAND    8
 #define ARG_FILE      16
 #define ARG_MEM_BLOCK 32
+   static const char *grid_arg_content_types[] = {"ARG_RANGE", "ARG_NUMBER", "ARG_LITERAL", "ARG_COMMAND", "ARG_FILE", "ARG_MEM_BLCOK"};
 
    typedef unsigned char arg_t;
    static int _grid_arg_get_int_code(arg_t arg)
@@ -86,8 +88,12 @@ namespace neweraHPC
    }
    static void grid_arg_set_address_space(const char **arg_value, void *address, nhpc_size_t size, arg_t arg)
    {
-      (*arg_value) = new char [sizeof(arg_t) + sizeof(nhpc_size_t) + sizeof(void *) + 1];
-      grid_arg_set_type(*arg_value, arg);
+      nhpc_size_t len = sizeof(arg_t) + sizeof(nhpc_size_t) + sizeof(void *) + 1;
+      
+      char *_arg_value = new char [len];
+      _arg_value[len]  = '\0';
+      grid_arg_set_type(_arg_value, arg);
+      *arg_value = _arg_value;
       
       char         **_address = (char **)((char *)(*arg_value) + sizeof(arg_t));
       nhpc_size_t   *_size    = (nhpc_size_t *)((char *)(*arg_value) + sizeof(arg_t) + sizeof(void *));
@@ -102,7 +108,7 @@ namespace neweraHPC
 #define grid_arg_set_file(av, a, s)       (grid_arg_set_address_space(av, a, s, ARG_FILE))
 #define grid_arg_set_literal(av, l)       (grid_arg_set_literals(av, l, ARG_LITERAL))
 #define grid_arg_set_command(av, l)       (grid_arg_set_literals(av, l, ARG_COMMAND))
-#define grid_arg_is_type(av, t)           (_grid_arg_is_type(av->arg, t))
+#define grid_arg_is_type(av, t)           (1 & (av >> _grid_arg_get_int_code(t)))
 #define grid_arg_is_range(av)             (grid_arg_is_type(av, ARG_RANGE))
 #define grid_arg_is_value(av)             (grid_arg_is_type(av, ARG_VALUE))
 #define grid_arg_is_literal(av)           (grid_arg_is_type(av, ARG_LITERAL))
@@ -176,6 +182,52 @@ namespace neweraHPC
    }   
    
    void grid_data_create_from_socket(grid_data_t *data, nhpc_socket_t *socket);
+   
+   struct grid_shared_data_t
+   {
+      void         *address;
+      const char   *content_type;
+      arg_t         arg;
+      nhpc_size_t   len;
+   };
+#define grid_shared_data_get_data_address(g)  (g->address)
+#define grid_shared_data_get_data_lenth(g)    (g->len)
+   static void grid_shared_data_init(grid_shared_data_t **data)
+   {
+      (*data) = new grid_shared_data_t;
+      memset((*data), 0, sizeof(grid_shared_data_t));
+   }
+   static void grid_shared_data_destruct(grid_shared_data_t *data)
+   {
+      delete data;
+   }
+   static void grid_shared_data_set_data(grid_shared_data_t *data, void *address, nhpc_size_t *len, arg_t arg)
+   {
+      int code = _grid_arg_get_int_code(arg);
+
+      data->address      = address;
+      data->len          = *len;
+      data->arg          = arg;
+      data->content_type = grid_arg_content_types[code];
+   }
+   static void grid_shared_data_get_headers(grid_shared_data_t *data, nhpc_headers_t *src_headers)
+   {
+      char *content_len_str = nhpc_longitostr(data->len);
+      
+      src_headers->insert("Content-Length", content_len_str);
+      src_headers->insert("Content-Type"  , data->content_type);
+
+      delete[] content_len_str;
+   }
+   static nhpc_status_t grid_shared_data_push_data(grid_shared_data_t *data, nhpc_socket_t *socket)
+   {
+      nhpc_size_t   size = data->len;
+      nhpc_status_t nrv;
+      
+      nrv = socket_sendmsg(socket, (char *)(data->address), &size);
+      return nrv;
+   } 
+   nhpc_status_t grid_shared_data_get_data(grid_shared_data_t **data, nhpc_socket_t *socket);
 };
 
 #endif

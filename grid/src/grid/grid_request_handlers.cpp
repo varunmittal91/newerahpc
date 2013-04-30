@@ -43,8 +43,7 @@ namespace neweraHPC
       if(nrv == NHPC_SUCCESS)
       {
 	 grid_set_response_status_code(grid_response, GRID_RESPONSE_SUCCESSFUL);
-	 	 
-	 grid_response_add_data(grid_response, (void *)client_uid, strlen(client_uid) + 1);
+	 grid_response_add_data(grid_response, (void *)client_uid, strlen(client_uid) + 1, ARG_MEM_BLOCK);
       }
       else 
 	 grid_set_response_status_code(grid_response, GRID_RESPONSE_RESOURCE_UNAVAILABLE);
@@ -71,8 +70,7 @@ namespace neweraHPC
       else 
       {
 	 grid_set_response_status_code(grid_response, GRID_RESPONSE_SUCCESSFUL);	 
-	 
-	 grid_response_add_data(grid_response, (void *)server_uid, strlen(server_uid) + 1);
+	 grid_response_add_data(grid_response, (void *)server_uid, strlen(server_uid) + 1, ARG_MEM_BLOCK);
       }
       
       grid_response_send(grid_response);

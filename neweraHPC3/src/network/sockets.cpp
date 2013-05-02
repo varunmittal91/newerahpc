@@ -208,6 +208,10 @@ namespace neweraHPC
 	    nhpc_delete_headers(sock->headers);
 	    delete (sock->headers);
 	 }
+	 if(sock->partial_content)
+	 {
+	    delete ((char *)(sock->partial_content));
+	 }
 
 	 delete sock;
 	 sock = NULL;

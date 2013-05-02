@@ -20,6 +20,7 @@
 #ifndef _GRID_INSTRUCTION_SET_H_
 #define _GRID_INSTRUCTION_SET_H_
 
+#include "grid_communication.h"
 #include "grid_data.h"
 
 namespace neweraHPC
@@ -42,8 +43,8 @@ namespace neweraHPC
       
       grid_shared_data_t *input_data;
       grid_shared_data_t *result_data;
-
-      instruction_status_t instruction_status;
+      
+      instruction_status_t  instruction_status;
    };
    
    static bool grid_instrution_opt_is_set(grid_instruction_t *instruction, instruction_status_t opt)
@@ -118,8 +119,8 @@ namespace neweraHPC
    }
 #define grid_instruction_set_input_data(i, addr, l, a)    (grid_instruction_set_data(i, (void *)addr, l, a, true))
 #define grid_instruction_set_result_data(i, addr, l, a)   (grid_instruction_set_data(i, (void *)addr, l, a, false))
+#define grid_instruction_set_communication(i, c)          (i->communication = c)
    
-   nhpc_status_t grid_instruction_send(grid_instruction_t *instruction);
 }
 
 #endif

@@ -25,9 +25,83 @@
 #include <include/grid_communication.h>
 #include <include/grid_response.h>
 #include <include/grid_client_instruction_generator.h>
+#include <include/grid_instruction.h>
 
 using namespace std;
 
 namespace neweraHPC
-{
+{   
+   
+   nhpc_status_t grid_instruction_send(grid_instruction_t *instruction)
+   {
+      const char *peer_addr   = grid_instruction_get_peer_addr(instruction);
+      const char *peer_port   = grid_instruction_get_peer_port(instruction);
+      const char *grid_uid    = grid_instruction_get_grid_uid(instruction);
+      const char *plugin_name = grid_instruction_get_plugin_name(instruction);
+      
+      if(!peer_addr || !peer_port)
+	 return NHPC_FAIL;
+      
+      nhpc_status_t nrv;
+      
+      grid_communication_t *grid_communication;
+      grid_communication_init(&grid_communication, GRID_INSTRUCTION);
+      grid_communication_add_dest(grid_communication, peer_addr, peer_port);
+      grid_communication_set_opt(grid_communication, GRID_COMMUNICATION_OPT_REGISTER);
+      if(grid_instruction_get_input_data(instruction))
+	 grid_communication_add_data(grid_communication, grid_instruction_get_input_data(instruction));
+      grid_communication_send(grid_communication);
+      
+      if(instruction->arguments)
+      {
+	 const char *argument;
+	 const char *argument_headers;
+	 const char *num_str;
+	 const char *count_str;
+	 int         count;
+	 
+	 count     = grid_instruction_get_argument_count(instruction);
+	 count_str = nhpc_itostr(count);
+	 grid_communication_set_header(grid_communication, "Argument-Count", count_str);
+	 for(int i = 1; i <= count; i++)
+	 {
+	    num_str          = nhpc_itostr(i);
+	    argument_headers = nhpc_strconcat("Argument", num_str);	    
+	    argument         = grid_instruction_get_argument(instruction, i);
+	    
+	    grid_communication_set_header(grid_communication, argument_headers, argument);
+	    
+	    delete[] argument_headers;
+	    delete[] num_str;
+	 }
+	 delete[] count_str;
+      }      
+      grid_communication_set_header(grid_communication, "Plugin-Name", plugin_name);
+      
+      nrv = grid_communication_push(grid_communication);
+      
+      grid_response_t *response;
+      nrv = grid_response_get(&response, grid_communication);
+      if(nrv == NHPC_SUCCESS)
+	 cout << "Instruction processing complete" << endl;
+      else 
+	 cout << "No response recieved" << endl;      
+      
+      grid_response_destruct(response);
+      grid_communication_destruct(grid_communication);
+      
+      return nrv;
+   }   
+   
+   nhpc_status_t grid_instruction_wait_for_completetion(grid_instruction_t *instrunction)
+   {
+      
+   }
+   
+   nhpc_status_t grid_instruction_check_for_result(grid_instruction_t *instrunction)
+   {
+      nhpc_status_t nrv;
+      
+      grid_response_t *response;
+   }
 };

@@ -17,18 +17,9 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GRID_CLIENT_INSTRUCTION_H_
-#define _GRID_CLIENT_INSTRUCTION_H_
+#ifndef _GRID_DEFAULT_PLUGINS_H_
+#define _GRID_DEFAULT_PLUGINS_H_
 
-#include <neweraHPC/constants.h>
-
-#include "grid_data.h"
-#include "grid_instruction.h"
-
-namespace neweraHPC
-{
-   nhpc_status_t grid_instruction_send(grid_instruction_t *instruction);
-   nhpc_status_t grid_instruction_check_for_result(grid_instruction_t *instrunction);
-};
+#include "grid_plugin_range.h"
 
 #endif

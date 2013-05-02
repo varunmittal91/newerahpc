@@ -56,6 +56,12 @@ namespace neweraHPC
       nhpc_display_headers(socket);
       
       command_str = (const char *)socket->headers->search("command");
+      if(!command_str)
+      {
+	 nrv = NHPC_FAIL;
+	 goto return_response;
+      }
+      
       command_parts = nhpc_substr(command_str, ' ');
       if(command_parts->count < 3)
       {
@@ -65,15 +71,25 @@ namespace neweraHPC
       response_code = nhpc_strtoi(command_parts->strings[2]);
       grid_set_response_status_code((*grid_response), response_code);
       
-      grid_shared_data_t *grid_shared_data;
-      nrv = grid_shared_data_get_data(&grid_shared_data, socket);
-      if(nrv == NHPC_FAIL)
-	 goto return_response;
-      grid_response_add_data((*grid_response), grid_shared_data);
+      if(grid_shared_data_check(socket) == NHPC_SUCCESS)
+      {
+	 grid_shared_data_t *grid_shared_data;
+
+	 nrv = grid_shared_data_get_data(&grid_shared_data, socket);
+	 if(nrv == NHPC_FAIL)
+	    goto return_response;
+	 else 
+	    nrv = NHPC_SUCCESS;
+	 
+	 grid_response_add_data((*grid_response), grid_shared_data);
+      }
       
    return_response:
       if(command_parts)
 	 nhpc_string_delete(command_parts);
+      
+      if(nrv == NHPC_EOF)
+	 nrv = NHPC_SUCCESS;
       
       return nrv;
    }   

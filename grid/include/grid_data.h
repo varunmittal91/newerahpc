@@ -140,9 +140,6 @@ namespace neweraHPC
 #define grid_data_set_socket(g, s)         (g->socket = s)
 #define grid_data_get_socket(g)            (g->socket)
 
-#define grid_data_set_content_length(g, l) (g->content_len = l)
-#define grid_data_set_content_addr(g, a)   (g->content_addr = a)
-#define grid_data_set_content_type(g, t)   (nhpc_strcpy((char **)&(g->content_type), t))
    static void grid_data_set_opt(grid_data_t *data, int opt, bool on)
    {
       if(on)
@@ -181,7 +178,7 @@ namespace neweraHPC
       if(data->data)
 	 grid_shared_data_destruct(data->data);
    }   
-   
+#define grid_data_add_data(g, d, l, a) do{grid_shared_data_init(&(g->data)); grid_shared_data_set_data(g->data, (void *)d, &l, a);}while(false);
    void grid_data_create_from_socket(grid_data_t *data, nhpc_socket_t *socket);
    
    struct grid_shared_data_t
@@ -228,6 +225,7 @@ namespace neweraHPC
       nrv = socket_sendmsg(socket, (char *)(data->address), &size);
       return nrv;
    } 
+   nhpc_status_t grid_shared_data_check(nhpc_socket_t *socket);
    nhpc_status_t grid_shared_data_get_data(grid_shared_data_t **data, nhpc_socket_t *socket);
 };
 

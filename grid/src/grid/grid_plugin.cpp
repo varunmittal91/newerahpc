@@ -18,6 +18,7 @@
  */
 
 #include <include/grid_plugin.h>
+#include <include/grid_default_plugins.h>
 
 namespace neweraHPC
 {
@@ -34,6 +35,18 @@ namespace neweraHPC
       
       thread_mutex_init(&mutex_plugins_installed);
       thread_mutex_init(&mutex_plugins_requested);
+      
+      plugin_details_t *grid_plugin_range;
+      grid_plugin_range_init(&grid_plugin_range);
+      grid_plugin_install(grid_plugin_range);
+   }
+   
+   nhpc_status_t grid_plugin_install(plugin_details_t *plugin_details)
+   {
+      if(plugins_installed->insert(plugin_details->plugin_name) == 0)
+	 return NHPC_FAIL;
+      
+      return NHPC_SUCCESS;
    }
    
    nhpc_status_t grid_plugin_install_dll(const char *dll_path, plugin_details_t **plugin_details)
@@ -61,5 +74,10 @@ namespace neweraHPC
 	 return NHPC_SUCCESS;      
       
       return NHPC_FAIL;
+   }
+   
+   nhpc_status_t grid_plugin_request_plugin(const char *plugin_name, const char *peer_addr, const char *peer_port)
+   {
+      
    }
 };

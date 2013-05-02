@@ -24,7 +24,6 @@
 #include <neweraHPC/network.h>
 
 #include "grid_data.h"
-#include "grid.h"
 
 namespace neweraHPC
 {
@@ -38,20 +37,21 @@ namespace neweraHPC
 #define GRID_SUBMISSION                     4
 #define GRID_PLUGIN_REQUEST                 5
    
-#define GRID_COMMUNICATION_OPT_REGISTER           1
-#define GRID_COMMUNICATION_OPT_SEND_PEER_DETAILS  2
-#define GRID_COMMUNICATION_SENT                   4
-#define GRID_COMMUNICATION_COMPLETE               8
+#define GRID_COMMUNICATION_OPT_REGISTER            1
+#define GRID_COMMUNICATION_OPT_SEND_PEER_DETAILS   2
+#define GRID_COMMUNICATION_SENT                    4
+#define GRID_COMMUNICATION_COMPLETE                8
+#define GRID_COMMUNICATION_PRESERVE_SOCKET        16
    
    static struct _GRID_STATUS_MSSGS
    {
       const char        *MSSGS_STRINGS;
    }GRID_STATUS_MSSGS[6] = {"CLIENT_REGISTRATION", "NODE_REGISTRATION", "FILE_EXCHANGE",
       "INSTRUCTION", "SUBMISSION", "PLUGIN_REQUEST"};
-#define grid_get_communication_status_code(gc)      ((gc->request_type) >> 3)
+#define grid_get_communication_status_code(gc)      ((gc->request_type) >> 4)
 #define grid_get_communication_status_mssg(gc)      (GRID_STATUS_MSSGS[grid_get_communication_status_code(gc)].MSSGS_STRINGS)
 #define grid_get_communication_code_status_mssg(c)  (GRID_STATUS_MSSGS[c].MSSGS_STRINGS)
-#define grid_set_communication_type(gc, c)          ((gc->request_type) |= (c << 3))
+#define grid_set_communication_type(gc, c)          ((gc->request_type) |= (c << 4))
    
    typedef unsigned char grid_request_type;      
    struct grid_communication_t
@@ -64,6 +64,7 @@ namespace neweraHPC
       const char        *dest_port;
       const char        *peer_addr;
       const char        *peer_port;
+      const char        *grid_uid;
       
       grid_shared_data_t *data;
    };
@@ -98,14 +99,17 @@ namespace neweraHPC
    static void grid_communication_destruct(grid_communication_t *grid_communication)
    {
       if(grid_communication->dest_addr)
-	 delete[] grid_communication->dest_addr;
+	 delete[] (grid_communication->dest_addr);
       if(grid_communication->dest_port)
-	 delete[] grid_communication->dest_port;
+	 delete[] (grid_communication->dest_port);
       
       if(grid_communication->peer_addr)
-	 delete[] grid_communication->peer_addr;
+	 delete[] (grid_communication->peer_addr);
       if(grid_communication->peer_port)
-	 delete[] grid_communication->peer_port;
+	 delete[] (grid_communication->peer_port);
+      
+      if(grid_communication->grid_uid)
+	 delete[] (grid_communication->grid_uid);
 
       delete (grid_communication->headers);
       

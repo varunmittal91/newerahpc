@@ -30,8 +30,8 @@ namespace neweraHPC
 {
    nhpc_status_t grid_data_download_memory_block(void **dst, nhpc_socket_t *socket, nhpc_size_t *content_len)
    {
-      char *tmp_dst;
       char *dst_str = new char [*content_len];
+      char *tmp_dst = dst_str;
       memset(dst_str, 0, *content_len);
       
       char          buffer[1000];
@@ -45,20 +45,21 @@ namespace neweraHPC
 	 tmp_dst         += (socket->partial_content_len);
 	 size_downloaded += (socket->partial_content_len);
       }
-      else 
-	 tmp_dst = dst_str;
       
-      do 
+      if(size_downloaded < *content_len)
       {
-	 bzero(buffer, sizeof(buffer));
-	 size = sizeof(buffer);
-	 nrv = socket_recv(socket, buffer, &size); 
-	 memcpy(tmp_dst, buffer, size);
+	 do 
+	 {
+	    bzero(buffer, sizeof(buffer));
+	    size = sizeof(buffer);
+	    nrv = socket_recv(socket, buffer, &size); 
+	    memcpy(tmp_dst, buffer, size);
 	 
-	 size_downloaded += size;
-	 memcpy(tmp_dst, buffer, size);
-	 tmp_dst += size;
-      }while(nrv != NHPC_EOF && size_downloaded != *content_len);      
+	    size_downloaded += size;
+	    memcpy(tmp_dst, buffer, size);
+	    tmp_dst += size;
+	 }while(nrv != NHPC_EOF && size_downloaded != *content_len);      
+      }
       
       if(nrv == NHPC_EOF)
 	 nrv = NHPC_SUCCESS;

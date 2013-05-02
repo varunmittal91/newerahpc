@@ -27,6 +27,7 @@
 #include <include/grid.h>
 #include <include/grid_request_handlers.h>
 #include <include/grid_client_registration.h>
+#include <include/grid_response.h>
 
 using namespace std;
 
@@ -125,6 +126,24 @@ namespace neweraHPC
 	 grid_data_create_from_socket(grid_data, socket);
 	 
 	 nrv = fnc_ptr(grid_data);
+	 
+	 grid_response_t *response;
+	 grid_response_init(&response);
+	 grid_response_set_socket(response, grid_data_get_socket(grid_data));
+	 if(nrv == NHPC_SUCCESS)
+	 {
+	    cout << "sending details" << endl;
+	    
+	    grid_set_response_status_code(response, GRID_RESPONSE_SUCCESSFUL);
+	    if(grid_data->data)
+	       grid_response_add_data(response, grid_data->data);
+	 }
+	 else 
+	    grid_set_response_status_code(response, GRID_RESPONSE_RESOURCE_UNAVAILABLE);
+	 
+	 grid_response_send(response);
+	 grid_response_push(response);
+	 grid_response_destruct(response);
 	 grid_data_destruct(grid_data);
       }      
       else 

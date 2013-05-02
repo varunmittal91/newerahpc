@@ -20,11 +20,14 @@
 #include <iostream>
 
 #include <neweraHPC/network.h>
+#include <neweraHPC/error.h>
 
 #include <include/grid_data.h>
 #include <include/grid_node.h>
 #include <include/grid_uid.h>
 #include <include/grid_response.h>
+#include <include/grid_instruction.h>
+#include <include/grid_plugin.h>
 
 using namespace std;
 
@@ -32,14 +35,18 @@ namespace neweraHPC
 {
    nhpc_status_t grid_instruction_request_handler(grid_data_t *grid_data)
    {
-      cout << "Encounter instruction call" << endl;
-      
       nhpc_status_t       nrv;
       grid_instruction_t *instruction;
       nrv = grid_instruction_prepare(&instruction, grid_data);
       if(nrv != NHPC_SUCCESS)
 	 return nrv;
+
+      const char *plugin_name = grid_instruction_get_plugin_name(instruction);
+      const char *peer_addr   = grid_instruction_get_peer_addr(instruction);
+      const char *peer_port   = grid_instruction_get_peer_port(instruction);
       
-      cout << "Prepared instruction" << endl;
+      plugin_details_t *plugin_details;
+      nrv = NHPC_FAIL;
+      return nrv;
    }   
 };

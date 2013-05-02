@@ -73,8 +73,10 @@ namespace neweraHPC
       return plugin_details;
    }
    
+   nhpc_status_t grid_plugin_install(plugin_details_t *plugin_details);
    nhpc_status_t grid_plugin_install_dll(const char *dll_path, plugin_details_t **plugin_details);
    nhpc_status_t grid_plugin_search(const char *plugin_name, plugin_details_t **plugin_details);
+
    
    typedef unsigned char plugin_request_status;
    struct plugin_request_t
@@ -97,6 +99,7 @@ namespace neweraHPC
       
       return plugin_request;
    }
+   nhpc_status_t grid_plugin_request_plugin(const char *plugin_name, const char *peer_addr, const char *peer_port);
 };
 
 #endif

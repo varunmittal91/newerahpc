@@ -40,7 +40,20 @@ namespace neweraHPC
       nhpc_strcpy((char **)&(data->peer_port), peer_port);
       
       grid_data_set_socket(data, socket);
-      grid_shared_data_get_data(&(data->data), socket);
+      if(grid_shared_data_check(socket) == NHPC_SUCCESS)
+	 grid_shared_data_get_data(&(data->data), socket);
+   }
+   
+   nhpc_status_t grid_shared_data_check(nhpc_socket_t *socket)
+   {
+      rbtree        *headers            = socket->headers;
+      const char    *check_content_len  = (const char *)socket->headers->search("Content-Length");
+      const char    *check_content_type = (const char *)socket->headers->search("Content-Type");
+      
+      if(!check_content_len || !check_content_type)
+	 return NHPC_FAIL;
+      
+      return NHPC_SUCCESS;
    }
    
    nhpc_status_t grid_shared_data_get_data(grid_shared_data_t **data, nhpc_socket_t *socket)
@@ -49,9 +62,6 @@ namespace neweraHPC
       rbtree        *headers            = socket->headers;
       const char    *check_content_len  = (const char *)socket->headers->search("Content-Length");
       const char    *check_content_type = (const char *)socket->headers->search("Content-Type");
-
-      if(!check_content_len || !check_content_type)
-	 return NHPC_FAIL;
 
       int code = -1;
       for(int i = 0; i < ARG_COUNT; i++)

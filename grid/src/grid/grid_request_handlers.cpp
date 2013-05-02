@@ -34,23 +34,16 @@ namespace neweraHPC
    {
       nhpc_status_t nrv;
       
-      grid_response_t *grid_response;
-      grid_response_init(&grid_response);
-      grid_response_set_socket(grid_response, grid_data_get_socket(grid_data));
-      
       const char *client_uid;
       nrv = grid_uid_generate(&client_uid, grid_data, NODE_TYPE_CLIENT);
       if(nrv == NHPC_SUCCESS)
       {
-	 grid_set_response_status_code(grid_response, GRID_RESPONSE_SUCCESSFUL);
-	 grid_response_add_data(grid_response, (void *)client_uid, strlen(client_uid) + 1, ARG_MEM_BLOCK);
+	 nhpc_size_t size = strlen(client_uid) + 1;
+	 grid_data_add_data(grid_data, client_uid, size, ARG_MEM_BLOCK);
+	 return NHPC_SUCCESS;
       }
       else 
-	 grid_set_response_status_code(grid_response, GRID_RESPONSE_RESOURCE_UNAVAILABLE);
-      
-      grid_response_send(grid_response);
-      grid_response_push(grid_response);
-      grid_response_destruct(grid_response);
+	 return NHPC_FAIL;
       
       return nrv;
    }
@@ -59,23 +52,16 @@ namespace neweraHPC
    {
       nhpc_status_t nrv;
       
-      grid_response_t *grid_response;
-      grid_response_init(&grid_response);
-      grid_response_set_socket(grid_response, grid_data_get_socket(grid_data));
-      
       const char *server_uid;
       nrv = grid_uid_generate(&server_uid, grid_data, NODE_TYPE_COMPUTE);
       if(nrv != NHPC_SUCCESS)
-	 grid_set_response_status_code(grid_response, GRID_RESPONSE_RESOURCE_UNAVAILABLE);
+	 return NHPC_FAIL;
       else 
       {
-	 grid_set_response_status_code(grid_response, GRID_RESPONSE_SUCCESSFUL);	 
-	 grid_response_add_data(grid_response, (void *)server_uid, strlen(server_uid) + 1, ARG_MEM_BLOCK);
+	 nhpc_size_t size = strlen(server_uid) + 1;
+	 grid_data_add_data(grid_data, server_uid, size, ARG_MEM_BLOCK);
+	 return NHPC_SUCCESS;
       }
-      
-      grid_response_send(grid_response);
-      grid_response_push(grid_response);
-      grid_response_destruct(grid_response);      
       
       return nrv;
    }

@@ -40,6 +40,7 @@ namespace neweraHPC
       nhpc_strcpy((char **)&(data->peer_port), peer_port);
       
       grid_data_set_socket(data, socket);
+      grid_shared_data_get_data(&(data->data), socket);
    }
    
    nhpc_status_t grid_shared_data_get_data(grid_shared_data_t **data, nhpc_socket_t *socket)

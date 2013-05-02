@@ -69,17 +69,7 @@ namespace neweraHPC
       nrv = grid_shared_data_get_data(&grid_shared_data, socket);
       if(nrv == NHPC_FAIL)
 	 goto return_response;
-      
-      check_content_len = (const char *)socket->headers->search("Content-Length");
-      if(check_content_len)
-      {
-	 nhpc_size_t content_len = nhpc_strtoi(check_content_len);
-	 
-	 void *data;
-	 nrv = grid_data_download_memory_block(&data, socket, &content_len);
-
-	 grid_response_add_data((*grid_response), data, content_len, ARG_MEM_BLOCK);
-      }
+      grid_response_add_data((*grid_response), grid_shared_data);
       
    return_response:
       if(command_parts)

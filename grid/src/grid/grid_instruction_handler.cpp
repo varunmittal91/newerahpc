@@ -33,5 +33,13 @@ namespace neweraHPC
    nhpc_status_t grid_instruction_request_handler(grid_data_t *grid_data)
    {
       cout << "Encounter instruction call" << endl;
+      
+      nhpc_status_t       nrv;
+      grid_instruction_t *instruction;
+      nrv = grid_instruction_prepare(&instruction, grid_data);
+      if(nrv != NHPC_SUCCESS)
+	 return nrv;
+      
+      cout << "Prepared instruction" << endl;
    }   
 };

@@ -52,7 +52,8 @@ namespace neweraHPC
 	 else 
 	    nrv = NHPC_FAIL;	 
       }
-      
+
+      grid_response_destruct(grid_response);
       grid_communication_destruct(grid_communication);
       
       return nrv;

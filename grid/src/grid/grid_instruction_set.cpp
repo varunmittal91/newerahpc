@@ -32,7 +32,10 @@ namespace neweraHPC
 	 delete[] grid_instruction_get_plugin_name(instruction);
       
       if(grid_instruction_get_grid_uid(instruction))
+      {
+	 cout << grid_instruction_get_grid_uid(instruction) << endl;
 	 delete[] grid_instruction_get_grid_uid(instruction);
+      }
       
       if(grid_instruction_get_referer_grid_uid(instruction))
 	 delete[] grid_instruction_get_referer_grid_uid(instruction);
@@ -66,11 +69,39 @@ namespace neweraHPC
 	 
 	 delete (instruction->arguments);
       }
+      delete instruction;
    }
    
    nhpc_status_t grid_instruction_prepare(grid_instruction_t **instruction, grid_data_t *grid_data)
    {
       grid_instruction_init(instruction);
+      
+      nhpc_socket_t *socket  = grid_data->socket;
+      rbtree        *headers = socket->headers;
+      rbtree        *arguments;
+
+      char *argument_count_str = (char *)headers->search("Argument-Count");
+      if(argument_count_str)
+      {
+	 arguments = new rbtree(RBTREE_NUM);
+	 
+	 int   argument_count = nhpc_strtoi(argument_count_str); 
+	 char *argument_num_str;
+	 char *argument_str;
+	 char *argument;
+	 
+	 for(int i = 1; i <= argument_count; i++)
+	 {
+	    argument_num_str = nhpc_itostr(i);
+	    argument_str     = nhpc_strconcat("Argument", argument_num_str);
+	    argument         = (char *)headers->search(argument_str);
+	    
+	    delete[] argument_num_str;
+	    delete[] argument_str;
+	    
+	    arguments->insert(argument);
+	 }
+      }	 
       
       return NHPC_SUCCESS;
    }
@@ -144,8 +175,12 @@ namespace neweraHPC
 	 const char *argument;
 	 const char *argument_headers;
 	 const char *num_str;
+	 const char *count_str;
+	 int         count;
 	 
-	 int count = grid_instruction_get_argument_count(instruction);
+	 count     = grid_instruction_get_argument_count(instruction);
+	 count_str = nhpc_itostr(count);
+	 grid_communication_set_header(grid_communication, "Argument-Count", count_str);
 	 for(int i = 1; i <= count; i++)
 	 {
 	    num_str          = nhpc_itostr(i);
@@ -157,10 +192,13 @@ namespace neweraHPC
 	    delete[] argument_headers;
 	    delete[] num_str;
 	 }
+	 delete[] count_str;
       }      
       grid_communication_set_header(grid_communication, "Plugin-Name", plugin_name);
       
       nrv = grid_communication_push(grid_communication);
+      grid_communication_destruct(grid_communication);
+      
       if(nrv != NHPC_SUCCESS)
 	 return nrv;    
       

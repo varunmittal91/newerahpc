@@ -63,10 +63,17 @@ namespace neweraHPC
    }
    static void grid_response_destruct(grid_response_t *grid_response)
    {
-      delete grid_response->headers;
+      if(grid_response->data)
+	 grid_shared_data_destruct(grid_response->data);
+      
+      delete (grid_response->headers);
       delete grid_response;
    }
    void grid_response_add_data(grid_response_t *grid_response, void *data, nhpc_size_t data_len, arg_t arg);
+   static void grid_response_add_data(grid_response_t *grid_response, grid_shared_data_t *data)
+   {
+      grid_response->data = data;
+   }
    nhpc_status_t grid_response_send(grid_response_t *grid_response);
    nhpc_status_t grid_response_push(grid_response_t *grid_response);
    

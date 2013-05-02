@@ -79,7 +79,7 @@ namespace neweraHPC
       
       grid_instruction_t *tmp = (*instruction);
    }
-   static void grid_instruction_destruct(grid_instruction_t *instruction);
+   void grid_instruction_destruct(grid_instruction_t *instruction);
    static void grid_instruction_set_plugin_name(grid_instruction_t *instruction, const char *plugin_name)
    {
       nhpc_strcpy((char **)&(grid_instruction_get_plugin_name(instruction)), plugin_name);

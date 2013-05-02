@@ -49,6 +49,9 @@ int main(int argc, char **argv)
    grid_instruction_add_argument(instruction, ARG_COMMAND, "blender");
    grid_instruction_add_argument(instruction, ARG_RANGE, &a, &b);
    grid_instruction_set_input_data(instruction, abc, &len, ARG_MEM_BLOCK);
+   grid_instruction_send(instruction);  
+   grid_instruction_destruct(instruction);
    
-   grid_instruction_send(instruction);      
+   while(1)
+      sleep(1);
 }

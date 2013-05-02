@@ -101,7 +101,13 @@ namespace neweraHPC
 	 delete[] grid_communication->dest_addr;
       if(grid_communication->dest_port)
 	 delete[] grid_communication->dest_port;
-      delete grid_communication->headers;
+      
+      if(grid_communication->peer_addr)
+	 delete[] grid_communication->peer_addr;
+      if(grid_communication->peer_port)
+	 delete[] grid_communication->peer_port;
+
+      delete (grid_communication->headers);
       
       if(grid_communication->socket)
       {

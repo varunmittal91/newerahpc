@@ -117,6 +117,7 @@ namespace neweraHPC
 #define grid_arg_is_mem_block(av)         (grid_arg_is_type(av, ARG_MEM_BLOCK))
    
 
+   struct grid_shared_data_t;
    typedef unsigned char status_t;
    struct grid_data_t
    {
@@ -128,9 +129,7 @@ namespace neweraHPC
       const char    *peer_port;
       nhpc_socket_t *socket;
 
-      nhpc_size_t    content_len;
-      const char    *content_type;
-      void          *content_addr;
+      grid_shared_data_t *data;
    };
 
 #define grid_data_get_arguments(g)         (g->arguments) 
@@ -163,6 +162,7 @@ namespace neweraHPC
       (*data) = new grid_data_t;
       memset((*data), 0, sizeof(grid_data_t));
    }
+   static void grid_shared_data_destruct(grid_shared_data_t *data);
    static void grid_data_destruct(grid_data_t *data)
    {
       if(data->arguments)
@@ -174,11 +174,12 @@ namespace neweraHPC
 	    value = grid_data_get_argument_value(data, i);
 	    delete value;
 	 }
-	 if(data->content_type)
-	    delete[] (data->content_type);
 	 
 	 delete data->arguments;
       }
+      
+      if(data->data)
+	 grid_shared_data_destruct(data->data);
    }   
    
    void grid_data_create_from_socket(grid_data_t *data, nhpc_socket_t *socket);
@@ -191,7 +192,7 @@ namespace neweraHPC
       nhpc_size_t   len;
    };
 #define grid_shared_data_get_data_address(g)  (g->address)
-#define grid_shared_data_get_data_lenth(g)    (g->len)
+#define grid_shared_data_get_data_length(g)    (g->len)
    static void grid_shared_data_init(grid_shared_data_t **data)
    {
       (*data) = new grid_shared_data_t;

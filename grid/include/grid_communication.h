@@ -37,12 +37,11 @@ namespace neweraHPC
 #define GRID_SUBMISSION                     4
 #define GRID_PLUGIN_REQUEST                 5
    
-#define GRID_COMMUNICATION_OPT_REGISTER            1
-#define GRID_COMMUNICATION_OPT_SEND_PEER_DETAILS   2
-#define GRID_COMMUNICATION_SENT                    4
-#define GRID_COMMUNICATION_COMPLETE                8
-#define GRID_COMMUNICATION_PRESERVE_SOCKET        16
-   
+#define GRID_COMMUNICATION_SENT                    1
+#define GRID_COMMUNICATION_COMPLETE                2
+#define GRID_COMMUNICATION_OPT_REGISTER            4
+#define GRID_COMMUNICATION_OPT_SEND_PEER_DETAILS   8
+
    static struct _GRID_STATUS_MSSGS
    {
       const char        *MSSGS_STRINGS;
@@ -95,6 +94,14 @@ namespace neweraHPC
       (*gc) = new grid_communication_t;
       memset((*gc), 0, sizeof(grid_communication_t));
       grid_set_communication_type((*gc), c);
+      
+      const char *mssg       = grid_get_communication_status_mssg((*gc));      
+      const char *header_str = nhpc_strconcat("GRID ", mssg, " 2.90");
+      
+      ((*gc)->headers) = new nhpc_headers_t;
+      (*gc)->headers->insert(header_str);    
+
+      delete[] header_str;
    }
    static void grid_communication_destruct(grid_communication_t *grid_communication)
    {
@@ -119,18 +126,22 @@ namespace neweraHPC
 	 socket_delete(grid_communication->socket);
       }
       
+      if(grid_communication->data)
+	 grid_shared_data_destruct(grid_communication->data);
+      
       delete grid_communication;
    }   
+   
+#define grid_communication_add_data(g, d) (g->data = d)
    
    static void grid_communication_add_dest(grid_communication_t *grid_commuincation, const char *dest_addr, const char *dest_port)
    {
       nhpc_strcpy((char **)&(grid_commuincation->dest_addr), dest_addr);
       nhpc_strcpy((char **)&(grid_commuincation->dest_port), dest_port);
    }
-#define grid_communication_add_data(g, d) (g->data = d)
    
    nhpc_status_t grid_communication_send(grid_communication_t *grid_communication);
-   nhpc_status_t grid_communication_push(grid_communication_t *grid_communication);
+   nhpc_status_t grid_communication_push(grid_communication_t *grid_communication, grid_shared_data_t *data = NULL);
    
    nhpc_status_t grid_communication_handlers_init();
    nhpc_status_t grid_request_handler(nhpc_socket_t *socket);

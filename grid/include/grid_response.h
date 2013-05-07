@@ -42,7 +42,7 @@ namespace neweraHPC
       
       grid_shared_data_t   *data;
    };
-
+   
 #define grid_get_response_status_code(gc)      ((gc->response_type) >> 3)
 #define grid_set_response_status_code(gc, c)   ((gc->response_type) |= (c << 3))
 #define grid_get_response_status_mssg(gc)      (GRID_RESPONSE_MSSGS[grid_get_response_status_code(gc)].MSSGS_STRINGS)
@@ -75,7 +75,7 @@ namespace neweraHPC
       grid_response->data = data;
    }
    nhpc_status_t grid_response_send(grid_response_t *grid_response);
-   nhpc_status_t grid_response_push(grid_response_t *grid_response);
+   nhpc_status_t grid_response_push(grid_response_t *grid_response, grid_shared_data_t *data = NULL);
    
    nhpc_status_t grid_response_get(grid_response_t **grid_response, grid_communication_t *grid_communication);
 };

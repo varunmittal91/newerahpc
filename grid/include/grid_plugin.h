@@ -29,6 +29,7 @@
 #include <neweraHPC/thread.h>
 
 #include "grid_data.h"
+#include "grid_instruction_data_type.h"
 
 namespace neweraHPC 
 {
@@ -39,7 +40,7 @@ namespace neweraHPC
    extern nhpc_mutex_t mutex_plugins_requested;
    extern nhpc_mutex_t mutex_plugins_installed;
    
-   typedef nhpc_status_t (*grid_plugin_fnc_ptr_t)(grid_data_t *);
+   typedef nhpc_status_t (*grid_plugin_fnc_ptr_t)(grid_instruction_t *);
    struct plugin_details_t
    {
       char       *plugin_name;
@@ -64,15 +65,15 @@ namespace neweraHPC
 #define grid_plugin_details_set_plugin_name(p, n)    (nhpc_strcpy(&(p->plugin_name), n))
 #define grid_plugin_details_set_fnc_exec(p, f)       (p->fnc_exec = f)
 #define grid_plugin_details_set_fnc_processor(p, f)  (p->fnc_processor = f)
+   
    inline plugin_details_t *grid_plugin_search_installed(const char *plugin_name)
    {
       thread_mutex_lock(&mutex_plugins_installed, NHPC_THREAD_LOCK_READ);
       plugin_details_t *plugin_details = (plugin_details_t *)(*plugins_installed).search(plugin_name);
       thread_mutex_unlock(&mutex_plugins_installed, NHPC_THREAD_LOCK_READ);
-
+      
       return plugin_details;
-   }
-   
+   }   
    nhpc_status_t grid_plugin_install(plugin_details_t *plugin_details);
    nhpc_status_t grid_plugin_install_dll(const char *dll_path, plugin_details_t **plugin_details);
    nhpc_status_t grid_plugin_search(const char *plugin_name, plugin_details_t **plugin_details);
@@ -100,6 +101,10 @@ namespace neweraHPC
       return plugin_request;
    }
    nhpc_status_t grid_plugin_request_plugin(const char *plugin_name, const char *peer_addr, const char *peer_port);
+   
+#define grid_plugin_execute_function(f, arg)  (f(arg))
+#define grid_plugin_execute_exec(g, arg)      (grid_plugin_execute_function(g->fnc_exec, arg))
+#define grid_plugin_execute_processor(g, arg) (grid_plugin_execute_function(g->fnc_processor, arg))
 };
 
 #endif

@@ -17,7 +17,29 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <include/grid_scheduler.h>
+
 namespace neweraHPC
 {
-
+   rbtree *queued_instructions;
+   rbtree *jobs;
+   
+   void grid_scheduler_system_init()
+   {
+      queued_instructions = new rbtree(RBTREE_STR);
+   }
+   
+   void grid_task_add_task(const char *grid_uid, grid_instruction_t **instructions, int *instructions_count)
+   {
+      grid_task_t *task = new grid_task_t;
+      task->count        = *instructions_count;
+      task->instructions = instructions;
+      
+      jobs->insert(task, grid_uid);
+   }
+   
+   nhpc_status_t grid_scheduler_add_job(const char *grid_uid, grid_instruction_t **instructions, int *instructions_count)
+   {
+      grid_task_add_task(grid_uid, instructions, instructions_count);
+   }
 };

@@ -46,7 +46,16 @@ namespace neweraHPC
       const char *peer_port   = grid_instruction_get_peer_port(instruction);
       
       plugin_details_t *plugin_details;
-      nrv = NHPC_FAIL;
+      nrv = grid_plugin_search(plugin_name, &plugin_details);
+      if(nrv == NHPC_FAIL && peer_addr && peer_port)
+      {
+	 nrv = grid_plugin_request_plugin(plugin_name, peer_addr, peer_port);
+      }
+      if(nrv != NHPC_SUCCESS)
+	 return nrv;
+      
+      nrv = grid_instruction_execute(instruction, plugin_details);
+      
       return nrv;
    }   
 };

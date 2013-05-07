@@ -43,7 +43,7 @@ namespace neweraHPC
    
    nhpc_status_t grid_plugin_install(plugin_details_t *plugin_details)
    {
-      if(plugins_installed->insert(plugin_details->plugin_name) == 0)
+      if(plugins_installed->insert(plugin_details, plugin_details->plugin_name) == 0)
 	 return NHPC_FAIL;
       
       return NHPC_SUCCESS;

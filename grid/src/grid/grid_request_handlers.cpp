@@ -39,7 +39,7 @@ namespace neweraHPC
       if(nrv == NHPC_SUCCESS)
       {
 	 nhpc_size_t size = strlen(client_uid) + 1;
-	 grid_data_add_data(grid_data, client_uid, size, ARG_MEM_BLOCK);
+	 grid_data_add_result_data(grid_data, client_uid, size, ARG_MEM_BLOCK);
 	 return NHPC_SUCCESS;
       }
       else 
@@ -59,7 +59,7 @@ namespace neweraHPC
       else 
       {
 	 nhpc_size_t size = strlen(server_uid) + 1;
-	 grid_data_add_data(grid_data, server_uid, size, ARG_MEM_BLOCK);
+	 grid_data_add_result_data(grid_data, server_uid, size, ARG_MEM_BLOCK);
 	 return NHPC_SUCCESS;
       }
       

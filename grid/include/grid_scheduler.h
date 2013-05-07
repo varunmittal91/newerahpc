@@ -20,6 +20,12 @@
 #ifndef _GRID_SCHEDULER_H_
 #define _GRID_SCHEDULER_H_
 
+#include <neweraHPC/constants.h>
+#include <neweraHPC/rbtree.h>
+
+#include "grid_data.h"
+#include "grid_instruction_data_type.h"
+
 namespace neweraHPC
 {
    struct grid_job_t
@@ -28,10 +34,25 @@ namespace neweraHPC
       rbtree *instructions_queued;
    };
    
-   rbtree *queued_instructions;
-   rbtree *jobs;
+   struct grid_peer_t
+   {
+      
+   };
+   
+   extern rbtree *queued_instructions;
+   extern rbtree *jobs;
+   
+   void grid_scheduler_system_init();
+   
+   struct grid_task_t
+   {
+      int count;
+      grid_instruction_t **instructions;
+   };
+   static void grid_task_add_task(const char *grid_uid, grid_instruction_t **instructions, int *instructions_count);
    
    nhpc_status_t grid_scheduler_find_peer();
+   nhpc_status_t grid_scheduler_add_job(const char *grid_uid, grid_instruction_t **instructions, int *instructions_count);
 };
 
 #endif

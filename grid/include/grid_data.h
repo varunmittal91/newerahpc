@@ -41,7 +41,8 @@ namespace neweraHPC
 #define ARG_MEM_BLOCK 32
    static const char *grid_arg_content_types[] = {"ARG_RANGE", "ARG_NUMBER", "ARG_LITERAL", "ARG_COMMAND", "ARG_FILE", "ARG_MEM_BLCOK"};
 
-   typedef unsigned char arg_t;
+   typedef unsigned char  arg_t;
+   typedef const char    *arg_value_t;
    static int _grid_arg_get_int_code(arg_t arg)
    {
       int code = 0;
@@ -57,10 +58,26 @@ namespace neweraHPC
 #define _grid_arg_is_file(a)      (_grid_arg_is_type(a, ARG_FILE))
 #define _grid_arg_set_type(a, t)  ((*a) = t)
    
+#define grid_arg_set_mem_block(av, a, s)  (grid_arg_set_address_space(av, a, s, ARG_MEM_BLOCK))
+#define grid_arg_set_file(av, a, s)       (grid_arg_set_address_space(av, a, s, ARG_FILE))
+#define grid_arg_set_literal(av, l)       (grid_arg_set_literals(av, l, ARG_LITERAL))
+#define grid_arg_set_command(av, l)       (grid_arg_set_literals(av, l, ARG_COMMAND))
+#define grid_arg_is_type(av, t)           (1 & (av >> _grid_arg_get_int_code(t)))
+#define grid_arg_is_range(av)             (grid_arg_is_type(av, ARG_RANGE))
+#define grid_arg_is_value(av)             (grid_arg_is_type(av, ARG_VALUE))
+#define grid_arg_is_literal(av)           (grid_arg_is_type(av, ARG_LITERAL))
+#define grid_arg_is_command(av)           (grid_arg_is_type(av, ARG_COMMAND))
+#define grid_arg_is_file(av)              (grid_arg_is_type(av, ARG_FILE))
+#define grid_arg_is_mem_block(av)         (grid_arg_is_type(av, ARG_MEM_BLOCK))
+#define grid_arg_get_code(av)             (*av)
    static void grid_arg_set_value(const char **arg_value, const char *s)
    {
       (*arg_value) = new char [strlen(s) + sizeof(arg_t) + 1];
       nhpc_strcpy_noalloc((char *)((*arg_value) + sizeof(arg_t)), s);
+   }
+   static const char *grid_arg_get_value(arg_value_t arg_value)
+   {
+      return (const char *)(arg_value + sizeof(arg_t));
    }
 #define grid_arg_set_type(av, t)   (_grid_arg_set_type((char *)av, t))
    static void grid_arg_set_number(const char **arg_value, int number)
@@ -80,6 +97,26 @@ namespace neweraHPC
       delete str1;
       delete str2;
       delete str3;
+   }
+   static void grid_arg_get_range(arg_value_t arg_value, int *number1, int *number2)
+   {
+      if(!grid_arg_is_range(grid_arg_get_code(arg_value)))
+	 return;
+
+      const char *arg_string = grid_arg_get_value(arg_value);
+      
+      int pos    = nhpc_strfind(arg_string, ',');
+      if(pos == 0)
+	 return;
+      
+      char *str1 = nhpc_substr(arg_string, 1, pos - 1);
+      char *str2 = nhpc_substr(arg_string, pos + 1, strlen(arg_string));
+      
+      *number1 = nhpc_strtoi(str1);
+      *number2 = nhpc_strtoi(str2);
+      
+      delete[] str1;
+      delete[] str2;
    }
    static void grid_arg_set_literals(const char **arg_value, const char *literal, arg_t arg)
    {
@@ -104,17 +141,6 @@ namespace neweraHPC
    {
       
    }
-#define grid_arg_set_mem_block(av, a, s)  (grid_arg_set_address_space(av, a, s, ARG_MEM_BLOCK))
-#define grid_arg_set_file(av, a, s)       (grid_arg_set_address_space(av, a, s, ARG_FILE))
-#define grid_arg_set_literal(av, l)       (grid_arg_set_literals(av, l, ARG_LITERAL))
-#define grid_arg_set_command(av, l)       (grid_arg_set_literals(av, l, ARG_COMMAND))
-#define grid_arg_is_type(av, t)           (1 & (av >> _grid_arg_get_int_code(t)))
-#define grid_arg_is_range(av)             (grid_arg_is_type(av, ARG_RANGE))
-#define grid_arg_is_value(av)             (grid_arg_is_type(av, ARG_VALUE))
-#define grid_arg_is_literal(av)           (grid_arg_is_type(av, ARG_LITERAL))
-#define grid_arg_is_command(av)           (grid_arg_is_type(av, ARG_COMMAND))
-#define grid_arg_is_file(av)              (grid_arg_is_type(av, ARG_FILE))
-#define grid_arg_is_mem_block(av)         (grid_arg_is_type(av, ARG_MEM_BLOCK))
    
 
    struct grid_shared_data_t;
@@ -129,7 +155,8 @@ namespace neweraHPC
       const char    *peer_port;
       nhpc_socket_t *socket;
 
-      grid_shared_data_t *data;
+      grid_shared_data_t *input_data;
+      grid_shared_data_t *result_data;
    };
 
 #define grid_data_get_arguments(g)         (g->arguments) 
@@ -175,10 +202,13 @@ namespace neweraHPC
 	 delete data->arguments;
       }
       
-      if(data->data)
-	 grid_shared_data_destruct(data->data);
+      if(data->input_data)
+	 grid_shared_data_destruct(data->input_data);
+      if(data->result_data)
+	 grid_shared_data_destruct(data->result_data);
    }   
-#define grid_data_add_data(g, d, l, a) do{grid_shared_data_init(&(g->data)); grid_shared_data_set_data(g->data, (void *)d, &l, a);}while(false);
+#define grid_data_add_result_data(g, d, l, a) do{grid_shared_data_init(&(g->result_data)); grid_shared_data_set_data(g->result_data, (void *)d, &l, a);}while(false);
+#define grid_data_destruct_data(g)     (grid_shared_data_destruct(g->data))
    void grid_data_create_from_socket(grid_data_t *data, nhpc_socket_t *socket);
    
    struct grid_shared_data_t

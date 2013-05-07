@@ -75,6 +75,20 @@ namespace neweraHPC
       rbtree        *headers = socket->headers;
       rbtree        *arguments;
 
+      const char *peer_addr       = network_headers_get_param(socket->headers, "Peer-Addr");
+      const char *peer_port       = network_headers_get_param(socket->headers, "Peer-Port");
+      const char *plugin_name     = network_headers_get_param(socket->headers, "Plugin-Name");
+      const char *execution_state = network_headers_get_param(socket->headers, "Execution-State");
+
+      if(!plugin_name)
+	 return NHPC_FAIL;
+      grid_instruction_set_plugin_name((*instruction), plugin_name);
+      if(execution_state)
+	 grid_instruction_set_executable((*instruction));
+      
+      if(peer_addr && peer_port)
+	 grid_instruction_set_peer((*instruction), peer_addr, peer_port);
+      
       char *argument_count_str = (char *)headers->search("Argument-Count");
       if(argument_count_str)
       {
@@ -96,6 +110,8 @@ namespace neweraHPC
 	    
 	    arguments->insert(argument);
 	 }
+	 
+	 (*instruction)->arguments = arguments;
       }	 
       
       return NHPC_SUCCESS;
@@ -143,5 +159,20 @@ namespace neweraHPC
       
       instruction->arguments->insert((void *)arg_value);
       return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t grid_instruction_execute(grid_instruction_t *instruction, plugin_details_t *plugin_details)
+   {
+      nhpc_status_t nrv;
+      
+      if(grid_instruction_is_executable(instruction))
+	 nrv = grid_plugin_execute_exec(plugin_details, instruction);
+      else 
+	 nrv = grid_plugin_execute_processor(plugin_details, instruction);
+      
+      if(nrv == NHPC_FAIL)
+	 grid_instruction_destruct(instruction);
+      
+      return nrv;
    }
 };

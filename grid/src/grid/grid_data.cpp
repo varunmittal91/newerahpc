@@ -41,7 +41,7 @@ namespace neweraHPC
       
       grid_data_set_socket(data, socket);
       if(grid_shared_data_check(socket) == NHPC_SUCCESS)
-	 grid_shared_data_get_data(&(data->data), socket);
+	 grid_shared_data_get_data(&(data->input_data), socket);
    }
    
    nhpc_status_t grid_shared_data_check(nhpc_socket_t *socket)

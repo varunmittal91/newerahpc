@@ -22,32 +22,16 @@
 
 #include "grid_communication.h"
 #include "grid_data.h"
+#include "grid_plugin.h"
+#include "grid_instruction_data_type.h"
 
 namespace neweraHPC
 {
-   typedef unsigned char instruction_status_t;
-#define GRID_INSTRUCTION_SENT      1
-#define GRID_INSTRUCTION_PROCESSED 2
-   struct grid_instruction_t
-   {
-      const char *plugin_name;
-      rbtree     *arguments;
-      
-      const char *grid_uid;
-      const char *peer_addr;
-      const char *peer_port;
+#define GRID_INSTRUCTION_SENT        1
+#define GRID_INSTRUCTION_PROCESSED   2
+#define GRID_INSTRUCTION_OPT_EXECUTE 4
 
-      const char *referer_grid_uid;
-      const char *referer_addr;
-      const char *referer_port;
-      
-      grid_shared_data_t *input_data;
-      grid_shared_data_t *result_data;
-      
-      instruction_status_t  instruction_status;
-   };
-   
-   static bool grid_instrution_opt_is_set(grid_instruction_t *instruction, instruction_status_t opt)
+   static bool grid_instruction_opt_is_set(grid_instruction_t *instruction, instruction_status_t opt)
    {
       int bit = 0;
       while(opt > 1)
@@ -58,9 +42,14 @@ namespace neweraHPC
       
       return (1 & ((instruction->instruction_status) >> bit));
    }
+#define grid_instruction_set_opt(i, o)    (i->instruction_status |= o)
+
 #define grid_instruction_is_sent(i)       (grid_instruction_opt_is_set(i, GRID_INSTRUCTION_SENT))
 #define grid_instruction_is_processed(i)  (grid_instruction_opt_is_set(i, GRID_INSTRUCTION_PROCESSED))
+#define grid_instruction_is_executable(i) (grid_instruction_opt_is_set(i, GRID_INSTRUCTION_OPT_EXECUTE))
    
+#define grid_instruction_set_executable(i) (grid_instruction_set_opt(i, GRID_INSTRUCTION_OPT_EXECUTE))
+
 #define grid_instruction_get_input_data(i)       (i->input_data)
 #define grid_instruction_get_result_data(i)      (i->result_data)
    
@@ -117,10 +106,17 @@ namespace neweraHPC
       grid_shared_data_init(data);
       grid_shared_data_set_data((*data), address, len, arg);
    }
+   static void grid_instruction_set_data(grid_instruction_t *grid_instruction, grid_shared_data_t *data, bool is_input)
+   {
+      if(is_input)
+	 data = grid_instruction->input_data;
+      else 
+	 data = grid_instruction->result_data;
+   }
 #define grid_instruction_set_input_data(i, addr, l, a)    (grid_instruction_set_data(i, (void *)addr, l, a, true))
 #define grid_instruction_set_result_data(i, addr, l, a)   (grid_instruction_set_data(i, (void *)addr, l, a, false))
-#define grid_instruction_set_communication(i, c)          (i->communication = c)
-   
+
+   nhpc_status_t grid_instruction_execute(grid_instruction_t *instruction, plugin_details_t *plugin_details);
 }
 
 #endif

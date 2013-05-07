@@ -24,12 +24,13 @@
 
 #include "grid_plugin.h"
 #include "grid_data.h"
+#include "grid_instruction.h"
 
 namespace neweraHPC
 {
    nhpc_status_t grid_plugin_range_init(plugin_details_t **plugin_details);
-   nhpc_status_t grid_plugin_range_exec(grid_data_t *grid_data);
-   nhpc_status_t grid_plugin_range_processor(grid_data_t *grid_data);
+   nhpc_status_t grid_plugin_range_exec(grid_instruction_t *instruction);
+   nhpc_status_t grid_plugin_range_processor(grid_instruction_t *instruction);
 };
 
 #endif

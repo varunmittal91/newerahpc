@@ -121,16 +121,24 @@ namespace neweraHPC
       return NHPC_SUCCESS;
    }
    
-   nhpc_status_t grid_response_push(grid_response_t *grid_response)
+   nhpc_status_t grid_response_push(grid_response_t *grid_response, grid_shared_data_t *_data)
    {
       nhpc_status_t nrv;
       
-      nhpc_socket_t  *socket  = grid_response->socket;
-      nhpc_headers_t *headers = grid_response->headers;
+      nhpc_socket_t      *socket  = grid_response->socket;
+      nhpc_headers_t     *headers = grid_response->headers;
+      grid_shared_data_t *data    = _data;
+      if(!_data)
+	 data = grid_response->data;
       
-      nrv = headers->write(socket);
-      if(grid_response->data && nrv == NHPC_SUCCESS)
-	 nrv = grid_shared_data_push_data(grid_response->data, socket);
+      if(data && nrv == NHPC_SUCCESS)
+      {
+	 grid_shared_data_get_headers(data, headers);
+	 nrv = headers->write(socket);
+	 nrv = grid_shared_data_push_data(data, socket);
+      }
+      else 
+	 nrv = headers->write(socket);
       
       return nrv;
    }

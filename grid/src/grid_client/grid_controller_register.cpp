@@ -42,10 +42,11 @@ namespace neweraHPC
       grid_communication_set_opt(grid_communication, GRID_COMMUNICATION_OPT_SEND_PEER_DETAILS);
       grid_communication_add_dest(grid_communication, host_addr, host_port);
 
-      grid_communication_send(grid_communication);
       grid_set_communication_header(grid_communication, "Core-Count", core_count_str);
       grid_set_communication_header(grid_communication, "Free-Mem", free_mem_str);     
       grid_set_communication_header(grid_communication, "Total-Mem", total_mem_str);
+     
+      grid_communication_send(grid_communication);
       nrv = grid_communication_push(grid_communication);      
 
       delete[] core_count_str;
@@ -77,6 +78,7 @@ namespace neweraHPC
       }
       
       grid_communication_destruct(grid_communication);
+      grid_response_destruct(grid_response);
       
       return nrv;      
    }

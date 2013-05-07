@@ -48,8 +48,6 @@ namespace neweraHPC
       nhpc_status_t nrv;
       const char *grid_uid = NULL;
       
-      const char *mssg = grid_get_communication_status_mssg(grid_communication);
-      
       if(grid_communication_is_opt_register(grid_communication))
       {
 	 nrv = grid_client_register_to_server(&grid_uid, grid_communication->dest_addr, grid_communication->dest_port);
@@ -59,9 +57,6 @@ namespace neweraHPC
 	 }
       }
       
-      const char *header_str = nhpc_strconcat("GRID ", mssg, " 2.90");
-      grid_communication->headers = new nhpc_headers_t;
-      grid_communication->headers->insert(header_str);
       if(grid_uid)
       {
 	 grid_communication->headers->insert("Grid-Uid", grid_uid);
@@ -73,31 +68,34 @@ namespace neweraHPC
 	 grid_communication->headers->insert("Peer-Port", _host_port);      
       }
       
-      delete[] header_str;
+      return NHPC_SUCCESS;
    }
    
-   nhpc_status_t grid_communication_push(grid_communication_t *grid_communication)
+   nhpc_status_t grid_communication_push(grid_communication_t *grid_communication, grid_shared_data_t *_data)
    {
       const char *dest_addr = grid_communication->dest_addr;
       const char *dest_port = grid_communication->dest_port;
-      nhpc_status_t   nrv;
-      nhpc_socket_t  *socket;
-      nhpc_headers_t *headers = grid_communication->headers;
 
-      if(grid_communication->data)
-      {
-	 grid_shared_data_get_headers((grid_communication->data), headers);
-      }      
+      nhpc_status_t       nrv;
+      nhpc_socket_t      *socket;
+      nhpc_headers_t     *headers = grid_communication->headers;
       
+      grid_shared_data_t *data    = _data;
+      if(!data)
+	 data = grid_communication->data;
+
       nrv = socket_connect(&socket, dest_addr, dest_port, AF_INET, SOCK_STREAM, 0);
-      nrv = headers->write(socket);	          
       grid_communication->socket = socket;
 
-      if(grid_communication->data)
+      if(data && nrv == NHPC_SUCCESS)
       {
-	 grid_shared_data_push_data((grid_communication->data), socket);
-      }            
-      
+	 grid_shared_data_get_headers(data, headers);
+	 nrv = headers->write(socket);
+	 nrv = grid_shared_data_push_data(data, socket);	 
+      }
+      else 
+	 nrv = headers->write(socket);
+
       return nrv;
    }
    
@@ -130,25 +128,24 @@ namespace neweraHPC
 	 grid_response_t *response;
 	 grid_response_init(&response);
 	 grid_response_set_socket(response, grid_data_get_socket(grid_data));
+	 grid_shared_data_t *data = NULL;
 	 if(nrv == NHPC_SUCCESS)
 	 {
-	    cout << "sending details" << endl;
-	    
 	    grid_set_response_status_code(response, GRID_RESPONSE_SUCCESSFUL);
-	    if(grid_data->data)
-	       grid_response_add_data(response, grid_data->data);
+	    if(grid_data->result_data)
+	       data = grid_data->result_data;
 	 }
 	 else 
 	    grid_set_response_status_code(response, GRID_RESPONSE_RESOURCE_UNAVAILABLE);
 	 
 	 grid_response_send(response);
-	 grid_response_push(response);
+	 grid_response_push(response, data);
 	 grid_response_destruct(response);
 	 grid_data_destruct(grid_data);
       }      
       else 
       {
-	 cout << "No handler found:" << fnc_str << endl;
+	 LOG_ERROR("No Suitable GRID Handler found for the request");
       }
       
       nhpc_string_delete(string);

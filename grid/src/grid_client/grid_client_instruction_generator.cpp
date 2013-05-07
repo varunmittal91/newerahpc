@@ -42,15 +42,15 @@ namespace neweraHPC
       if(!peer_addr || !peer_port)
 	 return NHPC_FAIL;
       
-      nhpc_status_t nrv;
+      nhpc_status_t       nrv;
+      grid_shared_data_t *data = NULL;
       
       grid_communication_t *grid_communication;
       grid_communication_init(&grid_communication, GRID_INSTRUCTION);
       grid_communication_add_dest(grid_communication, peer_addr, peer_port);
       grid_communication_set_opt(grid_communication, GRID_COMMUNICATION_OPT_REGISTER);
       if(grid_instruction_get_input_data(instruction))
-	 grid_communication_add_data(grid_communication, grid_instruction_get_input_data(instruction));
-      grid_communication_send(grid_communication);
+	 data = grid_instruction_get_input_data(instruction);
       
       if(instruction->arguments)
       {
@@ -62,6 +62,7 @@ namespace neweraHPC
 	 
 	 count     = grid_instruction_get_argument_count(instruction);
 	 count_str = nhpc_itostr(count);
+	 	 
 	 grid_communication_set_header(grid_communication, "Argument-Count", count_str);
 	 for(int i = 1; i <= count; i++)
 	 {
@@ -77,8 +78,9 @@ namespace neweraHPC
 	 delete[] count_str;
       }      
       grid_communication_set_header(grid_communication, "Plugin-Name", plugin_name);
-      
-      nrv = grid_communication_push(grid_communication);
+
+      grid_communication_send(grid_communication);
+      nrv = grid_communication_push(grid_communication, data);
       
       grid_response_t *response;
       nrv = grid_response_get(&response, grid_communication);

@@ -21,6 +21,10 @@
 #define _GRID_CLIENT_H_
 
 #include <iostream>
+
+#include <neweraHPC/thread.h>
+#include <neweraHPC/strings.h>
+
 using namespace std;
 
 namespace neweraHPC 
@@ -39,7 +43,13 @@ namespace neweraHPC
       int      logical_cores;
       long int total_mem;
       long int free_mem;
+      int      free_cores;
    };
+#define grid_compute_node_get_cores(cn)                 (cn->logical_cores)
+#define grid_compute_node_get_free_cores(cn)            (cn->free_cores)
+#define grid_compute_node_get_available_cores(cn)       (grid_compute_node_get_free_cores(cn))
+#define grid_compute_node_alloc_available_cores(cn, n)  (grid_compute_node_get_free_cores(cn) -= n)
+#define grid_compute_node_free_available_cores(cn, n)   (grid_compute_node_get_free_cores(cn) += n)
    static void grid_node_compute_init(grid_node_compute_t **grid_node_compute)
    {
       (*grid_node_compute) = new grid_node_compute_t;
@@ -48,6 +58,7 @@ namespace neweraHPC
    static void grid_node_compute_set_logical_cores(grid_node_compute_t *grid_node_compute, const char *cpu_cores_str)
    {
       grid_node_compute->logical_cores = nhpc_strtoi(cpu_cores_str);
+      grid_node_compute->free_cores    = grid_node_compute->logical_cores;
    }
    static void grid_node_compute_set_total_mem(grid_node_compute_t *grid_node_compute, const char *total_mem)
    {
@@ -71,14 +82,21 @@ namespace neweraHPC
       node_type_t  node_type;
       void        *node_data;
    };
+#define grid_node_get_peer_addr(n)  (n->peer_addr)
+#define grid_node_get_peer_port(n)  (n->peer_port)
    
    extern rbtree *registered_nodes;
    extern rbtree *registered_clients;
+   extern nhpc_mutex_t mutex_registered_nodes;
+   extern nhpc_mutex_t mutex_registered_clients;
    
    static void grid_node_db_init()
    {
       registered_nodes   = new rbtree(RBTREE_STR);
       registered_clients = new rbtree(RBTREE_STR);
+      
+      thread_mutex_init(&mutex_registered_nodes);
+      thread_mutex_init(&mutex_registered_clients);
    }
    static void grid_node_init(grid_node_t **grid_node, node_type_t node_type)
    {
@@ -95,6 +113,8 @@ namespace neweraHPC
    {
       nhpc_strcpy((char **)&(grid_node->peer_uid), uid);
    }
+   grid_node_t *grid_node_get_compute_node(int cpu_cores);
+   void grid_node_free_compute_node(grid_node_t *node, int cpu_cores);
 #define grid_node_get_compute_node_data(n)    (grid_node_compute_t *)(n->node_data)
 #define grid_node_get_client_node_data(n)     (grid_node_client_t *)(n->node_data)
 #define grid_node_set_compute_node_data(n, d) (n->node_data = (void *)d)

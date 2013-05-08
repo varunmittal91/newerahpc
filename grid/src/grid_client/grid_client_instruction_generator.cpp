@@ -79,8 +79,13 @@ namespace neweraHPC
       }      
       grid_communication_set_header(grid_communication, "Plugin-Name", plugin_name);
 
+      if(grid_instruction_is_executable(instruction))
+	 grid_communication_set_header(grid_communication, "Execution-State", "Ready");
+
       grid_communication_send(grid_communication);
       nrv = grid_communication_push(grid_communication, data);
+      
+      grid_instruction_set_grid_uid(instruction, grid_communication_get_grid_uid(grid_communication));
       
       grid_response_t *response;
       nrv = grid_response_get(&response, grid_communication);

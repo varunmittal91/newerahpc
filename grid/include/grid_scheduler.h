@@ -34,11 +34,6 @@ namespace neweraHPC
       rbtree *instructions_queued;
    };
    
-   struct grid_peer_t
-   {
-      
-   };
-   
    extern rbtree *queued_instructions;
    extern rbtree *jobs;
    
@@ -53,6 +48,7 @@ namespace neweraHPC
    
    nhpc_status_t grid_scheduler_find_peer();
    nhpc_status_t grid_scheduler_add_job(const char *grid_uid, grid_instruction_t **instructions, int *instructions_count);
+   void *grid_scheduler_job_dispatcher();
 };
 
 #endif

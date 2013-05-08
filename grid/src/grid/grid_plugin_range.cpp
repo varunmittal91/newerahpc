@@ -66,9 +66,6 @@ namespace neweraHPC
 	       found_range = true;
 	       
 	       grid_arg_get_range(arg_value, &value1, &value2);
-	       cout << "Arg value found" << endl;
-	       
-	       cout << value1 << value2 << endl;
 	       if(value2 > value1)
 		  instruction_count = (value2 - value1) + 1;
 	    }
@@ -80,8 +77,9 @@ namespace neweraHPC
       
       const char *plugin_name = grid_instruction_get_plugin_name(instruction);
       const char *grid_uid    = grid_instruction_get_grid_uid(instruction);
+      const char *peer_addr   = grid_instruction_get_peer_addr(instruction);
+      const char *peer_port   = grid_instruction_get_peer_port(instruction);
       
-      cout << "Creating instruction:" << instruction_count << endl;
       instructions = new grid_instruction_t* [instruction_count];
       for(int i = 0; i < instruction_count; i++)
       {
@@ -89,8 +87,14 @@ namespace neweraHPC
 	 grid_instruction_init(&(instructions[i]));
 	 grid_instruction_set_plugin_name(instructions[i], plugin_name);
 	 
+	 //grid_instruction_set_referer(instructions[i], peer_addr, peer_port);
+	 //cout << (void *)(grid_uid) << endl;
+	 //grid_instruction_set_referer_grid_uid(instructions[i], grid_uid);
+	 
 	 int value = value1 + i;
 	 grid_instruction_add_argument(instructions[i], ARG_NUMBER, &value);
+	 
+	 grid_instruction_set_executable(instructions[i]);
       }
       grid_scheduler_add_job(grid_uid, instructions, &instruction_count);
       

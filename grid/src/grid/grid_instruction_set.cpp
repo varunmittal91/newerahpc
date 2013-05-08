@@ -79,10 +79,13 @@ namespace neweraHPC
       const char *peer_port       = network_headers_get_param(socket->headers, "Peer-Port");
       const char *plugin_name     = network_headers_get_param(socket->headers, "Plugin-Name");
       const char *execution_state = network_headers_get_param(socket->headers, "Execution-State");
-
-      if(!plugin_name)
+      const char *grid_uid        = network_headers_get_param(socket->headers, "Grid-Uid");
+      
+      if(!plugin_name || !grid_uid)
 	 return NHPC_FAIL;
       grid_instruction_set_plugin_name((*instruction), plugin_name);
+      grid_instruction_set_grid_uid((*instruction), grid_uid);
+      
       if(execution_state)
 	 grid_instruction_set_executable((*instruction));
       
@@ -171,7 +174,9 @@ namespace neweraHPC
 	 nrv = grid_plugin_execute_processor(plugin_details, instruction);
       
       if(nrv == NHPC_FAIL)
+      {
 	 grid_instruction_destruct(instruction);
+      }
       
       return nrv;
    }

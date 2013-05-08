@@ -18,9 +18,49 @@
  */
 
 #include <neweraHPC/rbtree.h>
+#include <neweraHPC/thread.h>
+
+#include <include/grid_node.h>
 
 namespace neweraHPC
 {
    rbtree *registered_nodes;
    rbtree *registered_clients;
+   nhpc_mutex_t mutex_registered_nodes;
+   nhpc_mutex_t mutex_registered_clients;
+   
+   grid_node_t *grid_node_get_compute_node(int cpu_cores)
+   {
+      thread_mutex_lock(&mutex_registered_nodes, NHPC_THREAD_LOCK_WRITE);
+      
+      int i = 1;
+      grid_node_t         *node;
+      grid_node_compute_t *compute_node;
+      
+      while((node = (grid_node_t *)(*registered_nodes).search_inorder_str(i, NULL)) != NULL)
+      {
+	 compute_node = grid_node_get_compute_node_data(node);
+	 
+	 if(grid_compute_node_get_available_cores(compute_node) >= cpu_cores)
+	 {
+	    grid_compute_node_alloc_available_cores(compute_node, cpu_cores);
+	    break;
+	 }
+	 
+	 i++;
+      }
+      
+      thread_mutex_unlock(&mutex_registered_nodes, NHPC_THREAD_LOCK_WRITE);
+      
+      return node;
+   }
+   
+   void grid_node_free_compute_node(grid_node_t *node, int cpu_cores)
+   {
+      grid_node_compute_t *compute_node = grid_node_get_compute_node_data(node);
+      
+      thread_mutex_lock(&mutex_registered_nodes, NHPC_THREAD_LOCK_WRITE);
+      grid_compute_node_free_available_cores(compute_node, cpu_cores);
+      thread_mutex_unlock(&mutex_registered_nodes, NHPC_THREAD_LOCK_WRITE);
+   }
 };

@@ -73,8 +73,8 @@ namespace neweraHPC
       }
 
       *uid = random_string;
-      (*node_db).insert(node_db, *uid);
       grid_node_set_uid(grid_node, *uid);
+      (*node_db).insert(grid_node, *uid);
 
       return NHPC_SUCCESS;      
    }

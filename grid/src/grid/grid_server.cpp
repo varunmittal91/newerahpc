@@ -42,6 +42,7 @@ namespace neweraHPC
    
    const char *_host_addr;
    const char *_host_port;
+   const char *_host_grid_uid;
    int _host_core_count;
    int _host_cpu_time;   
    

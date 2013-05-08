@@ -60,7 +60,7 @@ namespace neweraHPC
       if(grid_uid)
       {
 	 grid_communication->headers->insert("Grid-Uid", grid_uid);
-	 delete[] grid_uid;
+	 grid_communication->grid_uid = grid_uid;
       }
       if(grid_communication_is_opt_send_peer_details(grid_communication))
       {

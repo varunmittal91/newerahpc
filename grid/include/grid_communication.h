@@ -89,6 +89,8 @@ namespace neweraHPC
 
 #define grid_set_communication_header(gc,h,v)      ((gc->headers->insert(h, v)))
 #define grid_communication_set_header(gc,h,v)      ((gc->headers->insert(h, v)))
+#define grid_communication_set_grid_uid(gc, guid)  (nhpc_strcpy((char **)&(gc->grid_uid), gudi))
+#define grid_communication_get_grid_uid(gc)        (gc->grid_uid) 
    static void grid_communication_init(grid_communication_t **gc, grid_request_type c)
    {
       (*gc) = new grid_communication_t;

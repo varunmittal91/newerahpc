@@ -29,6 +29,7 @@ namespace neweraHPC
    
    extern const char *_host_addr;
    extern const char *_host_port;
+   extern const char *_host_grid_uid;
    extern int _host_core_count;
    extern int _host_cpu_time;
 #define grid_get_host_addr()        (_host_addr)

@@ -47,19 +47,29 @@ namespace neweraHPC
 #define grid_set_response_status_code(gc, c)   ((gc->response_type) |= (c << 3))
 #define grid_get_response_status_mssg(gc)      (GRID_RESPONSE_MSSGS[grid_get_response_status_code(gc)].MSSGS_STRINGS)
 #define grid_get_response_code_status_mssg(c)  (GRID_RESPONSE_MSSGS[c].MSSGS_STRINGS)
-#define grid_is_response_complete(gc)          ((gc->request_type) & 1)
-#define grid_set_response_complete(gc)         ((gc->request_type) |= 1)
-#define grid_set_response_type(gc, c)          ((gc->request_type) |= (c << 3))
-#define grid_set_response_header(gc, h, v)     ((gc->headers->insert(h, v)))
+
+#define grid_response_set_header(gc, h, v)     ((gc->headers->insert(h, v)))
 #define grid_set_grid_data(gr, d)              ((gr->grid_data = d))
 #define grid_response_set_socket(g, s)         (g->socket = s)
 #define grid_response_get_grid_data(g)         (g->data)
    
-   static void grid_response_init(grid_response_t **grid_response)
+   static void grid_response_init(grid_response_t **grid_response, grid_response_type_t response_type)
    {
       (*grid_response) = new grid_response_t;
       memset((*grid_response), 0, sizeof(grid_response_t));
+      grid_set_response_status_code((*grid_response), response_type);
+      
+      const char *mssg          = grid_get_response_status_mssg((*grid_response));
+      int         response_code = grid_get_response_status_code((*grid_response));
+      const char *response_str  = nhpc_itostr(response_code); 
+
+      const char *header_string = nhpc_strconcat("GRID/1.1 ", mssg, " ", response_str);
+      
       (*grid_response)->headers = new nhpc_headers_t;
+      (*grid_response)->headers->insert(header_string);
+      
+      delete header_string;
+      delete response_str;
    }
    static void grid_response_destruct(grid_response_t *grid_response)
    {

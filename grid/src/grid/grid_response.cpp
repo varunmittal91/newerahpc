@@ -103,20 +103,10 @@ namespace neweraHPC
    nhpc_status_t grid_response_send(grid_response_t *grid_response)
    {
       const char *grid_uid = NULL;
-      const char *mssg     = grid_get_response_status_mssg(grid_response);
-
-      int         response_code = grid_get_response_status_code(grid_response);
-      const char *response_str  = nhpc_itostr(response_code); 
-      
-      const char *header_string = nhpc_strconcat("GRID/1.1 ", mssg, " ", response_str);
-      grid_response->headers    = new nhpc_headers_t;
-      grid_response->headers->insert(header_string);
       if(grid_response->data)
       {
 	 grid_shared_data_get_headers((grid_response->data), (grid_response->headers));
       }
-      delete[] header_string;
-      delete[] response_str;
       
       return NHPC_SUCCESS;
    }
@@ -131,7 +121,7 @@ namespace neweraHPC
       if(!_data)
 	 data = grid_response->data;
       
-      if(data && nrv == NHPC_SUCCESS)
+      if(data)
       {
 	 grid_shared_data_get_headers(data, headers);
 	 nrv = headers->write(socket);

@@ -125,18 +125,21 @@ namespace neweraHPC
 	 
 	 nrv = fnc_ptr(grid_data);
 	 
-	 grid_response_t *response;
-	 grid_response_init(&response);
-	 grid_response_set_socket(response, grid_data_get_socket(grid_data));
+	 grid_response_t    *response;	 
 	 grid_shared_data_t *data = NULL;
+	 
 	 if(nrv == NHPC_SUCCESS)
 	 {
-	    grid_set_response_status_code(response, GRID_RESPONSE_SUCCESSFUL);
+	    grid_response_init(&response, GRID_RESPONSE_SUCCESSFUL);
 	    if(grid_data->result_data)
 	       data = grid_data->result_data;
 	 }
 	 else 
+	 {
+	    grid_response_init(&response, GRID_RESPONSE_SUCCESSFUL);
 	    grid_set_response_status_code(response, GRID_RESPONSE_RESOURCE_UNAVAILABLE);
+	 }
+	 grid_response_set_socket(response, grid_data_get_socket(grid_data));
 	 
 	 grid_response_send(response);
 	 grid_response_push(response, data);

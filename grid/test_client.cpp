@@ -41,9 +41,17 @@ int main(int argc, char **argv)
    const char *abc = "hi this is the test input data";
    nhpc_size_t len = strlen(abc) + 1;
    
+   const char *host_addr = nhpc_get_cmdline_argument("host");
+   const char *host_port = nhpc_get_cmdline_argument("port");
+
+   if(!host_addr)
+      nhpc_strcpy((char **)&(host_addr), "localhost");
+   if(!host_port)
+      nhpc_strcpy((char **)&(host_port), "8080");
+
    grid_instruction_t *instruction;
    grid_instruction_init(&instruction);
-   grid_instruction_set_peer(instruction, "localhost", "8080");
+   grid_instruction_set_peer(instruction, host_addr, host_port);
    grid_instruction_set_plugin_name(instruction, "GRID_PLUGIN_RANGE");
    
    grid_instruction_add_argument(instruction, ARG_COMMAND, "blender");
@@ -52,6 +60,9 @@ int main(int argc, char **argv)
    grid_instruction_send(instruction);  
    grid_instruction_destruct(instruction);
    
+   delete[] host_addr;
+   delete[] host_port;
+
    while(1)
       sleep(1);
 }

@@ -18,9 +18,11 @@
  */
 
 #include <sys/stat.h>
-#include <iostream>
+#include <fcntl.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <errno.h>
+#include <iostream>
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -231,6 +233,40 @@ namespace neweraHPC
       
       *new_file_dir = target_name;
       return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t nhpc_create_dir(const char **final_path, const char *parent_dir, const char *child_dir)
+   {
+      nhpc_status_t nrv;
+      
+      const char *_path = nhpc_strconcat(parent_dir, "/", child_dir);
+      int rv = mkdir(_path, 0777);
+      if(rv == 0)
+      {
+	 *final_path = _path;
+	 return NHPC_SUCCESS;
+      }
+      else 
+	 return errno;
+   }
+   
+   nhpc_status_t nhpc_create_file(const char **final_path, const char *parent_dir, const char *file)
+   {
+      nhpc_status_t nrv;
+      
+      const char *_path = nhpc_strconcat(parent_dir, "/", file);
+      int rv = open(_path, O_CREAT, O_EXCL);
+      if(rv != -1)
+      {
+	 *final_path = _path;
+	 close(rv);
+	 return NHPC_SUCCESS;
+      }
+      else 
+      {
+	 perror("file create failed");
+	 return errno;
+      }
    }
    
    string_t *nhpc_get_file_list(const char *dir, int mode)

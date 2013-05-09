@@ -25,6 +25,7 @@
 
 #include <neweraHPC/rbtree.h>
 #include <neweraHPC/network.h>
+#include <neweraHPC/file.h>
 
 #include "grid_error.h"
 
@@ -231,6 +232,13 @@ namespace neweraHPC
    }
    static void grid_shared_data_set_data(grid_shared_data_t *data, void *address, nhpc_size_t *len, arg_t arg)
    {
+      if(grid_arg_is_file(arg))
+      {
+	 if(nhpc_file_size((const char *)address, &(data->len)) == NHPC_FAIL)
+	    return;
+	 *len = data->len;
+      }
+
       int code = _grid_arg_get_int_code(arg);
 
       data->address      = address;
@@ -240,6 +248,9 @@ namespace neweraHPC
    }
    static void grid_shared_data_get_headers(grid_shared_data_t *data, nhpc_headers_t *src_headers)
    {
+      if(data->arg == 0)
+	 return;
+      
       char *content_len_str = nhpc_longitostr(data->len);
       
       src_headers->insert("Content-Length", content_len_str);
@@ -247,14 +258,8 @@ namespace neweraHPC
 
       delete[] content_len_str;
    }
-   static nhpc_status_t grid_shared_data_push_data(grid_shared_data_t *data, nhpc_socket_t *socket)
-   {
-      nhpc_size_t   size = data->len;
-      nhpc_status_t nrv;
-      
-      nrv = socket_sendmsg(socket, (char *)(data->address), &size);
-      return nrv;
-   } 
+   nhpc_status_t grid_shared_data_push_data(grid_shared_data_t *data, nhpc_socket_t *socket);
+   nhpc_status_t grid_shared_data_push_file(const char *src_file, nhpc_socket_t *socket);
    nhpc_status_t grid_shared_data_check(nhpc_socket_t *socket);
    nhpc_status_t grid_shared_data_get_data(grid_shared_data_t **data, nhpc_socket_t *socket);
 };

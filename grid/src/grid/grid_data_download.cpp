@@ -23,6 +23,7 @@
 #include <neweraHPC/sockets.h>
 
 #include <include/grid_data_download.h>
+#include <include/grid_tmpfs.h>
 
 using namespace std;
 
@@ -67,5 +68,16 @@ namespace neweraHPC
       *dst = dst_str;
       
       return nrv;
+   }
+   
+   nhpc_status_t grid_data_download_file(void **dst, nhpc_socket_t *socket, nhpc_size_t *content_len)
+   {
+      nhpc_status_t nrv;
+      
+      const char *tmp_dir;
+      
+      nrv = grid_tmpfs_mkdir(&tmp_dir, "/../google");
+      
+      return NHPC_FAIL;
    }
 };

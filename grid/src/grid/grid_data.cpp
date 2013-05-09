@@ -83,13 +83,62 @@ namespace neweraHPC
       nhpc_size_t  content_len = nhpc_strtoi(check_content_len);
 
       arg = pow(2, code);
+
+      nhpc_status_t (*fnc_ptr)(void **dst, nhpc_socket_t *socket, nhpc_size_t *content_len) = NULL;
+      
       if(grid_arg_is_mem_block(arg))
       {
-	 nrv = grid_data_download_memory_block(&src_data, socket, &content_len);
+	 fnc_ptr = grid_data_download_memory_block;
+      }
+      else if(grid_arg_is_file(arg))
+      {
+	 fnc_ptr = grid_data_download_file;
+      }
+      
+      if(fnc_ptr)
+      {
+	 nrv = fnc_ptr(&src_data, socket, &content_len);
 	 grid_shared_data_init(data);
 	 grid_shared_data_set_data(*data, src_data, &content_len, arg);
       }
       
       return nrv;
    }   
+   
+   nhpc_status_t grid_shared_data_push_data(grid_shared_data_t *data, nhpc_socket_t *socket)
+   {
+      nhpc_size_t   size = data->len;
+      nhpc_status_t nrv;
+      
+      if(grid_arg_is_mem_block(data->arg))
+      {
+	 nrv = socket_sendmsg(socket, (char *)(data->address), &size);
+	 return nrv;
+      }
+      else if(grid_arg_is_file(data->arg))
+      {
+	 nrv = grid_shared_data_push_file((const char *)(data->address), socket);
+	 return nrv;
+      }
+      
+      return NHPC_FAIL;
+   }   
+   
+   nhpc_status_t grid_shared_data_push_file(const char *src_path, nhpc_socket_t *socket)
+   {
+      FILE *fp = fopen(src_path, "r");
+      nhpc_size_t   len;
+      nhpc_status_t nrv;
+
+      char        buffer[10000];
+      do 
+      {
+	 len = fread(buffer, 1, sizeof(buffer), fp);
+	 nrv = socket_sendmsg(socket, buffer, &len);
+      }while(nrv != EPIPE && !feof(fp) && nrv != NHPC_FAIL);
+      
+      fclose(fp);
+      
+      return nrv;
+   }
 }

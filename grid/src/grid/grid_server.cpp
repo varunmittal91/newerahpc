@@ -32,6 +32,7 @@
 #include <include/grid_controller_register.h>
 #include <include/grid_plugin.h>
 #include <include/grid_scheduler.h>
+#include <include/grid_tmpfs.h>
 
 using namespace std;
 
@@ -43,6 +44,7 @@ namespace neweraHPC
    const char *_host_addr;
    const char *_host_port;
    const char *_host_grid_uid;
+   const char *_tmp_dir;
    int _host_core_count;
    int _host_cpu_time;   
    
@@ -184,6 +186,7 @@ namespace neweraHPC
       grid_node_db_init();
       grid_plugin_system_init();
       grid_scheduler_system_init();
+      grid_tmpfs_init();
       
       (*_network).join_accept_thread();
    }

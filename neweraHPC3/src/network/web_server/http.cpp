@@ -195,10 +195,9 @@ namespace neweraHPC
 	       {
 		  bzero(buffer, sizeof(buffer));
 		  len = fread(buffer, 1, sizeof(buffer), fp);
-	       
-		  nrv = socket_sendmsg(sock, buffer, &len);	
-	       }while(!feof(fp) && errno != EPIPE);
-	    
+		  nrv = socket_sendmsg(sock, buffer, &len);
+	       }while(!feof(fp) && nrv != EPIPE);
+
 	       fclose(fp);
 	    }
 	    else 

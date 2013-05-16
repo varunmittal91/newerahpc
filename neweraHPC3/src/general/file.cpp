@@ -244,10 +244,18 @@ namespace neweraHPC
       if(rv == 0)
       {
 	 *final_path = _path;
-	 return NHPC_SUCCESS;
+	 nrv = NHPC_SUCCESS;
       }
       else 
-	 return errno;
+	 nrv = errno;
+      
+   return_dir:
+      if(nrv != NHPC_SUCCESS)
+	 delete[] _path;
+      else 
+	 *final_path = _path;
+      
+      return nrv;
    }
    
    nhpc_status_t nhpc_create_file(const char **final_path, const char *parent_dir, const char *file)
@@ -255,18 +263,30 @@ namespace neweraHPC
       nhpc_status_t nrv;
       
       const char *_path = nhpc_strconcat(parent_dir, "/", file);
-      int rv = open(_path, O_CREAT, O_EXCL);
-      if(rv != -1)
+      
+      if((nrv = nhpc_fileordirectory(_path)) != NHPC_FILE_NOT_FOUND)
+      {
+	 nrv = EEXIST;
+	 goto return_file;
+      }
+      
+      FILE *fp;
+      if((fp = fopen(_path, "w+")) != NULL)
       {
 	 *final_path = _path;
-	 close(rv);
-	 return NHPC_SUCCESS;
+	 fclose(fp);
+	 nrv = NHPC_SUCCESS;
       }
       else 
-      {
-	 perror("file create failed");
-	 return errno;
-      }
+	 nrv = errno;
+	 
+   return_file:
+      if(nrv != NHPC_SUCCESS)
+	 delete[] _path;
+      else 
+	 *final_path = _path;
+      
+      return nrv;
    }
    
    string_t *nhpc_get_file_list(const char *dir, int mode)

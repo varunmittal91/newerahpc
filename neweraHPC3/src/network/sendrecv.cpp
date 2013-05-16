@@ -50,7 +50,8 @@ namespace neweraHPC
 	    if(rv != NHPC_SUCCESS)
 	       continue;
 	    
-	    rv = read(sock->sockfd, buffer, *length);
+	    if((rv = read((sock->sockfd), buffer, *length)) == -1)
+	       perror("recv error");
 	 }while(rv == -1 && errno == EINTR);
       }
 	
@@ -76,23 +77,16 @@ namespace neweraHPC
       int rv;
       nhpc_status_t nrv;
       
-      nrv = nhpc_wait_for_io_or_timeout(sock, 0);
-      if(nrv != NHPC_SUCCESS)
+      do
       {
-	 *length = 0;
-	 return nrv;
-      }
-      else 
-      {
-	 do
+	 nrv = nhpc_wait_for_io_or_timeout(sock, 0);
+	 if(nrv != NHPC_SUCCESS)
 	 {
-	    rv = nhpc_wait_for_io_or_timeout(sock, 0);
-	    if(rv != NHPC_SUCCESS)
-	       continue;
-
-	    rv = write(sock->sockfd, buffer, *length);
-	 }while(rv == -1 && errno == EINTR);
-      }
+	    *length = 0;
+	    return nrv;
+	 }
+	 rv = write(sock->sockfd, buffer, *length);
+      }while(rv == -1 && errno == EINTR);
 	     
       if(rv == -1)
       {
@@ -116,14 +110,9 @@ namespace neweraHPC
 	 size = *length - data_sent;
 	 nrv = socket_send(sock, (buffer + data_sent), &size);
 	 data_sent += size;
-      }while(data_sent != *length && errno != EPIPE);
+      }while(data_sent != *length && nrv != EPIPE);
       
-      if(errno == EPIPE)
-      {
-	 return NHPC_FAIL;
-      }
-      
-      return NHPC_SUCCESS;
+      return nrv;
    }
    
    nhpc_status_t socket_send_file(nhpc_socket_t *sock)

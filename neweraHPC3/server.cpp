@@ -26,7 +26,6 @@
 #include <config.h>
 #endif
 #include <include/rbtree.h>
-#include <include/grid.h>
 #include <include/neweraHPC.h>
 #include <include/heap.h>
 

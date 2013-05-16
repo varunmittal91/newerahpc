@@ -18,6 +18,7 @@
  */
 
 #include <string.h>
+#include <errno.h>
 #include <iostream>
 
 #include <neweraHPC/sockets.h>
@@ -38,7 +39,7 @@ namespace neweraHPC
       char          buffer[1000];
       nhpc_size_t   size;
       nhpc_size_t   size_downloaded = 0;
-      nhpc_status_t nrv;
+      nhpc_status_t nrv = NHPC_SUCCESS;
 
       if(socket->partial_content)
       {
@@ -72,12 +73,62 @@ namespace neweraHPC
    
    nhpc_status_t grid_data_download_file(void **dst, nhpc_socket_t *socket, nhpc_size_t *content_len)
    {
+      int   rv;
+      FILE *fp = NULL;
+
       nhpc_status_t nrv;
+      const char   *target_file;      
+      char          buffer[1000];
+      nhpc_size_t   size;
+      nhpc_size_t   size_downloaded = 0;
       
-      const char *tmp_dir;
+      nrv = grid_tmpfs_mkfile(&target_file);
+      if(nrv != NHPC_SUCCESS)
+	 goto return_file;
       
-      nrv = grid_tmpfs_mkdir(&tmp_dir, "/../google");
+      if((fp = fopen(target_file, "r+")) == NULL)
+      {
+	 nrv = errno;
+	 goto return_file;
+      }
+            
+      if(socket->partial_content)
+      {
+	 if((rv = fwrite((socket->partial_content), (socket->partial_content_len), 1, fp)) == 0)
+	 {
+	    nrv = errno;
+	    goto return_file;
+	 }
+	 size_downloaded += (socket->partial_content_len);
+      }      
       
-      return NHPC_FAIL;
+      if(size_downloaded < *content_len)
+      {
+	 do 
+	 {
+	    bzero(buffer, sizeof(buffer));
+	    size = sizeof(buffer);
+	    nrv = socket_recv(socket, buffer, &size); 
+	    if((rv = fwrite(buffer, size, 1, fp)) == 0)
+	    {
+	       nrv = errno;
+	       goto return_file;
+	    }
+	    
+	    size_downloaded += size;
+	 }while(nrv != NHPC_EOF && size_downloaded != *content_len);      
+      }
+      
+      if(nrv == NHPC_EOF)
+	 nrv = NHPC_SUCCESS;      
+
+      *dst = (void *)target_file;
+      
+   return_file:
+
+      if(fp)
+	 fclose(fp);
+      
+      return nrv;
    }
 };

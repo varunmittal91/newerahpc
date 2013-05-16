@@ -24,7 +24,8 @@ namespace neweraHPC
 {
    void grid_tmpfs_init();
    
-   nhpc_status_t grid_tmpfs_mkdir(const char **final_path, const char *dest);
+   nhpc_status_t grid_tmpfs_mkfile(const char **final_path, const char *dest = NULL);
+   nhpc_status_t grid_tmpfs_mkdir(const char **final_path, const char *dest = NULL);
 };
 
 #endif

@@ -44,7 +44,7 @@ namespace neweraHPC
       }
    }
    
-   nhpc_status_t grid_tmpfs_mkdir(const char **final_path, const char *dest)
+   nhpc_status_t grid_tmpfs_get_path(const char **path, const char *dest)
    {
       if(!_tmp_dir)
 	 return NHPC_FAIL;
@@ -57,21 +57,71 @@ namespace neweraHPC
       {
 	 while(*_path == '.' || *_path == '/')
 	    _path++;
-
+	 
 	 nhpc_strcpy((char **)&_path, _path);
       }
       else 
 	 _path = nhpc_random_string(9);
       
-      nrv = nhpc_create_file(final_path, parent_path, _path);
-      cout << parent_path << "/" << _path << endl;
+      *path = _path;
       
-      cout << nrv << endl;
+      return NHPC_SUCCESS;
+   }
+   
+   nhpc_status_t grid_tmpfs_mkfile(const char **final_path, const char *dest)
+   {
+      if(!_tmp_dir)
+	 return NHPC_FAIL;
+      
+      const char *parent_path = _tmp_dir;
+      const char *_path       = dest;
+      
+      nhpc_status_t nrv;
+      if((nrv = grid_tmpfs_get_path(&_path, dest)) == NHPC_FAIL)
+	 return nrv;
+
+      nrv = nhpc_create_file(final_path, parent_path, _path);
       
       int i = 0;
       char *_tmp_path = NULL;
       char *i_str;
-      while(nrv == EEXIST)
+      while(nrv == EEXIST || nrv == EACCES)
+      {
+	 i_str     = nhpc_itostr(i);
+	 _tmp_path = nhpc_strconcat(_path, ".", i_str);
+	 
+	 nrv = nhpc_create_file(final_path, parent_path, _tmp_path);	 
+	 
+	 delete[] _tmp_path;
+	 delete[] i_str;
+	 i++;
+      }
+
+      if(nrv != NHPC_SUCCESS)
+      {
+	 delete[] _path;
+	 return nrv;
+      }
+      
+      return nrv;
+   }
+   
+   nhpc_status_t grid_tmpfs_mkdir(const char **final_path, const char *dest)
+   {
+      const char *parent_path = _tmp_dir;
+      const char *_path       = dest;
+      
+      nhpc_status_t nrv;      
+
+      if((nrv = grid_tmpfs_get_path(&_path, dest)) == NHPC_FAIL)
+	 return nrv;
+            
+      nrv = nhpc_create_dir(final_path, parent_path, _path);
+      
+      int i = 0;
+      char *_tmp_path = NULL;
+      char *i_str;
+      while(nrv == EEXIST || nrv == EACCES)
       {
 	 i_str     = nhpc_itostr(i);
 	 _tmp_path = nhpc_strconcat(_path, ".", i_str);
@@ -82,8 +132,13 @@ namespace neweraHPC
 	 delete[] i_str;
 	 i++;
       }
-      delete[] _path;
+
+      if(nrv != NHPC_SUCCESS)
+      {
+	 delete[] _path;
+	 return nrv;
+      }
       
-      return NHPC_FAIL;
+      return nrv;
    }
 };

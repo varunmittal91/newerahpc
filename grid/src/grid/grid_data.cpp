@@ -98,8 +98,16 @@ namespace neweraHPC
       if(fnc_ptr)
       {
 	 nrv = fnc_ptr(&src_data, socket, &content_len);
-	 grid_shared_data_init(data);
-	 grid_shared_data_set_data(*data, src_data, &content_len, arg);
+	 if(nrv == NHPC_SUCCESS)
+	 {
+	    grid_shared_data_init(data);
+	    grid_shared_data_set_data(*data, src_data, &content_len, arg);
+	 }
+	 else 
+	 {
+	    cout << nrv << endl;
+	    perror("error");
+	 }
       }
       
       return nrv;

@@ -50,8 +50,7 @@ namespace neweraHPC
 	    if(rv != NHPC_SUCCESS)
 	       continue;
 	    
-	    if((rv = read((sock->sockfd), buffer, *length)) == -1)
-	       perror("recv error");
+	    rv = read((sock->sockfd), buffer, *length);
 	 }while(rv == -1 && errno == EINTR);
       }
 	

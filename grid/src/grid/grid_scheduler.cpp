@@ -46,17 +46,33 @@ namespace neweraHPC
       (*_thread_manager).create_thread(&thread_id, NULL, (void* (*)(void*))grid_scheduler_job_dispatcher, NULL, NHPC_THREAD_DEFAULT);
    }
    
-   nhpc_status_t grid_scheduler_dispatch_instruction(grid_instruction_t *instruction, grid_node_t *node)
+   nhpc_status_t grid_scheduler_queue_instruction(grid_instruction_t *instruction, grid_node_t *node)
    {
-      nhpc_status_t nrv;
-      
       const char *peer_addr = grid_node_get_peer_addr(node);
-      const char *peer_port = grid_node_get_peer_port(node);
-      
+      const char *peer_port = grid_node_get_peer_port(node);      
       grid_instruction_set_peer(instruction, peer_addr, peer_port);
-      nrv = grid_instruction_send(instruction);
       
-      return nrv;
+      int thread_id;
+      (*_thread_manager).init_thread(&thread_id, NULL);
+      (*_thread_manager).create_thread(&thread_id, NULL, (void* (*)(void *))grid_scheduler_dispatch_instruction, instruction, NHPC_THREAD_DEFAULT);
+      
+      return NHPC_SUCCESS;
+   }
+   
+   void grid_scheduler_dispatch_instruction(grid_instruction_t *instruction)
+   {
+      nhpc_status_t  nrv;
+      grid_node_t   *node;
+ 
+      node = grid_node_search_compute_node(instruction->peer_uid);
+      nrv = grid_instruction_send(instruction);
+      if((nrv = grid_instruction_send(instruction)) != NHPC_SUCCESS)
+      {
+	 grid_node_free_compute_node(node, 1);
+	 grid_instruction_unset_sent(instruction);
+	 delete[] (instruction->peer_uid);
+	 (instruction->peer_uid) = NULL;
+      }
    }
    
    void *grid_scheduler_job_dispatcher()
@@ -82,12 +98,9 @@ namespace neweraHPC
 	    node = grid_node_get_compute_node(1);
 	    if(node)
 	    {
-	       nrv = grid_scheduler_dispatch_instruction(instruction, node);
-	       if(nrv == NHPC_SUCCESS)
-		  grid_instruction_set_sent(instruction);
-	       else 
-		  grid_node_free_compute_node(node, 1);
-		  
+	       grid_instruction_set_peer_uid(instruction, node->peer_uid);	       
+	       grid_instruction_set_sent(instruction);
+	       grid_scheduler_queue_instruction(instruction, node);
 	    }
 	 }
 	 thread_mutex_unlock(&mutex_queued_instructions, NHPC_THREAD_LOCK_WRITE);

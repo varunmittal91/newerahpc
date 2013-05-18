@@ -55,6 +55,17 @@ namespace neweraHPC
       return node;
    }
    
+   grid_node_t *grid_node_search_compute_node(const char *node_uid)
+   {
+      grid_node_t *node;
+      
+      thread_mutex_lock(&mutex_registered_nodes, NHPC_THREAD_LOCK_READ);      
+      node = (grid_node_t *)(*registered_nodes).search(node_uid);
+      thread_mutex_unlock(&mutex_registered_nodes, NHPC_THREAD_LOCK_READ);
+      
+      return node;
+   }
+   
    void grid_node_free_compute_node(grid_node_t *node, int cpu_cores)
    {
       grid_node_compute_t *compute_node = grid_node_get_compute_node_data(node);

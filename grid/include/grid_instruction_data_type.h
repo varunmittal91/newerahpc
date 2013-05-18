@@ -29,9 +29,10 @@ namespace neweraHPC
       const char *plugin_path;
       rbtree     *arguments;
       
-      const char *grid_uid;
-      const char *peer_addr;
-      const char *peer_port;
+      const char  *grid_uid;
+      const char  *peer_addr;
+      const char  *peer_port;
+      const char  *peer_uid;
       
       const char *referer_grid_uid;
       const char *referer_addr;

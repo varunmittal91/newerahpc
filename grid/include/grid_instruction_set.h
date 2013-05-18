@@ -43,7 +43,9 @@ namespace neweraHPC
       return (1 & ((instruction->instruction_status) >> bit));
    }
 #define grid_instruction_set_opt(i, o)      (i->instruction_status |= o)
+#define grid_instruction_unset_opt(i, o)    (i->instruction_status &= ~o)
 #define grid_instruction_set_sent(i)        grid_instruction_set_opt(i, GRID_INSTRUCTION_SENT)
+#define grid_instruction_unset_sent(i)      grid_instruction_unset_opt(i, GRID_INSTRUCTION_SENT)
 #define grid_instruction_set_processed(i)   grid_instruction_set_opt(i, GRID_INSTRUCTION_PROCESSED)
 #define grid_instruction_set_executable(i)  grid_instruction_set_opt(i, GRID_INSTRUCTION_OPT_EXECUTE)
 
@@ -83,6 +85,7 @@ namespace neweraHPC
       nhpc_strcpy((char **)&(grid_instruction_get_peer_addr(instruction)), peer_addr);
       nhpc_strcpy((char **)&(grid_instruction_get_peer_port(instruction)), peer_port);
    }
+#define grid_instruction_set_peer_uid(i, u) (nhpc_strcpy((char **)&(i->peer_uid), u))
    static void grid_instruction_set_referer(grid_instruction_t *instruction, const char *referer_addr, const char *referer_port)
    {
       nhpc_strcpy((char **)&(grid_instruction_get_referer_addr(instruction)), referer_addr);

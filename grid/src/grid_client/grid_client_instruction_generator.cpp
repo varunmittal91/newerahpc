@@ -26,6 +26,7 @@
 #include <include/grid_response.h>
 #include <include/grid_client_instruction_generator.h>
 #include <include/grid_instruction.h>
+#include <include/grid_node.h>
 
 using namespace std;
 
@@ -97,7 +98,15 @@ namespace neweraHPC
       grid_response_t *response;
       nrv = grid_response_get(&response, grid_communication);
       if(nrv == NHPC_SUCCESS)
+      {
+	 grid_instruction_set_processed(instruction);
+	 if(instruction->peer_uid)
+	 {
+	    grid_node_t *node = grid_node_search_compute_node(instruction->peer_uid);
+	    grid_node_free_compute_node(node, 1);
+	 }
 	 cout << "Instruction processing complete" << endl;
+      }
       else 
 	 cout << "No response recieved" << endl;      
       

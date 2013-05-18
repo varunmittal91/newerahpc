@@ -114,6 +114,7 @@ namespace neweraHPC
       nhpc_strcpy((char **)&(grid_node->peer_uid), uid);
    }
    grid_node_t *grid_node_get_compute_node(int cpu_cores);
+   grid_node_t *grid_node_search_compute_node(const char *node_uid);
    void grid_node_free_compute_node(grid_node_t *node, int cpu_cores);
 #define grid_node_get_compute_node_data(n)    (grid_node_compute_t *)(n->node_data)
 #define grid_node_get_client_node_data(n)     (grid_node_client_t *)(n->node_data)

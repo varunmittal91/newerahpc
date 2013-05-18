@@ -25,6 +25,7 @@
 
 #include "grid_data.h"
 #include "grid_instruction_data_type.h"
+#include "grid_node.h"
 
 namespace neweraHPC
 {
@@ -49,6 +50,8 @@ namespace neweraHPC
    nhpc_status_t grid_scheduler_find_peer();
    nhpc_status_t grid_scheduler_add_job(const char *grid_uid, grid_instruction_t **instructions, int *instructions_count);
    void *grid_scheduler_job_dispatcher();
+   nhpc_status_t grid_scheduler_queue_instruction(grid_instruction_t *instruction, grid_node_t *node);
+   void grid_scheduler_dispatch_instruction(grid_instruction_t *instruction);
 };
 
 #endif

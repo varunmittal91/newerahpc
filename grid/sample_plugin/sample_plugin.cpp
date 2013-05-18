@@ -23,6 +23,7 @@
 
 #include <include/grid_plugin.h>
 #include <include/grid_instruction_set.h>
+#include <include/grid_scheduler.h>
 
 using namespace std;
 
@@ -33,14 +34,31 @@ namespace neweraHPC
    {
       nhpc_status_t plugin_exec(grid_instruction_t *instruction)
       {
-      }
-      
-      nhpc_status_t plugin_processor(grid_instruction_t *instruction)
-      {
 	 const char *result = "Successful execution";
 	 nhpc_size_t size   = strlen(result) + 1;
 	 
 	 grid_instruction_set_result_data(instruction, result, &size, ARG_MEM_BLOCK);
+	 
+	 return NHPC_SUCCESS;
+      }
+      
+      nhpc_status_t plugin_processor(grid_instruction_t *instruction)
+      {
+	 int instruction_count = 10;
+	 
+	 const char *plugin_name = grid_instruction_get_plugin_name(instruction);
+	 const char *grid_uid    = grid_instruction_get_grid_uid(instruction);
+	 const char *peer_addr   = grid_instruction_get_peer_addr(instruction);
+	 const char *peer_port   = grid_instruction_get_peer_port(instruction);	 
+	 
+	 grid_instruction_t **instructions = new grid_instruction_t* [instruction_count];
+	 for(int i = 0; i < instruction_count; i++)
+	 {
+	    grid_instruction_init(&(instructions[i]));
+	    grid_instruction_set_plugin_name(instructions[i], plugin_name);
+	    grid_instruction_set_executable(instructions[i]);
+	 }
+	 grid_scheduler_add_job(grid_uid, instructions, &instruction_count);
 	 
 	 return NHPC_SUCCESS;
       }      

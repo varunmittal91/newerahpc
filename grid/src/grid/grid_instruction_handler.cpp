@@ -55,6 +55,10 @@ namespace neweraHPC
 	 return nrv;
       
       nrv = grid_instruction_execute(instruction, plugin_details);
+      if(instruction->result_data)
+      {
+	 grid_data->result_data = instruction->result_data;
+      }
       
       return nrv;
    }   

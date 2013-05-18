@@ -101,12 +101,7 @@ namespace neweraHPC
 	 if(nrv == NHPC_SUCCESS)
 	 {
 	    grid_shared_data_init(data);
-	    grid_shared_data_set_data(*data, src_data, &content_len, arg);
-	 }
-	 else 
-	 {
-	    cout << nrv << endl;
-	    perror("error");
+	    grid_shared_data_set_data((*data), src_data, &content_len, arg);
 	 }
       }
       

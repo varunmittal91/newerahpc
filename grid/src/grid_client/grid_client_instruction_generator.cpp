@@ -45,6 +45,13 @@ namespace neweraHPC
       nhpc_status_t       nrv;
       grid_shared_data_t *data = NULL;
       
+      if(instruction->plugin_path)
+      {
+	 nrv = grid_plugin_exchange(peer_addr, peer_port, (instruction->plugin_path));
+	 if(nrv != NHPC_SUCCESS)
+	    return nrv;
+      }
+      
       grid_communication_t *grid_communication;
       grid_communication_init(&grid_communication, GRID_INSTRUCTION);
       grid_communication_add_dest(grid_communication, peer_addr, peer_port);

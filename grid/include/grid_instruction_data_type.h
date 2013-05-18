@@ -26,6 +26,7 @@ namespace neweraHPC
    struct grid_instruction_t
    {
       const char *plugin_name;
+      const char *plugin_path;
       rbtree     *arguments;
       
       const char *grid_uid;

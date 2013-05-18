@@ -36,6 +36,7 @@ namespace neweraHPC
 #define GRID_INSTRUCTION                    3
 #define GRID_SUBMISSION                     4
 #define GRID_PLUGIN_REQUEST                 5
+#define GRID_PLUGIN_EXCHANGE                6             
    
 #define GRID_COMMUNICATION_SENT                    1
 #define GRID_COMMUNICATION_COMPLETE                2
@@ -45,8 +46,8 @@ namespace neweraHPC
    static struct _GRID_STATUS_MSSGS
    {
       const char        *MSSGS_STRINGS;
-   }GRID_STATUS_MSSGS[6] = {"CLIENT_REGISTRATION", "NODE_REGISTRATION", "FILE_EXCHANGE",
-      "INSTRUCTION", "SUBMISSION", "PLUGIN_REQUEST"};
+   }GRID_STATUS_MSSGS[7] = {"CLIENT_REGISTRATION", "NODE_REGISTRATION", "FILE_EXCHANGE",
+      "INSTRUCTION", "SUBMISSION", "PLUGIN_REQUEST", "PLUGIN_EXCHANGE"};
 #define grid_get_communication_status_code(gc)      ((gc->request_type) >> 4)
 #define grid_get_communication_status_mssg(gc)      (GRID_STATUS_MSSGS[grid_get_communication_status_code(gc)].MSSGS_STRINGS)
 #define grid_get_communication_code_status_mssg(c)  (GRID_STATUS_MSSGS[c].MSSGS_STRINGS)

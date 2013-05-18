@@ -97,7 +97,7 @@ namespace neweraHPC
    void grid_response_add_data(grid_response_t *grid_response, void *data, nhpc_size_t data_len, arg_t arg)
    {
       grid_shared_data_init(&(grid_response->data));
-      grid_shared_data_set_data(grid_response->data, data, &data_len, arg);
+      grid_shared_data_set_data((grid_response->data), data, &data_len, arg);
    }
    
    nhpc_status_t grid_response_send(grid_response_t *grid_response)

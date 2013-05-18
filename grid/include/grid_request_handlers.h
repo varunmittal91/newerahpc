@@ -25,9 +25,10 @@ namespace neweraHPC
    nhpc_status_t grid_client_registration_handler(grid_data_t *grid_data);
    nhpc_status_t grid_node_registration_handler(grid_data_t *grid_data);
    nhpc_status_t grid_plugin_request_handler(grid_data_t *grid_data);
+   nhpc_status_t grid_plugin_exchange_handler(grid_data_t *grid_data);
    nhpc_status_t grid_file_exchange_request_handler(grid_data_t *grid_data);
    nhpc_status_t grid_instruction_request_handler(grid_data_t *grid_data);
-   nhpc_status_t grid_submission_request_handler(grid_data_t *grid_data);   
+   nhpc_status_t grid_submission_request_handler(grid_data_t *grid_data);
 }
 
 #endif

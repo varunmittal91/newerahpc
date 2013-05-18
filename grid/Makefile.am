@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS= -I m4
 
-SUBDIRS = src
+SUBDIRS = src sample_plugin
 
 bin_PROGRAMS   = server test_client
 
@@ -15,6 +15,4 @@ library_include_HEADERS = include/*.h
 
 dist_doc_DATA = README
 
-src/libneweraHPC.la:
-	cd src && make
    

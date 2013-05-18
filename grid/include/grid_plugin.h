@@ -39,6 +39,11 @@ namespace neweraHPC
    extern rbtree *plugins_requested;
    extern nhpc_mutex_t mutex_plugins_requested;
    extern nhpc_mutex_t mutex_plugins_installed;
+#define grid_plugin_lock_installed(m)     (thread_mutex_lock(&mutex_plugins_installed, m))
+#define grid_plugin_unlock_installed(m)   (thread_mutex_unlock(&mutex_plugins_installed, m))
+#define grid_plugin_lock_requested(m)     (thread_mutex_lock(&mutex_plugins_requested, m))
+#define grid_plugin_unlock_requested(m)   (thread_mutex_unlock(&mutex_plugins_requested, m))
+#define grid_plugin_insert_installed(p,n) (plugins_installed->insert(p, n))
    
    typedef nhpc_status_t (*grid_plugin_fnc_ptr_t)(grid_instruction_t *);
    struct plugin_details_t
@@ -78,6 +83,7 @@ namespace neweraHPC
    nhpc_status_t grid_plugin_install_dll(const char *dll_path, plugin_details_t **plugin_details);
    nhpc_status_t grid_plugin_search(const char *plugin_name, plugin_details_t **plugin_details);
 
+   nhpc_status_t grid_plugin_exchange(const char *host_addr, const char *host_port, const char *plugin_path);
    
    typedef unsigned char plugin_request_status;
    struct plugin_request_t

@@ -322,7 +322,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = src
+SUBDIRS = src sample_plugin
 server_SOURCES = server.cpp
 server_LDADD = src/libneweraHPC_grid.la -ldl 
 test_client_SOURCES = test_client.cpp
@@ -976,9 +976,6 @@ uninstall-am: uninstall-binPROGRAMS uninstall-dist_docDATA \
 	uninstall-binPROGRAMS uninstall-dist_docDATA \
 	uninstall-library_includeHEADERS
 
-
-src/libneweraHPC.la:
-	cd src && make
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

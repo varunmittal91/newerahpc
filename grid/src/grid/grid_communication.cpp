@@ -39,6 +39,7 @@ namespace neweraHPC
       grid_communication_register_handler(grid_client_registration_handler, GRID_CLIENT_REGISTRATION);
       grid_communication_register_handler(grid_node_registration_handler, GRID_NODE_REGISTRATION);
       grid_communication_register_handler(grid_plugin_request_handler, GRID_PLUGIN_REQUEST);
+      grid_communication_register_handler(grid_plugin_exchange_handler, GRID_PLUGIN_EXCHANGE);
       grid_communication_register_handler(grid_file_exchange_request_handler, GRID_FILE_EXCHANGE);
       grid_communication_register_handler(grid_instruction_request_handler, GRID_INSTRUCTION);
    }
@@ -136,8 +137,7 @@ namespace neweraHPC
 	 }
 	 else 
 	 {
-	    grid_response_init(&response, GRID_RESPONSE_SUCCESSFUL);
-	    grid_set_response_status_code(response, GRID_RESPONSE_RESOURCE_UNAVAILABLE);
+	    grid_response_init(&response, GRID_RESPONSE_RESOURCE_UNAVAILABLE);
 	 }
 	 grid_response_set_socket(response, grid_data_get_socket(grid_data));
 	 

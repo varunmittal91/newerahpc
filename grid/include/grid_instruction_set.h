@@ -73,11 +73,11 @@ namespace neweraHPC
       grid_instruction_t *tmp = (*instruction);
    }
    void grid_instruction_destruct(grid_instruction_t *instruction);
-   static void grid_instruction_set_plugin_name(grid_instruction_t *instruction, const char *plugin_name)
-   {
-      nhpc_strcpy((char **)&(grid_instruction_get_plugin_name(instruction)), plugin_name);
-   }
 
+#define grid_instruction_set_plugin_name(i, n) (nhpc_strcpy((char **)&(i->plugin_name), n))
+#define grid_instruction_set_plugin_path(i, p) (nhpc_strcpy((char **)&(i->plugin_path), p))
+#define grid_instruction_set_plugin(i, p, n)   do{grid_instruction_set_plugin_name(i, n); grid_instruction_set_plugin_path(i, p);}while(false)
+   
    static void grid_instruction_set_peer(grid_instruction_t *instruction, const char *peer_addr, const char *peer_port)
    {
       nhpc_strcpy((char **)&(grid_instruction_get_peer_addr(instruction)), peer_addr);

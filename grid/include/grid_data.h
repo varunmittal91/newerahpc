@@ -208,13 +208,13 @@ namespace neweraHPC
       if(data->result_data)
 	 grid_shared_data_destruct(data->result_data);
    }   
-#define grid_data_add_result_data(g, d, l, a) do{grid_shared_data_init(&(g->result_data)); grid_shared_data_set_data(g->result_data, (void *)d, &l, a);}while(false);
-#define grid_data_destruct_data(g)     (grid_shared_data_destruct(g->data))
+#define grid_data_add_result_data(g, d, l, a) do{grid_shared_data_init(&(g->result_data)); grid_shared_data_set_data((g->result_data), (const void *)d, &l, a);}while(false);
+#define grid_data_destruct_data(g)            (grid_shared_data_destruct(g->data))
    void grid_data_create_from_socket(grid_data_t *data, nhpc_socket_t *socket);
    
    struct grid_shared_data_t
    {
-      void         *address;
+      const void   *address;
       const char   *content_type;
       arg_t         arg;
       nhpc_size_t   len;
@@ -230,13 +230,13 @@ namespace neweraHPC
    {
       delete data;
    }
-   static void grid_shared_data_set_data(grid_shared_data_t *data, void *address, nhpc_size_t *len, arg_t arg)
+   static void grid_shared_data_set_data(grid_shared_data_t *data, const void *address, nhpc_size_t *len, arg_t arg)
    {
       if(grid_arg_is_file(arg))
       {
-	 if(nhpc_file_size((const char *)address, &(data->len)) == NHPC_FAIL)
+	 (*len) = 0;
+	 if(nhpc_file_size((const char *)address, len) == NHPC_FAIL)
 	    return;
-	 *len = data->len;
       }
 
       int code = _grid_arg_get_int_code(arg);

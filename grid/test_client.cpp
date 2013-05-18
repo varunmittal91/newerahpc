@@ -24,6 +24,7 @@
 
 #include <include/grid_client_registration.h>
 #include <include/grid_instruction.h>
+#include <include/grid_instruction_set.h>
 
 using namespace std;
 using namespace neweraHPC;
@@ -52,7 +53,7 @@ int main(int argc, char **argv)
    grid_instruction_t *instruction;
    grid_instruction_init(&instruction);
    grid_instruction_set_peer(instruction, host_addr, host_port);
-   grid_instruction_set_plugin_name(instruction, "GRID_PLUGIN_RANGE");
+   grid_instruction_set_plugin(instruction, "sample_plugin/libsample_plugin.1.so", "GRID_SAMPLE_PLUGIN");
    
    grid_instruction_add_argument(instruction, ARG_COMMAND, "blender");
    grid_instruction_add_argument(instruction, ARG_RANGE, &a, &b);

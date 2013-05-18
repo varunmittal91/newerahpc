@@ -19,6 +19,7 @@
 
 #include <include/grid_plugin.h>
 #include <include/grid_default_plugins.h>
+#include <include/grid_response.h>
 
 namespace neweraHPC
 {
@@ -43,15 +44,37 @@ namespace neweraHPC
    
    nhpc_status_t grid_plugin_install(plugin_details_t *plugin_details)
    {
-      if(plugins_installed->insert(plugin_details, plugin_details->plugin_name) == 0)
+      nhpc_status_t nrv = NHPC_SUCCESS;
+      
+      if(!plugin_details || !(plugin_details->plugin_name))
 	 return NHPC_FAIL;
       
-      return NHPC_SUCCESS;
+      grid_plugin_lock_installed(NHPC_THREAD_LOCK_WRITE);
+      if(grid_plugin_insert_installed(plugin_details, (plugin_details->plugin_name)) == 0)
+      {
+	 nrv = NHPC_FAIL;
+      }
+      grid_plugin_unlock_installed(NHPC_THREAD_LOCK_WRITE);
+      
+      return nrv;
    }
    
    nhpc_status_t grid_plugin_install_dll(const char *dll_path, plugin_details_t **plugin_details)
    {
+      void *dll;
+      fnc_ptr_nhpc_t    plugin_init_fnc;
+      nhpc_status_t     nrv;
       
+      if((dll = dlopen(dll_path, RTLD_NOW)) == NULL)
+	 return errno;
+      if((plugin_init_fnc = (fnc_ptr_nhpc_t)dlsym(dll, "plugin_init")) == NULL)
+	 return errno;
+      
+      if((nrv = plugin_init_fnc(plugin_details)) != NHPC_SUCCESS)
+	 return nrv;
+
+      nrv = grid_plugin_install(*plugin_details);
+      return nrv;
    }
    
    nhpc_status_t grid_plugin_search(const char *plugin_name, plugin_details_t **plugin_details)
@@ -79,5 +102,30 @@ namespace neweraHPC
    nhpc_status_t grid_plugin_request_plugin(const char *plugin_name, const char *peer_addr, const char *peer_port)
    {
       
+   }
+   
+   nhpc_status_t grid_plugin_exchange(const char *peer_addr, const char *peer_port, const char *plugin_path)
+   {
+      nhpc_status_t nrv;
+      nhpc_size_t   size;
+      
+      grid_shared_data_t *data;
+      grid_shared_data_init(&data);
+      grid_shared_data_set_data(data, plugin_path, &size, ARG_FILE);
+      
+      grid_communication_t *communication;
+      grid_communication_init(&communication, GRID_PLUGIN_EXCHANGE);
+      grid_communication_add_dest(communication, peer_addr, peer_port);      
+      grid_communication_add_data(communication, data);
+      grid_communication_send(communication);
+      grid_communication_push(communication);
+      
+      grid_response_t *response;
+      nrv = grid_response_get(&response, communication);
+      
+      grid_communication_destruct(communication);
+      grid_response_destruct(response);
+      
+      return nrv;
    }
 };

@@ -7,6 +7,7 @@ main_LDADD   = src/libjarvis.la
 main_LDFLAGS = -lneweraHPC
 
 jarvis_grid_SOURCES = jarvis_grid.cpp
+jarvis_grid_LDADD   = src/libjarvis.la
 jarvis_grid_LDFLAGS = -lneweraHPC 
 
 jarvis_grid_client_SOURCES = jarvis_grid_client.cpp

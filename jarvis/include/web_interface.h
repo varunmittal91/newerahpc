@@ -1,5 +1,5 @@
 /*
- *	(C) 2013 Varun Mittal <varunmittal91@gmail.com>
+ *	(C) 2012 Varun Mittal <varunmittal91@gmail.com>
  *	jarvis program is distributed under the terms of the GNU General Public License v3
  *
  *	This file is part of jarvis.
@@ -17,20 +17,22 @@
  *	along with jarvis.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <neweraHPC/grid.h>
+#include <iostream>
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+#include <neweraHPC/network.h>
+#include <neweraHPC/general.h>
+#include <neweraHPC/constants.h>
+#include <neweraHPC/json.h>
+#include <neweraHPC/strings.h>
+#include <neweraHPC/http.h>
 
 using namespace neweraHPC;
 
 namespace jarvis
 {
-#ifdef __cplusplus
-   extern "C" 
-   {
-      nhpc_status_t jarvis_grid_plugin_register();
-   
-      nhpc_status_t plugin_init(plugin_details_t **plugin_details);
-      nhpc_status_t plugin_exec(grid_instruction_t *instruction);
-      nhpc_status_t plugin_processor(grid_instruction_t *instruction);
-   }
-#endif
+   void web_interface_init();
+   nhpc_status_t web_interface_handler(http_data_t *http_data);
 };

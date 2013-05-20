@@ -13,9 +13,9 @@ namespace jarvis
 {
    void speak(const char *sentence)
    {
-      const char *command = nhpc_strconcat("say ", sentence);
-      system(command);
-      delete[] command;
+      //const char *command = nhpc_strconcat("say ", sentence);
+      //system(command);
+      //delete[] command;
    }
    
    void jv_get_json_structure_recursive(json_t *json, int pos, synset_t *synset, int level = 0)
@@ -223,8 +223,11 @@ namespace jarvis
       *sense2 = matched_2;
    }
    
-   void jv_speak_results(json_t *structure1, json_t *structure2, int pos, int level, int sense1, int sense2)
+   json_t *jv_speak_results(json_t *structure1, json_t *structure2, int pos, int level, int sense1, int sense2)
    {
+      json_t *result = new json_t;
+      (*result).add_element(JSON_ARRAY, "Levels");
+
       (*structure1).reinitialize_search();
       const char *pos_ascii_name = jv_get_pos_ascii_name(pos);
       (*structure1)[pos_ascii_name];
@@ -239,13 +242,18 @@ namespace jarvis
       
       speak("The relationship can be defined by the following words,");
       
+      (*result).add_element(JSON_OBJECT);
+      (*result).add_element(JSON_ARRAY, "words");
       int word_count = (*structure1).count();
       if(word_count > 3)word_count = 3;
       for(int i = 1; i <= word_count; i++)
       {
 	 const char *word = (*structure1)[i];
 	 speak(word);
+	 (*result).add_element(JSON_STRING, word);
       }
+      (*result).close_element();
+      (*result).close_element();
       
       jv_pos pos_code = jv_get_pos_int_code(pos);
       if(1)
@@ -259,19 +267,25 @@ namespace jarvis
 	 {
 	    const char *response = (*structure1)["child"];
 	    if(!json_check_object_found(response))
-	       return;
+	       goto return_json;
 	 }
 	 (*structure1)["words"];
 
 	 speak("which is a");
 	 
+	 (*result).add_element(JSON_OBJECT);
+	 (*result).add_element(JSON_ARRAY, "words");
 	 int word_count = (*structure1).count();
 	 if(word_count > 3)word_count = 3;
 	 for(int i = 1; i <= word_count; i++)
 	 {
 	    const char *word = (*structure1)[i];
 	    speak(word);
+	    (*result).add_element(JSON_STRING, word);
 	 }
+	 (*result).close_element();
+	 (*result).close_element();
+	 
 	 if(level > 1)
 	 {
 	    (*structure1).reinitialize_search();
@@ -288,10 +302,12 @@ namespace jarvis
 	    {
 	       const char *response = (*structure1)["child"];
 	       if(!json_check_object_found(response))
-		  return;
+		  goto return_json;
 	    }	    
 	    (*structure1)["words"];
 	    
+	    (*result).add_element(JSON_OBJECT);
+	    (*result).add_element(JSON_ARRAY, "words");
 	    speak("A subset of");
 	    int word_count = (*structure1).count();
 	    if(word_count > 3)word_count = 3;
@@ -299,21 +315,29 @@ namespace jarvis
 	    {
 	       const char *word = (*structure1)[i];
 	       speak(word);
+	       (*result).add_element(JSON_STRING, word);
 	    }	    
+	    (*result).close_element();
+	    (*result).close_element();
 	    
 	    for(int i = 1; i <= (level - 1); i++)
 	    {
 	       const char *response = (*structure2)["child"];
 	       if(!json_check_object_found(response))
-		  return;
+		  goto return_json;
 	    }	    
 	 }
       }
       
+   return_json:
+      (*result).close_element();
+      (*result).close_element();
+      return result;
+      
       cout << (*structure1)[1] << endl;
    }
    
-   void jv_compare_json_structure(json_t *structure1, json_t *structure2, const char *word1, const char *word2)
+   json_t *jv_compare_json_structure(json_t *structure1, json_t *structure2, const char *word1, const char *word2)
    {
       const char *response1, *response2;
       
@@ -343,7 +367,7 @@ namespace jarvis
 	       speak("complete");
 	       speak("Probable relation found in");
 	       speak(pos_ascii_name);
-	       jv_speak_results(structure1, structure2, i, level, sense1, sense2);
+	       return jv_speak_results(structure1, structure2, i, level, sense1, sense2);
 	    }
 	 }
       }

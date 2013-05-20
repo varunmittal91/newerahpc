@@ -106,7 +106,6 @@ namespace jarvis
             nhpc_strcpy(&synset_word, synset_parts->strings[parts_position]);
             parts_position += 2;
 	    jv_set_synset_word(synset, synset_word);
-	    
 	    cout << synset_word << " ";
          }
 	 cout << endl;
@@ -143,6 +142,7 @@ namespace jarvis
 	 
 	 jv_insert_word_set_db(_part_of_speech, synset, offset);
 	 nhpc_string_delete(synset_parts);
+	 nhpc_string_delete(synset_str);
       }
       
       delete synset_offsets_tmp;

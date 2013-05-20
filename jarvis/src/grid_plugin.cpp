@@ -18,9 +18,16 @@
  */
 
 #include <iostream>
+
 #include <neweraHPC/error.h>
+#include <neweraHPC/json.h>
+#include <neweraHPC/grid_scheduler.h>
 
 #include <include/grid_plugin.h>
+#include <include/parse_index.h>
+#include <include/jarvis.h>
+#include <include/jarvis_data.h>
+#include <include/compare.h>
 
 using namespace std;
 
@@ -29,68 +36,99 @@ namespace jarvis
 #ifdef __cplusplus
    extern "C" 
    {
-      /*
-      nhpc_status_t jarvis_grid_plugin_register()
-      {
-      }
-   
       nhpc_status_t plugin_init(plugin_details_t **plugin_details)
       {
-	 (*plugin_details)->fnc_exec        = (fnc_ptr_nhpc_plugin_t)plugin_exec;
-	 (*plugin_details)->fnc_client_exec = (fnc_ptr_nhpc_plugin_t)plugin_client_exec;
-	 (*plugin_details)->fnc_processor   = (fnc_ptr_nhpc_plugin_t)plugin_processor;
-	 (*plugin_details)->plugin_name     = (char *)"JARVIS_GRID";
-      
+	 init_jarvis_data();
+	 thread_manager = new thread_manager_t;
+	 
+	 grid_plugin_details_init(plugin_details);
+	 grid_plugin_details_set_plugin_name((*plugin_details), "JARVIS_GRID_PLUGIN");
+	 grid_plugin_details_set_fnc_exec((*plugin_details), plugin_exec);
+	 grid_plugin_details_set_fnc_processor((*plugin_details), plugin_processor);
+	 
 	 return NHPC_SUCCESS;
       }
-   
-      nhpc_status_t plugin_exec(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
-				nhpc_socket_t *sock, char **grid_uid)
+      
+      nhpc_status_t plugin_exec(grid_instruction_t *instruction)
       {
-	 cout << "JARVIS PLUGIN EXEC" << endl;
-
-	 rbtree *headers = (rbtree *)sock->headers;
+	 json_t *word_structure1 = NULL, *word_structure2 = NULL;
+	 const char *word1 = NULL, *word2 = NULL;
 	 
-	 int *argument_count = &(instruction_set->argument_count);
-	 cout << *argument_count << endl;
-	 for(int i = 1; i <= *argument_count; i++)
-	 {
-	    nhpc_instruction_set_t *new_instruction_set;
-	    nhpc_generate_general_instruction(&new_instruction_set, headers);
+	 nhpc_status_t  nrv;
+	 rbtree        *arguments = instruction->arguments;
+	 if(arguments)
+	 {	    
+	    arg_t        arg;
+	    arg_value_t  arg_value;
+	    const char  *word;
 	    
-	    char *key      = nhpc_strconcat("Argument", nhpc_itostr(i));
-	    char *argument = (char *)headers->search(key);
-	    cout << "Argument:" << argument << endl;
-	    
-	    string_t *arg = nhpc_substr(argument, ',');
-	    
-	    char *word = nhpc_strconcat(arg->strings[1], ",", arg->strings[2]);
-	    nhpc_add_argument(new_instruction_set, LITERAL, word);
-	    new_instruction_set->execute = true;
-	    grid_server->queue_job(new_instruction_set);
-	    LOG_INFO("queueing job no: " << i);
+	    int argument_count = (*arguments).length();
+	    for(int i = 1; i <= argument_count; i++)
+	    {
+	       arg_value = grid_instruction_get_argument(instruction, i);
+	       arg       = grid_arg_get_code(arg_value);
+	       grid_arg_get_literals(&word, arg_value);
+	       
+	       nrv = jv_get_word_def(word);
+	       if(nrv == NHPC_SUCCESS)
+	       {
+		  jv_extract_word_def(word);
+		  if(i == 1)
+		  {
+		     word1           = word;
+		     word_structure1 = jv_get_json_structure(word);
+		  }
+		  else if(i == 2)
+		  {
+		     word2           = word;
+		     word_structure2 = jv_get_json_structure(word);
+		  }
+	       }	       
+	    }
 	 }
 	 
-	 
+	 json_t *result = NULL;
+	 if(word_structure1 && word_structure2)
+	 {
+	    cout << "Words loaded now comparing" << endl;
+	    result = jv_compare_json_structure(word_structure1, word_structure2, word1, word2);
+	    
+	    const char  *str  = (*result).get_string();
+	    nhpc_size_t  size = strlen(str) + 1;
+	    grid_instruction_set_result_data(instruction, str, &size, ARG_MEM_BLOCK);
+	 }
+
 	 return NHPC_SUCCESS;
       }
-   
-      nhpc_status_t plugin_client_exec(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
-				       nhpc_socket_t *sock, char **grid_uid)
+      
+      nhpc_status_t plugin_processor(grid_instruction_t *instruction)
       {
-	 cout << "JARVIS PLUGIN CLIENT EXEC" << endl;
+	 const char *plugin_name = grid_instruction_get_plugin_name(instruction);
+	 const char *grid_uid    = grid_instruction_get_grid_uid(instruction);
+	 const char *peer_addr   = grid_instruction_get_peer_addr(instruction);
+	 const char *peer_port   = grid_instruction_get_peer_port(instruction);	 	 
+      
+	 int instruction_count = 1;
+	 grid_instruction_t **instructions = new grid_instruction_t* [1];
+	 grid_instruction_init(&(instructions[0]));
+	 grid_instruction_set_plugin_name(instructions[0], plugin_name);
+	 grid_instruction_set_executable(instructions[0]);	 
+
+	 
+	 grid_instruction_t *_instruction = instructions[0];
+	 _instruction->arguments = instruction->arguments;
+	 _instruction->affinity  = instruction->affinity;
+	 
+	 grid_scheduler_add_job(grid_uid, instructions, &instruction_count);
+	 if(_instruction->result_data)
+	 {
+	    instruction->result_data  = _instruction->result_data;
+	    _instruction->result_data = NULL;
+	 }
+	 cout << "job complete" << endl;
 	 
 	 return NHPC_SUCCESS;
-      }
-   
-      nhpc_status_t plugin_processor(nhpc_grid_server_t *grid_server, nhpc_instruction_set_t *instruction_set, 
-				     nhpc_socket_t *sock, char **grid_uid)
-      {
-	 cout << "JARVIS PLUGIN PROCESSOR" << endl;
-	 
-	 return NHPC_SUCCESS;
-      }
-       */
+      }      
    }
 #endif
 };

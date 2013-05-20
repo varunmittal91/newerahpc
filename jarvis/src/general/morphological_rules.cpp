@@ -170,18 +170,10 @@ namespace jarvis
 	 
 	 while(!morphic_word && (morphic_rule = jv_get_morphological_rule(pos, morphic_count)) != NULL)
 	 {	    
-	    //cout << "Current search_status:" << morphic_count << endl;
 	    morphic_count++;   
 	    
-	    const char *suffix     = jv_get_morphological_rule_suffix(morphic_rule);
+	    const char *suffix      = jv_get_morphological_rule_suffix(morphic_rule);
 	    const char *replacement = jv_get_morphological_rule_replacement(morphic_rule);
-	    
-	    /*
-	    cout << "Found Morphc rule:" << endl;
-	    cout << "\tSuffix:" << morphic_rule->suffix << endl;
-	    if(morphic_rule->replacement)
-	       cout << "\tRepacement:" << morphic_rule->replacement << endl;
-	     */
 	    
 	    if(nhpc_strcmp(word, suffix) == NHPC_SUCCESS)
 	    {
@@ -204,7 +196,6 @@ namespace jarvis
 	 if(!morphic_rule)
 	 {
 	    jv_set_morphic_status_failed(*search_status);
-	    //cout << "Setting search failed" << endl;
 	 }
       }
       

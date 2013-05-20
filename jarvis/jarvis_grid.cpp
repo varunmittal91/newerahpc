@@ -18,27 +18,44 @@
  */
 
 #include <neweraHPC/neweraHPC.h>
+#include <neweraHPC/grid_server.h>
+#include <neweraHPC/grid_plugin.h>
+
+#include <include/jarvis.h>
+#include <include/web_interface.h>
 
 using namespace std;
+using namespace jarvis;
 using namespace neweraHPC;
 
 int main(int argc, char **argv)
 {
-   /*
-   neweraHPC_init(argc, argv);
    nhpc_status_t nrv;
    
-   nhpc_grid_server_t grid_server;
-   nrv = grid_server.grid_server_init();
-   
-   if(nrv != NHPC_SUCCESS)
-      LOG_ERROR("Failed to start grid server");
-   else 
+   nrv = grid_server_init(argc, argv);
+   if(nrv == NHPC_SUCCESS)
    {
-      cout << grid_server.install_plugin("src/.libs/libjarvis.dylib", NULL) << endl;
-      grid_server.grid_server_join();
+      const char       *plugin_path;
+      plugin_details_t *plugin;
+
+#ifdef __APPLE__
+      plugin_path = "src/.libs/libjarvis.0.dylib";
+#else
+      plugin_path = "src/.libs/libjarvis.0.so";
+#endif
+      
+      nrv = grid_plugin_install_dll(plugin_path, &plugin);
+      if(nrv == NHPC_SUCCESS)
+	 cout << "Plugin accepted in the core" << endl;
+      else 
+      {
+	 cout << "Plugin declined" << endl;
+      }
+      
+      jarvis_init(argc, argv);
+      web_interface_init();
+      grid_server_join();
    }
-   
+
    return 0;
-    */
 }

@@ -41,7 +41,7 @@ namespace jarvis
 
       string      line;
       const char *line_str;
-      string_t   *record_parts;
+      string_t   *record_parts = NULL;
       int         compare_value;
       
       jv_morphic_status morphic_search_status = 0;
@@ -52,7 +52,6 @@ namespace jarvis
       while(getline(index_file, line))
       {
 	 line_str = line.c_str();
-
 	 record_parts = nhpc_substr(line_str, ' ');
 
 	 const char *src_word = record_parts->strings[0];
@@ -97,6 +96,8 @@ namespace jarvis
       int pointer_count = nhpc_strtoi(record_parts->strings[3]);
       
       index_record_t *index_record = new index_record_t;
+      memset(index_record, 0, sizeof(index_record_t));
+      
       index_record->data_offsets   = new rbtree(RBTREE_NUM);
       index_record->pointers       = new rbtree(RBTREE_NUM);
 
@@ -149,6 +150,7 @@ namespace jarvis
 	 
 	 (*thread_manager).init_thread(&thread_id, NULL);
 	 (*thread_manager).create_thread(&thread_id, NULL, (void* (*)(void*))jv_get_index_record, search_param, NHPC_THREAD_DEFAULT);
+	 jv_get_index_record(search_param);
 	 
 	 jv_set_search_param_thread_id(search_param, thread_id);
       }
@@ -181,7 +183,6 @@ namespace jarvis
 	       jv_set_search_param_data(data_search, search_param);
 	       	       
 	       jv_get_word_data_record(data_search);
-	       
 	       jv_add_word((index_record_t *)search_param->result);
 	       
 	       search_param_destruct(data_search);

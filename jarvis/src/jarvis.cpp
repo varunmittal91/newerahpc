@@ -24,6 +24,7 @@
 #include <include/jarvis_data.h>
 #include <include/parse_index.h>
 #include <include/morphological_rules.h>
+#include <include/web_interface.h>
 
 using namespace std;
 using namespace neweraHPC;

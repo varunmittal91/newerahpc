@@ -1,7 +1,7 @@
 AC_INIT(jarvis, 0.1, varunmittal91@gmail.com)
 
 AM_INIT_AUTOMAKE
-AM_SILENT_RULES([no])
+AM_SILENT_RULES([yes])
 AM_CONFIG_HEADER(config.h)
 
 AC_CONFIG_SRCDIR([main.cpp])
@@ -41,4 +41,5 @@ LT_SUPPORTED_TAG(CXX)
 
 AC_OUTPUT([Makefile]
           [src/Makefile]
+	  [src/web_interface/Makefile]
           [src/general/Makefile])

@@ -636,6 +636,7 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIB@&t@OBJS
+neweraHPC_LIBS
 CXXCPP
 am__fastdepCXX_FALSE
 am__fastdepCXX_TRUE
@@ -767,6 +768,7 @@ enable_dependency_tracking
 with_gnu_ld
 with_sysroot
 enable_libtool_lock
+with_neweraHPC_lib_path
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1417,6 +1419,8 @@ Optional Packages:
   --with-gnu-ld           assume the C compiler uses GNU ld @<:@default=no@:>@
   --with-sysroot=DIR Search for dependent libraries within DIR
                         (or the compiler's sysroot if not specified).
+  --with-neweraHPC-lib-path 
+                          location of the neweraHPC core libraries
 
 Some influential environment variables:
   CC          C compiler command
@@ -2905,7 +2909,7 @@ fi
 case $enable_silent_rules in
 yes) AM_DEFAULT_VERBOSITY=0;;
 no)  AM_DEFAULT_VERBOSITY=1;;
-*)   AM_DEFAULT_VERBOSITY=1;;
+*)   AM_DEFAULT_VERBOSITY=0;;
 esac
 am_make=${MAKE-make}
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $am_make supports nested variables" >&5
@@ -7961,10 +7965,6 @@ _lt_linker_boilerplate=`cat conftest.err`
 $RM -r conftest*
 
 
-## CAVEAT EMPTOR:
-## There is no encapsulation within the following macros, do not change
-## the running order or otherwise move them around unless you know exactly
-## what you are doing...
 if test -n "$compiler"; then
   
 lt_prog_compiler_no_builtin_flag=
@@ -15143,6 +15143,16 @@ fi
 
 #AC_CHECK_LIB([neweraHPC], [neweraHPC_init], [], [AC_MSG_ERROR([neweraHPC library not found])])
 
+
+@%:@ Check whether --with-neweraHPC-lib-path was given.
+if test "${with_neweraHPC_lib_path+set}" = set; then :
+  withval=$with_neweraHPC_lib_path; neweraHPC_LIBS="-L$withval -lneweraHPC"
+else
+  neweraHPC_LIBS='-lneweraHPC'
+fi
+
+
+
 # Checks for header files.
 for ac_header in pthread.h
 do :
@@ -15324,7 +15334,7 @@ esac
 
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/general/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/web_interface/Makefile src/general/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -16427,6 +16437,7 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+    "src/web_interface/Makefile") CONFIG_FILES="$CONFIG_FILES src/web_interface/Makefile" ;;
     "src/general/Makefile") CONFIG_FILES="$CONFIG_FILES src/general/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

@@ -30,7 +30,7 @@ using namespace neweraHPC;
 
 namespace jarvis
 {
-#define WORDNET_ROOT_DIR "data/dict"
+#define WORDNET_ROOT_DIR "/jarvis/data/dict"
    
    extern const char *wordnet_index_files[INDEXED_POS_COUNT];
    extern const char *wordnet_data_files[INDEXED_POS_COUNT];

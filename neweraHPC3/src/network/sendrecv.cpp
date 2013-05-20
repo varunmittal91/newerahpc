@@ -36,23 +36,16 @@ namespace neweraHPC
       
       bzero(buffer, *length);
       
-      nrv = nhpc_wait_for_io_or_timeout(sock, 1);
-      if(nrv != NHPC_SUCCESS)
-      {
-	 *length = 0;
-	 return errno;
-      }
-      else 
-      {
-	 do 
-	 {	    
-	    rv = nhpc_wait_for_io_or_timeout(sock, 0);
-	    if(rv != NHPC_SUCCESS)
-	       continue;
-	    
-	    rv = read((sock->sockfd), buffer, *length);
-	 }while(rv == -1 && errno == EINTR);
-      }
+      do 
+      {	    
+	 nrv = nhpc_wait_for_io_or_timeout(sock, 0);
+	 if(nrv != NHPC_SUCCESS)
+	 {
+	    *length = 0;
+	    return nrv;
+	 }
+	 rv = read((sock->sockfd), buffer, *length);
+      }while(rv == -1 && errno == EINTR);
 	
       if(rv == -1)
       {

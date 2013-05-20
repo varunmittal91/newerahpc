@@ -241,6 +241,7 @@ namespace neweraHPC
       else 
       {
 	 page_set_empty(in_mem_page);  
+	 page_empty_data(in_mem_page);
 	 in_mem_page->address = NULL;
       }
    }

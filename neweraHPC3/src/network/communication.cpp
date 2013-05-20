@@ -47,6 +47,7 @@ namespace neweraHPC
 	 bzero(buffer, size);
 	 
 	 nrv = socket_recv(sock, buffer, &size);
+	 
 	 nhpc_analyze_stream(sock, buffer, &size, &header_size);
 	 
 	 if(nrv == NHPC_EOF)

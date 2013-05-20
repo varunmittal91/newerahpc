@@ -92,21 +92,46 @@ namespace neweraHPC
       char  *peer_host;
       char  *peer_port;
    
+      nhpc_mutex_t           mutex;           
       plugin_request_status  status;
    };   
-#define grid_plugin_request_set_sent(p)      ((p)->status |= 1)
-#define grid_plugin_request_set_complete(p)  ((p)->status |= 2)
-#define grid_plugin_request_is_sent(p)       ((p)->status & 1)
-#define grid_plugin_request_is_complete(p)   (((p)->status >> 1) & 1)
+   static void grid_plugin_request_init(plugin_request_t **plugin_request)
+   {
+      (*plugin_request) = new plugin_request_t;
+      memset((*plugin_request), 0, sizeof(plugin_request_t));
+
+      thread_mutex_init(&((*plugin_request)->mutex));
+   }
+   static void grid_plugin_request_destruct(plugin_request_t *plugin_request)
+   {
+      thread_mutex_lock(&((plugin_request)->mutex), NHPC_THREAD_LOCK_WRITE);      
+      delete plugin_request;
+   }
+#define grid_plugin_request_set_plugin_name(pr, n) (nhpc_strcpy(&(pr->plugin), n))
+#define grid_plugin_request_set_peer(pr, h, p)     do{nhpc_strcpy(&(pr->peer_host), h);nhpc_strcpy(&(pr->peer_port), p);}while(false)
+#define grid_plugin_request_set_sent(p)            ((p)->status |= 1)
+#define grid_plugin_request_set_complete(p)        ((p)->status |= 2)
+#define grid_plugin_request_set_failed(p)          ((p)->status |= 4)
+#define grid_plugin_request_set_successful(p)      ((p)->status |= 8)
+#define grid_plugin_request_is_sent(p)             ((p)->status & 1)
+#define grid_plugin_request_is_complete(p)         (((p)->status >> 1) & 1)
+#define grid_plugin_request_is_failed(p)           (((p)->status >> 2) & 1)
+#define grid_plugin_request_is_successful(p)       (((p)->status >> 3) & 1)
    inline plugin_request_t *grid_plugin_search_requested(const char *plugin_name)
    {
-      thread_mutex_lock(&mutex_plugins_installed, NHPC_THREAD_LOCK_READ);
+      thread_mutex_lock(&mutex_plugins_requested, NHPC_THREAD_LOCK_READ);
       plugin_request_t *plugin_request = (plugin_request_t *)(*plugins_requested).search(plugin_name);
-      thread_mutex_unlock(&mutex_plugins_installed, NHPC_THREAD_LOCK_READ);
+      thread_mutex_unlock(&mutex_plugins_requested, NHPC_THREAD_LOCK_READ);
       
       return plugin_request;
    }
-   nhpc_status_t grid_plugin_request_plugin(const char *plugin_name, const char *peer_addr, const char *peer_port);
+   inline void grid_plugin_insert_requested(plugin_request_t *plugin_request)
+   {
+      thread_mutex_lock(&mutex_plugins_requested, NHPC_THREAD_LOCK_WRITE);
+      (*plugins_requested).insert(plugin_request, (plugin_request->plugin));
+      thread_mutex_unlock(&mutex_plugins_requested, NHPC_THREAD_LOCK_WRITE);      
+   }
+   nhpc_status_t grid_plugin_request_plugin(const char *plugin_name, const char *peer_addr, const char *peer_port, plugin_details_t **plugin_details);
    
 #define grid_plugin_execute_function(f, arg)  (f(arg))
 #define grid_plugin_execute_exec(g, arg)      (grid_plugin_execute_function(g->fnc_exec, arg))

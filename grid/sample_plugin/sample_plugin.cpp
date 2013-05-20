@@ -34,6 +34,10 @@ namespace neweraHPC
    {
       nhpc_status_t plugin_exec(grid_instruction_t *instruction)
       {
+	 cout << "executing exec" << endl;
+	 
+	 sleep(3);
+	 
 	 const char *result = "Successful execution";
 	 nhpc_size_t size   = strlen(result) + 1;
 	 
@@ -44,7 +48,7 @@ namespace neweraHPC
       
       nhpc_status_t plugin_processor(grid_instruction_t *instruction)
       {
-	 int instruction_count = 10;
+	 int instruction_count = 4;
 	 
 	 const char *plugin_name = grid_instruction_get_plugin_name(instruction);
 	 const char *grid_uid    = grid_instruction_get_grid_uid(instruction);

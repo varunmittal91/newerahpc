@@ -75,14 +75,21 @@ namespace neweraHPC
       rbtree        *headers = socket->headers;
       rbtree        *arguments;
 
-      const char *peer_addr       = network_headers_get_param(socket->headers, "Peer-Addr");
+      const char *peer_addr       = network_headers_get_param(socket->headers, "Peer-Host");
       const char *peer_port       = network_headers_get_param(socket->headers, "Peer-Port");
       const char *plugin_name     = network_headers_get_param(socket->headers, "Plugin-Name");
       const char *execution_state = network_headers_get_param(socket->headers, "Execution-State");
       const char *grid_uid        = network_headers_get_param(socket->headers, "Grid-Uid");
+      const char *affinity        = network_headers_get_param(socket->headers, "Affinity");
       
       if(!plugin_name || !grid_uid)
 	 return NHPC_FAIL;
+      
+      if(!affinity || nhpc_strcmp(affinity, "0") == NHPC_SUCCESS)
+	 (*instruction)->affinity = 1;
+      else 
+	 (*instruction)->affinity = nhpc_strtoi(affinity);
+      
       grid_instruction_set_plugin_name((*instruction), plugin_name);
       grid_instruction_set_grid_uid((*instruction), grid_uid);
       

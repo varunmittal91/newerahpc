@@ -53,6 +53,9 @@ namespace neweraHPC
 #define grid_response_set_socket(g, s)         (g->socket = s)
 #define grid_response_get_grid_data(g)         (g->data)
    
+#define grid_response_is_status(gc, s)         (grid_get_response_status_code(gc) == s)
+#define grid_response_is_successful(gc)        (grid_response_is_status(gc, GRID_RESPONSE_SUCCESSFUL))
+   
    static void grid_response_init(grid_response_t **grid_response, grid_response_type_t response_type)
    {
       (*grid_response) = new grid_response_t;

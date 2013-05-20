@@ -56,7 +56,7 @@ namespace neweraHPC
       grid_communication_t *grid_communication;
       grid_communication_init(&grid_communication, GRID_INSTRUCTION);
       grid_communication_add_dest(grid_communication, peer_addr, peer_port);
-      grid_communication_set_opt(grid_communication, GRID_COMMUNICATION_OPT_REGISTER);
+      grid_communication_set_opt(grid_communication, GRID_COMMUNICATION_OPT_REGISTER | GRID_COMMUNICATION_OPT_SEND_PEER_DETAILS);
       if(grid_instruction_get_input_data(instruction))
 	 data = grid_instruction_get_input_data(instruction);
       
@@ -90,6 +90,10 @@ namespace neweraHPC
       if(grid_instruction_is_executable(instruction))
 	 grid_communication_set_header(grid_communication, "Execution-State", "Ready");
 
+      char *affinity_str = nhpc_itostr(instruction->affinity);
+      grid_communication_set_header(grid_communication, "Affinity", affinity_str);
+      delete[] affinity_str;
+      
       grid_communication_send(grid_communication);
       nrv = grid_communication_push(grid_communication, data);
       
@@ -97,18 +101,28 @@ namespace neweraHPC
       
       grid_response_t *response;
       nrv = grid_response_get(&response, grid_communication);
-      if(nrv == NHPC_SUCCESS)
+      if(nrv == NHPC_SUCCESS && grid_response_is_successful(response))
       {
-	 grid_instruction_set_processed(instruction);
-	 if(instruction->peer_uid)
+	 if(response->data)
 	 {
-	    grid_node_t *node = grid_node_search_compute_node(instruction->peer_uid);
-	    grid_node_free_compute_node(node, 1);
+	    instruction->result_data = response->data;
+	    response->data = NULL;
 	 }
+	    
+	 grid_instruction_set_processed(instruction);
 	 cout << "Instruction processing complete" << endl;
       }
       else 
+      {
+	 grid_instruction_unset_sent(instruction);
 	 cout << "No response recieved" << endl;      
+      }
+
+      if(instruction->peer_uid)
+      {
+	 grid_node_t *node = grid_node_search_compute_node(instruction->peer_uid);
+	 grid_node_free_compute_node(node, (instruction->affinity));
+      }
       
       grid_response_destruct(response);
       grid_communication_destruct(grid_communication);

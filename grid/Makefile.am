@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS= -I m4
 
-SUBDIRS = src sample_plugin
+SUBDIRS = src
 
 bin_PROGRAMS   = server test_client
 

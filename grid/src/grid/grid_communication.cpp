@@ -63,7 +63,7 @@ namespace neweraHPC
 	 grid_communication->headers->insert("Grid-Uid", grid_uid);
 	 grid_communication->grid_uid = grid_uid;
       }
-      if(grid_communication_is_opt_send_peer_details(grid_communication))
+      if(grid_communication_is_opt_send_peer_details(grid_communication) && _host_addr && _host_port)
       {
 	 grid_communication->headers->insert("Peer-Host", _host_addr);
 	 grid_communication->headers->insert("Peer-Port", _host_port);      

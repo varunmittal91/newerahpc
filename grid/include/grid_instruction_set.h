@@ -67,6 +67,7 @@ namespace neweraHPC
 #define grid_instruction_get_referer_grid_uid(i) (i->referer_grid_uid)
 #define grid_instruction_get_argument_count(i)   (i->arguments->length())
 #define grid_instruction_get_argument(i, n)      ((const char *)i->arguments->search(n))
+#define grid_instruction_set_affinity(i, a)      (i->affinity = a)
    static void grid_instruction_init(grid_instruction_t **instruction)
    {
       (*instruction) = new grid_instruction_t;

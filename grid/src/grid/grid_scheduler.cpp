@@ -17,6 +17,8 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <neweraHPC/error.h>
+
 #include <include/grid_scheduler.h>
 #include <include/grid_server.h>
 #include <include/grid_node.h>
@@ -65,10 +67,9 @@ namespace neweraHPC
       grid_node_t   *node;
  
       node = grid_node_search_compute_node(instruction->peer_uid);
-      nrv = grid_instruction_send(instruction);
       if((nrv = grid_instruction_send(instruction)) != NHPC_SUCCESS)
       {
-	 grid_node_free_compute_node(node, 1);
+	 grid_node_free_compute_node(node, (instruction->affinity));
 	 grid_instruction_unset_sent(instruction);
 	 delete[] (instruction->peer_uid);
 	 (instruction->peer_uid) = NULL;
@@ -78,6 +79,7 @@ namespace neweraHPC
    void *grid_scheduler_job_dispatcher()
    {
       int                 instruction_count;
+      int                 affinity;
       grid_instruction_t *instruction;
       grid_node_t        *node;
       nhpc_status_t       nrv;
@@ -88,14 +90,21 @@ namespace neweraHPC
 	 
 	 thread_mutex_lock(&mutex_queued_instructions, NHPC_THREAD_LOCK_WRITE);
 	 instruction_count = (*queued_instructions).length();
-	 
 	 for(int i = 1; i <= instruction_count; i++)
 	 {
 	    instruction = (grid_instruction_t *)(*queued_instructions).search(i);
+	    affinity    = instruction->affinity;
+	    if(grid_instruction_is_processed(instruction))
+	    {
+	       (*queued_instructions).erase(i);
+	       i--;
+	       instruction_count--;
+	       continue;
+	    }
 	    if(grid_instruction_is_sent(instruction))
 	       continue;
 	 
-	    node = grid_node_get_compute_node(1);
+	    node = grid_node_get_compute_node(affinity);
 	    if(node)
 	    {
 	       grid_instruction_set_peer_uid(instruction, node->peer_uid);	       
@@ -109,7 +118,7 @@ namespace neweraHPC
    
    void grid_task_add_task(const char *grid_uid, grid_instruction_t **instructions, int *instructions_count)
    {
-      grid_task_t *task = new grid_task_t;
+      grid_task_t *task  = new grid_task_t;
       task->count        = *instructions_count;
       task->instructions = instructions;
       
@@ -126,5 +135,23 @@ namespace neweraHPC
    nhpc_status_t grid_scheduler_add_job(const char *grid_uid, grid_instruction_t **instructions, int *instructions_count)
    {
       grid_task_add_task(grid_uid, instructions, instructions_count);
+      
+      bool job_done = false;
+      while(!job_done)
+      {
+	 sleep(1);
+	 job_done = true;	 
+	 
+	 for(int i = 0; i < (*instructions_count); i++)
+	 {
+	    if(!grid_instruction_is_processed(instructions[i]))
+	    {
+	       job_done = false;
+	       break;
+	    }
+	 }
+      }
+      
+      return NHPC_SUCCESS;
    }
 };

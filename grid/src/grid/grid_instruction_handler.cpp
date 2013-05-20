@@ -49,7 +49,7 @@ namespace neweraHPC
       nrv = grid_plugin_search(plugin_name, &plugin_details);
       if(nrv == NHPC_FAIL && peer_addr && peer_port)
       {
-	 nrv = grid_plugin_request_plugin(plugin_name, peer_addr, peer_port);
+	 nrv = grid_plugin_request_plugin(plugin_name, peer_addr, peer_port, &plugin_details);
       }
       if(nrv != NHPC_SUCCESS)
 	 return nrv;
@@ -58,6 +58,7 @@ namespace neweraHPC
       if(instruction->result_data)
       {
 	 grid_data->result_data = instruction->result_data;
+	 instruction->result_data = NULL;
       }
       
       return nrv;

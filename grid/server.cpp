@@ -37,4 +37,6 @@ using namespace neweraHPC;
 int main(int argc, char **argv)
 {      
    nhpc_status_t nrv = grid_server_init(argc, argv);
+   if(nrv == NHPC_SUCCESS)
+      grid_server_join();
 }

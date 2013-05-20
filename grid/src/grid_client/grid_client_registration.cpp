@@ -44,7 +44,7 @@ namespace neweraHPC
       if(nrv == NHPC_SUCCESS)
       {
 	 grid_shared_data_t *data = grid_response_get_grid_data(grid_response);
-	 if(data)
+	 if(data && grid_response_is_successful(grid_response))
 	 {
 	    (*grid_uid) = (const char *)grid_shared_data_get_data_address(data);
 	    cout << "Registration code:" << (*grid_uid) << endl;	    

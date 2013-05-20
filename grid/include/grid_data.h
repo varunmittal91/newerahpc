@@ -119,6 +119,10 @@ namespace neweraHPC
       delete[] str1;
       delete[] str2;
    }
+   static void grid_arg_get_literals(const char **literal, const char *arg_value)
+   {
+      (*literal) = arg_value + sizeof(arg_t);
+   }
    static void grid_arg_set_literals(const char **arg_value, const char *literal, arg_t arg)
    {
       grid_arg_set_value(arg_value, literal);

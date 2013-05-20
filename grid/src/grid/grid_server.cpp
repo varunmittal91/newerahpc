@@ -41,8 +41,8 @@ namespace neweraHPC
    network_t        *_network;
    thread_manager_t *_thread_manager;
    
-   const char *_host_addr;
-   const char *_host_port;
+   const char *_host_addr = NULL;
+   const char *_host_port = NULL;
    const char *_host_grid_uid;
    const char *_tmp_dir;
    int _host_core_count;
@@ -188,6 +188,11 @@ namespace neweraHPC
       grid_scheduler_system_init();
       grid_tmpfs_init();
       
-      (*_network).join_accept_thread();
+      return NHPC_SUCCESS;
    }
-}
+   
+   void grid_server_join()
+   {
+      (*_network).join_accept_thread();      
+   }
+};

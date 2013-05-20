@@ -73,6 +73,7 @@ namespace neweraHPC
       if((nrv = plugin_init_fnc(plugin_details)) != NHPC_SUCCESS)
 	 return nrv;
 
+      nhpc_strcpy((char **)&((*plugin_details)->path_plugin), dll_path);
       nrv = grid_plugin_install(*plugin_details);
       return nrv;
    }
@@ -86,10 +87,15 @@ namespace neweraHPC
       plugin_request_t *plugin_request = grid_plugin_search_requested(plugin_name);
       if(plugin_request)
       {
-	 while(grid_plugin_request_is_complete(plugin_request))
+	 if(grid_plugin_request_is_failed(plugin_request))
+	    return NHPC_FAIL;
+	 
+	 thread_mutex_lock(&(plugin_request->mutex), NHPC_THREAD_LOCK_READ);
+	 while(!grid_plugin_request_is_complete(plugin_request))
 	 {
 	    sleep(1);
 	 }
+	 thread_mutex_unlock(&(plugin_request->mutex), NHPC_THREAD_LOCK_READ);
       }
       
       (*plugin_details) = grid_plugin_search_installed(plugin_name);
@@ -99,9 +105,55 @@ namespace neweraHPC
       return NHPC_FAIL;
    }
    
-   nhpc_status_t grid_plugin_request_plugin(const char *plugin_name, const char *peer_addr, const char *peer_port)
+   nhpc_status_t grid_plugin_request_plugin(const char *plugin_name, const char *peer_addr, const char *peer_port, plugin_details_t **plugin_details)
    {
+      nhpc_status_t       nrv;
+      const char         *plugin_path;
+      grid_shared_data_t *data;
       
+      plugin_request_t *plugin_request;
+      grid_plugin_request_init(&plugin_request);
+      grid_plugin_request_set_plugin_name(plugin_request, plugin_name);
+      grid_plugin_request_set_peer(plugin_request, peer_addr, peer_port);
+      
+      grid_plugin_insert_requested(plugin_request);
+      
+      grid_communication_t *communication;
+      grid_communication_init(&communication, GRID_PLUGIN_REQUEST);
+      grid_communication_add_dest(communication, peer_addr, peer_port);
+      grid_communication_set_header(communication, "Plugin-Name", plugin_name);
+      
+      grid_communication_send(communication);
+      nrv = grid_communication_push(communication);
+      if(nrv != NHPC_SUCCESS)
+	 return nrv;
+      
+      grid_response_t *response;
+      nrv = grid_response_get(&response, communication);
+      grid_plugin_request_set_complete(plugin_request);
+      if(nrv == NHPC_SUCCESS)
+      {
+	 if(grid_response_is_successful(response))
+	 {
+	    data        = response->data;
+	    plugin_path = (const char *)grid_shared_data_get_data_address(data);
+	    nrv = grid_plugin_install_dll(plugin_path, plugin_details);
+	    if(nrv == NHPC_SUCCESS)
+	    {
+	       grid_plugin_request_set_successful(plugin_request);	    
+	       grid_plugin_request_destruct(plugin_request);
+	    }
+	    else 
+	       grid_plugin_request_set_failed(plugin_request);
+	 }
+	 else 
+	 {
+	    grid_plugin_request_set_failed(plugin_request);
+	    nrv = NHPC_FAIL;
+	 }
+      }
+      
+      return nrv;
    }
    
    nhpc_status_t grid_plugin_exchange(const char *peer_addr, const char *peer_port, const char *plugin_path)

@@ -39,6 +39,7 @@ namespace neweraHPC
 #define grid_get_host_cpu_time()    (_host_cpu_time)
    
    nhpc_status_t grid_server_init(int argc, char **argv);
+   void          grid_server_join();
    
    nhpc_status_t grid_register_to_controller(const char *grid_controller_addr, const char *grid_controller_port,
 					     const char *host_addr, const char *host_port, int host_core_count,

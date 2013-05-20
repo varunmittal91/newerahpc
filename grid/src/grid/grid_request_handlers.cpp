@@ -66,7 +66,29 @@ namespace neweraHPC
    
    nhpc_status_t grid_plugin_request_handler(grid_data_t *grid_data)
    {
+      nhpc_status_t     nrv;
+      nhpc_size_t       size;
+      plugin_details_t *plugin;
       
+      rbtree     *headers     = grid_data->socket->headers;      
+      const char *plugin_name = (const char *)headers->search("Plugin-Name");
+      if(!plugin_name)
+	 return NHPC_FAIL;
+      
+      nrv = grid_plugin_search(plugin_name, &plugin);
+      if(nrv == NHPC_SUCCESS)
+      {
+	 const char *plugin_path;
+	 
+	 if(plugin->path_nxi)
+	    plugin_path = plugin->path_nxi;
+	 else 
+	    plugin_path = plugin->path_plugin;
+	 
+	 grid_data_add_result_data(grid_data, plugin_path, size, ARG_FILE);
+      }
+      
+      return nrv;
    }
    
    nhpc_status_t grid_plugin_exchange_handler(grid_data_t *grid_data)

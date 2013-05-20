@@ -25,6 +25,8 @@ namespace neweraHPC
    typedef unsigned char instruction_status_t;
    struct grid_instruction_t
    {
+      int         affinity;
+      
       const char *plugin_name;
       const char *plugin_path;
       rbtree     *arguments;

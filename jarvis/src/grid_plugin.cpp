@@ -51,54 +51,34 @@ namespace jarvis
       
       nhpc_status_t plugin_exec(grid_instruction_t *instruction)
       {
-	 json_t *word_structure1 = NULL, *word_structure2 = NULL;
-	 const char *word1 = NULL, *word2 = NULL;
+	 json_t     *word_structure1 = NULL;
+	 const char *word1           = NULL;
 	 
 	 nhpc_status_t  nrv;
 	 rbtree        *arguments = instruction->arguments;
-	 if(arguments)
-	 {	    
-	    arg_t        arg;
-	    arg_value_t  arg_value;
-	    const char  *word;
+	 if(!arguments)
+	    return NHPC_FAIL;
+	 
+	 arg_t        arg;
+	 arg_value_t  arg_value;
+	 const char  *word;
 	    
-	    int argument_count = (*arguments).length();
-	    for(int i = 1; i <= argument_count; i++)
-	    {
-	       arg_value = grid_instruction_get_argument(instruction, i);
-	       arg       = grid_arg_get_code(arg_value);
-	       grid_arg_get_literals(&word, arg_value);
-	       
-	       nrv = jv_get_word_def(word);
-	       if(nrv == NHPC_SUCCESS)
-	       {
-		  jv_extract_word_def(word);
-		  if(i == 1)
-		  {
-		     word1           = word;
-		     word_structure1 = jv_get_json_structure(word);
-		  }
-		  else if(i == 2)
-		  {
-		     word2           = word;
-		     word_structure2 = jv_get_json_structure(word);
-		  }
-	       }	       
-	    }
+	 arg_value = grid_instruction_get_argument(instruction, 1);
+	 arg       = grid_arg_get_code(arg_value);
+	 grid_arg_get_literals(&word, arg_value);
+
+	 nrv = jv_get_word_def(word);
+	 if(nrv == NHPC_SUCCESS)
+	 {
+	    jv_extract_word_def(word);
+	    word_structure1 = jv_get_json_structure(word);
+
+	    const char  *json_str = (*word_structure1).get_string();
+	    nhpc_size_t  size     = strlen(json_str) + 1;
+	    grid_instruction_set_result_data(instruction, json_str, &size, ARG_MEM_BLOCK);
 	 }
 	 
-	 json_t *result = NULL;
-	 if(word_structure1 && word_structure2)
-	 {
-	    cout << "Words loaded now comparing" << endl;
-	    result = jv_compare_json_structure(word_structure1, word_structure2, word1, word2);
-	    
-	    const char  *str  = (*result).get_string();
-	    nhpc_size_t  size = strlen(str) + 1;
-	    grid_instruction_set_result_data(instruction, str, &size, ARG_MEM_BLOCK);
-	 }
-
-	 return NHPC_SUCCESS;
+	 return nrv;
       }
       
       nhpc_status_t plugin_processor(grid_instruction_t *instruction)
@@ -108,24 +88,67 @@ namespace jarvis
 	 const char *peer_addr   = grid_instruction_get_peer_addr(instruction);
 	 const char *peer_port   = grid_instruction_get_peer_port(instruction);	 	 
       
-	 int instruction_count = 1;
-	 grid_instruction_t **instructions = new grid_instruction_t* [1];
-	 grid_instruction_init(&(instructions[0]));
-	 grid_instruction_set_plugin_name(instructions[0], plugin_name);
-	 grid_instruction_set_executable(instructions[0]);	 
-
+	 int instruction_count = 2;
+	 grid_instruction_t **instructions = new grid_instruction_t* [2];
 	 
-	 grid_instruction_t *_instruction = instructions[0];
-	 _instruction->arguments = instruction->arguments;
-	 _instruction->affinity  = instruction->affinity;
+	 for(int i = 0; i < instruction_count; i++)
+	 {
+	    grid_instruction_init(&(instructions[i]));
+	    grid_instruction_set_plugin_name(instructions[i], plugin_name);
+	    grid_instruction_set_executable(instructions[i]);	 
+ 
+	    grid_instruction_t *_instruction = instructions[i];
+	    _instruction->affinity = instruction->affinity;
+	 }
+	 
+	 json_t *word_structure1 = NULL;
+	 json_t *word_structure2 = NULL;
+
+	 const char *words[2];
+	 
+	 rbtree *arguments = instruction->arguments;
+	 if(instruction->arguments)
+	 {
+	    arg_t        arg;
+	    arg_value_t  arg_value;
+	    
+	    int argument_count = (*arguments).length();
+	    if(argument_count > 2)
+	       argument_count = 2;
+	    for(int i = 1; i <= argument_count; i++)
+	    {
+	       grid_arg_get_literals(&(words[i - 1]), arg_value);
+	       
+	       arg_value = grid_instruction_get_argument(instruction, i);
+	       grid_instruction_add_argument(instructions[i - 1], arg_value);
+	    }	       
+	 }
 	 
 	 grid_scheduler_add_job(grid_uid, instructions, &instruction_count);
-	 if(_instruction->result_data)
-	 {
-	    instruction->result_data  = _instruction->result_data;
-	    _instruction->result_data = NULL;
-	 }
-	 cout << "job complete" << endl;
+	 
+	 if(!(instructions[0]->result_data) || !(instructions[0]->result_data))
+	    return NHPC_FAIL;
+	 
+	 const char *word_str1 = (const char *)((instructions[0])->result_data->address);
+	 const char *word_str2 = (const char *)((instructions[1])->result_data->address);
+
+	 word_structure1 = new json_t;
+	 word_structure2 = new json_t;
+	 (*word_structure1).build_structure(word_str1);
+	 (*word_structure2).build_structure(word_str2);
+	 
+	 json_t     *result     = jv_compare_json_structure(word_structure1, word_structure2, words[0], words[1]);
+	 const char *result_str = (*result).get_string();
+	 nhpc_size_t size       = strlen(result_str) + 1;
+	 nhpc_strcpy((char **)&result_str, result_str);
+	 
+	 grid_instruction_set_result_data(instruction, result_str, &size, ARG_MEM_BLOCK);
+	 
+	 delete   word_structure1;
+	 delete   word_structure2;
+	 delete[] word_str1;
+	 delete[] word_str2;
+	 delete   result;
 	 
 	 return NHPC_SUCCESS;
       }      

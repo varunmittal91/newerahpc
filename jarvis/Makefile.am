@@ -10,3 +10,4 @@ jarvis_grid_SOURCES = jarvis_grid.cpp
 jarvis_grid_LDADD   = src/libjarvis.la
 
 jarvis_grid_client_SOURCES = jarvis_grid_client.cpp
+jarvis_grid_clinet_LDFLAGS = -lneweraHPC

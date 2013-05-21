@@ -148,7 +148,7 @@ m4trace:configure.ac:1: -1- AC_SUBST_TRACE([target_alias])
 m4trace:configure.ac:1: -1- m4_pattern_allow([^target_alias$])
 m4trace:configure.ac:3: -1- AM_INIT_AUTOMAKE
 m4trace:configure.ac:3: -1- m4_pattern_allow([^AM_[A-Z]+FLAGS$])
-m4trace:configure.ac:3: -1- AM_AUTOMAKE_VERSION([1.11.3])
+m4trace:configure.ac:3: -1- AM_AUTOMAKE_VERSION([1.11.6])
 m4trace:configure.ac:3: -1- AC_REQUIRE_AUX_FILE([install-sh])
 m4trace:configure.ac:3: -1- AC_SUBST([INSTALL_PROGRAM])
 m4trace:configure.ac:3: -1- AC_SUBST_TRACE([INSTALL_PROGRAM])
@@ -247,7 +247,7 @@ m4trace:configure.ac:4: -1- AC_SUBST_TRACE([AM_BACKSLASH])
 m4trace:configure.ac:4: -1- m4_pattern_allow([^AM_BACKSLASH$])
 m4trace:configure.ac:4: -1- _AM_SUBST_NOTMAKE([AM_BACKSLASH])
 m4trace:configure.ac:5: -1- _m4_warn([obsolete], [The macro `AM_CONFIG_HEADER' is obsolete.
-You should run autoupdate.], [aclocal.m4:9035: AM_CONFIG_HEADER is expanded from...
+You should run autoupdate.], [aclocal.m4:9016: AM_CONFIG_HEADER is expanded from...
 configure.ac:5: the top level])
 m4trace:configure.ac:5: -1- AC_CONFIG_HEADERS([config.h])
 m4trace:configure.ac:10: -1- LT_INIT

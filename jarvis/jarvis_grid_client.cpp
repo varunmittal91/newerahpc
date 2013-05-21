@@ -27,7 +27,7 @@ using namespace neweraHPC;
 
 int main(int argc, char **argv)
 {
-   neweraHPC_init(argc, argv);
+   //neweraHPC_init(argc, argv);
    
    /*
    if(argc < 3)

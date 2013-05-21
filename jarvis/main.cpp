@@ -17,6 +17,7 @@
  *	along with jarvis.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <dlfcn.h>
 #include <iostream>
 #include <fstream>
 #include <string>

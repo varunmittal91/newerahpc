@@ -39,9 +39,9 @@ int main(int argc, char **argv)
       plugin_details_t *plugin;
 
 #ifdef __APPLE__
-      plugin_path = "src/.libs/libjarvis.0.dylib";
+      plugin_path = "src/.libs/libjarvis.dylib";
 #else
-      plugin_path = "src/.libs/libjarvis.0.so";
+      plugin_path = "src/.libs/libjarvis.so";
 #endif
       
       nrv = grid_plugin_install_dll(plugin_path, &plugin);

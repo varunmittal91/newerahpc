@@ -230,7 +230,7 @@ m4trace:configure.ac:3: -1- m4_pattern_allow([^am__tar$])
 m4trace:configure.ac:3: -1- AC_SUBST([am__untar])
 m4trace:configure.ac:3: -1- AC_SUBST_TRACE([am__untar])
 m4trace:configure.ac:3: -1- m4_pattern_allow([^am__untar$])
-m4trace:configure.ac:4: -1- AM_SILENT_RULES([no])
+m4trace:configure.ac:4: -1- AM_SILENT_RULES([yes])
 m4trace:configure.ac:4: -1- AC_SUBST([AM_V])
 m4trace:configure.ac:4: -1- AC_SUBST_TRACE([AM_V])
 m4trace:configure.ac:4: -1- m4_pattern_allow([^AM_V$])
@@ -571,6 +571,7 @@ m4trace:configure.ac:39: -1- LT_INIT([])
 m4trace:configure.ac:40: -1- LT_SUPPORTED_TAG([CXX])
 m4trace:configure.ac:42: -1- AC_CONFIG_FILES([Makefile
           src/Makefile
+	  src/web_interface/Makefile
           src/general/Makefile])
 m4trace:configure.ac:42: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
 You should run autoupdate.], [])

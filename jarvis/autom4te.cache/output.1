@@ -2680,7 +2680,7 @@ fi
 case $enable_silent_rules in
 yes) AM_DEFAULT_VERBOSITY=0;;
 no)  AM_DEFAULT_VERBOSITY=1;;
-*)   AM_DEFAULT_VERBOSITY=1;;
+*)   AM_DEFAULT_VERBOSITY=0;;
 esac
 am_make=${MAKE-make}
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $am_make supports nested variables" >&5
@@ -4727,7 +4727,7 @@ esac
 LT_INIT()
 LT_SUPPORTED_TAG(CXX)
 
-ac_config_files="$ac_config_files Makefile src/Makefile src/general/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/web_interface/Makefile src/general/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -5466,6 +5466,7 @@ do
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+    "src/web_interface/Makefile") CONFIG_FILES="$CONFIG_FILES src/web_interface/Makefile" ;;
     "src/general/Makefile") CONFIG_FILES="$CONFIG_FILES src/general/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

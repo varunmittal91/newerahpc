@@ -49,47 +49,47 @@ namespace neweraHPC
    void nhpc_system_update_cpuinfo();
    void nhpc_system_update_meminfo();
    
-   static int nhpc_system_get_logical_cores()
+   inline int nhpc_system_get_logical_cores()
    {
       nhpc_system_update_cpuinfo();
       return nhpc_sysinfo.logical_cores;
    }
-   static double nhpc_system_get_load_avg_5()
+   inline double nhpc_system_get_load_avg_5()
    {
       nhpc_system_update_cpuinfo();
       return nhpc_sysinfo.load_avg_5;
    }   
-   static double nhpc_system_get_load_avg_15()
+   inline double nhpc_system_get_load_avg_15()
    {
       nhpc_system_update_cpuinfo();
       return nhpc_sysinfo.load_avg_15;
    }   
-   static double nhpc_system_get_load_avg_25()
+   inline double nhpc_system_get_load_avg_25()
    {
       nhpc_system_update_cpuinfo();
       return nhpc_sysinfo.load_avg_25;
    }   
-   static double nhpc_system_get_load_avg_max()
+   inline double nhpc_system_get_load_avg_max()
    {
       nhpc_system_update_cpuinfo();
       return nhpc_sysinfo.load_avg_max;
    }   
-   static long int nhpc_system_get_total_mem()
+   inline long int nhpc_system_get_total_mem()
    {
       nhpc_system_update_meminfo();
       return nhpc_sysinfo.total_mem;
    }
-   static long int nhpc_system_get_free_mem()
+   inline long int nhpc_system_get_free_mem()
    {
       nhpc_system_update_meminfo();
       return nhpc_sysinfo.free_mem;
    }
-   static long int nhpc_system_get_total_swap()
+   inline long int nhpc_system_get_total_swap()
    {
       nhpc_system_update_meminfo();
       return nhpc_sysinfo.total_swap;      
    }
-   static long int nhpc_system_get_free_swap()
+   inline long int nhpc_system_get_free_swap()
    {
       nhpc_system_update_meminfo();
       return nhpc_sysinfo.free_swap;

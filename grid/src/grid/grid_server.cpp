@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <iomanip>
 
+#include <neweraHPC/system.h>
 #include <neweraHPC/network.h>
 #include <neweraHPC/neweraHPC.h>
 

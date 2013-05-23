@@ -37,7 +37,8 @@ int main(int argc, char **argv)
    
    int a = 12;
    int b = 13;
-   nhpc_size_t size = 100;
+   nhpc_size_t   size = 100;
+   nhpc_status_t nrv;
       
    const char *abc = "hi this is the test input data";
    nhpc_size_t len = strlen(abc) + 1;
@@ -58,12 +59,17 @@ int main(int argc, char **argv)
    grid_instruction_add_argument(instruction, ARG_COMMAND, "blender");
    grid_instruction_add_argument(instruction, ARG_RANGE, &a, &b);
    grid_instruction_set_input_data(instruction, abc, &len, ARG_MEM_BLOCK);
-   grid_instruction_send(instruction);  
+   nrv = grid_instruction_send(instruction);  
    
    grid_instruction_destruct(instruction);
    
    delete[] host_addr;
    delete[] host_port;
+   
+   if(nrv != NHPC_SUCCESS)
+      cout << "instruction failed" << endl;
+   else 
+      cout << "instruction successful" << endl;
 
    while(1)
       sleep(1);

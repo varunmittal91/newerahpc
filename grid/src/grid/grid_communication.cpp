@@ -86,6 +86,9 @@ namespace neweraHPC
 	 data = grid_communication->data;
 
       nrv = socket_connect(&socket, dest_addr, dest_port, AF_INET, SOCK_STREAM, 0);
+      if(nrv != NHPC_SUCCESS)
+	 return nrv;
+      
       grid_communication->socket = socket;
 
       if(data && nrv == NHPC_SUCCESS)

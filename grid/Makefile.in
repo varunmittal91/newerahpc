@@ -76,15 +76,21 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(docdir)" \
 	"$(DESTDIR)$(library_includedir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_server_OBJECTS = server.$(OBJEXT)
+am_server_OBJECTS = server-server.$(OBJEXT)
 server_OBJECTS = $(am_server_OBJECTS)
 server_DEPENDENCIES = src/libneweraHPC_grid.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
-am_test_client_OBJECTS = test_client.$(OBJEXT)
+server_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(server_LDFLAGS) $(LDFLAGS) -o $@
+am_test_client_OBJECTS = test_client-test_client.$(OBJEXT)
 test_client_OBJECTS = $(am_test_client_OBJECTS)
 test_client_DEPENDENCIES = src/libneweraHPC_grid.la
+test_client_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(test_client_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -308,6 +314,8 @@ localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+neweraHPC_CFLAGS = @neweraHPC_CFLAGS@
+neweraHPC_LIBS = @neweraHPC_LIBS@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
@@ -325,8 +333,12 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = src
 server_SOURCES = server.cpp
 server_LDADD = src/libneweraHPC_grid.la -ldl 
+server_CPPFLAGS = $(neweraHPC_CFLAGS)
+server_LDFLAGS = $(neweraHPC_LIBS)
 test_client_SOURCES = test_client.cpp
 test_client_LDADD = src/libneweraHPC_grid.la -ldl 
+test_client_CPPFLAGS = $(neweraHPC_CFLAGS)
+test_client_LDFLAGS = $(neweraHPC_LIBS)
 library_includedir = $(includedir)/neweraHPC
 library_include_HEADERS = include/*.h
 dist_doc_DATA = README
@@ -432,10 +444,10 @@ clean-binPROGRAMS:
 	rm -f $$list
 server$(EXEEXT): $(server_OBJECTS) $(server_DEPENDENCIES) $(EXTRA_server_DEPENDENCIES) 
 	@rm -f server$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(server_OBJECTS) $(server_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(server_LINK) $(server_OBJECTS) $(server_LDADD) $(LIBS)
 test_client$(EXEEXT): $(test_client_OBJECTS) $(test_client_DEPENDENCIES) $(EXTRA_test_client_DEPENDENCIES) 
 	@rm -f test_client$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(test_client_OBJECTS) $(test_client_LDADD) $(LIBS)
+	$(AM_V_CXXLD)$(test_client_LINK) $(test_client_OBJECTS) $(test_client_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -443,8 +455,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_client.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/server-server.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_client-test_client.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -466,6 +478,34 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+server-server.o: server.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(server_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT server-server.o -MD -MP -MF $(DEPDIR)/server-server.Tpo -c -o server-server.o `test -f 'server.cpp' || echo '$(srcdir)/'`server.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/server-server.Tpo $(DEPDIR)/server-server.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='server.cpp' object='server-server.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(server_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o server-server.o `test -f 'server.cpp' || echo '$(srcdir)/'`server.cpp
+
+server-server.obj: server.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(server_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT server-server.obj -MD -MP -MF $(DEPDIR)/server-server.Tpo -c -o server-server.obj `if test -f 'server.cpp'; then $(CYGPATH_W) 'server.cpp'; else $(CYGPATH_W) '$(srcdir)/server.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/server-server.Tpo $(DEPDIR)/server-server.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='server.cpp' object='server-server.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(server_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o server-server.obj `if test -f 'server.cpp'; then $(CYGPATH_W) 'server.cpp'; else $(CYGPATH_W) '$(srcdir)/server.cpp'; fi`
+
+test_client-test_client.o: test_client.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_client_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_client-test_client.o -MD -MP -MF $(DEPDIR)/test_client-test_client.Tpo -c -o test_client-test_client.o `test -f 'test_client.cpp' || echo '$(srcdir)/'`test_client.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_client-test_client.Tpo $(DEPDIR)/test_client-test_client.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='test_client.cpp' object='test_client-test_client.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_client_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_client-test_client.o `test -f 'test_client.cpp' || echo '$(srcdir)/'`test_client.cpp
+
+test_client-test_client.obj: test_client.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_client_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_client-test_client.obj -MD -MP -MF $(DEPDIR)/test_client-test_client.Tpo -c -o test_client-test_client.obj `if test -f 'test_client.cpp'; then $(CYGPATH_W) 'test_client.cpp'; else $(CYGPATH_W) '$(srcdir)/test_client.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_client-test_client.Tpo $(DEPDIR)/test_client-test_client.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='test_client.cpp' object='test_client-test_client.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_client_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o test_client-test_client.obj `if test -f 'test_client.cpp'; then $(CYGPATH_W) 'test_client.cpp'; else $(CYGPATH_W) '$(srcdir)/test_client.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -35,8 +35,9 @@ namespace neweraHPC
       nhpc_status_t plugin_exec(grid_instruction_t *instruction)
       {
 	 cout << "executing exec" << endl;
-	 
 	 sleep(3);
+	 cout << "execution complete" << endl;
+	 cout << "Affinity:" << instruction->affinity << endl;
 	 
 	 const char *result = "Successful execution";
 	 nhpc_size_t size   = strlen(result) + 1;

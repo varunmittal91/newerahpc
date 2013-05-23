@@ -170,13 +170,16 @@ namespace neweraHPC
       grid_communication_add_dest(communication, peer_addr, peer_port);      
       grid_communication_add_data(communication, data);
       grid_communication_send(communication);
-      grid_communication_push(communication);
+      nrv = grid_communication_push(communication);
       
-      grid_response_t *response;
-      nrv = grid_response_get(&response, communication);
+      if(nrv == NHPC_SUCCESS)
+      {
+	 grid_response_t *response;
+	 nrv = grid_response_get(&response, communication);
+	 grid_response_destruct(response);
+      }
       
       grid_communication_destruct(communication);
-      grid_response_destruct(response);
       
       return nrv;
    }

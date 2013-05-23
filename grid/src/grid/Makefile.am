@@ -2,7 +2,6 @@ SOURCES = grid_communication.cpp grid_server.cpp grid_request_handlers.cpp grid_
 grid_instruction_handler.cpp grid_data_download.cpp grid_plugin.cpp grid_plugin_range.cpp grid_instruction_set.cpp grid_scheduler.cpp\
 grid_tmpfs.cpp
 
-noinst_LTLIBRARIES = libgrid.la
-libgrid_la_SOURCES = $(SOURCES)
-libgrid_la_LDFLAGS = -lpthread -ldl -lneweraHPC
-libgrid_la_CFLAGS  = CFLAGS
+noinst_LTLIBRARIES  = libgrid.la
+libgrid_la_SOURCES  = $(SOURCES)
+libgrid_la_CPPFLAGS = $(neweraHPC_CFLAGS)

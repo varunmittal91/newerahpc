@@ -636,6 +636,8 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+neweraHPC_LIBS
+neweraHPC_CFLAGS
 CXXCPP
 CPP
 OTOOL64
@@ -767,6 +769,8 @@ enable_fast_install
 with_gnu_ld
 with_sysroot
 enable_libtool_lock
+with_neweraHPC_include_path
+with_neweraHPC_lib_path
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1417,6 +1421,11 @@ Optional Packages:
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
   --with-sysroot=DIR Search for dependent libraries within DIR
                         (or the compiler's sysroot if not specified).
+  --with-neweraHPC-include-path
+                          location of the neweraHPC headers, defaults to
+                          /usr/include/neweraHPC
+  --with-neweraHPC-lib-path
+                          location of the neweraHPC core libraries
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -2390,6 +2399,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+
 am__api_version='1.11'
 
 ac_aux_dir=
@@ -2859,15 +2869,6 @@ fi
  PACKAGE='newerahpc_grid'
  VERSION='2.90'
 
-
-cat >>confdefs.h <<_ACEOF
-#define PACKAGE "$PACKAGE"
-_ACEOF
-
-
-cat >>confdefs.h <<_ACEOF
-#define VERSION "$VERSION"
-_ACEOF
 
 # Some tools Automake needs.
 
@@ -15139,6 +15140,26 @@ else
 fi
 
 #AC_CHECK_LIB([neweraHPC], [neweraHPC_init], [], [AC_MSG_ERROR([neweraHPC library not found])])
+
+
+# Check whether --with-neweraHPC-include-path was given.
+if test "${with_neweraHPC_include_path+set}" = set; then :
+  withval=$with_neweraHPC_include_path; neweraHPC_CFLAGS="-I$withval"
+else
+  neweraHPC_CFLAGS="-I/usr/include/neweraHPC"
+fi
+
+
+
+
+# Check whether --with-neweraHPC-lib-path was given.
+if test "${with_neweraHPC_lib_path+set}" = set; then :
+  withval=$with_neweraHPC_lib_path; neweraHPC_LIBS="-L$withval"
+else
+  neweraHPC_LIBS="-L/usr/lib"
+fi
+
+
 
 # Checks for header files.
 for ac_header in pthread.h

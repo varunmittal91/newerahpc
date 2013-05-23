@@ -66,18 +66,14 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgrid_client_la_LIBADD =
-am__objects_1 = grid_client_registration.lo \
-	grid_controller_register.lo \
-	grid_client_instruction_generator.lo
+am__objects_1 = libgrid_client_la-grid_client_registration.lo \
+	libgrid_client_la-grid_controller_register.lo \
+	libgrid_client_la-grid_client_instruction_generator.lo
 am_libgrid_client_la_OBJECTS = $(am__objects_1)
 libgrid_client_la_OBJECTS = $(am_libgrid_client_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
-libgrid_client_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
-	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
-	$(AM_CXXFLAGS) $(CXXFLAGS) $(libgrid_client_la_LDFLAGS) \
-	$(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -219,6 +215,8 @@ localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+neweraHPC_CFLAGS = @neweraHPC_CFLAGS@
+neweraHPC_LIBS = @neweraHPC_LIBS@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
 prefix = @prefix@
@@ -235,8 +233,7 @@ top_srcdir = @top_srcdir@
 SOURCES = grid_client_registration.cpp grid_controller_register.cpp grid_client_instruction_generator.cpp
 noinst_LTLIBRARIES = libgrid_client.la
 libgrid_client_la_SOURCES = $(SOURCES)
-libgrid_client_la_LDFLAGS = -lpthread -ldl 
-libgrid_client_la_CFLAGS = CFLAGS
+libgrid_client_la_CPPFLAGS = $(neweraHPC_CFLAGS)
 all: all-am
 
 .SUFFIXES:
@@ -281,7 +278,7 @@ clean-noinstLTLIBRARIES:
 	  rm -f "$${dir}/so_locations"; \
 	done
 libgrid_client.la: $(libgrid_client_la_OBJECTS) $(libgrid_client_la_DEPENDENCIES) $(EXTRA_libgrid_client_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(libgrid_client_la_LINK)  $(libgrid_client_la_OBJECTS) $(libgrid_client_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(CXXLINK)  $(libgrid_client_la_OBJECTS) $(libgrid_client_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -289,9 +286,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_client_instruction_generator.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_client_registration.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_controller_register.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgrid_client_la-grid_client_instruction_generator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgrid_client_la-grid_client_registration.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgrid_client_la-grid_controller_register.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -313,6 +310,27 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+libgrid_client_la-grid_client_registration.lo: grid_client_registration.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgrid_client_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libgrid_client_la-grid_client_registration.lo -MD -MP -MF $(DEPDIR)/libgrid_client_la-grid_client_registration.Tpo -c -o libgrid_client_la-grid_client_registration.lo `test -f 'grid_client_registration.cpp' || echo '$(srcdir)/'`grid_client_registration.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgrid_client_la-grid_client_registration.Tpo $(DEPDIR)/libgrid_client_la-grid_client_registration.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='grid_client_registration.cpp' object='libgrid_client_la-grid_client_registration.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgrid_client_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libgrid_client_la-grid_client_registration.lo `test -f 'grid_client_registration.cpp' || echo '$(srcdir)/'`grid_client_registration.cpp
+
+libgrid_client_la-grid_controller_register.lo: grid_controller_register.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgrid_client_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libgrid_client_la-grid_controller_register.lo -MD -MP -MF $(DEPDIR)/libgrid_client_la-grid_controller_register.Tpo -c -o libgrid_client_la-grid_controller_register.lo `test -f 'grid_controller_register.cpp' || echo '$(srcdir)/'`grid_controller_register.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgrid_client_la-grid_controller_register.Tpo $(DEPDIR)/libgrid_client_la-grid_controller_register.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='grid_controller_register.cpp' object='libgrid_client_la-grid_controller_register.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgrid_client_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libgrid_client_la-grid_controller_register.lo `test -f 'grid_controller_register.cpp' || echo '$(srcdir)/'`grid_controller_register.cpp
+
+libgrid_client_la-grid_client_instruction_generator.lo: grid_client_instruction_generator.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgrid_client_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libgrid_client_la-grid_client_instruction_generator.lo -MD -MP -MF $(DEPDIR)/libgrid_client_la-grid_client_instruction_generator.Tpo -c -o libgrid_client_la-grid_client_instruction_generator.lo `test -f 'grid_client_instruction_generator.cpp' || echo '$(srcdir)/'`grid_client_instruction_generator.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgrid_client_la-grid_client_instruction_generator.Tpo $(DEPDIR)/libgrid_client_la-grid_client_instruction_generator.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='grid_client_instruction_generator.cpp' object='libgrid_client_la-grid_client_instruction_generator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgrid_client_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libgrid_client_la-grid_client_instruction_generator.lo `test -f 'grid_client_instruction_generator.cpp' || echo '$(srcdir)/'`grid_client_instruction_generator.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

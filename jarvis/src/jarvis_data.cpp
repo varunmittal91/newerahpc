@@ -21,6 +21,7 @@
 #include <fstream>
 
 #include <neweraHPC/alloc.h>
+#include <neweraHPC/neweraHPC.h>
 
 #include <include/jarvis_data.h>
 #include <include/words.h>
@@ -30,6 +31,8 @@ using namespace std;
 
 namespace jarvis
 {
+   const char *WORDNET_ROOT_DIR;
+   
    const char *wordnet_index_files[INDEXED_POS_COUNT];
    const char *wordnet_data_files[INDEXED_POS_COUNT];
    const char *wordnet_exc_files[INDEXED_POS_COUNT];
@@ -57,6 +60,10 @@ namespace jarvis
    
    void init_jarvis_data()
    {
+      WORDNET_ROOT_DIR = nhpc_get_cmdline_argument("wordnet");
+      if(!WORDNET_ROOT_DIR)
+	 WORDNET_ROOT_DIR = "/jarvis/data/dict";
+      
       init_jarvis_words_db();
       init_wordnet_files();
       init_morphological_rules();      

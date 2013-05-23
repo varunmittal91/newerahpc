@@ -63,7 +63,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libweb_interface_la_LIBADD =
-am__objects_1 = web_interface.lo
+am__objects_1 = libweb_interface_la-web_interface.lo
 am_libweb_interface_la_OBJECTS = $(am__objects_1)
 libweb_interface_la_OBJECTS = $(am_libweb_interface_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -210,6 +210,7 @@ localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+neweraHPC_CFLAGS = @neweraHPC_CFLAGS@
 neweraHPC_LIBS = @neweraHPC_LIBS@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
@@ -227,6 +228,7 @@ top_srcdir = @top_srcdir@
 SOURCES = web_interface.cpp
 noinst_LTLIBRARIES = libweb_interface.la
 libweb_interface_la_SOURCES = $(SOURCES)
+libweb_interface_la_CPPFLAGS = $(neweraHPC_CFLAGS)
 all: all-am
 
 .SUFFIXES:
@@ -279,7 +281,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/web_interface.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libweb_interface_la-web_interface.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -301,6 +303,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+libweb_interface_la-web_interface.lo: web_interface.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libweb_interface_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libweb_interface_la-web_interface.lo -MD -MP -MF $(DEPDIR)/libweb_interface_la-web_interface.Tpo -c -o libweb_interface_la-web_interface.lo `test -f 'web_interface.cpp' || echo '$(srcdir)/'`web_interface.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libweb_interface_la-web_interface.Tpo $(DEPDIR)/libweb_interface_la-web_interface.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='web_interface.cpp' object='libweb_interface_la-web_interface.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libweb_interface_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libweb_interface_la-web_interface.lo `test -f 'web_interface.cpp' || echo '$(srcdir)/'`web_interface.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

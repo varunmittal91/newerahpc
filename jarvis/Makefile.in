@@ -70,7 +70,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_jarvis_grid_OBJECTS = jarvis_grid.$(OBJEXT)
+am_jarvis_grid_OBJECTS = jarvis_grid-jarvis_grid.$(OBJEXT)
 jarvis_grid_OBJECTS = $(am_jarvis_grid_OBJECTS)
 jarvis_grid_DEPENDENCIES = src/libjarvis.la
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -79,7 +79,7 @@ am__v_lt_0 = --silent
 am_jarvis_grid_client_OBJECTS = jarvis_grid_client.$(OBJEXT)
 jarvis_grid_client_OBJECTS = $(am_jarvis_grid_client_OBJECTS)
 jarvis_grid_client_LDADD = $(LDADD)
-am_main_OBJECTS = main.$(OBJEXT)
+am_main_OBJECTS = main-main.$(OBJEXT)
 main_OBJECTS = $(am_main_OBJECTS)
 main_DEPENDENCIES = src/libjarvis.la
 main_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
@@ -281,6 +281,7 @@ localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+neweraHPC_CFLAGS = @neweraHPC_CFLAGS@
 neweraHPC_LIBS = @neweraHPC_LIBS@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
@@ -298,9 +299,11 @@ top_srcdir = @top_srcdir@
 SUBDIRS = src
 main_SOURCES = main.cpp src/libjarvis.la
 main_LDADD = src/libjarvis.la 
-main_LDFLAGS = -lneweraHPC_grid -ldl -lneweraHPC
+main_LDFLAGS = -lneweraHPC_grid -ldl -lneweraHPC $(neweraHPC_LIBS)
+main_CPPFLAGS = $(neweraHPC_CFLAGS)
 jarvis_grid_SOURCES = jarvis_grid.cpp
 jarvis_grid_LDADD = src/libjarvis.la
+jarvis_grid_CPPFLAGS = $(neweraHPC_CFLAGS)
 jarvis_grid_client_SOURCES = jarvis_grid_client.cpp
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -418,9 +421,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jarvis_grid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jarvis_grid-jarvis_grid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jarvis_grid_client.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main-main.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -442,6 +445,34 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+jarvis_grid-jarvis_grid.o: jarvis_grid.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(jarvis_grid_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT jarvis_grid-jarvis_grid.o -MD -MP -MF $(DEPDIR)/jarvis_grid-jarvis_grid.Tpo -c -o jarvis_grid-jarvis_grid.o `test -f 'jarvis_grid.cpp' || echo '$(srcdir)/'`jarvis_grid.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/jarvis_grid-jarvis_grid.Tpo $(DEPDIR)/jarvis_grid-jarvis_grid.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='jarvis_grid.cpp' object='jarvis_grid-jarvis_grid.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(jarvis_grid_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o jarvis_grid-jarvis_grid.o `test -f 'jarvis_grid.cpp' || echo '$(srcdir)/'`jarvis_grid.cpp
+
+jarvis_grid-jarvis_grid.obj: jarvis_grid.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(jarvis_grid_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT jarvis_grid-jarvis_grid.obj -MD -MP -MF $(DEPDIR)/jarvis_grid-jarvis_grid.Tpo -c -o jarvis_grid-jarvis_grid.obj `if test -f 'jarvis_grid.cpp'; then $(CYGPATH_W) 'jarvis_grid.cpp'; else $(CYGPATH_W) '$(srcdir)/jarvis_grid.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/jarvis_grid-jarvis_grid.Tpo $(DEPDIR)/jarvis_grid-jarvis_grid.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='jarvis_grid.cpp' object='jarvis_grid-jarvis_grid.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(jarvis_grid_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o jarvis_grid-jarvis_grid.obj `if test -f 'jarvis_grid.cpp'; then $(CYGPATH_W) 'jarvis_grid.cpp'; else $(CYGPATH_W) '$(srcdir)/jarvis_grid.cpp'; fi`
+
+main-main.o: main.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT main-main.o -MD -MP -MF $(DEPDIR)/main-main.Tpo -c -o main-main.o `test -f 'main.cpp' || echo '$(srcdir)/'`main.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/main-main.Tpo $(DEPDIR)/main-main.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='main.cpp' object='main-main.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o main-main.o `test -f 'main.cpp' || echo '$(srcdir)/'`main.cpp
+
+main-main.obj: main.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT main-main.obj -MD -MP -MF $(DEPDIR)/main-main.Tpo -c -o main-main.obj `if test -f 'main.cpp'; then $(CYGPATH_W) 'main.cpp'; else $(CYGPATH_W) '$(srcdir)/main.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/main-main.Tpo $(DEPDIR)/main-main.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='main.cpp' object='main-main.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(main_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o main-main.obj `if test -f 'main.cpp'; then $(CYGPATH_W) 'main.cpp'; else $(CYGPATH_W) '$(srcdir)/main.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

@@ -92,7 +92,8 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libjarvis_la_DEPENDENCIES = general/libgeneral.la \
 	web_interface/libweb_interface.la
-am_libjarvis_la_OBJECTS = jarvis.lo jarvis_data.lo grid_plugin.lo
+am_libjarvis_la_OBJECTS = libjarvis_la-jarvis.lo \
+	libjarvis_la-jarvis_data.lo libjarvis_la-grid_plugin.lo
 libjarvis_la_OBJECTS = $(am_libjarvis_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -280,6 +281,7 @@ localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+neweraHPC_CFLAGS = @neweraHPC_CFLAGS@
 neweraHPC_LIBS = @neweraHPC_LIBS@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
@@ -298,7 +300,8 @@ SUBDIRS = general web_interface
 lib_LTLIBRARIES = libjarvis.la
 libjarvis_la_SOURCES = jarvis.cpp jarvis_data.cpp grid_plugin.cpp
 libjarvis_la_LIBADD = general/libgeneral.la web_interface/libweb_interface.la
-libjarvis_la_LDFLAGS = -lneweraHPC_grid -lneweraHPC -ldl -always-shared
+libjarvis_la_LDFLAGS = -lneweraHPC_grid -lneweraHPC -ldl -always-shared $(neweraHPC_LIBS)
+libjarvis_la_CPPFLAGS = $(neweraHPC_CFLAGS)
 all: all-recursive
 
 .SUFFIXES:
@@ -374,9 +377,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_plugin.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jarvis.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jarvis_data.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjarvis_la-grid_plugin.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjarvis_la-jarvis.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libjarvis_la-jarvis_data.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -398,6 +401,27 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+libjarvis_la-jarvis.lo: jarvis.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjarvis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libjarvis_la-jarvis.lo -MD -MP -MF $(DEPDIR)/libjarvis_la-jarvis.Tpo -c -o libjarvis_la-jarvis.lo `test -f 'jarvis.cpp' || echo '$(srcdir)/'`jarvis.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjarvis_la-jarvis.Tpo $(DEPDIR)/libjarvis_la-jarvis.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='jarvis.cpp' object='libjarvis_la-jarvis.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjarvis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libjarvis_la-jarvis.lo `test -f 'jarvis.cpp' || echo '$(srcdir)/'`jarvis.cpp
+
+libjarvis_la-jarvis_data.lo: jarvis_data.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjarvis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libjarvis_la-jarvis_data.lo -MD -MP -MF $(DEPDIR)/libjarvis_la-jarvis_data.Tpo -c -o libjarvis_la-jarvis_data.lo `test -f 'jarvis_data.cpp' || echo '$(srcdir)/'`jarvis_data.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjarvis_la-jarvis_data.Tpo $(DEPDIR)/libjarvis_la-jarvis_data.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='jarvis_data.cpp' object='libjarvis_la-jarvis_data.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjarvis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libjarvis_la-jarvis_data.lo `test -f 'jarvis_data.cpp' || echo '$(srcdir)/'`jarvis_data.cpp
+
+libjarvis_la-grid_plugin.lo: grid_plugin.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjarvis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libjarvis_la-grid_plugin.lo -MD -MP -MF $(DEPDIR)/libjarvis_la-grid_plugin.Tpo -c -o libjarvis_la-grid_plugin.lo `test -f 'grid_plugin.cpp' || echo '$(srcdir)/'`grid_plugin.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libjarvis_la-grid_plugin.Tpo $(DEPDIR)/libjarvis_la-grid_plugin.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='grid_plugin.cpp' object='libjarvis_la-grid_plugin.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libjarvis_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libjarvis_la-grid_plugin.lo `test -f 'grid_plugin.cpp' || echo '$(srcdir)/'`grid_plugin.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

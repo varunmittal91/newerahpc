@@ -63,8 +63,10 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgeneral_la_LIBADD =
-am__objects_1 = words.lo sentence_parser.lo parse_index.lo \
-	morphological_rules.lo parse_data.lo compare.lo
+am__objects_1 = libgeneral_la-words.lo \
+	libgeneral_la-sentence_parser.lo libgeneral_la-parse_index.lo \
+	libgeneral_la-morphological_rules.lo \
+	libgeneral_la-parse_data.lo libgeneral_la-compare.lo
 am_libgeneral_la_OBJECTS = $(am__objects_1)
 libgeneral_la_OBJECTS = $(am_libgeneral_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -211,6 +213,7 @@ localedir = @localedir@
 localstatedir = @localstatedir@
 mandir = @mandir@
 mkdir_p = @mkdir_p@
+neweraHPC_CFLAGS = @neweraHPC_CFLAGS@
 neweraHPC_LIBS = @neweraHPC_LIBS@
 oldincludedir = @oldincludedir@
 pdfdir = @pdfdir@
@@ -225,9 +228,11 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 SOURCES = words.cpp sentence_parser.cpp parse_index.cpp morphological_rules.cpp parse_data.cpp compare.cpp
 noinst_LTLIBRARIES = libgeneral.la
 libgeneral_la_SOURCES = $(SOURCES)
+libgeneral_la_CPPFLAGS = $(neweraHPC_CFLAGS)
 all: all-am
 
 .SUFFIXES:
@@ -280,12 +285,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/compare.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/morphological_rules.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parse_data.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/parse_index.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sentence_parser.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/words.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgeneral_la-compare.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgeneral_la-morphological_rules.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgeneral_la-parse_data.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgeneral_la-parse_index.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgeneral_la-sentence_parser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgeneral_la-words.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -307,6 +312,48 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+libgeneral_la-words.lo: words.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgeneral_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libgeneral_la-words.lo -MD -MP -MF $(DEPDIR)/libgeneral_la-words.Tpo -c -o libgeneral_la-words.lo `test -f 'words.cpp' || echo '$(srcdir)/'`words.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgeneral_la-words.Tpo $(DEPDIR)/libgeneral_la-words.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='words.cpp' object='libgeneral_la-words.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgeneral_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libgeneral_la-words.lo `test -f 'words.cpp' || echo '$(srcdir)/'`words.cpp
+
+libgeneral_la-sentence_parser.lo: sentence_parser.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgeneral_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libgeneral_la-sentence_parser.lo -MD -MP -MF $(DEPDIR)/libgeneral_la-sentence_parser.Tpo -c -o libgeneral_la-sentence_parser.lo `test -f 'sentence_parser.cpp' || echo '$(srcdir)/'`sentence_parser.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgeneral_la-sentence_parser.Tpo $(DEPDIR)/libgeneral_la-sentence_parser.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sentence_parser.cpp' object='libgeneral_la-sentence_parser.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgeneral_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libgeneral_la-sentence_parser.lo `test -f 'sentence_parser.cpp' || echo '$(srcdir)/'`sentence_parser.cpp
+
+libgeneral_la-parse_index.lo: parse_index.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgeneral_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libgeneral_la-parse_index.lo -MD -MP -MF $(DEPDIR)/libgeneral_la-parse_index.Tpo -c -o libgeneral_la-parse_index.lo `test -f 'parse_index.cpp' || echo '$(srcdir)/'`parse_index.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgeneral_la-parse_index.Tpo $(DEPDIR)/libgeneral_la-parse_index.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parse_index.cpp' object='libgeneral_la-parse_index.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgeneral_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libgeneral_la-parse_index.lo `test -f 'parse_index.cpp' || echo '$(srcdir)/'`parse_index.cpp
+
+libgeneral_la-morphological_rules.lo: morphological_rules.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgeneral_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libgeneral_la-morphological_rules.lo -MD -MP -MF $(DEPDIR)/libgeneral_la-morphological_rules.Tpo -c -o libgeneral_la-morphological_rules.lo `test -f 'morphological_rules.cpp' || echo '$(srcdir)/'`morphological_rules.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgeneral_la-morphological_rules.Tpo $(DEPDIR)/libgeneral_la-morphological_rules.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='morphological_rules.cpp' object='libgeneral_la-morphological_rules.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgeneral_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libgeneral_la-morphological_rules.lo `test -f 'morphological_rules.cpp' || echo '$(srcdir)/'`morphological_rules.cpp
+
+libgeneral_la-parse_data.lo: parse_data.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgeneral_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libgeneral_la-parse_data.lo -MD -MP -MF $(DEPDIR)/libgeneral_la-parse_data.Tpo -c -o libgeneral_la-parse_data.lo `test -f 'parse_data.cpp' || echo '$(srcdir)/'`parse_data.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgeneral_la-parse_data.Tpo $(DEPDIR)/libgeneral_la-parse_data.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parse_data.cpp' object='libgeneral_la-parse_data.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgeneral_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libgeneral_la-parse_data.lo `test -f 'parse_data.cpp' || echo '$(srcdir)/'`parse_data.cpp
+
+libgeneral_la-compare.lo: compare.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgeneral_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libgeneral_la-compare.lo -MD -MP -MF $(DEPDIR)/libgeneral_la-compare.Tpo -c -o libgeneral_la-compare.lo `test -f 'compare.cpp' || echo '$(srcdir)/'`compare.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgeneral_la-compare.Tpo $(DEPDIR)/libgeneral_la-compare.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='compare.cpp' object='libgeneral_la-compare.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgeneral_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libgeneral_la-compare.lo `test -f 'compare.cpp' || echo '$(srcdir)/'`compare.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

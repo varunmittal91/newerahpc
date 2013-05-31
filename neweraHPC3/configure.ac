@@ -1,6 +1,7 @@
 AC_INIT(neweraHPC, 2.90, varunmittal91@gmail.com)
+AC_PREREQ([2.59])
 
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([1.10 -Wall no-define])
 AM_SILENT_RULES([yes])
 AM_CONFIG_HEADER(config.h)
 

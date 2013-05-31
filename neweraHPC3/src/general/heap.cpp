@@ -31,265 +31,6 @@ using namespace std;
 
 namespace neweraHPC
 {
-   Heap::Heap(nhpc_size_t default_size)
-   {
-      _default_size = default_size;
-      _frame_size   = _default_size - (sizeof(mem_frame_t) + sizeof(mem_page_t));
-      
-      thread_mutex_init(&frame_mutex);
-      
-      frame_root = NULL;
-      _create_frame();
-      
-      pthread_create(&maintainer_thread, NULL, (void* (*)(void*))maintainer, this);
-   }
-   
-   Heap::~Heap()
-   {
-      mem_frame_t *frame = frame_root;
-      mem_frame_t *next_frame;
-      while(frame)
-      {
-	 next_frame = frame->frame_next;
-	 free(frame);
-	 frame = next_frame;
-      }      
-   }
-   
-   mem_frame_t *Heap::_create_frame()
-   {
-      mem_frame_t *new_frame = (mem_frame_t *)malloc(_default_size);
-      memset(new_frame, 0, _default_size);
-      new_frame->frame_next = NULL;
-      new_frame->page_first = (mem_page_t *)((char *)new_frame + sizeof(mem_frame_t));
-      page_set_size(new_frame->page_first, _frame_size);
-      thread_mutex_init(&(new_frame->mutex));
-      
-      if(!frame_root)
-	 frame_root = new_frame;
-      else 
-      {
-	 mem_frame_t *tmp_frame = frame_root;
-	 while(tmp_frame->frame_next)
-	 {
-	    tmp_frame = tmp_frame->frame_next;
-	 }
-	 tmp_frame->frame_next = new_frame;
-      }
-      frame_current = new_frame;
-      return new_frame;
-   }
-   
-   mem_page_t *Heap::_create_page(mem_page_t *parent, nhpc_size_t child_size)
-   {
-      nhpc_size_t parent_size = page_get_size(parent);
-      
-      mem_page_t *child_page = (mem_page_t *)((char *)parent  + sizeof(mem_page_t) + parent_size - child_size);
-      memset(child_page, 0, child_size);
-      
-      parent_size -= child_size;
-      page_set_size(parent, parent_size);      
-      page_set_size(child_page, (child_size - sizeof(mem_page_t)));
-
-      child_page->prev = parent;
-      child_page->next = parent->next;
-      parent->next = child_page;
-      
-      if(child_page->next)
-	 child_page->next->prev = child_page;
-      
-      return child_page;
-   }
-   
-   mem_page_t *Heap::_fetch_page(nhpc_size_t size)
-   {
-      mem_frame_t *frame = frame_root;
-      
-      mem_page_t   *recovered;
-      mem_page_t   *page;
-      mem_page_t   *new_page;
-      mem_page_t  **recovered_page;
-      nhpc_size_t   page_size;
-      
-      size += sizeof(mem_page_t);
-      
-   read_frame:
-      thread_mutex_lock(&(frame->mutex), NHPC_THREAD_LOCK_WRITE);
-      page           = frame->page_first;
-      page_size      = page_get_size(page);
-      recovered_page = &(frame->page_recovered);
-      new_page       = NULL;
-      recovered      = frame->page_recovered;
-      
-      if(*recovered_page && page_is_empty(*recovered_page) && page_get_size(*recovered_page) >= size)
-      {
-	 if(page_get_size(*recovered_page) > (sizeof(mem_page_t) + size))
-	 {
-	    new_page = _create_page(*recovered_page, size);
-	 }
-	 else 
-	 {
-	    new_page = (*recovered_page);
-	    frame->page_recovered = NULL;
-	    _clean_pages(frame);
-	 }
-      }
-      else if(page_is_empty(page) && page_size >= size)
-      {
-	 if(page_size > (size + sizeof(mem_page_t)))
-	 {
-	    _create_page(page, size);
-	    new_page = page->next;
-	 }
-	 else 
-	    new_page = page;	    
-      }
-      
-      if(new_page)
-      {
-	 page_set_occupied(new_page);  
-	 thread_mutex_unlock(&(frame->mutex), NHPC_THREAD_LOCK_WRITE);
-      }
-      else 
-      {
-	 thread_mutex_unlock(&(frame->mutex), NHPC_THREAD_LOCK_WRITE);
-
-	 thread_mutex_lock(&frame_mutex, NHPC_THREAD_LOCK_WRITE);
-	 if(frame->frame_next)
-	    frame = frame->frame_next;
-	 else 
-	    frame = _create_frame();
-	 thread_mutex_unlock(&frame_mutex, NHPC_THREAD_LOCK_WRITE);
-      }
-      
-      if(!new_page)
-	 goto read_frame;
-      
-      return new_page;
-   }
-   
-   void Heap::_clean_pages(mem_frame_t *frame)
-   {
-      mem_page_t  *in_mem_page = frame->page_first;;
-      nhpc_size_t  in_mem_page_size;
-      mem_page_t  *next_mem_page;
-      mem_page_t **page_recovered = &(frame->page_recovered);
-      bool         move_next;
-      
-      while(in_mem_page)
-      {
-	 move_next = false;
-	 next_mem_page = in_mem_page->next;
-
-	 if(page_is_empty(in_mem_page))
-	 {
-	    if(next_mem_page && page_is_empty(next_mem_page))
-	    {
-	       page_merge(in_mem_page, next_mem_page);	       
-	       memset(next_mem_page, 0, sizeof(mem_page_t));
-	    }
-	    else 
-	       move_next = true;
-	    
-	    if(in_mem_page != (frame->page_first))
-	    {
-	       if(!(*page_recovered) || (page_get_size(in_mem_page) > page_get_size(*page_recovered)))
-	       {
-		  (*page_recovered) = in_mem_page;
-	       }
-	    }
-	 }
-	 else
-	    move_next = true;
-	    
-	 if(move_next)
-	    in_mem_page = in_mem_page->next;
-      }    
-      
-      if(*page_recovered && (page_get_size(*page_recovered) > _default_size))
-	 *page_recovered = NULL;
-   }
-   
-   void *Heap::allocate(nhpc_size_t size)
-   {
-      mem_page_t *page = _fetch_page(size);
-      void       *address = NULL;
-      
-      if(page)
-      {
-	 address = (void *)((char *)page + sizeof(mem_page_t));
-	 memset(address, 0, size);
-      }
-      page->address = address;
-      
-      return address;      
-   }
-   
-   void Heap::deallocate(void *_address)
-   {
-      mem_page_t *in_mem_page   = (mem_page_t *)((char *)_address - sizeof(mem_page_t));
-      if(page_is_empty(in_mem_page))
-      {
-	 LOG_ERROR("HEAP: Resource already deallocated");
-	 return;
-      }
-      
-      if((in_mem_page->size) > _default_size || _address != in_mem_page->address)
-      {
-	 LOG_ERROR("Memory block already deallocated");
-      }
-      else 
-      {
-	 page_set_empty(in_mem_page);  
-	 page_empty_data(in_mem_page);
-	 in_mem_page->address = NULL;
-      }
-   }
-   
-   void Heap::maintain_frame()
-   {
-      LOG_DEBUG("Memory block status:");
-
-      mem_frame_t *frame;
-      mem_page_t  *page;
-      int          pageno = 0;
-      int          frameno = 0;
-
-      thread_mutex_lock(&frame_mutex, NHPC_THREAD_LOCK_READ);
-      frame = frame_root;
-
-      while(frame)
-      {
-	 thread_mutex_lock(&(frame->mutex), NHPC_THREAD_LOCK_WRITE);
-	 _clean_pages(frame);
-	 
-	 LOG_DEBUG("\t " << frameno << " Frame Address:" << frame);
-
-	 page = frame->page_first;
-	 while(page)
-	 {
-	    LOG_DEBUG("\t\t " << pageno << " Address:" << page << " Prev Address:" << page->prev << " Next Address:" << page->next << 
-		      " Size:" << page_get_size(page) << " Status:" << page_status(page));
-	    page = page->next;
-	    pageno++;	    
-	 }
-	 thread_mutex_unlock(&(frame->mutex), NHPC_THREAD_LOCK_WRITE);
-	 
-	 frame = frame->frame_next;
-	 frameno++;
-      }
-      thread_mutex_unlock(&frame_mutex, NHPC_THREAD_LOCK_READ);
-   }
-   
-   void Heap::maintainer(Heap *HeapObject)
-   {
-      while(1)
-      {
-	 HeapObject->maintain_frame();
-	 sleep(1);
-      }
-   }
-   
    void page_empty_data(mem_page_t *page)
    {
       void *_address = (char *)page + sizeof(mem_page_t);
@@ -300,10 +41,290 @@ namespace neweraHPC
    {
       mem_page_t  *tmp  = victim->next;
       nhpc_size_t  size = sizeof(mem_page_t) + page_get_size(victim) + page_get_size(parent);
-      page_set_size(parent, size);
       
       parent->next = tmp;
       if(tmp)
 	 tmp->prev = parent;
+      
+      memset(((char *)parent + sizeof(mem_page_t)), 0, size);
+      page_set_size(parent, size);
    }
+   
+   Heap::Heap(nhpc_size_t default_size)
+   {
+      _default_size = default_size;
+      _frame_size   = _default_size - (sizeof(mem_frame_t) + sizeof(mem_page_t));
+      
+      thread_mutex_init(&_frame_mutex);
+      
+      _frame_root = NULL;
+      _create_frame();
+      
+      pthread_create(&maintainer_thread, NULL, (void* (*)(void*))maintainer, this);
+   }
+   
+   Heap::~Heap()
+   {
+      mem_frame_t *frame = _frame_root;
+      mem_frame_t *next_frame;
+      while(frame)
+      {
+	 next_frame = frame->frame_next;
+	 free(frame);
+	 frame = next_frame;
+      }      
+   } 
+   
+   void Heap::print_table()
+   {
+      LOG_DEBUG("Memory block status:");
+      
+      mem_frame_t   *frame;
+      mem_page_t    *page;
+      int            pageno = 0;
+      int            frameno = 0;
+      nhpc_status_t  nrv;
+      
+      frame = _frame_root;
+      
+      while(frame)
+      {
+	 nrv = thread_mutex_trylock(&(frame->mutex), NHPC_THREAD_LOCK_READ);
+	 if(nrv != NHPC_SUCCESS)
+	 {
+	    frame = frame->frame_next;
+	    continue;
+	 }
+	 
+	 LOG_DEBUG("\t " << frameno << " Frame Address:" << frame);
+	 
+	 page = frame->page_first;
+	 while(page)
+	 {
+	    LOG_DEBUG("\t\t " << pageno << " Address:" << page << " Prev Address:" << page->prev << " Next Address:" << page->next 
+		      << " Size:" << page_get_size(page) << " Status:" << page_status(page));
+	    page = page->next;
+	    pageno++;	    
+	 }
+	 if(frame->page_recovered)
+	    LOG_DEBUG("\t\t\tRecovered page" << frame->page_recovered << " Size:" << page_get_size(frame->page_recovered));
+	 thread_mutex_unlock(&(frame->mutex), NHPC_THREAD_LOCK_READ);
+	 
+	 frame = frame->frame_next;
+	 frameno++;
+      }
+   }
+   
+   void Heap::clean_table()
+   {
+      mem_frame_t    *frame = _frame_root;
+      mem_page_t     *page;
+      mem_page_t     *page_next;
+      mem_page_t    **page_recovered;
+      bool            move_next;
+      nhpc_status_t   nrv;
+      
+      while(frame)
+      {
+	 nrv = thread_mutex_trylock(&(frame->mutex), NHPC_THREAD_LOCK_WRITE);
+	 if(nrv != NHPC_SUCCESS)
+	 {
+	    frame = frame->frame_next;
+	    continue;
+	 }
+	 
+	 page_recovered = &(frame->page_recovered);
+	 page           = frame->page_first;
+	 while(page)
+	 {
+	    move_next = true;
+	    
+	    page_next = page->next;
+	    if(!page_next)
+	       break;
+	    
+	    if(page_is_empty(page) && page_is_empty(page_next))
+	    {
+	       move_next = false;
+	       page_merge(page, page_next);
+	    }
+	    
+	    if((page != (frame->page_first)) && page_is_empty(page))
+	    {
+	       if(!(*page_recovered) || (page_get_size(*page_recovered) < page_get_size(page)))
+		  (*page_recovered) = page;
+	    }
+	    
+	    if(move_next)
+	       page = page->next;
+	 }
+	 
+	 thread_mutex_unlock(&(frame->mutex), NHPC_THREAD_LOCK_WRITE);
+	 
+	 frame = frame->frame_next;
+      }
+   }
+   
+   void Heap::maintainer(Heap *HeapObject)
+   {
+      while(1)
+      {
+	 (*HeapObject).clean_table();
+	 (*HeapObject).print_table();
+	 sleep(1);
+      }
+   }
+   
+   mem_frame_t *Heap::_create_frame()
+   {
+      mem_frame_t *frame = (mem_frame_t *)malloc(_default_size);
+      memset(frame, 0, _default_size);
+      
+      thread_mutex_init(&(frame->mutex));
+      
+      frame->page_first     = (mem_page_t *)((char *)frame + sizeof(mem_frame_t));
+      nhpc_size_t page_size = _default_size - (sizeof(mem_frame_t) + sizeof(mem_page_t));
+      page_set_size((frame->page_first), page_size);
+      
+      thread_mutex_lock(&_frame_mutex, NHPC_THREAD_LOCK_WRITE);
+      
+      mem_frame_t **new_frame = &(_frame_root);
+      mem_frame_t  *parent    = NULL;
+      
+      while(*new_frame)
+      {
+	 parent    = (*new_frame);
+	 new_frame = &((*new_frame)->frame_next);
+      }
+      
+      (*new_frame) = frame;
+      if(parent)
+	 parent->frame_next = frame;
+      
+      thread_mutex_unlock(&_frame_mutex, NHPC_THREAD_LOCK_WRITE);
+      
+      return frame;
+   }
+   
+   mem_page_t *Heap::_create_page(mem_page_t *parent, nhpc_size_t size)
+   {
+      nhpc_size_t parent_size = page_get_size(parent);
+      parent_size = parent_size - (size + sizeof(mem_page_t));
+      
+      mem_page_t *new_page = (mem_page_t *)((char *)parent + sizeof(mem_page_t) + parent_size);
+      memset(new_page, 0, (sizeof(mem_page_t) + size));
+      page_set_size(new_page, size);
+      page_set_size(parent,   parent_size);
+      
+      mem_page_t *tmp = parent->next;
+      if(tmp)
+	 new_page->next = tmp;
+      new_page->prev = parent;
+      parent->next   = new_page;
+      
+      return new_page;
+   }
+   
+   mem_page_t *Heap::_fetch_page(nhpc_size_t size)
+   {
+      mem_frame_t *frame = _frame_root;
+      
+      mem_page_t   *new_page;
+      mem_page_t  **page_recovered;
+      mem_page_t  **page_first;
+      nhpc_size_t   page_recovered_size;
+      nhpc_size_t   page_first_size;
+      bool          use_recovered;
+      nhpc_status_t nrv;
+      
+   read_frame:
+      nrv = thread_mutex_trylock(&(frame->mutex), NHPC_THREAD_LOCK_WRITE);
+      if(nrv != NHPC_SUCCESS)
+      {
+	 if(frame->frame_next)
+	    frame = frame->frame_next;
+	 else 
+	    frame = _create_frame();
+	 goto read_frame;
+      }
+      
+      page_recovered  = &(frame->page_recovered);
+      page_first      = &(frame->page_first);
+      page_first_size = page_get_size(*page_first);
+      new_page        = NULL;
+      use_recovered   = false;
+      
+      if(*page_recovered)
+	 page_recovered_size = page_get_size(*page_recovered);
+      else 
+	 page_recovered_size = 0;
+      
+      if(page_recovered_size >= size)
+      {
+	 new_page        = *page_recovered;
+	 use_recovered   = true;
+      }
+      else if(page_is_empty(*page_first) && page_first_size >= size)
+	 new_page = *page_first;
+      
+      if(new_page)
+      {
+	 if(page_get_size(new_page) > (size + sizeof(mem_page_t)))
+	 {
+	    _create_page(new_page, size);
+
+	    if(use_recovered)
+	       *page_recovered = new_page;
+	    
+	    new_page = new_page->next;	    
+	 }
+	 else 
+	 {
+	    if(use_recovered)
+	       *page_recovered = NULL;
+	 }  
+	 page_set_occupied(new_page);
+      }
+      thread_mutex_unlock(&(frame->mutex), NHPC_THREAD_LOCK_WRITE);
+      
+      if(!new_page)
+      {
+	 thread_mutex_lock(&_frame_mutex, NHPC_THREAD_LOCK_WRITE);
+	 
+	 if(frame->frame_next)
+	    frame = frame->frame_next;
+	 else 
+	    frame = _create_frame();
+	 
+	 thread_mutex_unlock(&_frame_mutex, NHPC_THREAD_LOCK_WRITE);
+	 
+	 goto read_frame;
+      }
+      
+      return new_page;
+   }
+   
+   void *Heap::allocate(nhpc_size_t size)
+   {
+      mem_page_t *page    = _fetch_page(size);
+      
+      if(!page)
+	 return NULL;
+      (page->address) = (void *)((char *)page + sizeof(mem_page_t));
+      
+      return (page->address);
+   }
+   
+   void Heap::deallocate(void *address)
+   {
+      mem_page_t *in_mem_page = (mem_page_t *)((char *)address - sizeof(mem_page_t));
+      
+      if(page_is_empty(in_mem_page) || !(in_mem_page->address))
+      {
+	 LOG_ERROR("Block Deallocated");
+      }
+      
+      in_mem_page->address = NULL;
+      page_set_empty(in_mem_page);
+   }   
 }

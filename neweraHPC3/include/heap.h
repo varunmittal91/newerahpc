@@ -30,6 +30,8 @@
 #define PAGE_EMPTY    0
 #define PAGE_OCCUPIED 1
 
+#define MIN_PAGE_SIZE 64  // Minimum page size is set to 16bytes.
+
 #define page_status(p)        ((p)->size & 1)
 #define page_get_size(p)      ((p)->size >> 1)
 #define page_set_size(p, s)   do { (p->size) &= 1; (p->size) |= (s << 1); }while(false) 
@@ -55,18 +57,19 @@ namespace neweraHPC
       nhpc_mutex_t  mutex;
    };
    
-   inline void page_empty_data(mem_page_t *page);
-   inline void page_merge(mem_page_t *parent, mem_page_t *victim);
+   void page_empty_data(mem_page_t *page);
+   void page_merge(mem_page_t *parent, mem_page_t *victim);
    
    class Heap
    {
    private:
-      nhpc_size_t    _default_size;
-      nhpc_size_t    _frame_size;
-      nhpc_mutex_t   frame_mutex;
-      mem_frame_t   *frame_root;
-      mem_frame_t   *frame_current;
-      pthread_t      maintainer_thread;
+      nhpc_size_t  _default_size;
+      nhpc_size_t  _frame_size;
+      mem_frame_t *_frame_root;
+      mem_frame_t *_frame_current;
+      
+      nhpc_mutex_t _frame_mutex;
+      pthread_t	  maintainer_thread;
       
       mem_frame_t *_create_frame();
       mem_page_t  *_create_page(mem_page_t *parent, nhpc_size_t child_size);
@@ -76,12 +79,16 @@ namespace neweraHPC
       
       static void maintainer(Heap *HeapObject);
       void        maintain_frame();
+      
    public:
       Heap(nhpc_size_t default_size = 10485760);
       ~Heap();
       
       void *allocate(nhpc_size_t _size);
       void  deallocate(void *_address);
+      
+      void print_table();
+      void clean_table();
    };
 };
 

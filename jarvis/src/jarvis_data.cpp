@@ -60,8 +60,8 @@ namespace jarvis
    
    void init_jarvis_data()
    {
-      WORDNET_ROOT_DIR = nhpc_get_cmdline_argument("wordnet");
-      if(!WORDNET_ROOT_DIR)
+      //WORDNET_ROOT_DIR = nhpc_get_cmdline_argument("wordnet");
+      //if(!WORDNET_ROOT_DIR)
 	 WORDNET_ROOT_DIR = "/jarvis/data/dict";
       
       init_jarvis_words_db();

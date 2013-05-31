@@ -79,7 +79,9 @@ int main(int argc, char **argv)
    if(word_structure1 && word_structure2)
    {
       cout << "Words loaded now comparing" << endl;
-      jv_compare_json_structure(word_structure1, word_structure2, word1, word2);
+      
+      json_t *result = jv_compare_json_structure(word_structure1, word_structure2, word1, word2);
+      delete result;
    }
    if(word_structure1)
       delete word_structure1;

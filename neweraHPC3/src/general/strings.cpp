@@ -226,18 +226,41 @@ namespace neweraHPC{
    }
    
    string_t *nhpc_substr(const char *s1, const char s2)
-   {      
-      string_t  *string      = new string_t;
-      memset(string, 0, sizeof(string_t));
-      
-      int       *count       = &(string->count);
-      char     **strings     = NULL;
-      char     **tmp_strings = NULL;
+   {
+      int         count   = 0;
+      int         tmp_len = 0;
+      const char *tmp_s1  = s1;
 
-      const char *tmp_s1 = s1;
+      while(*tmp_s1 != '\0')
+      {
+	 if(*tmp_s1 == s2)
+	 {
+	    if(tmp_len > 0)
+	    {
+	       count   += 1;
+	       tmp_len =  0;
+	    }
+	 }
+	 else
+	    tmp_len++;
+	 
+	 tmp_s1++;
+      }
+      if(tmp_len > 0)
+	 count++;
       
-      int tmp_len = 0;
+      if(count == 0)
+	 return NULL;
       
+      string_t  *string = new string_t;
+      memset(string, 0, sizeof(string_t));
+      string->count          = count;
+      string->strings        = new char* [count + 1];
+      string->strings[count] = NULL;
+      
+      tmp_s1  = s1;
+      tmp_len = 0;
+      int i   = 0;
       while(*tmp_s1 != '\0')
       {
 	 if(*tmp_s1 == s2)
@@ -247,29 +270,15 @@ namespace neweraHPC{
 	       char *new_string = new char [tmp_len + 1];
 	       memcpy(new_string, (tmp_s1 - tmp_len), tmp_len);
 	       new_string[tmp_len] = '\0';
-	       (*count)++;
 	       
-	       if(!strings)
-	       {
-		  strings = new char* [2];
-		  strings[0] = new_string;
-		  strings[1] = NULL;
-	       }
-	       else 
-	       {
-		  tmp_strings = strings;
-		  strings = new char* [*count + 1];
-		  memcpy(strings, tmp_strings, (sizeof(char*) * (*count - 1)));
-		  strings[*count - 1] = new_string;
-		  strings[*count] = NULL;
-		  delete[] tmp_strings;
-	       }
+	       tmp_len            = 0;
+	       string->strings[i] = new_string;
+	       i++;
 	    }
-	    
-	    tmp_len = -1;
 	 }
+	 else 
+	    tmp_len++;
 	 
-	 tmp_len++;
 	 tmp_s1++;
       }
       
@@ -278,30 +287,13 @@ namespace neweraHPC{
 	 char *new_string = new char[tmp_len + 1];
 	 memcpy(new_string, (tmp_s1 - tmp_len), tmp_len);
 	 new_string[tmp_len] = '\0';
-	 (*count)++;
 	 
-	 if(!strings)
-	 {
-	    strings = new char* [2];
-	    strings[0] = new_string;
-	    strings[1] = NULL;
-	 }
-	 else 
-	 {
-	    tmp_strings = strings;
-	    strings = new char* [*count + 1];
-	    memcpy(strings, tmp_strings, (sizeof(char*) * (*count - 1)));
-	    strings[*count - 1] = new_string;
-	    strings[*count] = NULL;
-	    delete[] tmp_strings;
-	 }	 
+	 string->strings[i] = new_string;
       }
       
-      string->strings = strings;
-      
-      return string;
+      return string;      
    }
-   
+
    void nhpc_string_delete(string_t *string)
    {
       for(int i = 0; i < string->count; i++)

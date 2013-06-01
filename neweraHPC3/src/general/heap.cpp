@@ -46,7 +46,7 @@ namespace neweraHPC
       if(tmp)
 	 tmp->prev = parent;
       
-      memset(((char *)parent + sizeof(mem_page_t)), 0, size);
+      //memset(((char *)parent + sizeof(mem_page_t)), 0, size);
       page_set_size(parent, size);
    }
    
@@ -170,8 +170,7 @@ namespace neweraHPC
       while(1)
       {
 	 (*HeapObject).clean_table();
-	 (*HeapObject).print_table();
-	 sleep(1);
+	 sleep(2);
       }
    }
    

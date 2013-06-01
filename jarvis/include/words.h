@@ -84,9 +84,8 @@ namespace jarvis
    };
    static void jv_init_synset(synset_t **synset)
    {
-      (*synset) = new synset_t;
-      memset((*synset), 0, sizeof(synset_t));
-      (*synset)->words = new rbtree;
+      (*synset)            = new synset_t;
+      (*synset)->words     = new rbtree;
       (*synset)->relations = new rbtree(RBTREE_NUM | RBTREE_HASH);
    }
 #define jv_set_synset_word(s, w) ((*(*s).words).insert(w))
@@ -127,7 +126,7 @@ namespace jarvis
    word_def_t *jv_get_word(const char *word, jv_pos pos);
    void        jv_add_word(index_record_t *index_record);
 #define _jv_word_def_set_pos(w, p)      (w->pos |= p)
-#define _jv_word_def_set_word(w, word)  (nhpc_strcpy((char **)&(w->word), word))
+#define _jv_word_def_set_word(w, _word) (nhpc_strcpy((char **)&(w->word), _word))
 #define _jv_word_def_set_pointers(w, p) (w->pointers = p)
 #define _jv_word_def_set_offsets(w, o)  (w->offsets = o)
 };

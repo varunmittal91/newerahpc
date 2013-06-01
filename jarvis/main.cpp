@@ -54,7 +54,6 @@ int main(int argc, char **argv)
       }
       else 
       {
-	 speak("Unfortunately word not found");
 	 cout << "word search failed" << endl;
       }
    }
@@ -72,7 +71,6 @@ int main(int argc, char **argv)
       }
       else 
       {
-	 speak("Unfortunately word not found");
 	 cout << "word search failed" << endl;
       }
    }
@@ -80,14 +78,14 @@ int main(int argc, char **argv)
    {
       cout << "Words loaded now comparing" << endl;
       
-      json_t *result = jv_compare_json_structure(word_structure1, word_structure2, word1, word2);
-      delete result;
+      //json_t *result = jv_compare_json_structure(word_structure1, word_structure2, word1, word2);
+      //delete result;
    }
    if(word_structure1)
       delete word_structure1;
    if(word_structure2)
       delete word_structure2;
 
-   while(1)
-      sleep(1);
+   //while(1)
+      //sleep(1);
 }

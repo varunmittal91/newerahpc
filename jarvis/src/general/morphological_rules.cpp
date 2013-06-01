@@ -44,7 +44,6 @@ namespace jarvis
       for(int i = 0; i < 20; i++)
       {
 	 morphological_pairs[i] = new jv_morphological_rule;
-	 memset((morphological_pairs[i]), 0, sizeof(jv_morphological_rule));
       }
       
       nhpc_strcpy((char **)&(morphological_pairs[0]->suffix), "*s");

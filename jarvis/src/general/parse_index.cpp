@@ -43,6 +43,8 @@ namespace jarvis
       const char *line_str;
       string_t   *record_parts = NULL;
       int         compare_value;
+      int         word_pos;
+      const char *src_word;
       
       jv_morphic_status morphic_search_status = 0;
       
@@ -52,20 +54,22 @@ namespace jarvis
       while(getline(index_file, line))
       {
 	 line_str = line.c_str();
-	 record_parts = nhpc_substr(line_str, ' ');
 
-	 const char *src_word = record_parts->strings[0];
-	 compare_value = strcmp(word, src_word);
-	 if(compare_value == 0)
-	    break;
-	 else 
+	 word_pos = nhpc_strfind(line_str, ' ');
+	 src_word = nhpc_substr(line_str, 1, word_pos - 1);
+	 compare_value = strcmp(word, src_word);	 
+	 delete[] src_word;
+	 
+	 if(compare_value < 0)
 	 {
-	    nhpc_string_delete(record_parts);
-	    record_parts = NULL;
-	    
-	    if(compare_value < 0)
-	       break;
+	    break;
 	 }
+	 else if(compare_value > 0)
+	    continue;
+	 
+	 record_parts = nhpc_substr(line_str, ' ');
+	 src_word     = record_parts->strings[0];	 
+	 break;
       }
       if(!record_parts)
       {
@@ -96,7 +100,6 @@ namespace jarvis
       int pointer_count = nhpc_strtoi(record_parts->strings[3]);
       
       index_record_t *index_record = new index_record_t;
-      memset(index_record, 0, sizeof(index_record_t));
       
       index_record->data_offsets   = new rbtree(RBTREE_NUM);
       index_record->pointers       = new rbtree(RBTREE_NUM);
@@ -139,7 +142,6 @@ namespace jarvis
       for(int i = 0; i < INDEXED_POS_COUNT; i++)
       {
 	 search_param = &(search_params[i]);
-	 memset(search_param, 0, sizeof(search_param_t));
 	 
 	 pos         = jv_get_pos_int_code(i);
 	 source_file = wordnet_index_files[i];

@@ -137,6 +137,7 @@ namespace jarvis
 	 (*word_structure1).build_structure(word_str1);
 	 (*word_structure2).build_structure(word_str2);
 	 
+	 /*
 	 json_t     *result     = jv_compare_json_structure(word_structure1, word_structure2, words[0], words[1]);
 	 const char *result_str = (*result).get_string();
 	 nhpc_size_t size       = strlen(result_str) + 1;
@@ -149,6 +150,7 @@ namespace jarvis
 	 delete[] word_str1;
 	 delete[] word_str2;
 	 delete   result;
+	  */
 	 
 	 return NHPC_SUCCESS;
       }      

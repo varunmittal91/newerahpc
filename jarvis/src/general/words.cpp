@@ -128,6 +128,7 @@ namespace jarvis
       thread_mutex_unlock(mutex_list_all, NHPC_THREAD_LOCK_READ);
       
       word_def_t *word_def = new word_def_t;
+      memset(word_def, 0, sizeof(word_def_t));
 
       _jv_word_def_set_pos(word_def, pos);
       _jv_word_def_set_word(word_def, _word);

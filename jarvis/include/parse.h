@@ -61,6 +61,7 @@ namespace jarvis
    static void search_param_init(search_param_t **search_param)
    {
       (*search_param) = new search_param_t;
+      memset((*search_param), 0, sizeof(search_param_t));
    }
    static void search_param_destruct(search_param_t *search_param)
    {

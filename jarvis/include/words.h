@@ -85,6 +85,7 @@ namespace jarvis
    static void jv_init_synset(synset_t **synset)
    {
       (*synset)            = new synset_t;
+      memset((*synset), 0, sizeof(synset_t));
       (*synset)->words     = new rbtree;
       (*synset)->relations = new rbtree(RBTREE_NUM | RBTREE_HASH);
    }

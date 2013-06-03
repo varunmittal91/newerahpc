@@ -96,16 +96,13 @@ namespace jarvis
          
          int parts_position = 4;
 
-	 cout << "New synset:";
 	 for(int i = 0; i < word_count; i++)
          {
             char *synset_word;
             nhpc_strcpy(&synset_word, synset_parts->strings[parts_position]);
             parts_position += 2;
 	    jv_set_synset_word(synset, synset_word);
-	    cout << synset_word << " ";
          }
-	 cout << endl;
 	 parts_position = 4 + 2 * word_count + 1;
 	 
 	 for(int i = 0; i < ptr_count; i++)

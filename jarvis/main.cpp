@@ -28,6 +28,7 @@
 #include <include/parse_index.h>
 #include <include/jarvis.h>
 #include <include/compare.h>
+#include <include/parse_json_structure.h>
 
 using namespace std;
 using namespace jarvis;
@@ -47,8 +48,6 @@ int main(int argc, char **argv)
       if(nrv == NHPC_SUCCESS)
       {
 	 cout << "Word found and loaded" << endl;
-	 jv_extract_word_def(word1);
-	 
 	 word_structure1 = jv_get_json_structure(word1);
       }
       else 
@@ -63,8 +62,6 @@ int main(int argc, char **argv)
       if(nrv == NHPC_SUCCESS)
       {
 	 cout << "Word found and loaded" << endl;
-	 jv_extract_word_def(word2);
-	 
 	 word_structure2 = jv_get_json_structure(word2);
       }
       else 

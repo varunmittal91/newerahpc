@@ -82,7 +82,6 @@ namespace jarvis
       }
       else 
       {
-	 cout << "Found word:" << word << " in:" << jv_get_search_param_sources(search_param) << endl;
 	 index_record_t *index_record = jv_analyze_index_record(search_param, record_parts);
 	 search_param->result = (void *)index_record;
 	 jv_set_search_successful(search_param);
@@ -114,7 +113,6 @@ namespace jarvis
       for(int i = 0; i < sense_count; i++)
       {
 	 jv_set_index_record_offset(index_record, record_parts->strings[i + 3 + pointer_count + 3]);
-	 cout << "Adding offset:" << record_parts->strings[i + 3 + pointer_count + 3] << endl;
       }
       
       return index_record;
@@ -172,14 +170,12 @@ namespace jarvis
 	    {
 	       nrv = NHPC_SUCCESS;
 	       
-	       cout << i << " Complete Status:Success" << endl;
-	       
 	       search_param_t *data_search;
 	       search_param_init(&data_search);
 	       
 	       pos         = jv_get_pos_int_code(i);
 	       source_file = wordnet_data_files[i];
-	       cout << "Searching for data in :" << source_file << endl;
+	       LOG_INFO("Searching for data in :" << source_file);
 	       
 	       jv_set_search_param_pos(data_search, pos);
 	       jv_set_search_param_source(data_search, source_file);
@@ -192,11 +188,9 @@ namespace jarvis
 	       search_param_destruct(data_search);
 	       delete data_search;
 	    }
-	    else 
-	       cout << i << " Complete Status:Fail" << endl;
 	 }
       }
-      cout << "Threads done" << endl;
+      LOG_INFO("Threads done");
       
       return nrv;
    }

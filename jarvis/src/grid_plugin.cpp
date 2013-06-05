@@ -28,6 +28,7 @@
 #include <include/jarvis.h>
 #include <include/jarvis_data.h>
 #include <include/compare.h>
+#include <include/parse_json_structure.h>
 
 using namespace std;
 
@@ -70,7 +71,6 @@ namespace jarvis
 	 nrv = jv_get_word_def(word);
 	 if(nrv == NHPC_SUCCESS)
 	 {
-	    jv_extract_word_def(word);
 	    word_structure1 = jv_get_json_structure(word);
 
 	    const char  *json_str = (*word_structure1).get_string();

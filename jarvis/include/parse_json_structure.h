@@ -19,15 +19,12 @@
 
 #include <neweraHPC/json.h>
 
+#include <include/words.h>
+
 using namespace neweraHPC;
 
 namespace jarvis
 {
-   json_t *match_json_structures(json_t *json1, json_t *json2);
-
-   rbtree * jv_extract_sense_tree(json_t *json);
-   void     jv_extract_sense_tree_print(rbtree *master_tree);
-   void    _jv_extract_sense_tree_merge_clones(rbtree *master_tree, rbtree **master_trees, int branch_count, int clone_count);
-   void    _jv_extract_sense_tree_replicate(rbtree *master_tree, int count);
-   void    _jv_extract_sense_tree_add_words(rbtree *dest, json_t *json);
-}
+   void jv_get_json_structure_recursive(json_t *json, int pos, synset_t *synset, int level = 0);
+   json_t *jv_get_json_structure(const char *word);
+};

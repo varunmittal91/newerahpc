@@ -1,3 +1,22 @@
+/*
+ *	(C) 2012 Varun Mittal <varunmittal91@gmail.com>
+ *	jarvis program is distributed under the terms of the GNU General Public License v3
+ *
+ *	This file is part of jarvis.
+ *
+ *	jarvis is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation version 3 of the License.
+ *
+ *	jarvis is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *
+ *	You should have received a copy of the GNU General Public License
+ *	along with jarvis.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <stdlib.h>
 #include <iostream>
 
@@ -11,344 +30,288 @@ using namespace neweraHPC;
 using namespace std;
 
 namespace jarvis
-{   
-   void jv_get_json_structure_recursive(json_t *json, int pos, synset_t *synset, int level = 0)
+{         
+   void _jv_extract_sense_tree_add_words(rbtree *dest, json_t *json)
    {
-      (*json).add_element(JSON_OBJECT, "child");
+      rbtree *word_tree = new rbtree(RBTREE_NUM);
       
-      (*json).add_element(JSON_ARRAY, "words");
-      const char *_word;
-      int         word_count = synset->words->length();
-      for(int k = 1; k <= word_count; k++)
+      (*json).save_search();
+      (*json)["words"];
+      int         count = (*json).count();
+      const char *word;
+      for(int i = 1; i <= count; i++)
       {
-	 _word = (const char *)synset->words->search(k);
-	 (*json).add_element(JSON_STRING, _word);
-      }      
-      (*json).close_element();
-      
-      int synset_length   = 0;
-      int parent_relation = 0;
-      if((synset_length = jv_get_offset_length_synset(synset, HYPERNYM)) > 0)
-	 parent_relation = HYPERNYM;
-      else if((synset_length = jv_get_offset_length_synset(synset, I_HYPERNYM)) > 0)
-	 parent_relation = I_HYPERNYM;
-      if(parent_relation == 0)
-      {
-	 (*json).close_element();
-	 return;
+	 nhpc_strcpy((char **)&(word), (*json)[i]);
+	 (*word_tree).insert((void *)word);
       }
+      (*json).restore_search();
       
-      if(synset_length > 1)
-	 (*json).add_element(JSON_ARRAY, "child");      
-      for(int i = 1; i <= synset_length; i++)
-      {
-	 int new_offset = jv_get_offset_synset(synset, parent_relation, i);	 
-	 synset_t *new_synset = jv_get_word_set_db(pos, new_offset);
-	 if(synset_length > 1)
-	 {
-	    (*json).add_element(JSON_OBJECT);
-	    jv_get_json_structure_recursive(json, pos, new_synset);
-	    (*json).close_element();
-	 }
-	 else 
-	    jv_get_json_structure_recursive(json, pos, new_synset);	    
-      }    
-      if(synset_length > 1)
-	 (*json).close_element();
-      
-      (*json).close_element();
+      (*dest).insert(word_tree);
    }
    
-   json_t *jv_get_json_structure(const char *word)
+   void _jv_extract_sense_tree_replicate(rbtree *master_tree, int count)
    {
-      json_t *json_structure = new json_t;
-      (*json_structure).add_element(JSON_STRING, "word", word);
+      count--;
       
-      for(int i = 0; i < POS_COUNT; i++)
+      rbtree *tree = (rbtree *)(*master_tree)[1];
+      rbtree *word_tree;
+      int     word_tree_count = (*tree).length();
+      
+      rbtree **new_trees = new rbtree* [count];
+      for(int i = 0; i < count; i++)
       {
-	 jv_pos pos = jv_get_pos_int_code(i);
-	 
-	 word_def_t *word_def = jv_get_word(word, pos);
-	 if(!word_def)
-	    continue;
-	 const char *pos_ascii_name = jv_get_pos_ascii_name(i);
-	 
-	 (*json_structure).add_element(JSON_OBJECT, pos_ascii_name);
-	 (*json_structure).add_element(JSON_ARRAY, "senses");
-	 
-	 rbtree *senses  = word_def->offsets;
-	 int sense_count = senses->length();
-	 for(int j = 1; j <= senses->length(); j++)
-	 {
-	    synset_t *synset;
-	    int offset = 0;
-	    (*senses).search_inorder_num(j, &offset);
-	    if(offset != 0)
-	    {
-	       (*json_structure).add_element(JSON_OBJECT);
-	       synset = jv_get_word_set_db(i, offset);
-	       jv_get_json_structure_recursive(json_structure, i, synset);
-	       (*json_structure).close_element();
-	    }
-	 }
-	 
-	 (*json_structure).close_element();
-	 (*json_structure).close_element();
+	 new_trees[i] = new rbtree(RBTREE_NUM);
       }
       
-      (*json_structure).close_element();
-      
-      return json_structure;
-   }
-      
-   void jv_extract_word_def(const char *word)
-   {
-      for(int i = 0; i < POS_COUNT; i++)
+      for(int i = 1; i <= word_tree_count; i++)
       {
-	 jv_pos pos = jv_get_pos_int_code(i);
-	 
-	 word_def_t *word_def = jv_get_word(word, pos);
-	 if(!word_def)
-	    continue;
-	 
-	 rbtree *senses  = word_def->offsets;
-	 int sense_count = senses->length();
-	 cout << "Sense count:" << sense_count << endl;
-	 
-	 const char *pos_ascii_name = jv_get_pos_ascii_name(i);
-	 
-	 for(int j = 1; j <= senses->length(); j++)
-	 {
-	    synset_t *synset;
-	    int offset = 0;
-	    (*senses).search_inorder_num(j, &offset);
-	    if(offset != 0)
-	    {
-	       synset = jv_get_word_set_db(i, offset);
-	    }
-	 }
+	 word_tree = (rbtree *)(*tree)[i];
+	 for(int j = 0; j < count; j++)
+	    (*(new_trees[j])).insert(word_tree);
       }
+      
+      for(int i = 0; i < count; i++)
+	 (*master_tree).insert(new_trees[i]);
    }
    
-   bool match_level(json_t *level1, json_t *level2)
+   void _jv_extract_sense_tree_merge_clones(rbtree *master_tree, rbtree **master_trees, int branch_count, int clone_count)
    {
-      int         word_count1;
-      int         word_count2;
-      bool        result = true;
-      const char *word1, *word2;
+      int pos = 1;
+      rbtree *tree;
+      rbtree *src_tree;
+      rbtree *word_tree;
+      int src_tree_count;
+      int word_tree_count;
       
-      (*level1).save_search();
-      (*level2).save_search();
-      
-      if(!json_check_object_is_array((*level1)["words"]) || !json_check_object_is_array((*level2)["words"]))
+      for(int i = 0; i < branch_count; i++)
       {
-	 cout << "Error not an words array" << endl;
-	 result = false;
-	 goto return_result;
+	 src_tree_count = (*(master_trees[i])).length();
+	 
+	 for(int j = 1; j <= src_tree_count; j++)
+	 {
+	    tree     = (rbtree *)(*master_tree)[pos];
+	    src_tree = (rbtree *)(*(master_trees[i]))[j];
+	    
+	    word_tree_count = (*src_tree).length();
+	    for(int k = 1; k <= word_tree_count; k++)
+	    {
+	       word_tree = (rbtree *)(*src_tree)[k];
+	       (*tree).insert(word_tree);
+	    }
+	    
+	    pos++;
+	 }
       }
-      
-      word_count1 = (*level1).count();
-      word_count2 = (*level2).count();
+   }
 
-      if(word_count1 != word_count2)
-      {
-	 result = false;
-	 goto return_result;
-      }
-      
-      for(int i = 1; i <= word_count1; i++)
-      {
-	 word1 = (*level1)[i];
-	 word2 = (*level2)[i];
-	 
-	 if(strcmp(word1, word2) != 0)
-	 {
-	    result = false;
-	    break;
-	 }
-      }
-      
-   return_result:
-      (*level1).restore_search();
-      (*level2).restore_search();
-      
-      return result;
-   }
-   
-   bool match_json_sense(json_t *sense1, json_t *sense2, int *level1, int *level2, json_t **result)
+   rbtree *jv_extract_sense_tree(json_t *json)
    {
-      *level1 = 0;
-      *level2 = 0;
+      rbtree *master_tree = new rbtree(RBTREE_NUM);
+      rbtree *tree        = new rbtree(RBTREE_NUM);
+      (*master_tree).insert(tree);
       
-      int         word_count; 
       const char *response;
+
+      (*json).save_search();
       
-      json_t *primary   = sense1;
-      json_t *secondary = sense2;
-      bool    complete  = false;
-      
-      (*primary).save_search();
-      (*secondary).save_search();
-      
-      while(json_check_object_found(response = (*primary)["child"]) && !complete)
+      while(json_check_object_found(response = (*json)["child"]))
       {
-	 (*level1)++;
+	 rbtree *new_master_tree;
 	 
 	 if(json_check_object_is_array(response))
 	 {
-	    int tmp_level1;
-	    int tmp_level2;
-	    int _tmp_level1 = -1;
-	    int _tmp_level2 = -1;
+	    int clone_count = 0;
 	    
-	    int     count = (*primary).count();
-	    json_t *tmp_result = NULL;
-	    json_t *_tmp_result;
-
+	    int count = (*json).count();
+	    rbtree **master_trees = new rbtree* [count];
+	    
 	    for(int i = 1; i <= count; i++)
 	    {
-	       (*primary).save_search();
-	       (*primary)[i];
-
-	       (*primary).save_search();
-	       (*secondary).save_search();
-	       if(match_json_sense(primary, secondary, &tmp_level1, &tmp_level2, &_tmp_result))
-	       {
-		  tmp_level1 = tmp_level1 + ((*level1) - 1);
-		  
-		  if(_tmp_level1 == -1 || (_tmp_level1 > tmp_level1 && _tmp_level2 > tmp_level2))
-		  {
-		     if(tmp_result)
-			delete tmp_result;
-		     tmp_result = _tmp_result;
-		     
-		     _tmp_level1 = tmp_level1;
-		     _tmp_level2 = tmp_level2;
-		  }
-		  complete = true;
-	       }
-	       (*primary).restore_search();
-	       (*secondary).restore_search();
-
-	       (*primary).restore_search();
-	    }
+	       (*json).save_search();
+	       (*json)[i];	       
+	       new_master_tree  = jv_extract_sense_tree(json);
+	       (*json).restore_search();
+	       	       
+	       master_trees[i - 1]  = new_master_tree;
+	       clone_count         += (*new_master_tree).length();
+	    }	    	    
+	    _jv_extract_sense_tree_replicate(master_tree, clone_count);
+	    _jv_extract_sense_tree_merge_clones(master_tree, master_trees, count, clone_count);
 	    
-	    if(complete)
-	    {
-	       (*result) = tmp_result;
-	       
-	       (*level1) = _tmp_level1;
-	       (*level2) = _tmp_level2;
-	    }
+	    break;
 	 }
 	 else 
 	 {
-	    (*secondary).save_search();
-	    (*level2) = 0;	    
-	    while(json_check_object_found(response = (*secondary)["child"]) && !complete)
-	    {
-	       (*level2)++;
-	       
-	       if(json_check_object_is_array(response))
-	       {
-		  int tmp_level1;
-		  int tmp_level2;
-		  
-		  int _tmp_level1 = -1;
-		  int _tmp_level2 = -1;
-		  		  
-		  int     count = (*secondary).count();
-		  json_t *tmp_result = NULL;
-		  json_t *_tmp_result;
-
-		  (*primary).restore_search();
-		  (*primary).save_search();
-		  for(int i = 1; i <= count; i++)
-		  {		     
-		     (*secondary).save_search();		     
-		     (*secondary)[i];
-		     
-		     (*primary).save_search();
-		     (*secondary).save_search();
-		     if(match_json_sense(primary, secondary, &tmp_level1, &tmp_level1, &_tmp_result))
-		     {
-			tmp_level1 = (*level1) + tmp_level1;
-			tmp_level2 = (*level2);
-			complete = true;
-			
-			if(_tmp_level1 == -1 || (_tmp_level1 > tmp_level1 && _tmp_level2 > tmp_level2))
-			{
-			   if(tmp_result)
-			      delete tmp_result;
-			   tmp_result = _tmp_result;
-			   
-			   _tmp_level1 = tmp_level1;
-			   _tmp_level2 = tmp_level2;
-			}
-		     }
-		     (*primary).restore_search();
-		     (*secondary).restore_search();
-
-		     (*secondary).restore_search();
-		  }
-		  (*primary).restore_search();
-		  
-		  if(complete)
-		  {		     
-		     (*result) = tmp_result;
-		     
-		     (*level1) = _tmp_level1;
-		     (*level2) = _tmp_level2;
-		  }		  
-	       }
-	       else 
-	       {
-		  if(match_level(primary, secondary))
-		  {		     
-		     (*result) = new json_t;
-		     (*(*result)).add_element(JSON_ARRAY, "matched_words");
-		     
-		     (*primary).save_search();
-		     (*primary)["words"];
-		     
-		     int count = (*primary).count();
-		     for(int i = 1; i <= count; i++)
-		     {
-			(*(*result)).add_element(JSON_STRING, (*primary)[i]);
-		     }
-		     
-		     (*(*result)).close_element();
-		     
-		     (*primary).restore_search();
-		     
-		     complete = true;		   
-		  }
-		  
-		  LOG_INFO(*level1);
-		  LOG_INFO(*level2);
-		  (*primary).save_search();
-		  (*secondary).save_search();
-		  (*primary)["words"];
-		  (*secondary)["words"];
-		  int count1 = (*primary).count();
-		  int count2 = (*secondary).count();
-		  LOG_INFO("\t" << (*primary)[1]);
-		  LOG_INFO("\t" << (*secondary)[1]);
-		  (*primary).restore_search();
-		  (*secondary).restore_search();	
-	       }
-	    }
-	    (*secondary).restore_search();
+	    _jv_extract_sense_tree_add_words(tree, json);
 	 }
       }
       
-      (*primary).restore_search();
-      (*secondary).restore_search();
+      (*json).restore_search();
+      
+      return master_tree;
+   }
+   
+   void jv_extract_sense_tree_print(rbtree *master_tree)
+   {
+      int     tree_count = (*master_tree).length();
+      int     word_count;
+      int     word_tree_count;
+      rbtree *tree;
+      rbtree *words;
+      rbtree *word_tree;
 
-      if(complete)
+      const char *word;
+      
+      for(int i = 1; i <= tree_count; i++)
       {
-	 (*(*result)).close_element();	 
+	 tree = (rbtree *)(*master_tree)[i];
+	 word_tree_count = (*tree).length();
+
+	 for(int j = 1; j <= word_tree_count; j++)
+	 {
+	    for(int k = 1; k < j; k++)
+	       cout << " ";
+	    cout << "-->";
+	    
+	    word_tree = (rbtree *)(*tree)[j];
+	    
+	    word_count = (*word_tree).length();
+	    for(int k = 1; k <= word_count; k++)
+	    {
+	       word = (const char *)(*word_tree)[k];
+	       cout << word << " ";
+	    }
+	    cout << endl;
+	 }
       }
+   }
+   
+   void jv_extract_sense_tree_print_word_tree(rbtree *tree)
+   {
+      const char *word;
+      rbtree     *word_tree;
+      int         word_tree_count = (*tree).length();
+      int         word_count;
+      
+      for(int j = 1; j <= word_tree_count; j++)
+      {
+	 for(int k = 1; k < j; k++)
+	    cout << " ";
+	 cout << "-->";
+	 
+	 word_tree = (rbtree *)(*tree)[j];
+	 
+	 word_count = (*word_tree).length();
+	 for(int k = 1; k <= word_count; k++)
+	 {
+	    word = (const char *)(*word_tree)[k];
+	    cout << word << " ";
+	 }
+	 cout << endl;
+      }      
+   }
+   
+   bool jv_compare_sense_tree_word_tree_level(rbtree *level1, rbtree *level2)
+   {
+      int level1_count = (*level1).length();
+      int level2_count = (*level2).length();
+      
+      if(level1_count != level2_count)
+	 return false;
+      
+      const char *word1, *word2;
+      for(int i = 1; i <= level1_count; i++)
+      {
+	 word1 = (const char *)(*level1)[i];
+	 word2 = (const char *)(*level2)[i];
+	 
+	 if(strcmp(word1, word2) != 0)
+	    return false;
+      }
+      
+      return true;
+   }
+   
+   bool jv_compare_sense_tree_word_tree(rbtree *word_tree1, rbtree *word_tree2, int *level1, int *level2)
+   {
+      rbtree *word_tree_level1;
+      rbtree *word_tree_level2;
+      
+      int word_tree_level_count1 = (*word_tree1).length();
+      int word_tree_level_count2 = (*word_tree2).length();
+      
+      bool complete_true = false;
+      
+      *level1 = 0;
+      *level2 = 0;
+      
+      for(int i = 1; i <= word_tree_level_count1 && !complete_true; i++)
+      {
+	 word_tree_level1 = (rbtree *)(*word_tree1)[i];
+	 
+	 for(int j = 1; j <= word_tree_level_count2 && !complete_true; j++)
+	 {
+	    word_tree_level2 = (rbtree *)(*word_tree2)[j];
+	    
+	    if(jv_compare_sense_tree_word_tree_level(word_tree_level1, word_tree_level2))
+	    {
+	       complete_true = true;
+
+	       *level1 = i;
+	       *level2 = j;
+	    }
+	 }
+      }
+      
+      return complete_true;
+   }
+   
+   bool jv_compare_sense_tree(rbtree *sense1, rbtree *sense2, int *level_match1, int *level_match2, int *subtree1, int *subtree2)
+   {
+      int subsense_count1 = (*sense1).length();
+      int subsense_count2 = (*sense2).length();
+      
+      rbtree *tree1, *tree2;
+      int tmp_level_match1;
+      int tmp_level_match2;
+      
+      (*level_match1) = -1;
+      (*level_match2) = -1;
+      
+      bool complete = false;
+      
+      for(int i = 1; i <= subsense_count1; i++)
+      {
+	 tree1 = (rbtree *)(*sense1)[i];
+	 
+	 for(int j = 1; j <= subsense_count2; j++)
+	 {
+	    tree2 = (rbtree *)(*sense2)[j];
+	    if(jv_compare_sense_tree_word_tree(tree1, tree2, &tmp_level_match1, &tmp_level_match2))
+	    {
+	       if((*level_match1) == -1 || ((*level_match1) > tmp_level_match1 && (*level_match2) > tmp_level_match2) || tmp_level_match1 == 1 
+		  || tmp_level_match2 == 1)
+	       {
+		  (*level_match1) = tmp_level_match1;
+		  (*level_match2) = tmp_level_match2;
+		  
+		  (*subtree1) = i;
+		  (*subtree2) = j;
+	       }
+	       
+	       /*
+	       jv_extract_sense_tree_print_word_tree(tree1);
+	       jv_extract_sense_tree_print_word_tree(tree2);
+	       
+	       cout << "Level matched at " << tmp_level_match1 << endl;
+	       cout << "Level matched at " << tmp_level_match2 << endl;
+		*/
+	       
+	       complete = true;
+	    }
+	 }
+      }
+      
       return complete;
    }
    
@@ -362,31 +325,85 @@ namespace jarvis
       
       int level1;
       int level2;
-
-      cout << "Sense count1:" << json1_sense_count << " Sense count2:" << json2_sense_count << endl;
+      
+      rbtree *word_sense_tree1, *word_sense_tree2;
+      rbtree *tmp_tree;
+      word_sense_tree1 = new rbtree(RBTREE_NUM);
+      word_sense_tree2 = new rbtree(RBTREE_NUM);
+      
       for(int i = 1; i <= json1_sense_count; i++)
       {
+	 (*json1).save_search();
+	 (*json1)[i];
+	 
+	 tmp_tree = jv_extract_sense_tree(json1);
+	 (*word_sense_tree1).insert(tmp_tree);
+	 
+	 (*json1).restore_search();
+      }
+      
+      for(int j = 1; j <= json2_sense_count; j++)
+      {
+	 (*json2).save_search();
+	 (*json2)[j];
+	 
+	 tmp_tree = jv_extract_sense_tree(json2);
+	 (*word_sense_tree2).insert(tmp_tree);
+	 
+	 (*json2).restore_search();
+      }
+      
+      int _sense1;
+      int _sense2;
+      int subtree1;
+      int subtree2;
+      int tmp_level_match1;
+      int tmp_level_match2;
+      int level_match1 = -1;
+      int level_match2 = -1;
+      bool found_result = false;
+      
+      rbtree *sense1, *sense2;
+      for(int i = 1; i <= json1_sense_count; i++)
+      {
+	 sense1 = (rbtree *)(*word_sense_tree1)[i];
+	 
 	 for(int j = 1; j <= json2_sense_count; j++)
 	 {
-	    (*json1).save_search();
-	    (*json2).save_search();
-
-	    (*json1)[i];
-	    (*json2)[j];	    
-
-	    json_t *result;
-	    if(match_json_sense(json1, json2, &level1, &level2, &result))
-	    {
-	       cout << "Matched sense:" << i << ":" << j << ":" << level1 << ":" << level2 << endl << endl;
-	       cout << (*result).get_string() << endl;
-	    }
-	    count++;
+	    sense2 = (rbtree *)(*word_sense_tree2)[j];
 	    
-	    (*json1).restore_search();
-	    (*json2).restore_search();
+	    if(jv_compare_sense_tree(sense1, sense2, &tmp_level_match1, &tmp_level_match2, &subtree1, &subtree2))
+	    {
+	       if(level_match1 == -1 || (level_match1 > tmp_level_match1 && level_match2 > tmp_level_match2) || tmp_level_match1 == 1
+		  || tmp_level_match2 == 1)
+	       {
+		  _sense1 = i;
+		  _sense2 = j;
+	       
+		  level_match1 = tmp_level_match1;
+		  level_match2 = tmp_level_match2;
+	       }
+	       
+	       found_result = true;
+	    }
 	 }
       }
-      cout << endl;
+      
+      if(found_result)
+      {
+	 cout << "Sense1:" << _sense1 << " Sense2:" << _sense2 << endl;
+	 cout << "Subtree1:" << subtree1 << " Subtree2:" << subtree2 << endl;
+	 cout << "Level1:" << level_match1 << " Level2:" << level_match2 << endl;
+	 
+	 sense1 = (rbtree *)(*word_sense_tree1)[_sense1];
+	 sense2 = (rbtree *)(*word_sense_tree2)[_sense2];
+	 
+	 rbtree *tmp1, *tmp2;
+	 tmp1 = (rbtree *)(*sense1)[subtree1];
+	 tmp2 = (rbtree *)(*sense2)[subtree2];
+	 jv_extract_sense_tree_print_word_tree(tmp1);
+	 jv_extract_sense_tree_print_word_tree(tmp2);
+      }
    }
    
    json_t *match_json_structures(json_t *json1, json_t *json2)
@@ -397,20 +414,20 @@ namespace jarvis
       
       for(int i = 0; i < POS_COUNT; i++)
       {
-	 (*json1).reinitialize_search();
-	 (*json2).reinitialize_search();
-	 
-	 pos_ascii_name = jv_get_pos_ascii_name(i);
-	 response1 = (*json1)[pos_ascii_name];
-	 response2 = (*json2)[pos_ascii_name];
-	 
-	 if(json_check_object_found(response1) && json_check_object_found(response2))
-	 {
-	    cout << "matching for sense:" << pos_ascii_name << endl;
-	    (*json1)["senses"];
-	    (*json2)["senses"];
-	    match_json_senses(json1, json2);
-	 }
+         (*json1).reinitialize_search();
+         (*json2).reinitialize_search();
+         
+         pos_ascii_name = jv_get_pos_ascii_name(i);
+         response1 = (*json1)[pos_ascii_name];
+         response2 = (*json2)[pos_ascii_name];
+         
+         if(json_check_object_found(response1) && json_check_object_found(response2))
+         {
+            cout << "matching for sense:" << pos_ascii_name << endl;
+            (*json1)["senses"];
+            (*json2)["senses"];
+            match_json_senses(json1, json2);
+         }
       }
    }
 };

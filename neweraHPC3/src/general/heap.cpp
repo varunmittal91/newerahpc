@@ -46,7 +46,6 @@ namespace neweraHPC
       if(tmp)
 	 tmp->prev = parent;
       
-      //memset(((char *)parent + sizeof(mem_page_t)), 0, size);
       page_set_size(parent, size);
    }
    

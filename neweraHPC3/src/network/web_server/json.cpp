@@ -40,7 +40,7 @@ namespace neweraHPC
 
    bool json_check_object_is_array(const char *response)
    {
-      if(nhpc_strcmp(JSON_OBJECT_STRINGS[JSON_ARRAY], response) != NHPC_SUCCESS)
+      if(nhpc_strcmp(JSON_OBJECT_STRINGS[JSON_ARRAY], response) == NHPC_SUCCESS)
 	 return true;
       else 
 	 return false;

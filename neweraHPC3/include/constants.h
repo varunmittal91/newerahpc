@@ -76,10 +76,12 @@ typedef nhpc_status_t (*fnc_ptr_nhpc_plugin_t)(void *, void *, void *, void **);
 
 typedef void *(*fnc_ptr_int_t)(int *);
 
+/*
 struct key_pair_t
 {
    void *data;
    char *key;
 };
+ */
 
 #endif

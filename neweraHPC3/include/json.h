@@ -50,19 +50,6 @@ namespace neweraHPC
       JSON_UPDATE
    };
    
-   class json_object_t
-   {
-   private:
-      key_pair_t *root_key_pair;
-      rbtree *search_queue;
-      
-   public:
-      json_object_t(key_pair_t *_root_key_pair);
-      
-      const char *operator[](const char *key);
-      const char *operator[](int key);
-   };
-   
    class json_t
    {
    private:

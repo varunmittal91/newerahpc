@@ -113,7 +113,7 @@ namespace neweraHPC
 	 
 	 string_t *tmp_str = nhpc_substr(http_data->request_page, '/');
 
-	 if(tmp_str->count > 0)
+	 if(tmp_str)
 	 {
 	    char *app_name = tmp_str->strings[0];
 	 
@@ -124,9 +124,9 @@ namespace neweraHPC
 	       LOG_INFO("Found http handler: " << app_name);
 	       nhpc_status_t nrv = (*func_trigger_local)(http_data);
 	    }
+	    
+	    nhpc_string_delete(tmp_str);
 	 }
-	 
-	 nhpc_string_delete(tmp_str);
 	 
 	 char *file_path = NULL;
 	 nhpc_size_t file_size;

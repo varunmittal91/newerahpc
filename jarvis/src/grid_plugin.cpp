@@ -137,20 +137,21 @@ namespace jarvis
 	 (*word_structure1).build_structure(word_str1);
 	 (*word_structure2).build_structure(word_str2);
 	 
-	 /*
-	 json_t     *result     = jv_compare_json_structure(word_structure1, word_structure2, words[0], words[1]);
-	 const char *result_str = (*result).get_string();
-	 nhpc_size_t size       = strlen(result_str) + 1;
-	 nhpc_strcpy((char **)&result_str, result_str);
-	 
-	 grid_instruction_set_result_data(instruction, result_str, &size, ARG_MEM_BLOCK);
-	 
+	 json_t *result = match_json_structures(word_structure1, word_structure2);
+	 if(result)
+	 {
+	    const char *result_str = (*result).get_string();
+	    nhpc_size_t size       = strlen(result_str) + 1;
+	    nhpc_strcpy((char **)&result_str, result_str);
+	    
+	    grid_instruction_set_result_data(instruction, result_str, &size, ARG_MEM_BLOCK);
+	    
+	    delete result;
+	 }
 	 delete   word_structure1;
 	 delete   word_structure2;
 	 delete[] word_str1;
 	 delete[] word_str2;
-	 delete   result;
-	  */
 	 
 	 return NHPC_SUCCESS;
       }      

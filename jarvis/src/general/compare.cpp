@@ -126,7 +126,7 @@ namespace jarvis
 	    rbtree **master_trees = new rbtree* [count];
 	    
 	    for(int i = 1; i <= count; i++)
-	    {
+	    {    
 	       (*json).save_search();
 	       (*json)[i];	       
 	       new_master_tree  = jv_extract_sense_tree(json);
@@ -315,7 +315,7 @@ namespace jarvis
       return complete;
    }
    
-   void match_json_senses(json_t *json1, json_t *json2)
+   bool match_json_senses(json_t *json1, json_t *json2, json_t **result, int *level_match1, int *level_match2)
    {
       int json1_sense_count = (*json1).count();
       int json2_sense_count = (*json2).count();
@@ -353,14 +353,14 @@ namespace jarvis
 	 (*json2).restore_search();
       }
       
+      (*level_match1) = -1;
+      (*level_match2) = -1;
       int _sense1;
       int _sense2;
       int subtree1;
       int subtree2;
       int tmp_level_match1;
       int tmp_level_match2;
-      int level_match1 = -1;
-      int level_match2 = -1;
       bool found_result = false;
       
       rbtree *sense1, *sense2;
@@ -374,14 +374,14 @@ namespace jarvis
 	    
 	    if(jv_compare_sense_tree(sense1, sense2, &tmp_level_match1, &tmp_level_match2, &subtree1, &subtree2))
 	    {
-	       if(level_match1 == -1 || (level_match1 > tmp_level_match1 && level_match2 > tmp_level_match2) || tmp_level_match1 == 1
+	       if((*level_match1) == -1 || ((*level_match1) > tmp_level_match1 && (*level_match2) > tmp_level_match2) || tmp_level_match1 == 1
 		  || tmp_level_match2 == 1)
 	       {
 		  _sense1 = i;
 		  _sense2 = j;
 	       
-		  level_match1 = tmp_level_match1;
-		  level_match2 = tmp_level_match2;
+		  (*level_match1) = tmp_level_match1;
+		  (*level_match2) = tmp_level_match2;
 	       }
 	       
 	       found_result = true;
@@ -391,9 +391,9 @@ namespace jarvis
       
       if(found_result)
       {
-	 cout << "Sense1:" << _sense1 << " Sense2:" << _sense2 << endl;
-	 cout << "Subtree1:" << subtree1 << " Subtree2:" << subtree2 << endl;
-	 cout << "Level1:" << level_match1 << " Level2:" << level_match2 << endl;
+	 cout << "Sense1:"   << _sense1         << " Sense2:"   << _sense2         << endl;
+	 cout << "Subtree1:" << subtree1        << " Subtree2:" << subtree2        << endl;
+	 cout << "Level1:"   << (*level_match1) << " Level2:"   << (*level_match2) << endl;
 	 
 	 sense1 = (rbtree *)(*word_sense_tree1)[_sense1];
 	 sense2 = (rbtree *)(*word_sense_tree2)[_sense2];
@@ -401,9 +401,25 @@ namespace jarvis
 	 rbtree *tmp1, *tmp2;
 	 tmp1 = (rbtree *)(*sense1)[subtree1];
 	 tmp2 = (rbtree *)(*sense2)[subtree2];
+	 
+	 const char *word;
+	 rbtree     *word_tree       = (rbtree *)(*tmp1)[*level_match1];
+	 int         word_tree_count = (*word_tree).length();
+	 (*result) = new json_t;
+	 (*(*result)).add_element(JSON_ARRAY, "match");
+	 for(int i = 1; i <= word_tree_count; i++)
+	 {
+	    word = (const char *)(*word_tree)[i];
+	    (*(*result)).add_element(JSON_STRING, word); 
+	 }
+	 (*(*result)).close_element();
+	 (*(*result)).close_element();
+	 	 
 	 jv_extract_sense_tree_print_word_tree(tmp1);
 	 jv_extract_sense_tree_print_word_tree(tmp2);
       }
+      
+      return found_result;
    }
    
    json_t *match_json_structures(json_t *json1, json_t *json2)
@@ -411,6 +427,13 @@ namespace jarvis
       jv_pos      pos;
       const char *pos_ascii_name;
       const char *response1, *response2;
+      
+      int level_match1 = -1;
+      int level_match2 = -1;
+      int tmp_level_match1;
+      int tmp_level_match2;
+      json_t *result     = NULL;
+      json_t *tmp_result = NULL;
       
       for(int i = 0; i < POS_COUNT; i++)
       {
@@ -423,11 +446,23 @@ namespace jarvis
          
          if(json_check_object_found(response1) && json_check_object_found(response2))
          {
-            cout << "matching for sense:" << pos_ascii_name << endl;
-            (*json1)["senses"];
-            (*json2)["senses"];
-            match_json_senses(json1, json2);
+	    (*json1)["senses"];
+	    (*json2)["senses"];	       
+
+            if(match_json_senses(json1, json2, &tmp_result, &tmp_level_match1, &tmp_level_match2))
+	    {
+	       if(level_match1 == -1 || (level_match1 > tmp_level_match1 && level_match2 > tmp_level_match2) || tmp_level_match1 == 1
+		  || tmp_level_match2 == 1)
+	       {
+		  if(result)
+		     delete result;
+		  result = tmp_result;
+	       }
+	       cout << "matching for sense:" << pos_ascii_name << endl;
+	    }
          }
       }
+      
+      return result;
    }
 };

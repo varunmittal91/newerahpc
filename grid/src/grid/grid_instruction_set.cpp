@@ -35,9 +35,6 @@ namespace neweraHPC
       if(grid_instruction_get_grid_uid(instruction))
       	 delete[] grid_instruction_get_grid_uid(instruction);
             
-      if(grid_instruction_get_referer_grid_uid(instruction))
-	 delete[] grid_instruction_get_referer_grid_uid(instruction);
-      
       if(grid_instruction_get_peer_addr(instruction))
 	 delete[] grid_instruction_get_peer_addr(instruction);
       
@@ -119,6 +116,7 @@ namespace neweraHPC
 	    delete[] argument_str;
 	    
 	    arguments->insert(argument);
+	    (headers)->erase(argument_str);
 	 }
 	 
 	 (*instruction)->arguments = arguments;

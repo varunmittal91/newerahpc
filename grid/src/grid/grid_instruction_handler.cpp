@@ -61,6 +61,8 @@ namespace neweraHPC
 	 instruction->result_data = NULL;
       }
       
+      grid_instruction_destruct(instruction);
+      
       return nrv;
    }   
 };

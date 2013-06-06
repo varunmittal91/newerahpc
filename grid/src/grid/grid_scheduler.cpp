@@ -121,6 +121,7 @@ namespace neweraHPC
    
    void grid_task_add_task(const char *grid_uid, grid_instruction_t **instructions, int *instructions_count)
    {
+      /*
       grid_task_t *task  = new grid_task_t;
       task->count        = *instructions_count;
       task->instructions = instructions;
@@ -128,6 +129,7 @@ namespace neweraHPC
       thread_mutex_lock(&mutex_jobs, NHPC_THREAD_LOCK_WRITE);
       jobs->insert(task, grid_uid);
       thread_mutex_unlock(&mutex_jobs, NHPC_THREAD_LOCK_WRITE);
+       */
       
       thread_mutex_lock(&mutex_queued_instructions, NHPC_THREAD_LOCK_WRITE);
       for(int i = 0; i < *instructions_count; i++)

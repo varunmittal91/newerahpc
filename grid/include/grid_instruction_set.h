@@ -61,10 +61,7 @@ namespace neweraHPC
 #define grid_instruction_set_peer_id(i, p)       (i->peer_id = p)
 #define grid_instruction_get_peer_addr(i)        (i->peer_addr)
 #define grid_instruction_get_peer_port(i)        (i->peer_port)
-#define grid_instruction_get_referer_addr(i)     (i->referer_addr)
-#define grid_instruction_get_referer_port(i)     (i->referer_port)
 #define grid_instruction_get_grid_uid(i)         (i->grid_uid)
-#define grid_instruction_get_referer_grid_uid(i) (i->referer_grid_uid)
 #define grid_instruction_get_argument_count(i)   (i->arguments->length())
 #define grid_instruction_get_argument(i, n)      ((const char *)i->arguments->search(n))
 #define grid_instruction_set_affinity(i, a)      (i->affinity = a)
@@ -87,18 +84,10 @@ namespace neweraHPC
       nhpc_strcpy((char **)&(grid_instruction_get_peer_port(instruction)), peer_port);
    }
 #define grid_instruction_set_peer_uid(i, u) (nhpc_strcpy((char **)&(i->peer_uid), u))
-   static void grid_instruction_set_referer(grid_instruction_t *instruction, const char *referer_addr, const char *referer_port)
-   {
-      nhpc_strcpy((char **)&(grid_instruction_get_referer_addr(instruction)), referer_addr);
-   }
    
    static void grid_instruction_set_grid_uid(grid_instruction_t *instruction, const char *grid_uid)
    {
       nhpc_strcpy((char **)&(grid_instruction_get_grid_uid(instruction)), grid_uid);
-   }
-   static void grid_instruction_set_referer_grid_uid(grid_instruction_t *instruction, const char *referer_grid_uid)
-   {
-      nhpc_strcpy((char **)&(grid_instruction_get_referer_grid_uid(instruction)), referer_grid_uid);      
    }
    
    nhpc_status_t grid_instruction_prepare(grid_instruction_t **instruction, grid_data_t *grid_data);

@@ -58,7 +58,7 @@ namespace jarvis
 	 nhpc_status_t  nrv;
 	 rbtree        *arguments = instruction->arguments;
 	 if(!arguments)
-	    return NHPC_FAIL;
+	    return NHPC_SUCCESS;
 	 
 	 arg_t        arg;
 	 arg_value_t  arg_value;
@@ -78,7 +78,7 @@ namespace jarvis
 	    grid_instruction_set_result_data(instruction, json_str, &size, ARG_MEM_BLOCK);
 	 }
 	 
-	 return nrv;
+	 return NHPC_SUCCESS;
       }
       
       nhpc_status_t plugin_processor(grid_instruction_t *instruction)
@@ -127,7 +127,7 @@ namespace jarvis
 	 grid_scheduler_add_job(grid_uid, instructions, &instruction_count);
 	 
 	 if(!(instructions[0]->result_data) || !(instructions[0]->result_data))
-	    return NHPC_FAIL;
+	    return NHPC_SUCCESS;
 	 
 	 const char *word_str1 = (const char *)((instructions[0])->result_data->address);
 	 const char *word_str2 = (const char *)((instructions[1])->result_data->address);

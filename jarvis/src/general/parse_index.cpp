@@ -158,11 +158,13 @@ namespace jarvis
       }
       
       jv_join_threads_search_params(search_params);
+      
       nhpc_status_t nrv = NHPC_FAIL;
       
       for(int i = 0; i < INDEXED_POS_COUNT; i++)
       {
 	 search_param = &(search_params[i]);
+	 (*thread_manager).delete_thread_data(jv_get_search_param_thread_id(search_param));
 	 
 	 if(jv_search_is_complete(search_param))
 	 {

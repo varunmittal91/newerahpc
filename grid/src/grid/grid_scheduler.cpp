@@ -69,7 +69,11 @@ namespace neweraHPC
       node = grid_node_search_compute_node(instruction->peer_uid);
       if((nrv = grid_instruction_send(instruction)) != NHPC_SUCCESS)
       {
-	 grid_node_free_compute_node(node, (instruction->affinity));
+	 if(nrv == ECONNREFUSED)
+	    grid_node_delete_compute_node(node);
+	 else 
+	    grid_node_free_compute_node(node, (instruction->affinity));
+
 	 grid_instruction_unset_sent(instruction);
 	 delete[] (instruction->peer_uid);
 	 (instruction->peer_uid) = NULL;
@@ -89,16 +93,13 @@ namespace neweraHPC
 	 sleep(1);
 	 
 	 thread_mutex_lock(&mutex_queued_instructions, NHPC_THREAD_LOCK_WRITE);
-	 instruction_count = (*queued_instructions).length();
-	 for(int i = 1; i <= instruction_count; i++)
+	 int i = 1;
+	 while((instruction = (grid_instruction_t *)(*queued_instructions)[i]))
 	 {
-	    instruction = (grid_instruction_t *)(*queued_instructions).search(i);
 	    affinity    = instruction->affinity;
 	    if(grid_instruction_is_processed(instruction))
 	    {
-	       (*queued_instructions).erase(i);
-	       i--;
-	       instruction_count--;
+	       (*queued_instructions).erase(1);
 	       continue;
 	    }
 	    if(grid_instruction_is_sent(instruction))
@@ -111,6 +112,8 @@ namespace neweraHPC
 	       grid_instruction_set_sent(instruction);
 	       grid_scheduler_queue_instruction(instruction, node);
 	    }
+	    
+	    i++;
 	 }
 	 thread_mutex_unlock(&mutex_queued_instructions, NHPC_THREAD_LOCK_WRITE);
       }

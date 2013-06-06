@@ -53,7 +53,9 @@ namespace neweraHPC
 	    return nrv;
       }
       
-      grid_communication_t *grid_communication;
+      grid_communication_t *grid_communication = NULL;
+      grid_response_t      *response           = NULL;
+      
       grid_communication_init(&grid_communication, GRID_INSTRUCTION);
       grid_communication_add_dest(grid_communication, peer_addr, peer_port);
       grid_communication_set_opt(grid_communication, GRID_COMMUNICATION_OPT_REGISTER | GRID_COMMUNICATION_OPT_SEND_PEER_DETAILS);
@@ -96,10 +98,15 @@ namespace neweraHPC
       
       grid_communication_send(grid_communication);
       nrv = grid_communication_push(grid_communication, data);
+      if(nrv != NHPC_SUCCESS)
+      {
+	 cout << "communication failed" << endl;
+	 cout << nrv << endl;
+	 goto return_status;
+      }
       
       grid_instruction_set_grid_uid(instruction, grid_communication_get_grid_uid(grid_communication));
       
-      grid_response_t *response;
       nrv = grid_response_get(&response, grid_communication);
       if(nrv == NHPC_SUCCESS && grid_response_is_successful(response))
       {
@@ -124,8 +131,11 @@ namespace neweraHPC
 	 grid_node_free_compute_node(node, (instruction->affinity));
       }
       
-      grid_response_destruct(response);
-      grid_communication_destruct(grid_communication);
+   return_status:
+      if(grid_communication)
+	 grid_communication_destruct(grid_communication);
+      if(response)
+	 grid_response_destruct(response);
       
       return nrv;
    }   

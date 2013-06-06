@@ -50,6 +50,7 @@ namespace neweraHPC
 #define grid_compute_node_get_available_cores(cn)       (grid_compute_node_get_free_cores(cn))
 #define grid_compute_node_alloc_available_cores(cn, n)  (grid_compute_node_get_free_cores(cn) -= n)
 #define grid_compute_node_free_available_cores(cn, n)   (grid_compute_node_get_free_cores(cn) += n)
+
    static void grid_node_compute_init(grid_node_compute_t **grid_node_compute)
    {
       (*grid_node_compute) = new grid_node_compute_t;
@@ -116,6 +117,7 @@ namespace neweraHPC
    grid_node_t *grid_node_get_compute_node(int cpu_cores);
    grid_node_t *grid_node_search_compute_node(const char *node_uid);
    void grid_node_free_compute_node(grid_node_t *node, int cpu_cores);
+   void grid_node_delete_compute_node(grid_node_t *node);
 #define grid_node_get_compute_node_data(n)    (grid_node_compute_t *)(n->node_data)
 #define grid_node_get_client_node_data(n)     (grid_node_client_t *)(n->node_data)
 #define grid_node_set_compute_node_data(n, d) (n->node_data = (void *)d)

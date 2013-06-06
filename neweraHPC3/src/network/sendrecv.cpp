@@ -38,7 +38,7 @@ namespace neweraHPC
       
       do 
       {	    
-	 nrv = nhpc_wait_for_io_or_timeout(sock, 0);
+	 nrv = nhpc_wait_for_io_or_timeout(sock, 1);
 	 if(nrv != NHPC_SUCCESS)
 	 {
 	    *length = 0;

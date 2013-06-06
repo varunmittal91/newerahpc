@@ -25,6 +25,7 @@
 #include <neweraHPC/error.h>
 
 #include <include/words.h>
+#include <include/compare.h>
 
 using namespace neweraHPC;
 using namespace std;
@@ -33,7 +34,8 @@ namespace jarvis
 {         
    void _jv_extract_sense_tree_add_words(rbtree *dest, json_t *json)
    {
-      rbtree *word_tree = new rbtree(RBTREE_NUM);
+      rbtree **word_tree = new rbtree*;
+      (*word_tree) = new rbtree(RBTREE_NUM);
       
       (*json).save_search();
       (*json)["words"];
@@ -41,8 +43,7 @@ namespace jarvis
       const char *word;
       for(int i = 1; i <= count; i++)
       {
-	 nhpc_strcpy((char **)&(word), (*json)[i]);
-	 (*word_tree).insert((void *)word);
+	 (*(*word_tree)).insert((void *)(*json)[i]);
       }
       (*json).restore_search();
       
@@ -53,9 +54,9 @@ namespace jarvis
    {
       count--;
       
-      rbtree *tree = (rbtree *)(*master_tree)[1];
-      rbtree *word_tree;
-      int     word_tree_count = (*tree).length();
+      rbtree  *tree = (rbtree *)(*master_tree)[1];
+      rbtree **word_tree;
+      int      word_tree_count = (*tree).length();
       
       rbtree **new_trees = new rbtree* [count];
       for(int i = 0; i < count; i++)
@@ -65,7 +66,7 @@ namespace jarvis
       
       for(int i = 1; i <= word_tree_count; i++)
       {
-	 word_tree = (rbtree *)(*tree)[i];
+	 word_tree = (rbtree **)(*tree)[i];
 	 for(int j = 0; j < count; j++)
 	    (*(new_trees[j])).insert(word_tree);
       }
@@ -77,9 +78,9 @@ namespace jarvis
    void _jv_extract_sense_tree_merge_clones(rbtree *master_tree, rbtree **master_trees, int branch_count, int clone_count)
    {
       int pos = 1;
-      rbtree *tree;
-      rbtree *src_tree;
-      rbtree *word_tree;
+      rbtree  *tree;
+      rbtree  *src_tree;
+      rbtree **word_tree;
       int src_tree_count;
       int word_tree_count;
       
@@ -95,7 +96,7 @@ namespace jarvis
 	    word_tree_count = (*src_tree).length();
 	    for(int k = 1; k <= word_tree_count; k++)
 	    {
-	       word_tree = (rbtree *)(*src_tree)[k];
+	       word_tree = (rbtree **)(*src_tree)[k];
 	       (*tree).insert(word_tree);
 	    }
 	    
@@ -138,6 +139,10 @@ namespace jarvis
 	    _jv_extract_sense_tree_replicate(master_tree, clone_count);
 	    _jv_extract_sense_tree_merge_clones(master_tree, master_trees, count, clone_count);
 	    
+	    for(int i = 0; i < count; i++)
+	       jv_delete_sense_tree(master_trees[i], 0);
+	    delete master_trees;
+	    	    
 	    break;
 	 }
 	 else 
@@ -151,14 +156,46 @@ namespace jarvis
       return master_tree;
    }
    
+   void jv_delete_sense_tree(rbtree *master_tree, int delete_word_tree)
+   {
+      int tree_count = (*master_tree).length();
+      int word_tree_count;
+
+      rbtree  *tree;
+      rbtree **word_tree;
+      
+      for(int i = 1; i <= tree_count; i++)
+      {
+	 tree            = (rbtree *)(*master_tree)[i];
+	 if(delete_word_tree)
+	 {
+	    word_tree_count = (*tree).length();
+	 
+	    for(int j = i; j <= word_tree_count; j++)
+	    {
+	       word_tree = (rbtree **)(*tree)[j];
+	       if(*word_tree)
+	       {
+		  delete (*word_tree);
+		  (*word_tree) = NULL;
+	       }
+	    }
+	 }
+	 
+	 delete tree;
+      }
+      
+      delete master_tree;
+   }
+   
    void jv_extract_sense_tree_print(rbtree *master_tree)
    {
-      int     tree_count = (*master_tree).length();
-      int     word_count;
-      int     word_tree_count;
-      rbtree *tree;
-      rbtree *words;
-      rbtree *word_tree;
+      int      tree_count = (*master_tree).length();
+      int      word_count;
+      int      word_tree_count;
+      rbtree  *tree;
+      rbtree  *words;
+      rbtree **word_tree;
 
       const char *word;
       
@@ -173,12 +210,12 @@ namespace jarvis
 	       cout << " ";
 	    cout << "-->";
 	    
-	    word_tree = (rbtree *)(*tree)[j];
+	    word_tree = (rbtree **)(*tree)[j];
 	    
-	    word_count = (*word_tree).length();
+	    word_count = (*(*word_tree)).length();
 	    for(int k = 1; k <= word_count; k++)
 	    {
-	       word = (const char *)(*word_tree)[k];
+	       word = (const char *)(*(*word_tree))[k];
 	       cout << word << " ";
 	    }
 	    cout << endl;
@@ -188,10 +225,10 @@ namespace jarvis
    
    void jv_extract_sense_tree_print_word_tree(rbtree *tree)
    {
-      const char *word;
-      rbtree     *word_tree;
-      int         word_tree_count = (*tree).length();
-      int         word_count;
+      const char  *word;
+      rbtree     **word_tree;
+      int          word_tree_count = (*tree).length();
+      int          word_count;
       
       for(int j = 1; j <= word_tree_count; j++)
       {
@@ -199,12 +236,12 @@ namespace jarvis
 	    cout << " ";
 	 cout << "-->";
 	 
-	 word_tree = (rbtree *)(*tree)[j];
+	 word_tree = (rbtree **)(*tree)[j];
 	 
-	 word_count = (*word_tree).length();
+	 word_count = (*(*word_tree)).length();
 	 for(int k = 1; k <= word_count; k++)
 	 {
-	    word = (const char *)(*word_tree)[k];
+	    word = (const char *)(*(*word_tree))[k];
 	    cout << word << " ";
 	 }
 	 cout << endl;
@@ -234,8 +271,8 @@ namespace jarvis
    
    bool jv_compare_sense_tree_word_tree(rbtree *word_tree1, rbtree *word_tree2, int *level1, int *level2)
    {
-      rbtree *word_tree_level1;
-      rbtree *word_tree_level2;
+      rbtree **word_tree_level1;
+      rbtree **word_tree_level2;
       
       int word_tree_level_count1 = (*word_tree1).length();
       int word_tree_level_count2 = (*word_tree2).length();
@@ -247,13 +284,13 @@ namespace jarvis
       
       for(int i = 1; i <= word_tree_level_count1 && !complete_true; i++)
       {
-	 word_tree_level1 = (rbtree *)(*word_tree1)[i];
+	 word_tree_level1 = (rbtree **)(*word_tree1)[i];
 	 
 	 for(int j = 1; j <= word_tree_level_count2 && !complete_true; j++)
 	 {
-	    word_tree_level2 = (rbtree *)(*word_tree2)[j];
+	    word_tree_level2 = (rbtree **)(*word_tree2)[j];
 	    
-	    if(jv_compare_sense_tree_word_tree_level(word_tree_level1, word_tree_level2))
+	    if(jv_compare_sense_tree_word_tree_level((*word_tree_level1), (*word_tree_level2)))
 	    {
 	       complete_true = true;
 
@@ -298,14 +335,6 @@ namespace jarvis
 		  (*subtree1) = i;
 		  (*subtree2) = j;
 	       }
-	       
-	       /*
-	       jv_extract_sense_tree_print_word_tree(tree1);
-	       jv_extract_sense_tree_print_word_tree(tree2);
-	       
-	       cout << "Level matched at " << tmp_level_match1 << endl;
-	       cout << "Level matched at " << tmp_level_match2 << endl;
-		*/
 	       
 	       complete = true;
 	    }
@@ -402,14 +431,14 @@ namespace jarvis
 	 tmp1 = (rbtree *)(*sense1)[subtree1];
 	 tmp2 = (rbtree *)(*sense2)[subtree2];
 	 
-	 const char *word;
-	 rbtree     *word_tree       = (rbtree *)(*tmp1)[*level_match1];
-	 int         word_tree_count = (*word_tree).length();
+	 const char  *word;
+	 rbtree     **word_tree       = (rbtree **)(*tmp1)[*level_match1];
+	 int          word_tree_count = (*(*word_tree)).length();
 	 (*result) = new json_t;
 	 (*(*result)).add_element(JSON_ARRAY, "match");
 	 for(int i = 1; i <= word_tree_count; i++)
 	 {
-	    word = (const char *)(*word_tree)[i];
+	    word = (const char *)(*(*word_tree))[i];
 	    (*(*result)).add_element(JSON_STRING, word); 
 	 }
 	 (*(*result)).close_element();
@@ -417,6 +446,18 @@ namespace jarvis
 	 	 
 	 jv_extract_sense_tree_print_word_tree(tmp1);
 	 jv_extract_sense_tree_print_word_tree(tmp2);
+      }
+      
+      for(int i = 1; i <= json1_sense_count; i++)
+      {
+	 rbtree *tmp_tree = (rbtree *)(*word_sense_tree1)[i];
+	 jv_delete_sense_tree(tmp_tree);
+      }
+
+      for(int i = 1; i <= json2_sense_count; i++)
+      {
+	 rbtree *tmp_tree = (rbtree *)(*word_sense_tree2)[i];
+	 jv_delete_sense_tree(tmp_tree);
       }
       
       return found_result;

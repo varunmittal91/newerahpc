@@ -68,7 +68,6 @@ namespace jarvis
       }
       
       grid_instruction_destruct(instruction);      
-
       
       nhpc_string_delete(words);
       

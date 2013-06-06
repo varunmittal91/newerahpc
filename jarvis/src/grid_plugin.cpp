@@ -126,7 +126,7 @@ namespace jarvis
 	 
 	 grid_scheduler_add_job(grid_uid, instructions, &instruction_count);
 	 
-	 if(!(instructions[0]->result_data) || !(instructions[0]->result_data))
+	 if(!(instructions[0]->result_data) || !(instructions[1]->result_data))
 	    return NHPC_SUCCESS;
 	 
 	 const char *word_str1 = (const char *)((instructions[0])->result_data->address);
@@ -152,6 +152,8 @@ namespace jarvis
 	 delete   word_structure2;
 	 delete[] word_str1;
 	 delete[] word_str2;
+	 
+	 delete instructions;
 	 
 	 return NHPC_SUCCESS;
       }      

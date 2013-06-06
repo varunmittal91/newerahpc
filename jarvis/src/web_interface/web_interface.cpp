@@ -46,7 +46,7 @@ namespace jarvis
       grid_instruction_init(&instruction);
       grid_instruction_set_plugin_name(instruction, "JARVIS_GRID_PLUGIN");
       grid_instruction_set_peer(instruction, _host_addr, _host_port);
-      grid_instruction_set_affinity(instruction, 2);
+      grid_instruction_set_affinity(instruction, 1);
       for(int i = 1; i < 3; i++)
       {
 	 char *word = words->strings[i];

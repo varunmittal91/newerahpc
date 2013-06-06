@@ -42,10 +42,14 @@ namespace neweraHPC
       int a, b;
    };
    
-#define LOG_ERROR(M)   do { if (Log::IsLevelActive(Log::Error))   (Log::GetStream() << "ERR: " << M << "\n"); } while (false)
-#define LOG_INFO(M)    do { if (Log::IsLevelActive(Log::Info) && log_on[Log::Info])    (Log::GetStream() << "INF: " << M << "\n"); } while (false)
+#define LOG_ERROR(M)   do { if (Log::IsLevelActive(Log::Error))                           (Log::GetStream() << "ERR: " << M << "\n"); } while (false)
+#define LOG_INFO(M)    do { if (Log::IsLevelActive(Log::Info)    && log_on[Log::Info])    (Log::GetStream() << "INF: " << M << "\n"); } while (false)
 #define LOG_WARNING(M) do { if (Log::IsLevelActive(Log::Warning) && log_on[Log::Warning]) (Log::GetStream() << "WRN: " << M << "\n"); } while (false)
-#define LOG_DEBUG(M)   do { if (Log::IsLevelActive(Log::Debug) && log_on[Log::Debug])   (Log::GetStream() << "DBG: " << M << "\n"); } while (false)
+#define LOG_DEBUG(M)   do { if (Log::IsLevelActive(Log::Debug)   && log_on[Log::Debug])   (Log::GetStream() << "DBG: " << M << "\n"); } while (false)
+
+#define log_is_debug_enabled()    (log_on[Log::Debug])
+#define log_is_info_enabled()     (log_on[Log::Info])
+#define log_is_warning_enabled()  (log_on[Log::Warning])
    
    ostream& operator<<(ostream& ostr, const MyObject& obj);
 };

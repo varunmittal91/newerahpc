@@ -169,6 +169,10 @@ namespace neweraHPC
       while(1)
       {
 	 (*HeapObject).clean_table();
+	 if(log_is_debug_enabled())
+	 {
+	    (*HeapObject).print_table();
+	 }
 	 sleep(2);
       }
    }
@@ -242,7 +246,7 @@ namespace neweraHPC
 	 if(frame->frame_next)
 	    frame = frame->frame_next;
 	 else 
-	    frame = _create_frame();
+	    frame = _frame_root;
 	 goto read_frame;
       }
       

@@ -48,21 +48,20 @@ namespace neweraHPC
 #define nhpc_http_request_is_post(h) (h->request_type == HTTP_RESPONSE_POST)
    struct http_data_t
    {
-      char        *user_agent;
-      char        *request_page;
-      char	  *request_get;
-      char	  *status_str;
+      char        *user_agent;               // referenced from network headers
+      char        *request_page;             // reallocated
+      char	  *request_get;              // reallocated
       int	  request_type;
-      char	  *content_type;
-      int	  content_length;
-      char	  *referer;
-      char	  *origin;
-      char	  *http_version;
-      int          response_code;
-      char        *location;
-      char        *custom_response_data;
-      short int    custom_response_type;
-      char        *custom_response_mime;
+      char	  *content_type;             // referenced from network headers
+      int	  content_length;            
+      char	  *referer;                  // referenced from network headers
+      char	  *origin;                   // referenced from network headers
+      char	  *http_version;             // referenced from network headers
+      int          response_code;            
+      char        *location;                 // referenced from network headers
+      char        *custom_response_data;     // user generated field
+      short int    custom_response_type;     // user set field
+      char        *custom_response_mime;     // user generated field
       char	  *host;
       rbtree      *headers;
       nhpc_socket_t *sock;

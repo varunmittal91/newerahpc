@@ -38,12 +38,12 @@ namespace neweraHPC
 	 delete[] (http_data->request_page);
       if(http_data->request_get)
 	 delete[] (http_data->request_get);
-      if(http_data->status_str)
-	 delete[] (http_data->status_str);
       if(http_data->http_version)
 	 delete[] (http_data->http_version);
-      if(http_data->location)
-	 delete[] (http_data->location);
+      if(http_data->custom_response_data)
+	 delete[] (http_data->custom_response_data);
+      if(http_data->custom_response_mime)
+	 delete[] (http_data->custom_response_mime);
       
       return NHPC_SUCCESS;
    }
@@ -54,19 +54,18 @@ namespace neweraHPC
       
       char *command = (char *)headers->search("command");
       
-      char *http_version = NULL;
-      char *status_str = NULL;
-      char *referer = (char *)headers->search("Referer");
-      char *origin = (char *)headers->search("Origin");
-      char *content_type = (char *)headers->search("Content-Type");
-      char *host = (char *)headers->search("Host");
+      int   response_code  = 0;
+      int   request_type   = 0;
+      char *http_version   = NULL;
+      char *request_page   = NULL;
+      char *request_get    = NULL;
+      char *referer        = (char *)headers->search("Referer");
+      char *origin         = (char *)headers->search("Origin");
+      char *content_type   = (char *)headers->search("Content-Type");
+      char *host           = (char *)headers->search("Host");
       char *content_length = (char *)headers->search("Content-Length");
-      char *user_agent = (char *)headers->search("User-Agent");
-      int request_type;
-      char *request_page = NULL;
-      char *request_get = NULL;
-      int response_code = 0;
-      char *location = NULL;
+      char *user_agent     = (char *)headers->search("User-Agent");
+      char *location       = (char *)headers->search("Location");
       
       string_t *command_str = nhpc_substr(command, ' ');
       if(nhpc_strcmp(command, "HTTP/*") == NHPC_SUCCESS)
@@ -76,10 +75,6 @@ namespace neweraHPC
 	 (*http_data)->response_code = response_code;
 	 
 	 nhpc_strcpy(&http_version, (command_str->strings[0]));
-	 
-	 location = (char *)headers->search("Location");
-	 if(location)
-	    nhpc_strcpy(&((*http_data)->location), location);
       }
       else if(command_str->count == 3)
       {
@@ -98,9 +93,9 @@ namespace neweraHPC
 	 char *request = command_str->strings[1];
 	 if(nhpc_strcmp(request, "*?*") == NHPC_SUCCESS)
 	 {
-	    int tmp_pos = nhpc_strfind(request, '?');
+	    int tmp_pos  = nhpc_strfind(request, '?');
 	    request_page = nhpc_substr(request, 1, tmp_pos - 1);
-	    request_get = nhpc_substr(request, tmp_pos, strlen(request));
+	    request_get  = nhpc_substr(request, tmp_pos, strlen(request));
 	 }
 	 else 
 	    nhpc_strcpy(&request_page, (command_str->strings[1]));
@@ -120,7 +115,6 @@ namespace neweraHPC
       local_data->user_agent = user_agent;
       local_data->request_page = request_page;
       local_data->request_get = request_get;
-      local_data->status_str = status_str;
       local_data->request_type = request_type;
       local_data->host = host;
       local_data->origin = origin;
@@ -161,6 +155,4 @@ namespace neweraHPC
       
       return NHPC_SUCCESS;
    }
-      
-      
 };

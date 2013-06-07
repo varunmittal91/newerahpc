@@ -100,6 +100,7 @@ namespace neweraHPC
       }
       
       delete_http_headers(http_data);
+      delete http_data;
    }
    
    void http_request(http_data_t *http_data)

@@ -74,6 +74,7 @@ namespace neweraHPC
    json_t::~json_t()
    {
       reinitialize();
+      delete saved_search;
    }
    
    void json_t::initialize()

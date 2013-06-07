@@ -146,6 +146,7 @@ namespace neweraHPC
 	 
 	 grid_response_send(response);
 	 grid_response_push(response, data);
+	 
 	 grid_response_destruct(response);
 	 grid_data_destruct(grid_data);
       }      

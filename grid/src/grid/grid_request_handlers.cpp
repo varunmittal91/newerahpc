@@ -33,13 +33,14 @@ namespace neweraHPC
 {
    nhpc_status_t grid_client_registration_handler(grid_data_t *grid_data)
    {
-      nhpc_status_t nrv;
-      
-      const char *client_uid;
+      nhpc_status_t  nrv;
+      nhpc_size_t    size;
+      const char    *client_uid;
+
       nrv = grid_uid_generate(&client_uid, grid_data, NODE_TYPE_CLIENT);
       if(nrv == NHPC_SUCCESS)
       {
-	 nhpc_size_t size = strlen(client_uid) + 1;
+	 size = strlen(client_uid) + 1;
 	 grid_data_add_result_data(grid_data, client_uid, size, ARG_MEM_BLOCK);
 	 return NHPC_SUCCESS;
       }

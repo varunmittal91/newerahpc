@@ -76,6 +76,7 @@ namespace neweraHPC
 
 #define grid_instruction_set_plugin_name(i, n) (nhpc_strcpy((char **)&(i->plugin_name), n))
 #define grid_instruction_set_plugin_path(i, p) (nhpc_strcpy((char **)&(i->plugin_path), p))
+#define grid_instruction_get_plugin_path(i)    (i->plugin_path)
 #define grid_instruction_set_plugin(i, p, n)   do{grid_instruction_set_plugin_name(i, n); grid_instruction_set_plugin_path(i, p);}while(false)
    
    static void grid_instruction_set_peer(grid_instruction_t *instruction, const char *peer_addr, const char *peer_port)
@@ -84,6 +85,7 @@ namespace neweraHPC
       nhpc_strcpy((char **)&(grid_instruction_get_peer_port(instruction)), peer_port);
    }
 #define grid_instruction_set_peer_uid(i, u) (nhpc_strcpy((char **)&(i->peer_uid), u))
+#define grid_instruction_get_peer_uid(i)    (i->peer_uid)
    
    static void grid_instruction_set_grid_uid(grid_instruction_t *instruction, const char *grid_uid)
    {

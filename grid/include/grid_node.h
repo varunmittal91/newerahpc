@@ -56,6 +56,10 @@ namespace neweraHPC
       (*grid_node_compute) = new grid_node_compute_t;
       memset((*grid_node_compute), 0, sizeof(grid_node_compute_t));
    }
+   static void grid_node_compute_destruct(grid_node_compute_t *compute_node)
+   {
+      delete compute_node;
+   }
    static void grid_node_compute_set_logical_cores(grid_node_compute_t *grid_node_compute, const char *cpu_cores_str)
    {
       grid_node_compute->logical_cores = nhpc_strtoi(cpu_cores_str);
@@ -105,6 +109,18 @@ namespace neweraHPC
       memset((*grid_node), 0, sizeof(grid_node_t));
       grid_node_set_type((*grid_node)->node_type, node_type);
    }
+   static void grid_node_destruct(grid_node_t *node)
+   {
+      if(grid_node_is_type_compute(node->node_type))
+	 grid_node_compute_destruct(((grid_node_compute_t *)(node->node_data)));
+      //else 
+	 //delete ((grid_node_client_t *)(node->node_data));
+      
+      delete[] (node->peer_addr);
+      delete[] (node->peer_port);
+      delete[] (node->peer_uid);
+      delete node;      
+   }
    static void grid_node_set_peer_details(grid_node_t *grid_node, const char *peer_addr, const char *peer_port)
    {
       nhpc_strcpy((char **)&(grid_node->peer_addr), peer_addr);
@@ -118,6 +134,7 @@ namespace neweraHPC
    grid_node_t *grid_node_search_compute_node(const char *node_uid);
    void grid_node_free_compute_node(grid_node_t *node, int cpu_cores);
    void grid_node_delete_compute_node(grid_node_t *node);
+   void grid_node_delete_client_node(const char *grid_uid);
 #define grid_node_get_compute_node_data(n)    (grid_node_compute_t *)(n->node_data)
 #define grid_node_get_client_node_data(n)     (grid_node_client_t *)(n->node_data)
 #define grid_node_set_compute_node_data(n, d) (n->node_data = (void *)d)

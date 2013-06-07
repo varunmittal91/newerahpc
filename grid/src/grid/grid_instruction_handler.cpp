@@ -44,6 +44,7 @@ namespace neweraHPC
       const char *plugin_name = grid_instruction_get_plugin_name(instruction);
       const char *peer_addr   = grid_instruction_get_peer_addr(instruction);
       const char *peer_port   = grid_instruction_get_peer_port(instruction);
+      const char *grid_uid    = grid_instruction_get_grid_uid(instruction);
       
       plugin_details_t *plugin_details;
       nrv = grid_plugin_search(plugin_name, &plugin_details);
@@ -61,6 +62,7 @@ namespace neweraHPC
 	 instruction->result_data = NULL;
       }
       
+      grid_node_delete_client_node(grid_uid);
       grid_instruction_destruct(instruction);
       
       return nrv;

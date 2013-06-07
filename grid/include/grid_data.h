@@ -142,12 +142,8 @@ namespace neweraHPC
       *_address = (char *)address;
       *_size    = size;
    }
-   static void *grid_arg_get_address_space(const char *arg_value, nhpc_size_t *size)
-   {
-      
-   }
-   
 
+   
    struct grid_shared_data_t;
    typedef unsigned char status_t;
    struct grid_data_t
@@ -155,7 +151,6 @@ namespace neweraHPC
       status_t       status;
       rbtree        *arguments;
       const char    *grid_uid;
-      const char    *referer_grid_uid;
       const char    *peer_addr;
       const char    *peer_port;
       nhpc_socket_t *socket;
@@ -207,6 +202,11 @@ namespace neweraHPC
 	 delete data->arguments;
       }
       
+      if(data->peer_addr)
+	 delete[] (data->peer_addr);
+      if(data->peer_port)
+	 delete[] (data->peer_port);
+      
       if(data->input_data)
 	 grid_shared_data_destruct(data->input_data);
       if(data->result_data)
@@ -218,13 +218,20 @@ namespace neweraHPC
    
    struct grid_shared_data_t
    {
+#define OPT_DELETE  1
+      typedef unsigned char data_options;
+
+      data_options  options;
       const void   *address;
       const char   *content_type;
       arg_t         arg;
       nhpc_size_t   len;
    };
+#define grid_shared_data_set_opt(g, o)        ((g->options) |= o)
+#define grid_shared_data_is_opt_delete        ((g->options) & 1)
+   
 #define grid_shared_data_get_data_address(g)  (g->address)
-#define grid_shared_data_get_data_length(g)    (g->len)
+#define grid_shared_data_get_data_length(g)   (g->len)
    static void grid_shared_data_init(grid_shared_data_t **data)
    {
       (*data) = new grid_shared_data_t;
@@ -234,8 +241,12 @@ namespace neweraHPC
    {
       delete data;
    }
-   static void grid_shared_data_set_data(grid_shared_data_t *data, const void *address, nhpc_size_t *len, arg_t arg)
+   static void grid_shared_data_set_data(grid_shared_data_t *data, const void *address, nhpc_size_t *len, arg_t arg,
+					 int option = NULL)
    {
+      if(option)
+	 grid_shared_data_set_opt(data, option);
+      
       if(grid_arg_is_file(arg))
       {
 	 (*len) = 0;

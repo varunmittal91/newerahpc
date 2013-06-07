@@ -49,7 +49,7 @@ namespace neweraHPC
       
       nhpc_status_t plugin_processor(grid_instruction_t *instruction)
       {
-	 int instruction_count = 4;
+	 int instruction_count = 2;
 	 
 	 const char *plugin_name = grid_instruction_get_plugin_name(instruction);
 	 const char *grid_uid    = grid_instruction_get_grid_uid(instruction);
@@ -64,6 +64,15 @@ namespace neweraHPC
 	    grid_instruction_set_executable(instructions[i]);
 	 }
 	 grid_scheduler_add_job(grid_uid, instructions, &instruction_count);
+	 
+	 for(int i = 0; i < instruction_count; i++)
+	 {
+	    grid_instruction_destruct((instructions[i]));
+	 }
+	 delete instructions;
+	 
+	 if(instruction->input_data)
+	    delete[] (char *)(instruction->input_data->address);
 	 
 	 return NHPC_SUCCESS;
       }      

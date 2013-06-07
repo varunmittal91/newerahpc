@@ -77,32 +77,24 @@ namespace neweraHPC
    
    void grid_node_delete_compute_node(grid_node_t *node)
    {
-      rbtree       *node_db;
-      nhpc_mutex_t *mutex;
+      thread_mutex_lock(&mutex_registered_nodes, NHPC_THREAD_LOCK_WRITE);
+      (*registered_nodes).erase(node->peer_uid);
+      thread_mutex_unlock(&mutex_registered_nodes, NHPC_THREAD_LOCK_WRITE);
 
-      if(grid_node_is_type_compute(node->node_type))
-      {
-	 node_db = registered_nodes;
-	 mutex   = &(mutex_registered_nodes);
-      }
-      else 
-      {
-	 node_db = registered_clients;
-	 mutex   = &(mutex_registered_clients);
-      }
+      grid_node_destruct(node);
+   }
+   
+   void grid_node_delete_client_node(const char *grid_uid)
+   {
+      grid_node_t *node;
       
-      thread_mutex_lock(mutex, NHPC_THREAD_LOCK_WRITE);
-      (*node_db).erase(node->peer_uid);
-      thread_mutex_unlock(mutex, NHPC_THREAD_LOCK_WRITE);
+      thread_mutex_lock(&mutex_registered_clients, NHPC_THREAD_LOCK_WRITE);
+      node = (grid_node_t *)(*registered_clients).search(grid_uid);
+      if(node)
+	 (*registered_nodes).erase(grid_uid);
+      thread_mutex_unlock(&mutex_registered_clients, NHPC_THREAD_LOCK_WRITE);
       
-      if(grid_node_is_type_compute(node->node_type))
-	 delete ((grid_node_compute_t *)(node->node_data));
-      else 
-	 delete ((grid_node_client_t *)(node->node_data));
-      
-      delete[] (node->peer_addr);
-      delete[] (node->peer_port);
-      delete[] (node->peer_uid);
-      delete node;
+      if(node)
+	 grid_node_destruct(node);
    }
 };

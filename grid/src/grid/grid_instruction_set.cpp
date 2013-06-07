@@ -41,6 +41,12 @@ namespace neweraHPC
       if(grid_instruction_get_peer_port(instruction))
 	 delete[] grid_instruction_get_peer_port(instruction);
       
+      if(grid_instruction_get_peer_uid(instruction))
+	 delete[] grid_instruction_get_peer_uid(instruction);
+      
+      if(grid_instruction_get_plugin_path(instruction))
+	 delete[] grid_instruction_get_plugin_path(instruction);
+      
       if(grid_instruction_get_input_data(instruction))
       	 grid_shared_data_destruct(instruction->input_data);
       

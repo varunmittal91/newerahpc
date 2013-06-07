@@ -132,8 +132,8 @@ namespace jarvis
 
       _jv_word_def_set_pos(word_def, pos);
       _jv_word_def_set_word(word_def, _word);
-      _jv_word_def_set_pointers(word_def, jv_get_index_record_pointers(index_record));
-      _jv_word_def_set_offsets(word_def, jv_get_index_record_offsets(index_record));
+      _jv_word_def_set_pointers(word_def, &(jv_get_index_record_pointers(index_record)));
+      _jv_word_def_set_offsets(word_def, &(jv_get_index_record_offsets(index_record)));
       
       int pos_value = jv_get_pos_int_value(pos);
       

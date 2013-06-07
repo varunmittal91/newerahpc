@@ -33,24 +33,25 @@ namespace jarvis
    {
       const char *word;
       jv_pos      pos;
-      rbtree     *pointers;
-      rbtree     *data_offsets;
+      rbtree      pointers;
+      rbtree      data_offsets;
    };
-#define jv_set_index_record_word(r, w)           ((r)->word = w)
-#define jv_set_index_record_pos(r, p)            ((r)->pos |= p)
-#define jv_set_index_record_pointer(r, cp)       ((r)->pointers->insert(cp))
-#define jv_set_index_record_offset(r, offset)    ((r)->data_offsets->insert((void *)1, nhpc_strtoi(offset)))
 #define jv_get_index_record_word(r)              ((r)->word)
 #define jv_get_index_record_pos(r)               ((r)->pos)
-#define jv_get_index_record_pointer_count(r)     ((r)->pointers->length())
-#define jv_get_index_record_sense_count(r)       ((r)->data_offsets->length())
-#define jv_get_index_record_pointer(r, i)        (char *)((r)->pointers->search(i))
-#define jv_get_index_record_offset(r, pos, i)    ((r)->data_offsets->search_inorder_num(pos, &i))
 #define jv_get_index_record_offsets(r)           (r->data_offsets)
 #define jv_get_index_record_pointers(r)          (r->pointers)
+#define jv_get_index_record_pointer_count(r)     (jv_get_index_record_pointers(r).length())
+#define jv_get_index_record_sense_count(r)       (jv_get_index_record_offsets(r).length())
+#define jv_get_index_record_pointer(r, i)        (char *)(jv_get_index_record_pointers(r).search(i))
+#define jv_get_index_record_offset(r, pos, i)    (jv_get_index_record_offsets(r).search_inorder_num(pos, &i))
+#define jv_set_index_record_word(r, w)           ((r)->word = w)
+#define jv_set_index_record_pos(r, p)            ((r)->pos |= p)
+#define jv_set_index_record_pointer(r, cp)       (jv_get_index_record_pointers(r).insert(cp))
+#define jv_set_index_record_offset(r, offset)    (jv_get_index_record_offsets(r).insert((void *)1, nhpc_strtoi(offset)))
    
    void jv_get_index_record(search_param_t *search_param);
    index_record_t *jv_analyze_index_record(search_param_t *search_param, string_t *record_parts);
+   index_record_t *jv_analyze_index_record(search_param_t *search_param, char *record_string);
 
    nhpc_status_t jv_get_word_def(const char *word);
 };

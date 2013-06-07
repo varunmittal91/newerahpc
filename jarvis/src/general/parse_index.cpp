@@ -40,11 +40,11 @@ namespace jarvis
       const char *word = jv_get_search_param_word(search_param);
 
       string      line;
-      const char *line_str;
-      string_t   *record_parts = NULL;
+      char       *line_str;
       int         compare_value;
       int         word_pos;
       const char *src_word;
+      bool        found_record = false;
       
       jv_morphic_status morphic_search_status = 0;
       
@@ -53,25 +53,24 @@ namespace jarvis
       getline(index_file, line);
       while(getline(index_file, line))
       {
-	 line_str = line.c_str();
+	 line_str = (char *)line.c_str();
 
 	 word_pos = nhpc_strfind(line_str, ' ');
-	 src_word = nhpc_substr(line_str, 1, word_pos - 1);
-	 compare_value = strcmp(word, src_word);	 
-	 delete[] src_word;
+	 line_str[word_pos - 1] = '\0';
+	 src_word = line_str;
+	 line_str = line_str + word_pos;
+	 
+	 compare_value = strcmp(word, src_word);	
 	 
 	 if(compare_value < 0)
-	 {
 	    break;
-	 }
 	 else if(compare_value > 0)
 	    continue;
 	 
-	 record_parts = nhpc_substr(line_str, ' ');
-	 src_word     = record_parts->strings[0];	 
+	 found_record = true;
 	 break;
       }
-      if(!record_parts)
+      if(!found_record)
       {
 	 if(jv_morphic_status_is_on(morphic_search_status))
 	 {
@@ -80,21 +79,45 @@ namespace jarvis
 	       goto search;
 	 }
       }
-      else 
+      else
       {
-	 index_record_t *index_record = jv_analyze_index_record(search_param, record_parts);
+	 index_record_t *index_record;
+	 index_record         = jv_analyze_index_record(search_param, line_str);
 	 search_param->result = (void *)index_record;
 	 jv_set_search_successful(search_param);
-	 
-	 nhpc_string_delete(record_parts);
       }
       
       index_file.close();      
       jv_set_search_complete(search_param);      
    }
    
+   index_record_t *jv_analyze_index_record(search_param_t *search_param, char *record_string)
+   {
+      char *record_part[50];
+      int   count = 50;
+      jv_get_record_parts(record_string, record_part, &count);
+
+      index_record_t *index_record = new index_record_t;
+      memset(index_record, 0, sizeof(index_record_t));
+      
+      int sense_count   = nhpc_strtoi(record_part[1]);
+      int pointer_count = nhpc_strtoi(record_part[2]);
+      
+      jv_set_index_record_word(index_record, jv_get_search_param_word(search_param));
+      jv_set_index_record_pos(index_record, jv_get_search_param_pos(search_param));
+      
+      for(int i = 0; i < pointer_count; i++)
+	 jv_set_index_record_pointer(index_record, record_part[i + 3]);
+      
+      for(int i = 0; i < sense_count; i++)
+	 jv_set_index_record_offset(index_record, record_part[i + 2 + pointer_count + 3]);
+      
+      return index_record;
+   }
+   
    index_record_t *jv_analyze_index_record(search_param_t *search_param ,string_t *record_parts)
    {
+      /*
       int sense_count   = nhpc_strtoi(record_parts->strings[2]);
       int pointer_count = nhpc_strtoi(record_parts->strings[3]);
       
@@ -116,6 +139,7 @@ namespace jarvis
       }
       
       return index_record;
+       */
    }
    
    void jv_join_threads_search_params(search_param_t *search_params)
@@ -152,7 +176,6 @@ namespace jarvis
 	 
 	 (*thread_manager).init_thread(&thread_id, NULL);
 	 (*thread_manager).create_thread(&thread_id, NULL, (void* (*)(void*))jv_get_index_record, search_param, NHPC_THREAD_DEFAULT);
-	 jv_get_index_record(search_param);
 	 
 	 jv_set_search_param_thread_id(search_param, thread_id);
       }

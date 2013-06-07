@@ -137,24 +137,30 @@ namespace jarvis
 	 
 	 ifstream     exc_file(jv_get_wordnet_exc_file(pos_int));
 	 string       line;
-	 const char  *line_str;
-	 string_t    *exc_parts;
+	 char        *line_str;
 	 int          compare_value;
 	 const char  *src_word;
+
+	 char *record_parts[10];
+	 int   record_parts_count = 10;
+	 
 	 while(getline(exc_file, line))
 	 {
-	    line_str  = line.c_str();
-	    exc_parts = nhpc_substr(line_str, ' ');
-	    src_word = exc_parts->strings[0];
+	    record_parts_count = 10;
+
+	    line_str = (char *)line.c_str();
+	    jv_get_record_parts(line_str, record_parts, &record_parts_count);
+	    
+	    src_word = record_parts[0];
 
 	    compare_value = strcmp(word, src_word);
 	    if(compare_value == 0)
+	    {
+	       nhpc_strcpy(&morphic_word, (record_parts[1]));
 	       break;
+	    }
 	    else 
 	    {
-	       nhpc_string_delete(exc_parts);
-	       exc_parts = NULL;
-	       
 	       if(compare_value < 0)
 		  break;
 	    }
@@ -197,7 +203,6 @@ namespace jarvis
 	    jv_set_morphic_status_failed(*search_status);
 	 }
       }
-      
       
       jv_set_morphic_status_count(*search_status, morphic_count);
       

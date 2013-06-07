@@ -55,6 +55,9 @@ namespace jarvis
 	 (*synset_offsets_tmp).add_elem(offset);
 	 i++;
       }
+      
+      char *record_parts[2000];
+      int   record_count = 2000;
 
       while(1)
       {
@@ -68,6 +71,8 @@ namespace jarvis
 	    continue;
 	 }
 	 
+	 record_count = 2000;
+	 
 	 synset_t *synset;
 	 jv_init_synset(&synset);
 	 
@@ -75,40 +80,37 @@ namespace jarvis
 	 record_file.seekg(offset);
 	 getline(record_file, line);
 	 
-	 const char *line_str = line.c_str();
+	 char *line_str = (char *)line.c_str();
 	 
 	 int pos = nhpc_strfind(line_str, '|');
-         char *synset_str = nhpc_substr(line_str, 1, pos - 1);
+	 line_str[pos - 1] = '\0';
+         char *synset_str = line_str;
          if(!synset_str)
 	 {
 	    cout << line << endl;
 	    continue;
 	 }
 	 
-         string_t *synset_parts = nhpc_substr(synset_str, ' ');
-         char *word_count_str = synset_parts->strings[3];
-	 int word_count = nhpc_hexstrtoi(word_count_str);
-	    
-         char *ptr_count_str = synset_parts->strings[4 + 2 * word_count];
-         int ptr_count = nhpc_strtoi(ptr_count_str);
-         
-         int part_of_speech = (int)*(synset_parts->strings[2]);
-         
-         int parts_position = 4;
-
+	 jv_get_record_parts(synset_str, record_parts, &record_count);
+	 
+	 int word_count     = nhpc_hexstrtoi(record_parts[3]);
+	 int ptr_count      = nhpc_strtoi(record_parts[4 + 2 * word_count]);
+         int part_of_speech = (int)*(record_parts[2]);
+ 
+	 int parts_position = 4;
 	 for(int i = 0; i < word_count; i++)
          {
             char *synset_word;
-            nhpc_strcpy(&synset_word, synset_parts->strings[parts_position]);
+            nhpc_strcpy(&synset_word, record_parts[parts_position]);
             parts_position += 2;
 	    jv_set_synset_word(synset, synset_word);
          }
-	 parts_position = 4 + 2 * word_count + 1;
 	 
+	 parts_position = 4 + 2 * word_count + 1;
 	 for(int i = 0; i < ptr_count; i++)
          {
-	    const char *ptr_symbol_str = synset_parts->strings[parts_position];
-	    int relation_type = _jv_get_relation_type(ptr_symbol_str);
+	    const char *ptr_symbol_str = record_parts[parts_position];
+	    int relation_type          = _jv_get_relation_type(ptr_symbol_str);
 
 	    if(relation_type != HYPERNYM && relation_type != I_HYPERNYM)
 	    {
@@ -116,8 +118,8 @@ namespace jarvis
 	       continue;
 	    }
 	     
-	    int new_offset = nhpc_strtoi(synset_parts->strings[parts_position + 1]);
-	    const char *new_pos = synset_parts->strings[parts_position + 2];
+	    int new_offset      = nhpc_strtoi(record_parts[parts_position + 1]);
+	    const char *new_pos = record_parts[parts_position + 2];
 	    
 	    if(jv_get_pos_ascii_code(_part_of_speech) == *new_pos)
 	    {
@@ -135,8 +137,6 @@ namespace jarvis
          }
 	 
 	 jv_insert_word_set_db(_part_of_speech, synset, offset);
-	 nhpc_string_delete(synset_parts);
-	 nhpc_string_delete(synset_str);
       }
       
       delete synset_offsets_tmp;

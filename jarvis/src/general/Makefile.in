@@ -67,7 +67,7 @@ am__objects_1 = libgeneral_la-words.lo \
 	libgeneral_la-sentence_parser.lo libgeneral_la-parse_index.lo \
 	libgeneral_la-morphological_rules.lo \
 	libgeneral_la-parse_data.lo libgeneral_la-compare.lo \
-	libgeneral_la-parse_json_structure.lo
+	libgeneral_la-parse_json_structure.lo libgeneral_la-parse.lo
 am_libgeneral_la_OBJECTS = $(am__objects_1)
 libgeneral_la_OBJECTS = $(am_libgeneral_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -230,7 +230,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
-SOURCES = words.cpp sentence_parser.cpp parse_index.cpp morphological_rules.cpp parse_data.cpp compare.cpp parse_json_structure.cpp
+SOURCES = words.cpp sentence_parser.cpp parse_index.cpp morphological_rules.cpp parse_data.cpp compare.cpp parse_json_structure.cpp parse.cpp
 noinst_LTLIBRARIES = libgeneral.la
 libgeneral_la_SOURCES = $(SOURCES)
 libgeneral_la_CPPFLAGS = $(neweraHPC_CFLAGS)
@@ -288,6 +288,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgeneral_la-compare.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgeneral_la-morphological_rules.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgeneral_la-parse.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgeneral_la-parse_data.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgeneral_la-parse_index.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgeneral_la-parse_json_structure.Plo@am__quote@
@@ -363,6 +364,13 @@ libgeneral_la-parse_json_structure.lo: parse_json_structure.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parse_json_structure.cpp' object='libgeneral_la-parse_json_structure.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgeneral_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libgeneral_la-parse_json_structure.lo `test -f 'parse_json_structure.cpp' || echo '$(srcdir)/'`parse_json_structure.cpp
+
+libgeneral_la-parse.lo: parse.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgeneral_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libgeneral_la-parse.lo -MD -MP -MF $(DEPDIR)/libgeneral_la-parse.Tpo -c -o libgeneral_la-parse.lo `test -f 'parse.cpp' || echo '$(srcdir)/'`parse.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgeneral_la-parse.Tpo $(DEPDIR)/libgeneral_la-parse.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='parse.cpp' object='libgeneral_la-parse.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgeneral_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libgeneral_la-parse.lo `test -f 'parse.cpp' || echo '$(srcdir)/'`parse.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

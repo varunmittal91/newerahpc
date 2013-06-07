@@ -66,6 +66,7 @@ namespace jarvis
    static void search_param_destruct(search_param_t *search_param)
    {
    }
+   void jv_get_record_parts(char *record_string, char **record_parts, int *count);
 };
 
 #endif

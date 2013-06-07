@@ -84,4 +84,7 @@ int main(int argc, char **argv)
       delete word_structure1;
    if(word_structure2)
       delete word_structure2;
+   
+   while(1)
+      sleep(1);
 }

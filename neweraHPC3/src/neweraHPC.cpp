@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <signal.h>
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -33,8 +34,16 @@ neweraHPC::rbtree *cmdline_arguments;
 
 namespace neweraHPC
 {
+   void exit_handler(int signal)
+   {
+      exit(0);
+   }
+   
    void neweraHPC_init(int argc, char **argv)
    {      
+      signal(SIGPIPE, SIG_IGN);
+      signal(SIGINT, exit_handler);
+      
       cmdline_arguments = new rbtree(RBTREE_STR);
       
       char **tmp_argv = argv + 1;

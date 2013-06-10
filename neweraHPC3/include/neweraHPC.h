@@ -47,6 +47,8 @@ namespace neweraHPC
 {
    void neweraHPC_init(int argc, char **argv);
    void neweraHPC_destruct();
+
+   void exit_handler(int signal);
 };
 
 #endif

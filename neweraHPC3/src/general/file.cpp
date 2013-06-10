@@ -333,6 +333,8 @@ namespace neweraHPC
 	    
             i++;
          }
+	 
+	 closedir(_dir);
       }
       
       return string;

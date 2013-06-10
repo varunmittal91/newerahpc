@@ -51,7 +51,7 @@ namespace neweraHPC
    /* Function for sending data to socket file description */
    nhpc_status_t socket_send(nhpc_socket_t *sock, const char *buffer, nhpc_size_t *length);
    nhpc_status_t socket_sendmsg(nhpc_socket_t *sock, const char *buffer, nhpc_size_t *length);
-   nhpc_status_t socket_send_file(nhpc_socket_t *sock);
+   nhpc_status_t socket_sendfile(nhpc_socket_t *socket, const char *file_name);
    
    nhpc_status_t nhpc_wait_for_io_or_timeout(nhpc_socket_t *sock, int for_read);
 }

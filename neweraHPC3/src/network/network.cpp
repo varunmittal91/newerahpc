@@ -33,319 +33,180 @@ using namespace std;
 
 namespace neweraHPC
 {
-   network_t *network;
-   
-   network_t::network_t()
+   nhpc_network_t *network;
+
+   nhpc_status_t nhpc_network_init(thread_manager_t *_thread_manager)
    {
-      external_thread_manager = false;
-      thread_manager = new thread_manager_t*;
-      *thread_manager = new thread_manager_t;
+      network = new nhpc_network_t;
+      memset(network, 0, sizeof(nhpc_network_t));
       
-      network_init();
-   }
-   
-   network_t::network_t(thread_manager_t **in_thread_manager)
-   {
-      external_thread_manager = true;
-      thread_manager = in_thread_manager;
+      (*network).client_connections = new rbtree;
+      (*network).network_addons     = new rbtree;
       
-      network_init();
-   }
-   
-   void network_t::network_init()
-   {
-      client_connections = new rbtree;
-      mutex = new pthread_mutex_t;   
-      mutex_addons = new pthread_mutex_t;
-      pthread_mutex_init(mutex, NULL);
-      pthread_mutex_init(mutex_addons, NULL);
+      thread_mutex_init(&((*network).mutex_general));
+      thread_mutex_init(&((*network).mutex_addons));      
       
-      network_addons = new rbtree(RBTREE_STR);
-      server_sock = NULL;    
-      network = this;
-      accept_thread_id = 0;
-   }
-   
-   void network_t::network_quit()
-   {
-      LOG_INFO("Initiating Server Shutdown");
-      (**thread_manager).cancel_thread(accept_thread_id);
-   }
-   
-   network_t::~network_t()
-   {
-      LOG_INFO("Deleting network structure");
-      
-      lock();
-      
-      LOG_INFO("Closing all active sockets\t");
-      nhpc_socket_t *client_sock;
-      int key;
-      int client_count = (*client_connections).length();
-      for(int i = 1; i <= client_count; i++)
+      if(_thread_manager)
       {
-	 client_sock = (nhpc_socket_t *)(*client_connections)[i];
-	 socket_close(client_sock);
-	 socket_delete(client_sock);
+	 (*network).thread_manager          = _thread_manager;
+	 (*network).external_thread_manager = true;
       }
+      else 
+	 (*network).thread_manager = new thread_manager_t;
       
-      delete client_connections;
-      
-      LOG_INFO("Deleting network addons");
-      delete network_addons;
-      
-      LOG_INFO("Closing server socket");
-      if(server_sock)
-      {
-	 socket_close(server_sock);
-	 socket_delete(server_sock);
-      }
-      
-      if(!external_thread_manager) 
-      {
-	 LOG_INFO("Shuting down thread manager");
-	 delete (*thread_manager);
-      }
-      
-      delete mutex;
-      
-      LOG_INFO("Network stack deleted");
-   }
-   
-   void exit_handler(int signum)
-   {
-      neweraHPC_destruct();
-      network->network_quit();
-   }
-   
-   inline void network_t::lock()
-   {
-      pthread_mutex_lock(mutex);
-   }
-   
-   inline void network_t::unlock()
-   {
-      pthread_mutex_unlock(mutex);
-   }
-   
-   inline void network_t::lock_addons()
-   {
-      pthread_mutex_lock(mutex_addons);
-   }
-   
-   inline void network_t::unlock_addons()
-   {
-      pthread_mutex_unlock(mutex_addons);
-   }
-   
-   int network_t::add_client_connection(nhpc_socket_t *sock, int sockfd)
-   {
-      int id;
-      lock();
-      id = (*client_connections).insert(sock);
-      unlock();
-      
-      return id;
-   }
-   
-   nhpc_status_t network_t::connect(nhpc_socket_t **sock, const char *host_addr, 
-				    const char *host_port, int family, int type, int protocol)
-   {
-      nhpc_status_t nrv;
-      
-      nrv = socket_connect(sock, host_addr, host_port, family, type, protocol);
-      if(nrv != NHPC_SUCCESS)
-      {
-	 perror("connects");
-	 return nrv;
-      }      
-      
-      add_client_connection(*sock, (*sock)->sockfd);
       return NHPC_SUCCESS;
    }
    
-   nhpc_status_t network_t::create_server(const char *host_addr, const char *host_port,
-					  int family, int type, int protocol)
-   {            
-      int rv, nrv;
+   nhpc_status_t nhpc_network_create_server(const char *host_addr, const char *host_port,
+					    int family, int type, int protocol)
+   {
+      nhpc_status_t   nrv;
+      nhpc_socket_t **server_socket = &((*network).server_socket);
+
       int connection_queue = CONNECTION_QUEUE;
+      int enable_opts      = 1;
+      int rv;
       
-      int enable_opts = 1;
+      socket_init(server_socket);
+
+      if((nrv = socket_getaddrinfo(server_socket, host_addr, host_port, family, type, protocol)) != NHPC_SUCCESS)
+	 goto return_status;
+	 
+      if((nrv = socket_create(server_socket)) != NHPC_SUCCESS)
+	 goto return_status;
+	 
+      socket_options_set((*server_socket), NHPC_NONBLOCK, 1);
       
-      if(server_sock == NULL)
-	 socket_init(&server_sock);
-      
-      nrv = socket_getaddrinfo(&server_sock, host_addr, host_port, family, type, protocol);
-      if(nrv != NHPC_SUCCESS)
+      if((rv = setsockopt((*server_socket)->sockfd, SOL_SOCKET, SO_REUSEADDR, &enable_opts, sizeof(int))) == -1)
       {
-	 delete server_sock;
-	 server_sock = NULL;
-	 return nrv;
-      }      
-      
-      nrv = socket_create(&server_sock);     
-      if(nrv != NHPC_SUCCESS)
-      {
-	 delete server_sock;
-	 return nrv;
-      }    
-      
-      socket_options_set(server_sock, NHPC_NONBLOCK, 1);
-      
-      rv = setsockopt(server_sock->sockfd, SOL_SOCKET, SO_REUSEADDR, &enable_opts, sizeof(int));
-      if(rv == -1)
-      {
-	 delete server_sock;
-	 server_sock = NULL;
-	 return errno;
+	 nrv = errno;
+	 goto return_status;
       }
       
-      nrv = socket_bind(server_sock);
+      if((nrv = socket_bind(*server_socket)) != NHPC_SUCCESS)
+	 goto return_status;
+      
+      if((nrv = socket_listen(*server_socket, &connection_queue)) != NHPC_SUCCESS)
+	 goto return_status;
+      
+   return_status:
       if(nrv != NHPC_SUCCESS)
       {
-	 delete server_sock;
-	 server_sock = NULL;
-	 return errno;
+	 perror("ERR: nhpc_create_server");
+	 
+	 delete (*server_socket);
+	 (*server_socket) = NULL;
       }
-      
-      nrv = socket_listen(server_sock, &connection_queue);
-      if(nrv != NHPC_SUCCESS)
+      else 
       {
-	 delete server_sock;
-	 server_sock = NULL;
-	 return errno;
+	 nhpc_network_set_host_address(host_addr, host_port);
       }
       
-      nhpc_thread_details_t *accept_thread = new nhpc_thread_details_t;
-      memset(accept_thread, 0, sizeof(nhpc_thread_details_t));
+      (*(*network).thread_manager).init_thread(&((*network).accept_thread_id), NULL);
+      (*(*network).thread_manager).create_thread(&((*network).accept_thread_id), NULL, nhpc_network_accept_thread, 
+						 NULL, NHPC_THREAD_DEFAULT);
       
-      accept_thread->sock           = server_sock;
-      accept_thread->thread_manager = *thread_manager;
-      accept_thread->client_socks   = client_connections;
-      accept_thread->network        = this;
-      (**thread_manager).init_thread(&accept_thread_id, NULL);
-      (**thread_manager).create_thread(&accept_thread_id, NULL, (void * (*)(void *))network_t::accept_connection, 
-				       (void *)accept_thread, NHPC_THREAD_DEFAULT);
-      
-      return NHPC_SUCCESS;      
+      return nrv;
    }
    
-   void network_t::join_accept_thread()
+   void *nhpc_network_accept_thread(void *data)
    {
-      (**thread_manager).join_thread(accept_thread_id);
-   }
-   
-   void sig_action(int sig)
-   {
-      if(sig == SIGPIPE)
-	 LOG_ERROR("PIPE Broken at thread - "<<pthread_self());
-   }
-   
-   void *network_t::accept_connection(nhpc_thread_details_t *main_thread)
-   {
-      signal(SIGPIPE, SIG_IGN);
-      signal(SIGINT, exit_handler);
+      nhpc_size_t       size;
+      nhpc_status_t     nrv;
+      nhpc_socket_t    *server_socket  = (*network).server_socket;
+      thread_manager_t *thread_manager = (*network).thread_manager;
       
-      nhpc_size_t rv;
-      nhpc_status_t nrv;
-      pthread_mutex_t mutex;
-      pthread_mutex_init(&mutex, NULL);
-      
-      thread_manager_t *thread_manager = main_thread->thread_manager;
-      nhpc_socket_t *server_sock = main_thread->sock;
-      rbtree *client_socks = main_thread->client_socks;
-      
-      struct pollfd *fds = new pollfd;
-      int timeout        = (3 * 60 * 1000);
-      
-      nhpc_server_details_t *server_details = new nhpc_server_details_t;
-      server_details->mutex        = &mutex;
-      server_details->client_socks = client_socks;
-      server_details->thread_manager = thread_manager;
-      server_details->main_network = main_thread->network;
-      
-      int *server_sockfd = &(main_thread->sock->sockfd);
-      
-      fds[0].fd     = *server_sockfd;
-      fds[0].events = POLLIN;
-      
+      int          new_sockfd;
+      sockaddr_in  client_sockaddr;
+
       bool end_server = false;
       
       do 
       {
-	 rv = poll(fds, 1, timeout);
-	 
-	 if(rv < 0)
-	 {
-	    break;
-	 }
-	 
-	 if(rv == 0)
+	 if((nrv = nhpc_wait_for_io_or_timeout(server_socket, 1)) != NHPC_SUCCESS)
 	 {
 	    continue;
 	 }
 	 
-	 int new_sd;
-	 
-	 do
+	 do 
 	 {
-	    nhpc_size_t size = sizeof(sockaddr_in);
-	    struct sockaddr_in *client_sockaddr = new sockaddr_in;
-	    memset(client_sockaddr, 0, sizeof(struct sockaddr_in));
+	    size            = sizeof(sockaddr_in);
+	    memset(&client_sockaddr, 0, sizeof(sockaddr_in));
 	    
-	    new_sd = accept(*server_sockfd, (sockaddr *)client_sockaddr, (socklen_t *)&size);
-	    
-	    if(new_sd < 0)
+	    new_sockfd = accept((*server_socket).sockfd, (sockaddr *)&client_sockaddr, (socklen_t *)&size);
+	    if(new_sockfd < 0)
 	    {
-	       delete client_sockaddr;  
-	       
 	       if(errno != EWOULDBLOCK)
-	       {
 		  end_server = true;
-		  break;
-	       }
+	       
 	       break;
 	    }
 	    
-	    nhpc_socket_t *client_sock;
-	    socket_init(&client_sock);
-	    client_sock->sockfd = new_sd;
-	    client_sock->server_details = server_details;
-	    client_sock->timeout = 3 * 60 * 60;
-	    nhpc_strcpy_noalloc((client_sock->host), inet_ntoa(client_sockaddr->sin_addr));
-	    char *tmp_port = nhpc_itostr(ntohs(client_sockaddr->sin_port));
-	    nhpc_strcpy_noalloc((client_sock->port), tmp_port);
+	    nhpc_socket_t *new_socket;
+	    socket_init(&new_socket);
+	    new_socket->sockfd = new_sockfd;
+	    
+	    char *tmp_port = nhpc_itostr(ntohs(client_sockaddr.sin_port));
+	    nhpc_strcpy_noalloc((new_socket->port), tmp_port);
+	    nhpc_strcpy_noalloc((new_socket->host), inet_ntoa(client_sockaddr.sin_addr));
 	    nhpc_string_delete(tmp_port);
 	    
-	    delete client_sockaddr;
-	    
-	    pthread_mutex_lock(&mutex);
-	    client_socks->insert(client_sock, new_sd);
-	    pthread_mutex_unlock(&mutex);
-	    
-	    (*thread_manager).init_thread(&(client_sock->thread_id), NULL);
-	    (*thread_manager).create_thread(&(client_sock->thread_id), NULL, (void* (*)(void*))read_communication, 
-					    client_sock, NHPC_THREAD_DETACH);	
-	 }while(new_sd != -1);
-      }while(true);
+	    nhpc_network_insert_client(new_socket);
+	    nhpc_network_spawn_client_thread(new_socket);
+	 }while(new_sockfd != -1);
+      }while(!end_server);
    }
    
-   void nhpc_socket_cleanup(nhpc_socket_t *client_sock)
-   {    
-      if(client_sock != NULL)
+   void nhpc_network_join_accept_thread()
+   {
+      (*(*network).thread_manager).join_thread((*network).accept_thread_id);
+   }
+   
+   nhpc_status_t nhpc_network_register_addon(const char *command_str, network_addon_ptr_t fnc)
+   {
+      int rv;
+      
+      nhpc_network_addon_def_t *addon_def = new nhpc_network_addon_def_t;
+      (*addon_def).command_str = command_str;
+      (*addon_def).fnc         = fnc;
+      
+      nhpc_network_insert_addon(addon_def, rv);
+      
+      if(!rv)
       {
-	 rbtree *client_socks = client_sock->server_details->client_socks;
-	 pthread_mutex_t *mutex = client_sock->server_details->mutex;
-	 thread_manager_t *thread_manager = client_sock->server_details->thread_manager;
-	 
-	 pthread_mutex_lock(mutex);	 
-	 client_socks->erase(client_sock->sockfd);
-	 pthread_mutex_unlock(mutex);
-	 
-	 thread_manager->delete_thread_data(client_sock->thread_id);
-	 
-	 socket_close(client_sock);
-	 socket_delete(client_sock);
+	 delete addon_def;
+	 return NHPC_FAIL;
       }
+      
+      return NHPC_SUCCESS;
+   }
+   
+   network_addon_ptr_t nhpc_network_find_addon(const char *command_str)
+   {
+      nhpc_network_lock_addons(NHPC_THREAD_LOCK_READ);
+      
+      nhpc_network_addon_def_t *addon_def;
+
+      int i = 1;
+      while(((addon_def = nhpc_network_get_addon_def(i)) && (nhpc_strcmp(command_str, addon_def->command_str) != NHPC_SUCCESS)))
+	 i++;
+
+      nhpc_network_unlock_addons(NHPC_THREAD_LOCK_WRITE);
+      
+      if(addon_def)
+	 return (addon_def->fnc);
+
+      return NULL;
+   }
+   
+   void nhpc_socket_cleanup(nhpc_socket_t *client_socket)
+   {    
+      int *sockfd = &((*client_socket).sockfd);
+      
+      nhpc_network_remove_client(client_socket);	 
+      nhpc_network_delete_client_thread(client_socket);
+	 
+      socket_close(client_socket);
+      socket_delete(client_socket);
    }
 };

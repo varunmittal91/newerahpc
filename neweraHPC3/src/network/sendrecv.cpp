@@ -107,8 +107,21 @@ namespace neweraHPC
       return nrv;
    }
    
-   nhpc_status_t socket_send_file(nhpc_socket_t *sock)
+   nhpc_status_t socket_sendfile(nhpc_socket_t *socket, const char *file_name)
    {
+      FILE *fp = fopen(file_name, "r");
+      nhpc_size_t   len;
+      nhpc_status_t nrv;
       
+      char        buffer[10000];
+      do 
+      {
+	 len = fread(buffer, 1, sizeof(buffer), fp);
+	 nrv = socket_sendmsg(socket, buffer, &len);
+      }while(nrv != EPIPE && !feof(fp) && nrv != NHPC_FAIL);
+      
+      fclose(fp);
+      
+      return nrv;      
    }
 };

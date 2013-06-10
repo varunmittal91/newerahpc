@@ -33,14 +33,14 @@
 
 namespace neweraHPC
 {
-   class network_t;
+   //class network_t;
    
    struct nhpc_server_details_t
    {
       pthread_mutex_t  *mutex;
       rbtree           *client_socks;
       thread_manager_t *thread_manager;
-      network_t        *main_network;
+      //network_t        *main_network;
    };
 
    struct nhpc_socket_t
@@ -56,7 +56,6 @@ namespace neweraHPC
       addrinfo		     *hints_res;
       rbtree                 *headers;
       bool                    have_headers;
-      nhpc_server_details_t  *server_details;
       char		     *partial_content;
       nhpc_size_t             partial_content_len;
       int                     thread_id;

@@ -58,12 +58,13 @@ int main(int argc, char **argv)
       host_port = "8080";
    }
    
-   network_t *network = new network_t;
-   (*network).network_init();
-   http_init(network);
-   nrv = (*network).create_server(host_addr, host_port, AF_INET, SOCK_STREAM, 0);
-   if(nrv == NHPC_SUCCESS)
-      (*network).join_accept_thread();
+   nhpc_network_init();
+   if((nrv = nhpc_network_create_server(host_addr, host_port, AF_INET, SOCK_STREAM, 0)) != NHPC_SUCCESS)
+   {
+      return 1;
+   }
+   http_init();
+   nhpc_network_join_accept_thread();
 
    return 0;
 }

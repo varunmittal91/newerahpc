@@ -51,9 +51,7 @@ int main(int argc, char **argv)
       {
 	 cout << "Plugin declined" << endl;
       }
-      
-      jarvis_init(argc, argv);
-      web_interface_init();
+
       grid_server_join();
    }
 

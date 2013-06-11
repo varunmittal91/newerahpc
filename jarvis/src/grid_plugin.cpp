@@ -29,6 +29,7 @@
 #include <include/jarvis_data.h>
 #include <include/compare.h>
 #include <include/parse_json_structure.h>
+#include <include/web_interface.h>
 
 using namespace std;
 
@@ -39,8 +40,9 @@ namespace jarvis
    {
       nhpc_status_t plugin_init(plugin_details_t **plugin_details)
       {
-	 init_jarvis_data();
 	 thread_manager = new thread_manager_t;
+	 init_jarvis_data();
+	 web_interface_init();
 	 
 	 grid_plugin_details_init(plugin_details);
 	 grid_plugin_details_set_plugin_name((*plugin_details), "JARVIS_GRID_PLUGIN");
@@ -153,7 +155,9 @@ namespace jarvis
 	 delete[] word_str1;
 	 delete[] word_str2;
 	 
+	 cout << "deleting parent instruction" << endl;
 	 delete instructions;
+	 cout << "deted parent instruction" << endl;  
 	 
 	 return NHPC_SUCCESS;
       }      

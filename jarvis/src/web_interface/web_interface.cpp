@@ -30,15 +30,14 @@ namespace jarvis
 {
    void web_interface_init()
    {
-      http_init(_network);
-      http_handler_register("jarvis", (fnc_ptr_nhpc_t)web_interface_handler);
+      http_handler_register_app("jarvis", web_interface_handler);
    }
    
-   nhpc_status_t web_interface_handler(http_data_t *http_data)
+   void web_interface_handler(http_data_t *http_data)
    {
-      cout << http_data->request_page << endl;
+      cout << http_data->request << endl;
       
-      string_t *words = nhpc_substr((http_data->request_page), '/');
+      string_t *words = nhpc_substr((http_data->request), '/');
       
       nhpc_status_t nrv;
       
@@ -53,24 +52,29 @@ namespace jarvis
 	 grid_instruction_add_argument(instruction, ARG_LITERAL, word);
       }
       nrv = grid_instruction_send(instruction);  
+
+      grid_shared_data_t *data;
+      const char         *response;
+      nhpc_size_t         response_len;
+      
       if(nrv == NHPC_SUCCESS && (instruction->result_data) != NULL)
       {
-	 grid_shared_data_t *data    = instruction->result_data;
-	 const char         *respone = (const char *)data->address;
-
-	 nhpc_strcpy((char **)&(http_data->custom_response_data), respone);
-	 http_data->custom_response_type = NHPC_FILE;
+	 data         = instruction->result_data;
+	 response     = (const char *)data->address;
+	 response     = nhpc_strconcat((const char *)(data->address));
+	 response_len = strlen(response);
       }
       else 
       {
-	 nhpc_strcpy((char **)&(http_data->custom_response_data), "{error}");
-	 http_data->custom_response_type = NHPC_FILE;	 
+	 response     = nhpc_strconcat("{error}");
+	 response_len = strlen(response);
       }
+      http_data_add_content(http_data, (void *)response, "application/json", response_len, HTTP_CONTENT_TYPE_MEM, HTTP_OPT_NEW_ALLOCATED);
+      
+      delete[] response;
       
       grid_instruction_destruct(instruction);      
       
       nhpc_string_delete(words);
-      
-      return NHPC_SUCCESS;
    }
 };

@@ -166,7 +166,7 @@ namespace jarvis
       
       for(int i = 1; i <= tree_count; i++)
       {
-	 tree            = (rbtree *)(*master_tree)[i];
+	 tree = (rbtree *)(*master_tree)[i];
 	 if(delete_word_tree)
 	 {
 	    word_tree_count = (*tree).length();
@@ -174,10 +174,14 @@ namespace jarvis
 	    for(int j = i; j <= word_tree_count; j++)
 	    {
 	       word_tree = (rbtree **)(*tree)[j];
-	       if(*word_tree)
+	       if(word_tree)
 	       {
-		  delete (*word_tree);
-		  (*word_tree) = NULL;
+		  if(*word_tree)
+		  {
+		     delete (*word_tree);
+		     (*word_tree) = NULL;
+		     delete word_tree;
+		  }
 	       }
 	    }
 	 }
@@ -453,12 +457,14 @@ namespace jarvis
 	 rbtree *tmp_tree = (rbtree *)(*word_sense_tree1)[i];
 	 jv_delete_sense_tree(tmp_tree);
       }
+      delete word_sense_tree1;
 
       for(int i = 1; i <= json2_sense_count; i++)
       {
 	 rbtree *tmp_tree = (rbtree *)(*word_sense_tree2)[i];
 	 jv_delete_sense_tree(tmp_tree);
       }
+      delete word_sense_tree2;
       
       return found_result;
    }

@@ -34,5 +34,5 @@ using namespace neweraHPC;
 namespace jarvis
 {
    void web_interface_init();
-   nhpc_status_t web_interface_handler(http_data_t *http_data);
+   void web_interface_handler(http_data_t *http_data);
 };

@@ -217,7 +217,8 @@ namespace neweraHPC
       
       http_content_set_type(content, type);
       (*content).content_data = tmp_address;
-      (*content).content_mime = mime;
+      if(mime)
+	 nhpc_strcpy((char **)&((*content).content_mime), mime);
       (*content).len          = len;
       
       http_data_set_opt(http_data, HTTP_OPT_DATA_SET);

@@ -260,6 +260,7 @@ namespace neweraHPC
       if(data->address)
       {
 	 delete[] ((char *)(data->address));
+	 (data->address) = NULL;
       }
       
       delete data;

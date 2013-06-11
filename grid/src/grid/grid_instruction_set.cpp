@@ -52,7 +52,7 @@ namespace neweraHPC
       
       if(grid_instruction_get_result_data(instruction))
       	 grid_shared_data_destruct(instruction->result_data);
-            
+      
       if(instruction->arguments)
       {
 	 int         argument_count = instruction->arguments->length();

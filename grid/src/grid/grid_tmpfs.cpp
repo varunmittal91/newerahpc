@@ -81,6 +81,7 @@ namespace neweraHPC
 	 return nrv;
 
       nrv = nhpc_create_file(final_path, parent_path, _path);
+      delete[] _path;
       
       int i = 0;
       char *_tmp_path = NULL;

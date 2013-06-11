@@ -36,6 +36,7 @@ namespace neweraHPC
    void grid_scheduler_system_init()
    {
       grid_controller_register_to_server(&_host_grid_uid, _host_addr, _host_port);
+      nhpc_strcpy((char **)&_host_grid_uid, _host_grid_uid);
       
       queued_instructions = new rbtree(RBTREE_NUM_MANAGED);
       jobs                = new rbtree(RBTREE_STR);

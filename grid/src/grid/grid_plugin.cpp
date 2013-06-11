@@ -73,7 +73,7 @@ namespace neweraHPC
       if((nrv = plugin_init_fnc(plugin_details)) != NHPC_SUCCESS)
 	 return nrv;
 
-      nhpc_strcpy((char **)&((*plugin_details)->path_plugin), dll_path);
+      (*(*plugin_details)).path_plugin = dll_path;
       nrv = grid_plugin_install(*plugin_details);
       return nrv;
    }

@@ -48,8 +48,12 @@ int main(int argc, char **argv)
 
    if(!host_addr)
       nhpc_strcpy((char **)&(host_addr), "localhost");
+   else 
+      nhpc_strcpy((char **)&(host_addr), host_addr);
    if(!host_port)
       nhpc_strcpy((char **)&(host_port), "8080");
+   else 
+      nhpc_strcpy((char **)&(host_port), host_port);
 
    grid_instruction_t *instruction;
    grid_instruction_init(&instruction);

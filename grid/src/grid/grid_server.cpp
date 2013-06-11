@@ -34,31 +34,34 @@
 #include <include/grid_plugin.h>
 #include <include/grid_scheduler.h>
 #include <include/grid_tmpfs.h>
+#include <include/grid_http_interface.h>
 
 using namespace std;
 
 namespace neweraHPC
 {
-   network_t        *_network;
    thread_manager_t *_thread_manager;
    
    const char *_host_addr = NULL;
    const char *_host_port = NULL;
    const char *_host_grid_uid;
+   const char *_controller_addr;
+   const char *_controller_port;
+   const char *_controller_grid_uid;   
    const char *_tmp_dir;
    int _host_core_count;
    int _host_cpu_time;   
    
    void print_help()
    {
-      cout<<"Usage: server \t[-l host_ip:port] [-r remote_ip:port] \n\t\t[-c cpu_time] [-d daemon]"<<endl;
-      cout<<"Options:"<<endl;
-      cout<<setw(20)<<"-l host_ip:port"<<setw(50)<<":Ip address and port of local server"<<endl;
-      cout<<setw(22)<<"-r remote_ip:port"<<setw(46)<<":Ip address and port of controller"<<endl;
-      cout<<setw(16)<<"-c cpu_time"<<setw(38)<<":Mac cpu time to use"<<endl;
-      cout<<setw(14)<<"-d daemon"<<setw(32)<<":Daemon mode"<<endl;
-      cout<<setw(15)<<"-v verbose"<<setw(50)<<":Verbose mode: info, debug, all"<<endl;
-      cout<<setw(12)<<"-h help"<<setw(37)<<":This help menu"<<endl;
+      cout << "Usage: server \t[-l host_ip:port] [-r remote_ip:port] \n\t\t[-c cpu_time] [-d daemon]"<<endl;
+      cout << "Options:"<<endl;
+      cout << setw(20) <<"-l host_ip:port"   << setw(50) << ":Ip address and port of local server" <<endl;
+      cout << setw(22) <<"-r remote_ip:port" << setw(46) << ":Ip address and port of controller"   <<endl;
+      cout << setw(16) <<"-c cpu_time"       << setw(38) << ":Mac cpu time to use"                 <<endl;
+      cout << setw(14) <<"-d daemon"         << setw(32) << ":Daemon mode"                         <<endl;
+      cout << setw(15) <<"-v verbose"        << setw(50) << ":Verbose mode: info, debug, all"      <<endl;
+      cout << setw(12) <<"-h help"           << setw(37) << ":This help menu"                      <<endl;
       
       exit(0);
    }   
@@ -136,16 +139,16 @@ namespace neweraHPC
       {
 	 string_t *string = nhpc_substr(controller, ':');
 	 
-	 const char *controller_addr = (const char *)(string->strings[0]);
-	 const char *controller_port;
+	 nhpc_strcpy((char **)&_controller_addr, string->strings[0]);
 	 
 	 if(string->count == 1)
-	    nhpc_strcpy((char **)&controller_port, "8080");
+	    nhpc_strcpy((char **)&_controller_port, "8080");
 	 else 
-	    nhpc_strcpy((char **)&controller_port, string->strings[1]);
+	    nhpc_strcpy((char **)&_controller_port, string->strings[1]);
 	 
-	 const char *grid_uid;
-	 nhpc_status_t nrv = grid_controller_register_to_server(&grid_uid, controller_addr, controller_port);
+	 nhpc_status_t nrv = grid_controller_register_to_server(&_controller_grid_uid, _controller_addr, _controller_port);
+	 if(nrv == NHPC_SUCCESS)
+	    nhpc_strcpy((char **)&_controller_grid_uid, _controller_grid_uid);
 	 
 	 nhpc_string_delete(string);
       }      
@@ -172,28 +175,26 @@ namespace neweraHPC
       nhpc_system_init();
       
       _thread_manager = new thread_manager_t;
-      _network        = new network_t(&_thread_manager);
-      (*_network).network_init();
-      
-      int rv;
-      fnc_ptr_t grid_handler = (fnc_ptr_t)grid_request_handler;
-      rv = (*_network).network_addons->insert((void *)grid_handler, "GRID");
-
-      nhpc_status_t nrv = (*_network).create_server(_host_addr, _host_port, AF_INET, SOCK_STREAM, 0);  
-      if(nrv != NHPC_SUCCESS)
-	 return nrv;  
+      nhpc_status_t nrv;
+      nhpc_network_init();
+      if((nrv = nhpc_network_create_server(_host_addr, _host_port, AF_INET, SOCK_STREAM, 0)) != NHPC_SUCCESS)
+	 return nrv;
+      http_init();
+      if((nrv = nhpc_network_register_addon("GRID*2.90", grid_request_handler)) != NHPC_SUCCESS)
+	 return nrv;
       
       grid_communication_handlers_init();
       grid_node_db_init();
       grid_plugin_system_init();
       grid_scheduler_system_init();
       grid_tmpfs_init();
+      grid_http_init();
       
       return NHPC_SUCCESS;
    }
    
    void grid_server_join()
    {
-      (*_network).join_accept_thread();      
+      nhpc_network_join_accept_thread();
    }
 };

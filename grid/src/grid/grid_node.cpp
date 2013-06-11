@@ -21,6 +21,8 @@
 #include <neweraHPC/thread.h>
 
 #include <include/grid_node.h>
+#include <include/grid_data.h>
+#include <include/grid_instruction_data_type.h>
 
 namespace neweraHPC
 {
@@ -28,6 +30,30 @@ namespace neweraHPC
    rbtree *registered_clients;
    nhpc_mutex_t mutex_registered_nodes;
    nhpc_mutex_t mutex_registered_clients;
+   
+   grid_node_t *grid_node_search_node(const char *node_uid, node_type_t type)
+   {
+      rbtree       *node_db;
+      nhpc_mutex_t *mutex;
+      grid_node_t  *grid_node;
+      
+      if(grid_node_is_type_compute(type))
+      {
+	 node_db = registered_nodes;
+	 mutex   = &mutex_registered_nodes;
+      }
+      else 
+      {
+	 node_db = registered_clients;
+	 mutex   = &mutex_registered_clients;
+      }
+      
+      thread_mutex_lock(mutex, NHPC_THREAD_LOCK_READ);
+      grid_node = (grid_node_t *)(*node_db).search(node_uid);
+      thread_mutex_unlock(mutex, NHPC_THREAD_LOCK_READ);
+      
+      return grid_node;
+   }
    
    grid_node_t *grid_node_get_compute_node(int cpu_cores)
    {
@@ -96,5 +122,22 @@ namespace neweraHPC
       
       if(node)
 	 grid_node_destruct(node);
+   }
+   
+   nhpc_status_t grid_node_client_queue_job(const char *node_uid, grid_instruction_t *instruction)
+   {
+      grid_node_t         *grid_node;
+      grid_node_client_t  *client_data;
+      
+      if(!(grid_node = grid_node_search_node(node_uid, NODE_TYPE_CLIENT)))
+	 return NHPC_FAIL;
+      
+      client_data = grid_node_get_client_node_data(grid_node);
+      if(!client_data)
+      {
+	 
+      }
+      
+      return NHPC_SUCCESS;
    }
 };

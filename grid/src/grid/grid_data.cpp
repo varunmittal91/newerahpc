@@ -79,7 +79,7 @@ namespace neweraHPC
       }
       
       arg_t        arg;
-      void        *src_data;
+      void        *src_data    = NULL;
       nhpc_size_t  content_len = nhpc_strtoi(check_content_len);
 
       arg = pow(2, code);
@@ -98,10 +98,12 @@ namespace neweraHPC
       if(fnc_ptr)
       {
 	 nrv = fnc_ptr(&src_data, socket, &content_len);
-	 if(nrv == NHPC_SUCCESS)
+	 if(nrv == NHPC_SUCCESS && src_data)
 	 {
 	    grid_shared_data_init(data);
 	    grid_shared_data_set_data((*data), src_data, &content_len, arg);
+	    
+	    delete[] (char *)src_data;
 	 }
       }
       

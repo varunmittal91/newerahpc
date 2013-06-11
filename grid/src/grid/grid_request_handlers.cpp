@@ -37,29 +37,27 @@ namespace neweraHPC
       nhpc_size_t    size;
       const char    *client_uid;
 
-      nrv = grid_uid_generate(&client_uid, grid_data, NODE_TYPE_CLIENT);
-      if(nrv == NHPC_SUCCESS)
+      if((nrv = grid_uid_generate(&client_uid, grid_data, NODE_TYPE_CLIENT)) == NHPC_SUCCESS)
       {
 	 size = strlen(client_uid) + 1;
-	 grid_data_add_result_data(grid_data, client_uid, size, ARG_MEM_BLOCK);
-	 return NHPC_SUCCESS;
+	 grid_data_add_result_data(grid_data, client_uid, size, ARG_MEM_BLOCK);	 
+	 grid_shared_data_set_opt(grid_data->result_data, GRID_SHARED_DATA_OPT_NEW_ALLOCATED);
       }
-      else 
-	 return NHPC_FAIL;
       
       return nrv;
    }
    
    nhpc_status_t grid_node_registration_handler(grid_data_t *grid_data)
    {
-      nhpc_status_t nrv;
+      nhpc_status_t  nrv;      
+      nhpc_size_t    size;
+      const char    *server_uid;
       
-      const char *server_uid;
-      nrv = grid_uid_generate(&server_uid, grid_data, NODE_TYPE_COMPUTE);
-      if(nrv == NHPC_SUCCESS) 
+      if((nrv = grid_uid_generate(&server_uid, grid_data, NODE_TYPE_COMPUTE)) == NHPC_SUCCESS) 
       {
-	 nhpc_size_t size = strlen(server_uid) + 1;
+	 size = strlen(server_uid) + 1;
 	 grid_data_add_result_data(grid_data, server_uid, size, ARG_MEM_BLOCK);
+	 grid_shared_data_set_opt(grid_data->result_data, GRID_SHARED_DATA_OPT_NEW_ALLOCATED);
       }
       
       return nrv;
@@ -103,6 +101,7 @@ namespace neweraHPC
       
       file_path = (const char *)grid_shared_data_get_data_address(grid_data->input_data);
       nrv = grid_plugin_install_dll(file_path, &plugin);
+      grid_shared_data_use_data(grid_data->input_data);
       
       return nrv;
    }

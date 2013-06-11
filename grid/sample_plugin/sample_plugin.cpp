@@ -35,10 +35,7 @@ namespace neweraHPC
       nhpc_status_t plugin_exec(grid_instruction_t *instruction)
       {
 	 cout << "executing exec" << endl;
-	 sleep(3);
-	 cout << "execution complete" << endl;
-	 cout << "Affinity:" << instruction->affinity << endl;
-	 
+
 	 const char *result = "Successful execution";
 	 nhpc_size_t size   = strlen(result) + 1;
 	 
@@ -64,15 +61,12 @@ namespace neweraHPC
 	    grid_instruction_set_executable(instructions[i]);
 	 }
 	 grid_scheduler_add_job(grid_uid, instructions, &instruction_count);
-	 
+
 	 for(int i = 0; i < instruction_count; i++)
 	 {
-	    grid_instruction_destruct((instructions[i]));
+	    grid_instruction_destruct(instructions[i]);
 	 }
 	 delete instructions;
-	 
-	 if(instruction->input_data)
-	    delete[] (char *)(instruction->input_data->address);
 	 
 	 return NHPC_SUCCESS;
       }      

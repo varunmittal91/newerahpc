@@ -55,6 +55,9 @@ namespace neweraHPC
       if(nrv != NHPC_SUCCESS)
 	 return nrv;
       
+      if((nrv = grid_node_client_queue_job(grid_uid, instruction)) != NHPC_SUCCESS)
+	 return nrv;
+      
       nrv = grid_instruction_execute(instruction, plugin_details);
       if(instruction->result_data)
       {

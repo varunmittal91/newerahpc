@@ -24,12 +24,14 @@
 
 namespace neweraHPC
 {
-   extern network_t        *_network;
    extern thread_manager_t *_thread_manager;
    
    extern const char *_host_addr;
    extern const char *_host_port;
    extern const char *_host_grid_uid;
+   extern const char *_controller_addr;
+   extern const char *_controller_port;
+   extern const char *_controller_grid_uid;
    extern const char *_tmp_dir;
    extern int _host_core_count;
    extern int _host_cpu_time;

@@ -29,13 +29,13 @@ namespace neweraHPC
 {
    nhpc_status_t grid_uid_generate(const char **uid, grid_data_t *grid_data, node_type_t node_mode)
    {
-      grid_node_t *grid_node = new grid_node_t;
+      grid_node_t *grid_node;
       
       rbtree *node_db;
+      rbtree *headers = grid_data->socket->headers;
       if(grid_node_is_type_compute(node_mode))
       {
 	 node_db = registered_nodes;
-	 rbtree *headers = grid_data->socket->headers;
 	 
 	 const char *cpu_cores_str = (const char *)headers->search("Core-Count");
 	 const char *total_mem     = (const char *)headers->search("Total-Mem");
@@ -73,9 +73,9 @@ namespace neweraHPC
       }
 
       *uid = random_string;
-      grid_node_set_uid(grid_node, *uid);
+      grid_node_set_uid(grid_node, *uid);      
       (*node_db).insert(grid_node, *uid);
-
+      
       return NHPC_SUCCESS;      
    }
 }

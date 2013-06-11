@@ -20,6 +20,8 @@
 #ifndef _GRID_INSTRUCTION_DATA_TYPE_H_
 #define _GRID_INSTRUCTION_DATA_TYPE_H_
 
+#include "grid_data.h"
+
 namespace neweraHPC
 {
    typedef unsigned char instruction_status_t;

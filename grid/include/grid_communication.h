@@ -147,7 +147,7 @@ namespace neweraHPC
    nhpc_status_t grid_communication_push(grid_communication_t *grid_communication, grid_shared_data_t *data = NULL);
    
    nhpc_status_t grid_communication_handlers_init();
-   nhpc_status_t grid_request_handler(nhpc_socket_t *socket);
+   void          grid_request_handler(nhpc_socket_t *socket);
 }
 
 #endif

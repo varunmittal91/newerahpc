@@ -17,13 +17,15 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GRID_CLIENT_H_
-#define _GRID_CLIENT_H_
+#ifndef _GRID_NODE_H_
+#define _GRID_NODE_H_
 
 #include <iostream>
 
 #include <neweraHPC/thread.h>
 #include <neweraHPC/strings.h>
+
+#include "grid_instruction_data_type.h"
 
 using namespace std;
 
@@ -76,8 +78,23 @@ namespace neweraHPC
    
    struct grid_node_client_t
    {
-      rbtree *jobs;
+      rbtree       *jobs;
+      nhpc_mutex_t  mutex;
    };
+   static void grid_node_client_init(grid_node_client_t **grid_node_client)
+   {
+      (*grid_node_client) = new grid_node_client_t;
+      memset((*grid_node_client), 0, sizeof(grid_node_client_t));
+      
+      (*grid_node_client)->jobs = new rbtree(RBTREE_NUM_MANAGED);
+      thread_mutex_init(&((*grid_node_client)->mutex));
+   }
+   static void grid_node_client_destruct(grid_node_client_t *grid_node_client)
+   {
+      delete (grid_node_client->jobs);
+      delete grid_node_client;
+   }
+   nhpc_status_t grid_node_client_queue_job(const char *node_uid, grid_instruction_t *instruction);
    
    struct grid_node_t
    {
@@ -113,23 +130,21 @@ namespace neweraHPC
    {
       if(grid_node_is_type_compute(node->node_type))
 	 grid_node_compute_destruct(((grid_node_compute_t *)(node->node_data)));
-      //else 
-	 //delete ((grid_node_client_t *)(node->node_data));
+      else if(grid_node_is_type_client(node->node_type) && (node->node_data)) 
+	 delete ((grid_node_client_t *)(node->node_data));
       
       delete[] (node->peer_addr);
       delete[] (node->peer_port);
       delete[] (node->peer_uid);
       delete node;      
    }
-   static void grid_node_set_peer_details(grid_node_t *grid_node, const char *peer_addr, const char *peer_port)
+   inline void grid_node_set_peer_details(grid_node_t *grid_node, const char *peer_addr, const char *peer_port)
    {
       nhpc_strcpy((char **)&(grid_node->peer_addr), peer_addr);
       nhpc_strcpy((char **)&(grid_node->peer_port), peer_port);
    }
-   static void grid_node_set_uid(grid_node_t *grid_node, const char *uid)
-   {
-      nhpc_strcpy((char **)&(grid_node->peer_uid), uid);
-   }
+   grid_node_t *grid_node_search_node(const char *node_uid, node_type_t type);
+
    grid_node_t *grid_node_get_compute_node(int cpu_cores);
    grid_node_t *grid_node_search_compute_node(const char *node_uid);
    void grid_node_free_compute_node(grid_node_t *node, int cpu_cores);
@@ -139,6 +154,7 @@ namespace neweraHPC
 #define grid_node_get_client_node_data(n)     (grid_node_client_t *)(n->node_data)
 #define grid_node_set_compute_node_data(n, d) (n->node_data = (void *)d)
 #define grid_node_set_client_node_data(n, d)  (n->node_data = (void *)d)
+#define grid_node_set_uid(g, u)               (g->peer_uid = u)
 };
 
 #endif

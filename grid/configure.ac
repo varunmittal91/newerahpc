@@ -45,5 +45,6 @@ AC_OUTPUT([Makefile]
           [src/Makefile]
           [src/grid/Makefile]
 	  [src/grid_client/Makefile]
+	  [src/grid_interface/Makefile]
           [tests/grid/Makefile])
 

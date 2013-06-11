@@ -87,7 +87,11 @@ namespace neweraHPC
 
       nrv = socket_connect(&socket, dest_addr, dest_port, AF_INET, SOCK_STREAM, 0);
       if(nrv != NHPC_SUCCESS)
+      {
+	 socket_close(socket);
+	 socket_delete(socket);
 	 return nrv;
+      }
       
       grid_communication->socket = socket;
 
@@ -103,7 +107,7 @@ namespace neweraHPC
       return nrv;
    }
    
-   nhpc_status_t grid_request_handler(nhpc_socket_t *socket)
+   void grid_request_handler(nhpc_socket_t *socket)
    {
       char       *command         = network_headers_get_param(socket->headers, "command");
       const char *uid             = network_headers_get_param(socket->headers, "Grid-Uid");
@@ -113,13 +117,13 @@ namespace neweraHPC
       if(string->count < 3)
       {
 	 nhpc_string_delete(string);
-	 return NHPC_FAIL;
+	 return;
       }
 
       nhpc_status_t  nrv     = NHPC_FAIL;
       const char    *fnc_str = string->strings[1];
       
-      fnc_ptr_nhpc_t fnc_ptr = (fnc_ptr_nhpc_t)grid_communication_handlers->search(fnc_str);      
+      fnc_ptr_nhpc_t fnc_ptr = (fnc_ptr_nhpc_t)grid_communication_handlers->search(fnc_str); 
       
       if(fnc_ptr)
       {
@@ -142,7 +146,7 @@ namespace neweraHPC
 	 {
 	    grid_response_init(&response, GRID_RESPONSE_RESOURCE_UNAVAILABLE);
 	 }
-	 grid_response_set_socket(response, grid_data_get_socket(grid_data));
+	 grid_response_set_socket(response, socket);
 	 
 	 grid_response_send(response);
 	 grid_response_push(response, data);
@@ -157,6 +161,6 @@ namespace neweraHPC
       
       nhpc_string_delete(string);
 
-      return nrv;
+      return;
    }
 }

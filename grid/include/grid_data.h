@@ -202,6 +202,8 @@ namespace neweraHPC
 	 delete data->arguments;
       }
       
+      if(data->grid_uid)
+	 delete[] (data->grid_uid);
       if(data->peer_addr)
 	 delete[] (data->peer_addr);
       if(data->peer_port)
@@ -211,27 +213,43 @@ namespace neweraHPC
 	 grid_shared_data_destruct(data->input_data);
       if(data->result_data)
 	 grid_shared_data_destruct(data->result_data);
+      
+      delete data;
    }   
-#define grid_data_add_result_data(g, d, l, a) do{grid_shared_data_init(&(g->result_data)); grid_shared_data_set_data((g->result_data), (const void *)d, &l, a);}while(false);
-#define grid_data_destruct_data(g)            (grid_shared_data_destruct(g->data))
+#define grid_data_add_result_data(g, d, l, a)      do{grid_shared_data_init(&(g->result_data));                            \
+						      grid_shared_data_set_data((g->result_data), (const void *)d, &l, a); \
+						   }while(false);
+#define grid_data_destruct_data(g)                 (grid_shared_data_destruct(g->data))
    void grid_data_create_from_socket(grid_data_t *data, nhpc_socket_t *socket);
    
    struct grid_shared_data_t
    {
-#define OPT_DELETE  1
       typedef unsigned char data_options;
-
+#define GRID_SHARED_DATA_OPT_PRE_ALLOCATED 1
+#define GRID_SHARED_DATA_OPT_NEW_ALLOCATED 2
       data_options  options;
+      
       const void   *address;
       const char   *content_type;
       arg_t         arg;
       nhpc_size_t   len;
    };
+   static bool grid_shared_data_check_opt(grid_shared_data_t *data, int opt)
+   {
+      int i = 0;
+      while(opt > 1)
+      {
+	 opt /= 2;
+	 i++;
+      }
+      
+      return (1 & ((data->options) >> i));
+   }
 #define grid_shared_data_set_opt(g, o)        ((g->options) |= o)
-#define grid_shared_data_is_opt_delete        ((g->options) & 1)
    
 #define grid_shared_data_get_data_address(g)  (g->address)
 #define grid_shared_data_get_data_length(g)   (g->len)
+#define grid_shared_data_use_data(g)          (g->address = NULL)
    static void grid_shared_data_init(grid_shared_data_t **data)
    {
       (*data) = new grid_shared_data_t;
@@ -239,28 +257,39 @@ namespace neweraHPC
    }
    static void grid_shared_data_destruct(grid_shared_data_t *data)
    {
+      if(data->address)
+      {
+	 delete[] ((char *)(data->address));
+      }
+      
       delete data;
-   }
-   static void grid_shared_data_set_data(grid_shared_data_t *data, const void *address, nhpc_size_t *len, arg_t arg,
-					 int option = NULL)
+   }      
+   static void grid_shared_data_set_data(grid_shared_data_t *data, const void *address, nhpc_size_t *len, arg_t arg)
    {
-      if(option)
-	 grid_shared_data_set_opt(data, option);
+      char *tmp_address = NULL;
       
       if(grid_arg_is_file(arg))
       {
 	 (*len) = 0;
 	 if(nhpc_file_size((const char *)address, len) == NHPC_FAIL)
 	    return;
+	 
+	 nhpc_strcpy(&tmp_address, (const char *)address);
       }
-
+      
       int code = _grid_arg_get_int_code(arg);
-
-      data->address      = address;
+      
+      if(!tmp_address)
+      {
+	 tmp_address = new char [*len];
+	 memcpy(tmp_address, address, (*len));
+      }
+      
+      data->address      = tmp_address;
       data->len          = *len;
       data->arg          = arg;
       data->content_type = grid_arg_content_types[code];
-   }
+   }   
    static void grid_shared_data_get_headers(grid_shared_data_t *data, nhpc_headers_t *src_headers)
    {
       if(data->arg == 0)

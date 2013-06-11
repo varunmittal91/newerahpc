@@ -47,8 +47,8 @@ namespace neweraHPC
       grid_set_communication_header(grid_communication, "Total-Mem", total_mem_str);
      
       grid_communication_send(grid_communication);
-      nrv = grid_communication_push(grid_communication);      
-
+      nrv = grid_communication_push(grid_communication);   
+      
       delete[] core_count_str;
       delete[] total_mem_str;
       delete[] free_mem_str;
@@ -70,13 +70,12 @@ namespace neweraHPC
 	    if(data && grid_response_is_successful(grid_response))
 	    {
 	       (*grid_uid) = (const char *)grid_shared_data_get_data_address(data);
-	       cout << "Registration code:" << (*grid_uid) << endl;
+	       cout << "Controller Registration code:" << (*grid_uid) << endl;	    
 	    }
 	    else 
 	       nrv = NHPC_FAIL;
 	 }
       }
-      
       grid_communication_destruct(grid_communication);
       grid_response_destruct(grid_response);
       

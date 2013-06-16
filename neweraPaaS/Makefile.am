@@ -1,5 +1,7 @@
 ACLOCAL_AMFLAGS= -I m4
 
+SUBDIRS = src
+
 bin_PROGRAMS = neweraPaaS
 
 neweraPaaS_SOURCES  = neweraPaaS.cpp

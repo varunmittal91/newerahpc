@@ -41,6 +41,8 @@ AC_C_INLINE
 LT_INIT()
 LT_SUPPORTED_TAG(CXX)
 
-AC_OUTPUT([Makefile])
+AC_OUTPUT([Makefile]
+	  [src/Makefile]
+	  [src/lxc_interface/Makefile])
 
 

@@ -1,7 +1,8 @@
 AC_INIT(neweraPaaS, 0.1, varunmittal91@gmail.com)
-AC_PREREQ([2.59])
+#AC_PREREQ([2.59])
 
-AM_INIT_AUTOMAKE([1.10 -Wall no-define])
+#AM_INIT_AUTOMAKE([1.10 -Wall no-define])
+AM_INIT_AUTOMAKE([-Wall no-define])
 AM_SILENT_RULES([yes])
 AM_CONFIG_HEADER(config.h)
 

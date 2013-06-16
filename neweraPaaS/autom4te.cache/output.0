@@ -2380,8 +2380,9 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
+#AC_PREREQ([2.59])
 
-
+#AM_INIT_AUTOMAKE([1.10 -Wall no-define])
 am__api_version='1.11'
 
 ac_aux_dir=
@@ -5064,7 +5065,7 @@ else
   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
     lt_cv_nm_interface="MS dumpbin"
   fi
-  rm -rf conftest*
+  rm -f conftest*
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_nm_interface" >&5
 $as_echo "$lt_cv_nm_interface" >&6; }
@@ -5624,7 +5625,7 @@ linux* | k*bsd*-gnu | kopensolaris*-gnu)
   lt_cv_deplibs_check_method=pass_all
   ;;
 
-netbsd*)
+netbsd* | netbsdelf*-gnu)
   if echo __ELF__ | $CC -E - | $GREP __ELF__ > /dev/null; then
     lt_cv_deplibs_check_method='match_pattern /lib[^/]+(\.so\.[0-9]+\.[0-9]+|_pic\.a)$'
   else
@@ -6431,7 +6432,7 @@ for ac_symprfx in "" "_"; do
   # Check to see that the pipe works correctly.
   pipe_works=no
 
-  rm -rf conftest*
+  rm -f conftest*
   cat > conftest.$ac_ext <<_LT_EOF
 #ifdef __cplusplus
 extern "C" {
@@ -6947,7 +6948,7 @@ else
   if $GREP 'Manifest Tool' conftest.out > /dev/null; then
     lt_cv_path_mainfest_tool=yes
   fi
-  rm -rf conftest*
+  rm -f conftest*
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_path_mainfest_tool" >&5
 $as_echo "$lt_cv_path_mainfest_tool" >&6; }
@@ -8333,7 +8334,7 @@ ac_outfile=conftest.$ac_objext
 echo "$lt_simple_compile_test_code" >conftest.$ac_ext
 eval "$ac_compile" 2>&1 >/dev/null | $SED '/^$/d; /^ *+/d' >conftest.err
 _lt_compiler_boilerplate=`cat conftest.err`
-$RM -r conftest*
+$RM conftest*
 
 ac_outfile=conftest.$ac_objext
 echo "$lt_simple_link_test_code" >conftest.$ac_ext
@@ -8390,7 +8391,7 @@ else
        lt_cv_prog_compiler_rtti_exceptions=yes
      fi
    fi
-   $RM -r conftest*
+   $RM conftest*
 
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_prog_compiler_rtti_exceptions" >&5
@@ -8767,7 +8768,7 @@ else
        lt_cv_prog_compiler_pic_works=yes
      fi
    fi
-   $RM -r conftest*
+   $RM conftest*
 
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_prog_compiler_pic_works" >&5
@@ -8879,14 +8880,14 @@ else
      fi
    fi
    chmod u+w . 2>&5
-   $RM -r conftest*
+   $RM conftest*
    # SGI C++ compiler will create directory out/ii_files/ for
    # template instantiation
    test -d out/ii_files && $RM out/ii_files/* && rmdir out/ii_files
    $RM out/* && rmdir out
    cd ..
    $RM -r conftest
-   $RM -r conftest*
+   $RM conftest*
 
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_prog_compiler_c_o" >&5
@@ -8934,14 +8935,14 @@ else
      fi
    fi
    chmod u+w . 2>&5
-   $RM -r conftest*
+   $RM conftest*
    # SGI C++ compiler will create directory out/ii_files/ for
    # template instantiation
    test -d out/ii_files && $RM out/ii_files/* && rmdir out/ii_files
    $RM out/* && rmdir out
    cd ..
    $RM -r conftest
-   $RM -r conftest*
+   $RM conftest*
 
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_prog_compiler_c_o" >&5
@@ -8956,7 +8957,7 @@ if test "$lt_cv_prog_compiler_c_o" = no && test "$need_locks" != no; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking if we can lock with hard links" >&5
 $as_echo_n "checking if we can lock with hard links... " >&6; }
   hard_links=yes
-  $RM -r conftest*
+  $RM conftest*
   ln conftest.a conftest.b 2>/dev/null && hard_links=no
   touch conftest.a
   ln conftest.a conftest.b 2>&5 || hard_links=no
@@ -9035,6 +9036,9 @@ $as_echo_n "checking whether the $compiler linker ($LD) supports shared librarie
     ;;
   openbsd*)
     with_gnu_ld=no
+    ;;
+  linux* | k*bsd*-gnu | gnu*)
+    link_all_deplibs=no
     ;;
   esac
 
@@ -9257,7 +9261,7 @@ _LT_EOF
       fi
       ;;
 
-    netbsd*)
+    netbsd* | netbsdelf*-gnu)
       if echo __ELF__ | $CC -E - | $GREP __ELF__ >/dev/null; then
 	archive_cmds='$LD -Bshareable $libobjs $deplibs $linker_flags -o $lib'
 	wlarc=
@@ -9434,6 +9438,7 @@ _LT_EOF
 	if test "$aix_use_runtimelinking" = yes; then
 	  shared_flag="$shared_flag "'${wl}-G'
 	fi
+	link_all_deplibs=no
       else
 	# not using gcc
 	if test "$host_cpu" = ia64; then
@@ -9887,7 +9892,7 @@ $as_echo "$lt_cv_irix_exported_symbol" >&6; }
       link_all_deplibs=yes
       ;;
 
-    netbsd*)
+    netbsd* | netbsdelf*-gnu)
       if echo __ELF__ | $CC -E - | $GREP __ELF__ >/dev/null; then
 	archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'  # a.out
       else
@@ -10172,7 +10177,7 @@ $as_echo_n "checking whether -lc should be explicitly linked in... " >&6; }
 if ${lt_cv_archive_cmds_need_lc+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  $RM -r conftest*
+  $RM conftest*
 	echo "$lt_simple_compile_test_code" > conftest.$ac_ext
 
 	if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
@@ -10207,7 +10212,7 @@ else
 	else
 	  cat conftest.err 1>&5
 	fi
-	$RM -r conftest*
+	$RM conftest*
 	
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_archive_cmds_need_lc" >&5
@@ -10913,6 +10918,18 @@ fi
   # people can always --disable-shared, the test was removed, and we
   # assume the GNU/Linux dynamic linker is in use.
   dynamic_linker='GNU/Linux ld.so'
+  ;;
+
+netbsdelf*-gnu)
+  version_type=linux
+  need_lib_prefix=no
+  need_version=no
+  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
+  soname_spec='${libname}${release}${shared_ext}$major'
+  shlibpath_var=LD_LIBRARY_PATH
+  shlibpath_overrides_runpath=no
+  hardcode_into_libs=yes
+  dynamic_linker='NetBSD ld.elf_so'
   ;;
 
 netbsd*)
@@ -12073,7 +12090,7 @@ compiler=$CC
 echo "$lt_simple_compile_test_code" >conftest.$ac_ext
 eval "$ac_compile" 2>&1 >/dev/null | $SED '/^$/d; /^ *+/d' >conftest.err
 _lt_compiler_boilerplate=`cat conftest.err`
-$RM -r conftest*
+$RM conftest*
 
   ac_outfile=conftest.$ac_objext
 echo "$lt_simple_link_test_code" >conftest.$ac_ext
@@ -13750,7 +13767,7 @@ lt_prog_compiler_static_CXX=
 	    ;;
 	esac
 	;;
-      netbsd*)
+      netbsd* | netbsdelf*-gnu)
 	;;
       *qnx* | *nto*)
         # QNX uses GNU C++, but need to define -shared option too, otherwise
@@ -13895,7 +13912,7 @@ else
        lt_cv_prog_compiler_pic_works_CXX=yes
      fi
    fi
-   $RM -r conftest*
+   $RM conftest*
 
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_prog_compiler_pic_works_CXX" >&5
@@ -13998,14 +14015,14 @@ else
      fi
    fi
    chmod u+w . 2>&5
-   $RM -r conftest*
+   $RM conftest*
    # SGI C++ compiler will create directory out/ii_files/ for
    # template instantiation
    test -d out/ii_files && $RM out/ii_files/* && rmdir out/ii_files
    $RM out/* && rmdir out
    cd ..
    $RM -r conftest
-   $RM -r conftest*
+   $RM conftest*
 
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_prog_compiler_c_o_CXX" >&5
@@ -14050,14 +14067,14 @@ else
      fi
    fi
    chmod u+w . 2>&5
-   $RM -r conftest*
+   $RM conftest*
    # SGI C++ compiler will create directory out/ii_files/ for
    # template instantiation
    test -d out/ii_files && $RM out/ii_files/* && rmdir out/ii_files
    $RM out/* && rmdir out
    cd ..
    $RM -r conftest
-   $RM -r conftest*
+   $RM conftest*
 
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_prog_compiler_c_o_CXX" >&5
@@ -14072,7 +14089,7 @@ if test "$lt_cv_prog_compiler_c_o_CXX" = no && test "$need_locks" != no; then
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking if we can lock with hard links" >&5
 $as_echo_n "checking if we can lock with hard links... " >&6; }
   hard_links=yes
-  $RM -r conftest*
+  $RM conftest*
   ln conftest.a conftest.b 2>/dev/null && hard_links=no
   touch conftest.a
   ln conftest.a conftest.b 2>&5 || hard_links=no
@@ -14121,6 +14138,9 @@ $as_echo_n "checking whether the $compiler linker ($LD) supports shared librarie
       ;;
     esac
     ;;
+  linux* | k*bsd*-gnu | gnu*)
+    link_all_deplibs_CXX=no
+    ;;
   *)
     export_symbols_cmds_CXX='$NM $libobjs $convenience | $global_symbol_pipe | $SED '\''s/.* //'\'' | sort | uniq > $export_symbols'
     ;;
@@ -14159,7 +14179,7 @@ $as_echo_n "checking whether -lc should be explicitly linked in... " >&6; }
 if ${lt_cv_archive_cmds_need_lc_CXX+:} false; then :
   $as_echo_n "(cached) " >&6
 else
-  $RM -r conftest*
+  $RM conftest*
 	echo "$lt_simple_compile_test_code" > conftest.$ac_ext
 
 	if { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_compile\""; } >&5
@@ -14194,7 +14214,7 @@ else
 	else
 	  cat conftest.err 1>&5
 	fi
-	$RM -r conftest*
+	$RM conftest*
 	
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_archive_cmds_need_lc_CXX" >&5
@@ -14744,6 +14764,18 @@ fi
   # people can always --disable-shared, the test was removed, and we
   # assume the GNU/Linux dynamic linker is in use.
   dynamic_linker='GNU/Linux ld.so'
+  ;;
+
+netbsdelf*-gnu)
+  version_type=linux
+  need_lib_prefix=no
+  need_version=no
+  library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
+  soname_spec='${libname}${release}${shared_ext}$major'
+  shlibpath_var=LD_LIBRARY_PATH
+  shlibpath_overrides_runpath=no
+  hardcode_into_libs=yes
+  dynamic_linker='NetBSD ld.elf_so'
   ;;
 
 netbsd*)

@@ -21,7 +21,7 @@
 #define _NHPC_PALLOC_H_
 
 #define NHPC_MAX_ALLOC_FROM_POOL  (nhpc_pagesize - 1)
-#define NHPC_DEFAULT_POOL_SIZE    (16 * 1024)
+#define NHPC_DEFAULT_POOL_SIZE    (4 * 1024)
 
 struct nhpc_pool_t;
 struct nhpc_pool_data_t;

@@ -20,10 +20,17 @@
 #ifndef _NHPC_COMMUNICATION_H_
 #define _NHPC_COMMUNICATION_H_
 
-void          nhpc_read_communication(nhpc_connection_t *c);
-nhpc_status_t nhpc_analyze_stream(nhpc_connection_t *c);
-void          nhpc_display_headers(nhpc_connection_t *c);
+struct nhpc_communication_s {
+   char           *command_str;
+   nhpc_rbtree_t  *headers;
 
-void nhpc_communication_handler(nhpc_event_t *ev);
+   unsigned        have_headers:1;
+   
+   void           *data;
+};
+
+void          nhpc_communication_handler(nhpc_event_t *ev);
+nhpc_status_t nhpc_read_communication(nhpc_connection_t *c, char *buffer, nhpc_size_t bufferlen, 
+				      char **partial_data, nhpc_size_t *partial_datalen);
 
 #endif

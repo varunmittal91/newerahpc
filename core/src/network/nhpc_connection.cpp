@@ -32,10 +32,36 @@ void nhpc_destroy_connection(nhpc_connection_t *c) {
    
 }
 
+void nhpc_shutdown_connection(nhpc_connection_t *c, int how) {
+
+   if(how == SHUT_RD || how == SHUT_RDWR) {
+      shutdown(c->socket.fd, SHUT_RD);
+
+      if(c->rev->enabled)
+	 nhpc_del_event(c->rev, NHPC_READ_EVENT, NHPC_DELETE_EVENT);
+   }
+   
+   if(how == SHUT_WR || how == SHUT_RDWR) {
+      shutdown(c->socket.fd, SHUT_WR);
+      
+      if(c->wev->enabled)
+	 nhpc_del_event(c->wev, NHPC_WRITE_EVENT, NHPC_DELETE_EVENT);
+   }
+}
+
+void nhpc_close_connection(nhpc_connection_t *c) {
+   close(c->socket.fd);
+   
+   if(c->rev->enabled)
+      nhpc_del_event(c->rev, NHPC_READ_EVENT, NHPC_CLOSE_EVENT);
+   if(c->wev->enabled)
+      nhpc_del_event(c->wev, NHPC_WRITE_EVENT, NHPC_CLOSE_EVENT);
+}
+
 void nhpc_init_listening(nhpc_listening_t *ls) {
    ls->nconnections = CONNECTION_BACKLOG;
    ls->connections  = (nhpc_connection_t *)nhpc_calloc(sizeof(nhpc_connection_t) * ls->nconnections);
-   ls->events       = (nhpc_event_t *)nhpc_calloc(sizeof(nhpc_event_t) * (ls->nconnections * 2 + 7));
+   ls->events       = (nhpc_event_t *)nhpc_calloc(sizeof(nhpc_event_t) * (ls->nconnections * 2 + 1));
 
    ls->connections_queue = nhpc_init_queue(CONNECTION_BACKLOG);
    
@@ -44,10 +70,13 @@ void nhpc_init_listening(nhpc_listening_t *ls) {
    for(int i = 0; i < CONNECTION_BACKLOG; i++) {
       rev = &ls->events[2 * i + 1];
       wev = &ls->events[2 * i + 2];
+      
       rev->data = &ls->connections[i];
-      wev->data = &ls->connections[i];
       rev->instance = 1;
+
+      wev->data = &ls->connections[i];
       wev->instance = 1;
+      wev->write    = 1;
       
       ls->connections[i].rev = rev;
       ls->connections[i].wev = wev;      

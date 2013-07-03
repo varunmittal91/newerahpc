@@ -39,6 +39,10 @@
 #define NHPC_DISABLE_EVENT 2
 #endif
 
+#ifndef NHPC_EOF
+#define NHPC_EOF 0x8000
+#endif
+
 struct nhpc_event_actions_t {
    nhpc_status_t  (*add)(nhpc_event_t *ev, nhpc_int_t event, nhpc_uint_t flags);
    nhpc_status_t  (*del)(nhpc_event_t *ev, nhpc_int_t event, nhpc_uint_t flags);
@@ -60,7 +64,7 @@ struct nhpc_event_s {
    void                  *data;
    nhpc_status_t          status;
    
-   unsigned               index;     
+   nhpc_int_t             index;     
    
    unsigned               instance:1;
    
@@ -68,6 +72,7 @@ struct nhpc_event_s {
    unsigned               accept:1;
    
    unsigned               active:1;
+   unsigned               enabled:1;
 
    unsigned               ready:1;
 #ifdef HAVE_KQUEUE

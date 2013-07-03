@@ -26,6 +26,9 @@
 
 #define NHPC_CLOSE_EVENT   EV_EOF
 #define NHPC_DISABLE_EVENT EV_DISABLE
+#define NHPC_DELETE_EVENT  EV_DELETE
+
+#define NHPC_EOF EV_EOF
 
 nhpc_status_t nhpc_event_kqueue_add_event(nhpc_event_t *ev, nhpc_int_t event, nhpc_uint_t flags);
 nhpc_status_t nhpc_event_kqueue_del_event(nhpc_event_t *ev, nhpc_int_t event, nhpc_uint_t flags);

@@ -29,13 +29,22 @@ void nhpc_accept_event(nhpc_event_t *ev) {
    pthread_t tid;
    
    do {
-      c = nhpc_accept_get_connection(ls);
+      c  = (nhpc_connection_t *)nhpc_get_queue(ls->connections_queue);
+      c->pool	       = nhpc_create_pool(1);
+      c->communication = NULL;
+      
       new_sockfd = accept(ls->socket.fd, (struct sockaddr *)&c->socket.sa_in, &c->socket.socklen);
       if(new_sockfd == -1) {
+	 LOG_ERROR("accept failed()");
 	 nhpc_accept_free_connection(c);
 	 break;
       }
       c->socket.fd = new_sockfd;
+      
+      c->rev->active = 1;
+      c->rev->index  = -1;
+      c->wev->active = 1;
+      c->wev->index  = -1;      
       
       c->rev->handler = nhpc_communication_handler;
       nhpc_add_event(c->rev, NHPC_READ_EVENT, 0);
@@ -46,28 +55,6 @@ void nhpc_accept_event(nhpc_event_t *ev) {
       
    } while (ev->available > 0);
    
-   ev->available = 0;
+   //ev->available = 0;
 }
 
-nhpc_connection_t *nhpc_accept_get_connection(nhpc_listening_t *ls) {
-   nhpc_connection_t *c  = (nhpc_connection_t *)nhpc_get_queue(ls->connections_queue);
-   return c;
-}
-
-void nhpc_accept_free_connection(nhpc_connection_t *c) {
-   nhpc_insert_queue(c->ls->connections_queue, c);
-}
-
-void nhpc_accept_handle_connection(nhpc_connection_t *c) {
-   c->rev->handler = nhpc_communication_handler;
-   nhpc_add_event(c->rev, NHPC_READ_EVENT, 0);
-}
-
-void nhpc_accept_close_connection(nhpc_connection_t *c) {
-   c->rev->close = 1;
-   c->wev->close = 1;
-   
-   shutdown(c->socket.fd, SHUT_RDWR);
-   close(c->socket.fd);
-   nhpc_accept_free_connection(c);
-}

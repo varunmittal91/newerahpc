@@ -28,16 +28,30 @@ struct timeval tv;
 struct timespec ts;
 
 nhpc_status_t nhpc_recv(nhpc_connection_t *c, char *buffer, nhpc_size_t *len) {
-   nhpc_event_t *ev = c->rev;
-
-   int rv;
+   if(c->rev->eof)
+      return NHPC_EOF;
    
-   if(!ev->available)
-      return EINTR;
+   int   rv;
+   char *tmp_buffer = buffer;
+   nhpc_size_t len_downloaded = 0;
+   nhpc_size_t tmp_len = *len;
    
    do {
-      rv = read(c->socket.fd, buffer, *len);
-   } while(rv == -1 && errno == EINTR);
+      rv = read(c->socket.fd, tmp_buffer, tmp_len);
+      if(rv > 0) {
+	 tmp_len    -= rv;
+	 tmp_buffer += rv;
+      } 
+   } while(rv == -1 && errno == EINTR && tmp_len > 0);
+
+   *len = (*len - tmp_len);
+   
+   if(rv == 0) {
+      c->rev->eof = 1;
+      
+      return NHPC_EOF;
+   } else if(rv == -1) {
+   }
    
    return NHPC_SUCCESS;
 }

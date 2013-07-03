@@ -45,6 +45,7 @@ nhpc_status_t nhpc_event_kqueue_set_event(nhpc_event_t *ev, nhpc_int_t filter, n
    nhpc_connection_t *c;
    
    if(nchanges >= maxevents) {
+      LOG_ERROR("Event list full");
       return NHPC_FAIL;
    }
    
@@ -56,25 +57,24 @@ nhpc_status_t nhpc_event_kqueue_set_event(nhpc_event_t *ev, nhpc_int_t filter, n
    kev->flags  = flags;
    kev->udata  = ev;
    
-   ev->index = nchanges;
-   nchanges++;
-
    return NHPC_SUCCESS;
 }
 
 nhpc_status_t nhpc_event_kqueue_add_event(nhpc_event_t *ev, nhpc_int_t event, nhpc_uint_t flags) {
    nhpc_status_t nrv;
 
-   ev->index     = 0;
-   ev->write     = 0;
-   ev->accept    = 0;
-   ev->active    = 1;
-   ev->ready     = 0;
    ev->available = 0;
    ev->eof       = 0;
+   ev->close     = 0;
+   ev->index     = 0;
+   ev->enabled   = 1;
    
    pthread_mutex_lock(&mutex);
+   
    nrv = nhpc_event_kqueue_set_event(ev, event, flags | EV_ADD | EV_ENABLE);
+   ev->index = nchanges;
+   nchanges++;
+
    pthread_mutex_unlock(&mutex);
 
    return nrv;
@@ -83,18 +83,18 @@ nhpc_status_t nhpc_event_kqueue_add_event(nhpc_event_t *ev, nhpc_int_t event, nh
 nhpc_status_t nhpc_event_kqueue_del_event(nhpc_event_t *ev, nhpc_int_t event, nhpc_uint_t flags) {
    pthread_mutex_lock(&mutex);
 
-   if(flags & NHPC_DISABLE_EVENT) {
-      flags |= EV_DISABLE;
-      nhpc_event_kqueue_set_event(ev, event, flags);
-   }
-   else {
+   nhpc_event_t *e;
+   
+   if(ev->index > 0 && ev->index < nchanges && ev == changelist[ev->index].udata) {
       nchanges--;
+
       if(ev->index < nchanges) {
+	 e = (nhpc_event_t *)changelist[nchanges].udata;
 	 changelist[ev->index] = changelist[nchanges];
-	 nhpc_event_t *e = (nhpc_event_t *)changelist[ev->index].udata;
 	 e->index = ev->index;
       }
-   }
+      ev->enabled = 0;
+   }   
    
    pthread_mutex_unlock(&mutex);
    return NHPC_SUCCESS;   
@@ -126,7 +126,7 @@ nhpc_status_t nhpc_event_kqueue_process_changes(nhpc_listening_t *ls) {
 	 return NHPC_FAIL;
       } else if(events > 0) {
 	 for(int i = 0; i < events; i++) {
-	    
+
 	    if(eventlist[i].data & EV_ERROR) {
 	       cout << "Error in list" << endl;
 	    }
@@ -135,15 +135,24 @@ nhpc_status_t nhpc_event_kqueue_process_changes(nhpc_listening_t *ls) {
 	       LOG_ERROR("kevent() udata empty");
 	       continue;
 	    }
+	    c  = (nhpc_connection_t *)ev->data;
 	    
-	    if(ev->available) {
+	    if(ev->available || c->socket.fd == 0) {
 	       continue;
-	    } else if(!ev->accept) {
+	    }
+	    
+	    if(!ev->accept) {
 	       ev->available = eventlist[i].data;
-	       ev->handler(ev);
+	       if(worker_pool)
+		  nhpc_submit_job_worker_pool(ev);
+	       else {
+		  ev->handler(ev);
+		  ev->available = 0;
+	       }
 	    } else {
 	       ev->available = eventlist[i].data;
 	       ev->handler(ev);
+	       ev->available = 0;
 	    }
 	 }
       }

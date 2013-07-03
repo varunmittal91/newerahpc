@@ -19,15 +19,18 @@
 
 #include <include/neweraHPC.h>
 
-nhpc_network_handler_t http_request_handlers = {
-   http_init_request,
-   http_cleanup_request
+using namespace std;
+
+nhpc_http_request_types http_request_types[] = {
+   "GET ", NHPC_HTTP_GET_REQUEST,
+   "POST", NHPC_HTTP_POST_REQUEST,
 };
 
-void http_init_request(nhpc_connection_t *c) {
+void nhpc_http_handler(nhpc_event_t *ev) {
+   //cout << "HTTP Handler" << endl;   
+   nhpc_connection_t *c = (nhpc_connection_t *)ev->data;
    
-}
-
-void http_cleanup_request(nhpc_connection_t *c) {
-
+   usleep(200);
+   
+   nhpc_accept_close_connection(c);
 }

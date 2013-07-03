@@ -19,8 +19,12 @@
 
 #include <include/nhpc_general.h>
 
+using namespace std;
+
 nhpc_pool_t *nhpc_create_pool(nhpc_size_t size) {
-   nhpc_pool_t *p = (nhpc_pool_t *)nhpc_calloc(size * NHPC_DEFAULT_POOL_SIZE);
+   
+   size = size * NHPC_DEFAULT_POOL_SIZE;
+   nhpc_pool_t *p = (nhpc_pool_t *)nhpc_calloc(size);
    
    if(!p)
       return NULL;

@@ -17,11 +17,21 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NHPC_RECV_H_
-#define _NHPC_RECV_H_
+extern nhpc_worker_pool_t *worker_pool;
 
-#include <include/neweraHPC.h>
+struct nhpc_worker_s {
+   pthread_mutex_t   mutex;
+   pthread_cond_t    cond;
+   nhpc_event_t     *ev;
+   pthread_t         tid;
+};
 
-nhpc_status_t nhpc_recv(nhpc_connection_t *c, char *buffer, nhpc_size_t *len);
+struct nhpc_worker_pool_s {
+   nhpc_uint_t      count;
+   nhpc_queue_t    *workers_queue;
+   nhpc_worker_t  **workers;
+};
 
-#endif
+void *nhpc_init_worker_pool(nhpc_pool_t *p, nhpc_uint_t count);
+void  nhpc_submit_job_worker_pool(nhpc_event_t *ev);
+

@@ -17,11 +17,10 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NHPC_RECV_H_
-#define _NHPC_RECV_H_
-
 #include <include/neweraHPC.h>
 
-nhpc_status_t nhpc_recv(nhpc_connection_t *c, char *buffer, nhpc_size_t *len);
+using namespace std;
 
-#endif
+void nhpc_http_parse_status(nhpc_http_request_t *http_request, char *command_str) {
+
+}

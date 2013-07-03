@@ -19,6 +19,15 @@
 
 #include <include/neweraHPC.h>
 
+void nhpc_strcpy(char *dst, const char *src, nhpc_size_t len) {
+   memcpy(dst, src, len);
+   dst[len] = '\0';
+}
+
+void nhpc_strcpy(char *dst, const char *src) {
+   nhpc_strcpy(dst, src, strlen(src));
+}
+
 nhpc_int_t nhpc_strcmp(const char *s1, const char *s2) {
    const char *tmp_s1 = s1;
    const char *tmp_s2 = s2;
@@ -95,4 +104,42 @@ char *nhpc_itoa(char *dst, int num) {
    dst[count] = '\0';
 
    return dst;
+}
+
+int nhpc_strfind(const char *s1, const char s2)
+{
+   return nhpc_strfind(s1, s2, 1);
+}
+
+int nhpc_strfind(const char *s1, const char s2, int old_position)
+{
+   const char *tmp_s1 = s1;
+   int position = 0;
+   
+   old_position--;
+   while(*tmp_s1 != '\0' && old_position != 0)
+   {
+      tmp_s1++;
+      old_position--;
+      position++;
+   }
+   
+   if(old_position > 0)
+   {
+      position = 0;
+      return position;
+   }
+   
+   while(*tmp_s1 != '\0')
+   {
+      position++;
+      if(*tmp_s1 == s2)
+      {
+	 return position;
+      }	 
+      tmp_s1++;
+   }
+   
+   position = 0;
+   return position;
 }

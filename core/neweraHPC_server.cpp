@@ -27,13 +27,13 @@ void *producer(void *data) {
 
 int main(int argc, char **argv)
 {
+   nhpc_status_t nrv;
+   
    neweraHPC_init(argc, argv);
    nhpc_init_network();
    nhpc_init_http();
-   nhpc_create_server("localhost", "8080");
+   if((nrv = nhpc_create_server("0.0.0.0", "8080")) != NHPC_SUCCESS)
+      perror("nhpc_create_server");
 
-   pthread_t tid;
-   
-   while(1)
-      sleep(1);
+   pthread_t tid;   
 }

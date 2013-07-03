@@ -30,7 +30,6 @@
 #define NHPC_BUFFER_EMPTY  0
 #define NHPC_BUFFER_FULL   1
 #define NHPC_BUFFER_LOCKED 2
-#define NHPC_EOF           8
 
 #define NHPC_CONNECTION_OCCUPIED       1
 #define NHPC_CONNECTION_READING        2
@@ -46,18 +45,21 @@ struct nhpc_peer_addr_t
 };
 
 struct nhpc_connection_s {
-   nhpc_socket_t       socket;
-   nhpc_peer_addr_t    peer;
+   nhpc_socket_t           socket;
+   nhpc_peer_addr_t        peer;
    
-   nhpc_listening_t   *ls;
-   nhpc_event_t       *rev;
-   nhpc_event_t       *wev;
+   nhpc_listening_t       *ls;
+   nhpc_event_t           *rev;
+   nhpc_event_t           *wev;
+   
+   nhpc_pool_t            *pool;
+   
+   nhpc_communication_t   *communication;
 };
 
 struct nhpc_listening_s {
-   nhpc_peer_addr_t    host;
-   
    nhpc_socket_t       socket;
+   nhpc_peer_addr_t    host;   
    
    nhpc_queue_t       *connections_queue;
    nhpc_connection_t  *connections;
@@ -76,5 +78,7 @@ void nhpc_destroy_listeneing(nhpc_listening_t *ls);
 
 void nhpc_init_connection(nhpc_connection_t *c);
 void nhpc_destroy_connection(nhpc_connection_t *c);
+void nhpc_shutdown_connection(nhpc_connection_t *c, int how);
+void nhpc_close_connection(nhpc_connection_t *c);
 
 #endif

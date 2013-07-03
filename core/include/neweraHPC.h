@@ -26,7 +26,7 @@
 extern nhpc_pool_t *main_pool;
 
 static nhpc_status_t neweraHPC_init(int argc, char **argv) {
-   main_pool = nhpc_create_pool(1);
+   main_pool = nhpc_create_pool(4);
    if(!main_pool)
       return NHPC_FAIL;
    

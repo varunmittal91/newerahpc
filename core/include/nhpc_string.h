@@ -27,14 +27,14 @@ struct nhpc_str_t {
    u_char      *data;
 };
 
-static inline void nhpc_strcpy(char *dst, const char *src) {
-   nhpc_size_t len = strlen(src);
-   
-   memcpy(dst, src, strlen(src));
-   dst[len] = '\0';
-}
+void nhpc_strcpy(char *dst, const char *src);
+void nhpc_strcpy(char *dst, const char *src, nhpc_size_t len);
 
-nhpc_int_t    nhpc_strcmp(const char *s1, const char *s2);
+nhpc_int_t nhpc_strcmp(const char *s1, const char *s2);
 
-char *        nhpc_itoa(char *dst, int i);
+char *nhpc_itoa(char *dst, int i);
+
+int nhpc_strfind(const char *s1, const char s2);
+int nhpc_strfind(const char *s1, const char s2, int old_position);
+
 #endif

@@ -19,6 +19,8 @@
 
 #include <include/nhpc_general.h>
 
+using namespace std;
+
 inline void nhpc_rbtree_rb_link_node(rb_node *new_node, rb_node *parent, rb_node **rb_link)
 {
    if(parent)
@@ -141,8 +143,8 @@ rb_node *nhpc_rbtree_search_node(nhpc_rbtree_t *rbtree, int *key_num, const char
    
    while(node)
    {
-      if(key_str)
-	 key = strcmp(*key_str, node->key.str);
+      if(key_str) 
+	 key = nhpc_strcmp(*key_str, node->key.str);
       else 
 	 key = *key_num - node->key.num;
       

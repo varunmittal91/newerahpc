@@ -21,6 +21,8 @@
 #define _NHPC_HTTP_H_
 
 #include "nhpc_http_request.h"
+#include "nhpc_http_data.h"
+#include "nhpc_http_parse.h"
 
 nhpc_status_t nhpc_init_http();
 

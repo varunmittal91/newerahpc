@@ -20,11 +20,27 @@
 #ifndef _NHPC_ACCEPT_H_
 #define _NHPC_ACCEPT_H_
 
+using namespace std;
+
 void nhpc_accept_event(nhpc_event_t *ev);
 
-nhpc_connection_t *nhpc_accept_get_connection(nhpc_listening_t *ls);
-void               nhpc_accept_free_connection(nhpc_connection_t *);
-void               nhpc_accept_handle_connection(nhpc_connection_t *c);
-void               nhpc_accept_close_connection(nhpc_connection_t *c);
+static inline void nhpc_accept_free_connection(nhpc_connection_t *c) {
+   nhpc_insert_queue(c->ls->connections_queue, c);
+   if(c->pool)
+      nhpc_destroy_pool(c->pool);
+   c->pool = NULL;
+   c->rev->active = 0;
+   c->wev->active = 0;
+   c->socket.fd   = 0;
+}
+static inline void nhpc_accept_close_connection(nhpc_connection_t *c) {
+   if(!c->rev->active) {
+      LOG_ERROR("failed to close connection");
+      exit(0);
+   }
+   nhpc_shutdown_connection(c, SHUT_RDWR);
+   nhpc_close_connection(c);
+   nhpc_accept_free_connection(c);
+}
 
 #endif

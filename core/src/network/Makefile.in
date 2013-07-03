@@ -66,7 +66,7 @@ libnetwork_la_LIBADD =
 am__objects_1 = nhpc_socket.lo nhpc_server.lo nhpc_accept.lo \
 	nhpc_waitio.lo nhpc_connection.lo nhpc_http.lo \
 	nhpc_http_request.lo nhpc_communication.lo nhpc_recv.lo \
-	nhpc_send.lo nhpc_event.lo nhpc_event_kqueue.lo
+	nhpc_send.lo nhpc_event.lo nhpc_event_kqueue.lo nhpc_worker.lo
 am_libnetwork_la_OBJECTS = $(am__objects_1)
 libnetwork_la_OBJECTS = $(am_libnetwork_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -227,7 +227,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SOURCES = nhpc_socket.cpp nhpc_server.cpp nhpc_accept.cpp nhpc_waitio.cpp nhpc_connection.cpp nhpc_http.cpp nhpc_http_request.cpp \
-nhpc_communication.cpp nhpc_recv.cpp nhpc_send.cpp nhpc_event.cpp nhpc_event_kqueue.cpp
+nhpc_communication.cpp nhpc_recv.cpp nhpc_send.cpp nhpc_event.cpp nhpc_event_kqueue.cpp nhpc_worker.cpp
 
 noinst_LTLIBRARIES = libnetwork.la 
 libnetwork_la_SOURCES = $(SOURCES)
@@ -295,6 +295,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nhpc_server.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nhpc_socket.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nhpc_waitio.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nhpc_worker.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

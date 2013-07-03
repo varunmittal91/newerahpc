@@ -135,14 +135,14 @@ nhpc_status_t nhpc_event_kqueue_process_changes(nhpc_listening_t *ls) {
 	       LOG_ERROR("kevent() udata empty");
 	       continue;
 	    }
-	    c  = (nhpc_connection_t *)ev->data;
 	    
+	    c  = (nhpc_connection_t *)ev->data;
 	    if(ev->available || c->socket.fd == 0) {
 	       continue;
 	    }
 	    
 	    if(!ev->accept) {
-	       ev->available = eventlist[i].data;
+	       ev->available = 1;
 	       if(worker_pool)
 		  nhpc_submit_job_worker_pool(ev);
 	       else {

@@ -27,6 +27,11 @@ struct nhpc_str_t {
    u_char      *data;
 };
 
+struct nhpc_key_pair_t {
+   char  *key;
+   char  *value;
+};
+
 void nhpc_strcpy(char *dst, const char *src);
 void nhpc_strcpy(char *dst, const char *src, nhpc_size_t len);
 
@@ -36,5 +41,7 @@ char *nhpc_itoa(char *dst, int i);
 
 int nhpc_strfind(const char *s1, const char s2);
 int nhpc_strfind(const char *s1, const char s2, int old_position);
+
+char *nhpc_substr(char *dst, char *src, int p1, int p2);
 
 #endif

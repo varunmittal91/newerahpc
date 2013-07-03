@@ -20,6 +20,8 @@
 #include <include/neweraHPC.h>
 
 nhpc_status_t nhpc_init_http() {
+   nhpc_http_init_parser();
+   
    nhpc_network_insert_addon(nhpc_http_handler, "GET*HTTP/1.1");
    nhpc_network_insert_addon(nhpc_http_handler, "GET*HTTP/1.0");
 }

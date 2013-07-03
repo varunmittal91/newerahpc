@@ -26,9 +26,6 @@
 #define NHPC_SUCCESS  0
 #define NHPC_FAIL    -1
 
-typedef unsigned int  nhpc_status_t;
-typedef size_t        nhpc_size_t;
-
 #ifdef __x86_64__
 typedef uint64_t nhpc_uint_t;
 typedef int64_t  nhpc_int_t;
@@ -36,6 +33,9 @@ typedef int64_t  nhpc_int_t;
 typedef uint32_t nhpc_uint_t;
 typedef int32_t  nhpc_int_t;
 #endif
+
+typedef nhpc_int_t  nhpc_status_t;
+typedef size_t      nhpc_size_t;
 
 typedef unsigned char u_char;
 

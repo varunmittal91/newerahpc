@@ -35,27 +35,27 @@ void nhpc_destroy_connection(nhpc_connection_t *c) {
 void nhpc_shutdown_connection(nhpc_connection_t *c, int how) {
 
    if(how == SHUT_RD || how == SHUT_RDWR) {
-      shutdown(c->socket.fd, SHUT_RD);
-
       if(c->rev->enabled)
 	 nhpc_del_event(c->rev, NHPC_READ_EVENT, NHPC_DELETE_EVENT);
+      
+      shutdown(c->socket.fd, SHUT_RD);      
    }
    
-   if(how == SHUT_WR || how == SHUT_RDWR) {
-      shutdown(c->socket.fd, SHUT_WR);
-      
+   if(how == SHUT_WR || how == SHUT_RDWR) {      
       if(c->wev->enabled)
 	 nhpc_del_event(c->wev, NHPC_WRITE_EVENT, NHPC_DELETE_EVENT);
+      
+      shutdown(c->socket.fd, SHUT_WR);
    }
 }
 
 void nhpc_close_connection(nhpc_connection_t *c) {
-   close(c->socket.fd);
-   
    if(c->rev->enabled)
       nhpc_del_event(c->rev, NHPC_READ_EVENT, NHPC_CLOSE_EVENT);
    if(c->wev->enabled)
       nhpc_del_event(c->wev, NHPC_WRITE_EVENT, NHPC_CLOSE_EVENT);
+
+   close(c->socket.fd);
 }
 
 void nhpc_init_listening(nhpc_listening_t *ls) {

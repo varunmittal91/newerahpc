@@ -17,4 +17,8 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-void nhpc_http_parse_status(nhpc_http_request_t *http_request, char *command_str);
+void          nhpc_http_init_parser();
+nhpc_status_t nhpc_http_parse_header(nhpc_http_request_t *http_request, char *header_str);
+
+nhpc_status_t nhpc_http_parse_request_str(nhpc_http_request_t *http_request, char *request_str);
+nhpc_status_t nhpc_http_parse_http_version(nhpc_http_request_t *http_request, char *http_version);

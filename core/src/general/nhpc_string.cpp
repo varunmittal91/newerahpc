@@ -143,3 +143,7 @@ int nhpc_strfind(const char *s1, const char s2, int old_position)
    position = 0;
    return position;
 }
+
+char *nhpc_substr(char *dst, char *src, int p1, int p2) {
+   
+}

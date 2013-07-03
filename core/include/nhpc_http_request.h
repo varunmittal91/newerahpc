@@ -26,6 +26,9 @@ typedef void (*nhpc_http_handler_ptr)(nhpc_http_request_t *);
 #define NHPC_HTTP_POST_REQUEST    0x0002
 #define NHPC_HTTP_INVALID_REQUEST 0x0004
 
+#define NHPC_HTTP_VERSION_1_0     0x0001
+#define NHPC_HTTP_VERSION_1_1	  0x0002
+
 struct nhpc_http_request_types {
    const char  *str;
    nhpc_uint_t  value;
@@ -41,16 +44,21 @@ struct nhpc_http_status_s {
 struct nhpc_http_request_s {
    nhpc_connection_t       *c;
    nhpc_communication_t    *communication;
+   nhpc_pool_t             *pool;
    
    nhpc_http_handler_ptr    read_handler;
    nhpc_http_handler_ptr    write_handler;
    
-   nhpc_http_status_s       nhpc_http_status_t;
+   nhpc_http_status_s       status;
+   
+   char                    *request_str;
+   nhpc_rbtree_t           *request_get_variables;
    
    unsigned                 read:1;
    unsigned                 write:1;
 };
 
 void nhpc_http_handler(nhpc_event_t *ev);
+nhpc_http_request_t *nhpc_http_init_request_data(nhpc_pool_t *p, nhpc_communication_t *cm);
 
 #endif

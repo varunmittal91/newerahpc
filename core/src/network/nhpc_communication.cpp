@@ -29,20 +29,24 @@ void nhpc_communication_handler(nhpc_event_t *ev) {
    char *partial_data;
    nhpc_size_t len = 1000;
    nhpc_size_t partial_datalen = 0;
+   bzero(buffer, 1000);
 
    nhpc_communication_t   *communication;
    nhpc_event_handler_ptr  handler;
    
    nrv = nhpc_recv(c, buffer, &len);
    if(nrv != NHPC_SUCCESS && nrv != NHPC_EOF) {
-      //nhpc_accept_close_connection(c);
       LOG_ERROR("nhpc_recv(), failed");
       return;
    }
    
    nrv = nhpc_read_communication(c, buffer, len, &partial_data, &partial_datalen);
-   if(nrv != NHPC_SUCCESS || !c->communication->command_str) {
-      return;
+   if(nrv != NHPC_SUCCESS) {
+      if(c->rev->eof) {
+	 nhpc_accept_close_connection(c);
+	 return;
+      } else if(!c->communication->command_str)
+	 return;
    }
    
    communication = c->communication;   
@@ -106,6 +110,9 @@ nhpc_status_t nhpc_read_communication(nhpc_connection_t *c, char *buffer, nhpc_s
 	 start = i + 2;
       }
    }
+   
+   if(!communication->have_headers)
+      return NHPC_FAIL;
    
    if(i  < bufferlen) {
       *partial_datalen = (bufferlen - i);

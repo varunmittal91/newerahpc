@@ -17,20 +17,4 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GENERAL_H_
-#define _GENERAL_H_
-
-#include "nhpc_atomic.h"
-#include "nhpc_options.h"
-#include "nhpc_log.h"
-#include "nhpc_string.h"
-#include "nhpc_alloc.h"
-#include "nhpc_palloc.h"
-#include "nhpc_rbtree.h"
-#include "nhpc_config.h"
-#include "nhpc_thread.h"
-#include "nhpc_queue.h"
-#include "nhpc_buffer.h"
-#include "nhpc_file.h"
-
-#endif
+void nhpc_http_prepare_response(nhpc_http_request_t *http_request);

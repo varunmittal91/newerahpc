@@ -32,6 +32,17 @@ struct nhpc_worker_pool_s {
    nhpc_worker_t  **workers;
 };
 
+#define nhpc_get_worker_from_pool() ((nhpc_worker_t *)nhpc_get_queue(worker_pool->workers_queue))
+#define nhpc_free_worker_to_pool(w) (nhpc_insert_queue(worker_pool->workers_queue, w))
+#define nhpc_add_event_worker(w, ev) \
+pthread_mutex_lock(&w->mutex);       \
+w->ev = ev;                          \
+pthread_cond_signal(&w->cond);       \
+pthread_mutex_unlock(&w->mutex);
+
 void *nhpc_init_worker_pool(nhpc_pool_t *p, nhpc_uint_t count);
-void  nhpc_submit_job_worker_pool(nhpc_event_t *ev);
+static inline void  nhpc_submit_job_worker_pool(nhpc_event_t *ev) {
+   nhpc_worker_t *worker = nhpc_get_worker_from_pool();
+   nhpc_add_event_worker(worker, ev);  
+}
 

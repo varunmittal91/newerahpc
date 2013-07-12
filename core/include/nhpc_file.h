@@ -17,20 +17,17 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GENERAL_H_
-#define _GENERAL_H_
+#ifndef _NHPC_FILE_H_
+#define _NHPC_FILE_H_
 
-#include "nhpc_atomic.h"
-#include "nhpc_options.h"
-#include "nhpc_log.h"
-#include "nhpc_string.h"
-#include "nhpc_alloc.h"
-#include "nhpc_palloc.h"
-#include "nhpc_rbtree.h"
-#include "nhpc_config.h"
-#include "nhpc_thread.h"
-#include "nhpc_queue.h"
-#include "nhpc_buffer.h"
-#include "nhpc_file.h"
+#define NHPC_FILE_NOT_FOUND    1
+#define NHPC_FILE              2
+#define NHPC_DIRECTORY         4
+
+#define NHPC_VISIBLE_DIR_CHILD 1
+#define NHPC_ALL_DIR_CHILD     2
+
+nhpc_status_t nhpc_file_size(const char *file_path, nhpc_size_t *size);
+nhpc_status_t nhpc_fileordirectory(const char *file_path);
 
 #endif

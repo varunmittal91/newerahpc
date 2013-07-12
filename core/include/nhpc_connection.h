@@ -60,6 +60,9 @@ struct nhpc_connection_s {
 struct nhpc_listening_s {
    nhpc_socket_t       socket;
    nhpc_peer_addr_t    host;   
+
+   nhpc_pool_t        *pool;
+   
    
    nhpc_queue_t       *connections_queue;
    nhpc_connection_t  *connections;

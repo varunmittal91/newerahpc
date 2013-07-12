@@ -21,6 +21,9 @@
 
 using namespace std;
 
+const char *temp_error_response = "<html><head><title>Content Not Found</title></head><body><center><h1>404 - Content Not Found</h1></center></body></html>";
+const char *temp_error_invalid  = "<html><head><title>Bad Request</title></head><body><center><h1>400 - Bad Request</h1></center></body></html>";
+
 nhpc_http_request_types http_request_types[] = {
    "GET " , NHPC_HTTP_GET_REQUEST,
    "POST ", NHPC_HTTP_POST_REQUEST,
@@ -38,10 +41,64 @@ void nhpc_http_handler(nhpc_event_t *ev) {
       http_request = (nhpc_http_request_t *)cm->data;
    }
    
-   if(http_request->status.request_type & NHPC_HTTP_INVALID_REQUEST)
-      cout << "Invalid request encountered" << endl;
+   http_request->response_buffer = nhpc_buffer_init(http_request->pool);
+
+   if(0) {
+      /* the application handler routine  will be placed here */   
+   } else {
+      /* prepare response based on file/dir check routine */
+   }
    
-   nhpc_accept_close_connection(c);
+   nhpc_http_prepare_response(http_request);
+
+   if(http_request->status.request_type & NHPC_HTTP_INVALID_REQUEST) {      
+      nhpc_shutdown_connection(c, SHUT_RD);
+
+      nhpc_buffer_add_data(http_request->response_buffer, (u_char *)temp_error_invalid, strlen(temp_error_invalid), 
+			   NHPC_BUFFER_DATA_MEM_BLOCK, 0);
+      nhpc_add_event(c->wev, NHPC_WRITE_EVENT, 0);
+      c->wev->handler = nhpc_http_write_handler;
+   } else {
+      nhpc_shutdown_connection(c, SHUT_RD);
+
+      nhpc_buffer_add_data(http_request->response_buffer, (u_char *)temp_error_invalid, strlen(temp_error_invalid), 
+			   NHPC_BUFFER_DATA_MEM_BLOCK, 0);
+      nhpc_add_event(c->wev, NHPC_WRITE_EVENT, 0);
+      c->wev->handler = nhpc_http_write_handler;
+   }
+   c->wev->handler(c->wev);
+}
+
+void nhpc_http_write_handler(nhpc_event_t *ev) {
+   nhpc_connection_t    *c  = (nhpc_connection_t *) ev->data;
+   nhpc_communication_t *cm = c->communication;
+   
+   nhpc_http_request_t *http_request = (nhpc_http_request_t *) cm->data;
+   nhpc_buffer_t *buffer = http_request->response_buffer;
+   
+   nhpc_size_t datasent = (buffer->end - buffer->start);
+   nhpc_status_t nrv = nhpc_send(c, (char *)buffer->start, &datasent);
+   
+   cout << "Send code nrv:" << nrv << endl;
+   if(nrv == NHPC_EOF) {
+      nhpc_accept_close_connection(c);      
+   } else if(nrv == NHPC_SUCCESS) {
+      if((datasent = (buffer->end - buffer->start) - datasent) > 0) {
+	 buffer->start += datasent;
+      }
+      else {
+	 if(buffer->chain) {
+	    buffer->start = buffer->chain->start;
+	    buffer->end   = buffer->chain->end;
+	    
+	    buffer->chain = buffer->chain->next;
+	 }
+	 else {
+	    nhpc_accept_close_connection(c);      
+	    return;
+	 }
+      }
+   }
 }
 
 nhpc_http_request_t *nhpc_http_init_request_data(nhpc_pool_t *p, nhpc_communication_t *cm) {
@@ -84,5 +141,6 @@ nhpc_http_request_t *nhpc_http_init_request_data(nhpc_pool_t *p, nhpc_communicat
    nhpc_http_parse_http_version(http_request, http_version);
    
 return_http_request:
+   
    return http_request;
 }

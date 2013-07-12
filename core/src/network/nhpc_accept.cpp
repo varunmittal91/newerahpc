@@ -35,7 +35,6 @@ void nhpc_accept_event(nhpc_event_t *ev) {
       
       new_sockfd = accept(ls->socket.fd, (struct sockaddr *)&c->socket.sa_in, &c->socket.socklen);
       if(new_sockfd == -1) {
-	 LOG_ERROR("accept failed()");
 	 nhpc_accept_free_connection(c);
 	 break;
       }
@@ -54,7 +53,5 @@ void nhpc_accept_event(nhpc_event_t *ev) {
 #endif
       
    } while (ev->available > 0);
-   
-   //ev->available = 0;
 }
 

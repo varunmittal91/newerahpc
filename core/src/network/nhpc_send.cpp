@@ -19,6 +19,44 @@
 
 #include <include/neweraHPC.h>
 
-nhpc_status_t nhpc_send(nhpc_socket_t *socket, char *buffer, nhpc_size_t *len) {
+nhpc_status_t nhpc_send(nhpc_connection_t *c, char *buffer, nhpc_size_t *len) {
+   if(c->wev->eof)
+      return NHPC_EOF;
+   
+   int   rv;
+   char *tmp_buffer = buffer;
+   nhpc_size_t tmp_len = *len;
+   
+   do {
+      rv = write(c->socket.fd, tmp_buffer, tmp_len);
+      if(rv > 0) {
+	 tmp_len    -= rv;
+	 tmp_buffer += rv;
+      }
+   } while(rv == -1 && errno == EINTR && tmp_len > 0);
+   
+   *len = *len - tmp_len;
+   
+   if(rv == 0) {
+      c->wev->eof = 1;
+      return NHPC_EOF;
+   }
+   
+   if(rv == -1) {
+      perror("write()");
+      
+      cout << errno << endl;
+      
+      return EINTR;
+   }
+   
+   return NHPC_SUCCESS;
+}
 
+nhpc_status_t nhpc_send_file(nhpc_connection_t *c, char *filepath) {
+   
+}
+
+void nhpc_send_file_handler(nhpc_event_t *ev) {
+   
 }

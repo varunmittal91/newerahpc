@@ -57,8 +57,8 @@ extern nhpc_event_actions_t nhpc_event_actions;
 #define nhpc_add_event        nhpc_event_actions.add
 #define nhpc_del_event        nhpc_event_actions.del
 #define nhpc_process_changes  nhpc_event_actions.process_changes
-#define nhpc_init_event       nhpc_event_actions.init
 #define nhpc_done_event       nhpc_event_actions.done
+nhpc_status_t nhpc_init_event(nhpc_listening_t *ls);
 
 struct nhpc_event_s {
    void                  *data;
@@ -86,7 +86,17 @@ struct nhpc_event_s {
    
    unsigned               close;
    
+   unsigned               posted_enabled;
+   
    nhpc_event_handler_ptr handler;   
 };
+extern nhpc_rbtree_t *nhpc_posted_events;
+#define nhpc_add_posted_event(ev)         (nhpc_rbtree_insert(nhpc_posted_events, ev))
+#define nhpc_del_posted_event(i)          (nhpc_rbtree_erase(nhpc_posted_events, i))         
+#define nhpc_get_posted_event(i)          ((nhpc_event_t *)nhpc_rbtree_search(nhpc_posted_events, i))
+#define nhpc_get_posted_event_length()    (nhpc_rbtree_length(nhpc_posted_events))
+
+void *nhpc_monitor_posted_events(nhpc_listening_t *ls);
+void  nhpc_init_posted_events(nhpc_listening_t *ls);
 
 #endif

@@ -17,22 +17,35 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-struct nhpc_buffer_t {
-   nhpc_size_t      max;
-   nhpc_size_t      len;
-   pthread_mutex_t  mutex;
-   pthread_cond_t   cond;
+#define NHPC_BUFFER_DATA_FILE      0x1
+#define NHPC_BUFFER_DATA_MEM_BLOCK 0x2
+#define NHPC_BUFFER_DEALLOCATE     0x4
+
+struct nhpc_chain_t {
+   nhpc_chain_t *next;
+   u_char       *start;
+   u_char       *end;
 };
 
-nhpc_buffer_t *nhpc_buffer_init(nhpc_size_t size);
+struct nhpc_buffer_t {
+   u_char         *address;
+   nhpc_size_t     data_len;
+   nhpc_uint_t     data_type;
+
+   u_char         *start;
+   u_char         *end;
+   
+   unsigned        deallocate:1;            
+   unsigned        file_io:1;
+   
+   FILE           *fp;
+   
+   nhpc_pool_t    *pool;
+   
+   nhpc_chain_t   *chain;
+};
+
+nhpc_buffer_t *nhpc_buffer_init(nhpc_pool_t *p);
 void           nhpc_buffer_destroy(nhpc_buffer_t *buffer);
-
-u_char *nhpc_buffer_get_dataptr(nhpc_buffer_t *buffer, nhpc_size_t *len);
-u_char *nhpc_buffer_get_data(nhpc_buffer_t *buffer, nhpc_size_t *len);
-
-void nhpc_buffer_set_length(nhpc_buffer_t *buffer, nhpc_size_t l);
-
-#define nhpc_buffer_set_empty(b)  nhpc_buffer_set_length(b, 0)
-
-#define nhpc_buffer_is_empty(b) (b->len == 0)
-#define nhpc_buffer_is_full(b)  (b->len == b->max)
+void           nhpc_buffer_add_data(nhpc_buffer_t *buffer, u_char *address, nhpc_size_t data_len, 
+				    nhpc_uint_t buffer_data_type, nhpc_uint_t deallocate = 0);

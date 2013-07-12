@@ -20,6 +20,9 @@
 #ifndef _NHPC_SEND_H_
 #define _NHPC_SEND_H_
 
-nhpc_status_t nhpc_send(nhpc_socket_t *socket, char *buffer, nhpc_size_t *len);
+nhpc_status_t nhpc_send(nhpc_connection_t *c, char *buffer, nhpc_size_t *len);
+nhpc_status_t nhpc_send_file(nhpc_connection_t *c, char *filepath);
+
+void nhpc_send_file_handler(nhpc_event_t *ev);
 
 #endif

@@ -23,6 +23,7 @@
 #include "nhpc_http_request.h"
 #include "nhpc_http_data.h"
 #include "nhpc_http_parse.h"
+#include "nhpc_http_response.h"
 
 nhpc_status_t nhpc_init_http();
 

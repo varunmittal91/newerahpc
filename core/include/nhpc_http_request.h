@@ -56,9 +56,26 @@ struct nhpc_http_request_s {
    
    unsigned                 read:1;
    unsigned                 write:1;
+   
+   nhpc_buffer_t           *response_buffer;
 };
 
 void nhpc_http_handler(nhpc_event_t *ev);
+void nhpc_http_write_handler(nhpc_event_t *ev);
+
 nhpc_http_request_t *nhpc_http_init_request_data(nhpc_pool_t *p, nhpc_communication_t *cm);
+
+#define NHPC_HTTP_STATUS_OK                    200
+
+#define NHPC_HTTP_STATUS_MOVED_PERMANENTLY     301
+#define NHPC_HTTP_STATUS_FOUND                 302
+
+#define NHPC_HTTP_STATUS_BAD_REQUEST           400
+#define NHPC_HTTP_STATUS_UNAUTHRIZED           401
+#define NHPC_HTTP_STATUS_FORBIDDEN             403
+#define NHPC_HTTP_STATUS_NOT_FOUND             404
+
+#define NHPC_HTTP_STATUS_INTERNAL_SERVER_ERROR 500
+#define NHPC_HTTP_STATUS_NOT_IMPLEMENTED       501
 
 #endif

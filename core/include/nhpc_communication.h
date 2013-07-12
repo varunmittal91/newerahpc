@@ -21,12 +21,14 @@
 #define _NHPC_COMMUNICATION_H_
 
 struct nhpc_communication_s {
-   char           *command_str;
-   nhpc_rbtree_t  *headers;
+   char                   *command_str;
+   nhpc_rbtree_t          *headers;
 
-   unsigned        have_headers:1;
+   unsigned                have_headers:1;
    
-   void           *data;
+   void                   *data;
+   
+   nhpc_event_handler_ptr  handler;
 };
 
 void          nhpc_communication_handler(nhpc_event_t *ev);

@@ -51,15 +51,15 @@ struct rb_node
 #define rb_set_parent(r, p)    ((r)->rb_parent = p)    
 #define rb_set_color(r, color) ((r)->rb_color) = color
 
-#define RBTREE_NUM         1
-#define RBTREE_NUM_MANAGED 2
-#define RBTREE_STR         4
-#define RBTREE_HASH        8
+#define RBTREE_NUM         1  // 0x0001
+#define RBTREE_NUM_MANAGED 2  // 0x0002
+#define RBTREE_STR         4  // 0x0004
+#define RBTREE_HASH        8  // 0x0008
 
-#define rb_mode_is_num(m)         (m & 1)
-#define rb_mode_is_num_managed(m) ((m >> 1) & 1)
-#define rb_mode_is_str(m)         ((m >> 2) & 1)
-#define rb_mode_is_hash(m)        ((m >> 3) & 1)
+#define rb_mode_is_num(m)         (m & RBTREE_NUM)
+#define rb_mode_is_num_managed(m) (m & RBTREE_NUM_MANAGED) // ((m >> 1) & 1)
+#define rb_mode_is_str(m)         (m & RBTREE_STR)         // ((m >> 2) & 1)
+#define rb_mode_is_hash(m)        (m & RBTREE_HASH)        // ((m >> 3) & 1)
 
 struct nhpc_rbtree_t
 {
@@ -113,10 +113,10 @@ inline int nhpc_rbtree_length(nhpc_rbtree_t *rbtree, const char *key)
       return 0;      
 }
 
-nhpc_status_t nhpc_rbtree_erase(int key);
-nhpc_status_t nhpc_rbtree_erase(int key, int subkey);
-nhpc_status_t nhpc_rbtree_erase(const char *key);
-nhpc_status_t nhpc_rbtree_erase(const char *key, int subkey);
-nhpc_status_t nhpc_rbtree_erase_inorder(int pos);
+nhpc_status_t nhpc_rbtree_erase(nhpc_rbtree_t *rbtree, int key);
+nhpc_status_t nhpc_rbtree_erase(nhpc_rbtree_t *rbtree, int key, int subkey);
+nhpc_status_t nhpc_rbtree_erase(nhpc_rbtree_t *rbtree, const char *key);
+nhpc_status_t nhpc_rbtree_erase(nhpc_rbtree_t *rbtree, const char *key, int subkey);
+nhpc_status_t nhpc_rbtree_erase_inorder(nhpc_rbtree_t *rbtree, int pos);
 
 #endif

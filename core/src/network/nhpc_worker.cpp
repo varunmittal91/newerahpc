@@ -23,11 +23,7 @@ using namespace std;
 nhpc_worker_pool_t *worker_pool = NULL;
 
 nhpc_worker_t *nhpc_create_worker(nhpc_pool_t *p);
-void           nhpc_add_event_worker(nhpc_worker_t *w, nhpc_event_t *ev);
 void          *nhpc_worker_thread(nhpc_worker_t *w);
-
-#define nhpc_get_worker_from_pool() ((nhpc_worker_t *)nhpc_get_queue(worker_pool->workers_queue))
-#define nhpc_free_worker_to_pool(w) (nhpc_insert_queue(worker_pool->workers_queue, w))
 
 void *nhpc_init_worker_pool(nhpc_pool_t *p, nhpc_uint_t count) {
    worker_pool = (nhpc_worker_pool_t *)nhpc_palloc(p, sizeof(nhpc_worker_pool_t) * count);
@@ -43,11 +39,6 @@ void *nhpc_init_worker_pool(nhpc_pool_t *p, nhpc_uint_t count) {
    }
 }
 
-void nhpc_submit_job_worker_pool(nhpc_event_t *ev) {
-   nhpc_worker_t *worker = nhpc_get_worker_from_pool();
-   nhpc_add_event_worker(worker, ev);
-}
-
 nhpc_worker_t *nhpc_create_worker(nhpc_pool_t *p) {
    nhpc_worker_t *worker = (nhpc_worker_t *)nhpc_palloc(p, sizeof(nhpc_worker_t));
    
@@ -60,29 +51,15 @@ nhpc_worker_t *nhpc_create_worker(nhpc_pool_t *p) {
    return worker;
 }
 
-void nhpc_add_event_worker(nhpc_worker_t *w, nhpc_event_t *ev) {
-   pthread_mutex_lock(&w->mutex);
-   while(w->ev)
-      pthread_cond_wait(&w->cond, &w->mutex);
-   w->ev = ev;
-   pthread_cond_signal(&w->cond);
-   pthread_mutex_unlock(&w->mutex);
-}
-
 void *nhpc_worker_thread(nhpc_worker_t *w) {
    pthread_mutex_lock(&w->mutex);
    while(1) {
       while(!w->ev)
-	 pthread_cond_wait(&w->cond, &w->mutex);
-      if(!w->ev->accept) {
-	 nhpc_connection_t *c = (nhpc_connection_t *)w->ev->data;
-      }
-      
+	 pthread_cond_wait(&w->cond, &w->mutex);      
       w->ev->handler(w->ev);
       w->ev->available = 0;
       w->ev = NULL;
       nhpc_free_worker_to_pool(w);
-      pthread_cond_signal(&w->cond);
    }
    pthread_mutex_unlock(&w->mutex);
 }

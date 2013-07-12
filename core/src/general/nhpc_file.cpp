@@ -17,20 +17,32 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GENERAL_H_
-#define _GENERAL_H_
+#include <sys/stat.h>
+#include <errno.h>
 
-#include "nhpc_atomic.h"
-#include "nhpc_options.h"
-#include "nhpc_log.h"
-#include "nhpc_string.h"
-#include "nhpc_alloc.h"
-#include "nhpc_palloc.h"
-#include "nhpc_rbtree.h"
-#include "nhpc_config.h"
-#include "nhpc_thread.h"
-#include "nhpc_queue.h"
-#include "nhpc_buffer.h"
-#include "nhpc_file.h"
+#include <include/nhpc_general.h>
 
-#endif
+nhpc_status_t nhpc_file_size(const char *file_path, nhpc_size_t *size) {
+   struct stat buffer;
+   
+   *size = 0;
+   if(stat(file_path, &buffer) == -1)
+      return errno;
+   else if(S_ISDIR(buffer.st_mode))
+      return NHPC_FAIL;
+      
+   *size = buffer.st_size;
+   
+   return NHPC_FILE;   
+}
+
+nhpc_status_t nhpc_fileordirectory(const char *file_path) {
+   struct stat buffer; 
+   
+   if(stat(file_path, &buffer) == -1)
+      return NHPC_FILE_NOT_FOUND;
+   else if(!S_ISDIR(buffer.st_mode))
+      return NHPC_DIRECTORY;
+   else 
+      return NHPC_FILE;
+}

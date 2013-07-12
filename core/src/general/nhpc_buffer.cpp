@@ -21,47 +21,53 @@
 
 using namespace std;
 
-nhpc_buffer_t *nhpc_buffer_init(nhpc_size_t size) {
-   nhpc_buffer_t *buffer = (nhpc_buffer_t *)nhpc_alloc(sizeof(nhpc_buffer_t) + size);
-   buffer->max = size;
-   buffer->len = 0;
-   
-   pthread_mutex_init(&buffer->mutex, NULL);
-   pthread_cond_init(&buffer->cond, NULL);
+nhpc_buffer_t *nhpc_buffer_init(nhpc_pool_t *p) {
+   nhpc_buffer_t *buffer = (nhpc_buffer_t *)nhpc_pcalloc(p, sizeof(nhpc_buffer_t));
+
+   buffer->pool  = p;
+   buffer->start = NULL;
+   buffer->end   = NULL;
+   buffer->chain = NULL;
    
    return buffer;
 }
 
-u_char *nhpc_buffer_get_data(nhpc_buffer_t *buffer, nhpc_size_t *len) {
-   u_char *data = (u_char *)buffer + sizeof(nhpc_buffer_t);
-   int rv = 0;
+void nhpc_buffer_destroy(nhpc_buffer_t *buffer) {
    
-   pthread_mutex_lock(&buffer->mutex);
-   while(nhpc_buffer_is_empty(buffer)) {
-      pthread_cond_wait(&buffer->cond, &buffer->mutex);
-   }
-   *len = buffer->len;
-   pthread_mutex_unlock(&buffer->mutex);
-   
-   return data;
 }
 
-u_char *nhpc_buffer_get_dataptr(nhpc_buffer_t *buffer, nhpc_size_t *len) {
-   u_char *data = (u_char *)buffer + sizeof(nhpc_buffer_t);
+void nhpc_buffer_add_data(nhpc_buffer_t *buffer, u_char *address, nhpc_size_t data_len, 
+			  nhpc_uint_t buffer_data_type, nhpc_uint_t deallocate) {
+   buffer->address    = address;
+   buffer->deallocate = deallocate;
+   buffer->data_type  = buffer_data_type;
    
-   pthread_mutex_lock(&buffer->mutex);
-   while(!nhpc_buffer_is_empty(buffer)) {
-      pthread_cond_wait(&buffer->cond, &buffer->mutex);
+   if(buffer->data_type & NHPC_BUFFER_DATA_MEM_BLOCK) {
+
+      nhpc_chain_t **chain = &(buffer->chain);
+      while((*chain)) {
+	 chain = &((*chain)->next);
+      }
+      (*chain) = (nhpc_chain_t *)nhpc_palloc(buffer->pool, sizeof(nhpc_chain_t));
+      
+      u_char *tmp_address;
+      if(deallocate) {
+	 tmp_address = (u_char *)nhpc_palloc(buffer->pool, data_len);
+	 memcpy(tmp_address, address, data_len);
+	 address = tmp_address;
+	 
+	 buffer->deallocate = 1;
+      }
+      
+      (*chain)->next  = NULL;
+      (*chain)->start = address;
+      (*chain)->end   = address + data_len;
+      
+      if(!buffer->start) {
+	 buffer->start = (*chain)->start;
+	 buffer->end   = (*chain)->end;
+      }
    }
-   *len = buffer->max;
-   pthread_mutex_unlock(&buffer->mutex);
-
-   return data;
-}
-
-void nhpc_buffer_set_length(nhpc_buffer_t *buffer, nhpc_size_t l) {
-   pthread_mutex_lock(&buffer->mutex);
-   buffer->len = l;			 
-   pthread_cond_broadcast(&buffer->cond);   
-   pthread_mutex_unlock(&buffer->mutex); 
+   
+   return;
 }

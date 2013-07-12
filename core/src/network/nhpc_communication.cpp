@@ -21,7 +21,7 @@
 
 using namespace std;
 
-void nhpc_communication_handler(nhpc_event_t *ev) {   
+void nhpc_communication_handler(nhpc_event_t *ev) {  
    nhpc_connection_t *c = (nhpc_connection_t *) ev->data;
    nhpc_status_t nrv;
    
@@ -38,7 +38,7 @@ void nhpc_communication_handler(nhpc_event_t *ev) {
    if(nrv != NHPC_SUCCESS && nrv != NHPC_EOF) {
       LOG_ERROR("nhpc_recv(), failed");
       return;
-   }
+   }      
    
    nrv = nhpc_read_communication(c, buffer, len, &partial_data, &partial_datalen);
    if(nrv != NHPC_SUCCESS) {

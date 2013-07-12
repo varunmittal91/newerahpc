@@ -65,6 +65,8 @@ void nhpc_init_listening(nhpc_listening_t *ls) {
 
    ls->connections_queue = nhpc_init_queue(CONNECTION_BACKLOG);
    
+   ls->pool = nhpc_create_pool(1);
+   
    nhpc_event_t *rev, *wev;
    
    for(int i = 0; i < CONNECTION_BACKLOG; i++) {

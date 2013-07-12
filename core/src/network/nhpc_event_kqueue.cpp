@@ -62,7 +62,7 @@ nhpc_status_t nhpc_event_kqueue_set_event(nhpc_event_t *ev, nhpc_int_t filter, n
 
 nhpc_status_t nhpc_event_kqueue_add_event(nhpc_event_t *ev, nhpc_int_t event, nhpc_uint_t flags) {
    nhpc_status_t nrv;
-
+   
    ev->available = 0;
    ev->eof       = 0;
    ev->close     = 0;
@@ -74,20 +74,29 @@ nhpc_status_t nhpc_event_kqueue_add_event(nhpc_event_t *ev, nhpc_int_t event, nh
    nrv = nhpc_event_kqueue_set_event(ev, event, flags | EV_ADD | EV_ENABLE);
    ev->index = nchanges;
    nchanges++;
-
+   
+   nhpc_add_posted_event(ev);
+   
    pthread_mutex_unlock(&mutex);
-
+   
    return nrv;
 }
-   
+
 nhpc_status_t nhpc_event_kqueue_del_event(nhpc_event_t *ev, nhpc_int_t event, nhpc_uint_t flags) {
    pthread_mutex_lock(&mutex);
-
+   
    nhpc_event_t *e;
    
    if(ev->index > 0 && ev->index < nchanges && ev == changelist[ev->index].udata) {
       nchanges--;
-
+      
+      if(flags & NHPC_DELETE_EVENT) {
+	 changelist[ev->index].flags = flags;
+	 kevent(kq, &changelist[ev->index], 1, NULL, 0, NULL);
+      }
+      
+      nhpc_del_posted_event(ev->index + 1);
+      
       if(ev->index < nchanges) {
 	 e = (nhpc_event_t *)changelist[nchanges].udata;
 	 changelist[ev->index] = changelist[nchanges];
@@ -110,50 +119,63 @@ void *nhpc_event_kqueue_exec(void *data) {
 nhpc_status_t nhpc_event_kqueue_process_changes(nhpc_listening_t *ls) {
    int    rv;
    struct timespec timedout = {0, 100 * 1000000};
-
+   
    nhpc_connection_t *c;
    nhpc_event_t      *ev;
    nhpc_uint_t        events;
    pthread_t          tid;
    
-   for(;;) {
-      pthread_mutex_lock(&mutex);
-      events = kevent(kq, changelist, nchanges, eventlist, nevents, &timedout);      
-      pthread_mutex_unlock(&mutex);
-      
-      if(events == -1) {
-	 LOG_ERROR("kevent() failed");
-	 return NHPC_FAIL;
-      } else if(events > 0) {
-	 for(int i = 0; i < events; i++) {
-
-	    if(eventlist[i].data & EV_ERROR) {
-	       cout << "Error in list" << endl;
-	    }
+   pthread_mutex_lock(&mutex);
+   events = kevent(kq, changelist, nchanges, eventlist, nevents, &timedout);      
+   pthread_mutex_unlock(&mutex);
+   
+   if(events == -1) {
+      cout << "errno:" << errno << endl;
+      LOG_ERROR("kevent() failed");
+      return NHPC_FAIL;
+   } else if(events > 0) {
+      for(int i = 0; i < events; i++) {
+	 
+	 if(eventlist[i].data & EV_ERROR) {
+	    cout << "Error in list" << endl;
+	 }
+	 
+	 if(!(ev = (nhpc_event_t *)eventlist[i].udata)) {
+	    LOG_ERROR("kevent() udata empty");
+	    continue;
+	 }
+	 
+	 c  = (nhpc_connection_t *)ev->data;
+	 if(ev->available) {
+	    cout << "Error connection" << endl;
+	    break;
+	    continue;
+	 } else if(c->socket.fd == 0) {
+	    cout << "Error socket" << endl;
+	    break;
+	    continue;
+	 }
+	 
+	 //cout << "Event:" << c->socket.fd << endl;
+	 
+	 if(!ev->accept) {
+	    ev->available = 1;
 	    
-	    if(!(ev = (nhpc_event_t *)eventlist[i].udata)) {
-	       LOG_ERROR("kevent() udata empty");
-	       continue;
-	    }
+	     ev->handler(ev);
+	     ev->available = 0;
 	    
-	    c  = (nhpc_connection_t *)ev->data;
-	    if(ev->available || c->socket.fd == 0) {
-	       continue;
-	    }
-	    
-	    if(!ev->accept) {
-	       ev->available = 1;
-	       if(worker_pool)
-		  nhpc_submit_job_worker_pool(ev);
-	       else {
-		  ev->handler(ev);
-		  ev->available = 0;
-	       }
-	    } else {
-	       ev->available = eventlist[i].data;
+	    /*
+	    if(worker_pool && !ev->write)
+	       nhpc_submit_job_worker_pool(ev);
+	    else {
 	       ev->handler(ev);
 	       ev->available = 0;
 	    }
+	     */
+	 } else {
+	    ev->available = eventlist[i].data;
+	    ev->handler(ev);
+	    ev->available = 0;
 	 }
       }
    }
@@ -177,6 +199,7 @@ nhpc_status_t nhpc_event_kqueue_init(nhpc_listening_t *ls) {
    ev->active       = 1;
    ev->handler      = nhpc_accept_event;
    ev->data         = ls;
+   ev->enabled      = 1;
    
    struct kevent *kev = changelist;
    kev->ident     = ls->socket.fd;
@@ -184,6 +207,7 @@ nhpc_status_t nhpc_event_kqueue_init(nhpc_listening_t *ls) {
    kev->flags     = EV_ADD | EV_ENABLE;
    kev->udata     = ev;
    nchanges++;
+   nhpc_add_posted_event(ev);
    
    pthread_mutex_init(&mutex, NULL);
    

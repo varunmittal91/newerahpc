@@ -21,22 +21,25 @@
 
 using namespace std;
 
-void *producer(void *data) {
-   
-}
+//const char *NHPC_HTTP_GET_HEADER = "HTTP/1.1 
 
-int main(int argc, char **argv)
-{
-   nhpc_status_t nrv;
+void nhpc_http_prepare_response(nhpc_http_request_t *http_request) {
+   cout << "preparing response data and buffer" << endl;
    
-   neweraHPC_init(argc, argv);
-   nhpc_init_network();
-   nhpc_init_http();
-   if((nrv = nhpc_create_server("0.0.0.0", "8080")) != NHPC_SUCCESS)
-      perror("nhpc_create_server");
+   //const char *header
    
-   while(1)
-      sleep(1);
-
-   pthread_t tid;   
+   
+   const char *test_mssg = "THIS IS A TEST hEADER";
+   if(http_request->status.request_type & NHPC_HTTP_INVALID_REQUEST) {
+      cout << "We have an invalid request" << endl;
+   } else if(http_request->status.request_type & NHPC_HTTP_GET_REQUEST) {
+      cout << "We have a get request" << endl;
+   } else if(http_request->status.request_type & NHPC_HTTP_POST_REQUEST) {
+      cout << "We have a post request" << endl;
+   } else {
+      cout << "Method nt implemnted";
+   }
+   
+   
+   nhpc_buffer_add_data(http_request->response_buffer, (u_char *)test_mssg, strlen(test_mssg), NHPC_BUFFER_DATA_MEM_BLOCK, 0);
 }

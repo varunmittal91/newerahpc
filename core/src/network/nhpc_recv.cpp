@@ -33,7 +33,6 @@ nhpc_status_t nhpc_recv(nhpc_connection_t *c, char *buffer, nhpc_size_t *len) {
    
    int   rv;
    char *tmp_buffer = buffer;
-   nhpc_size_t len_downloaded = 0;
    nhpc_size_t tmp_len = *len;
    
    do {

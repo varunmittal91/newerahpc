@@ -21,18 +21,29 @@
 
 using namespace std;
 
-nhpc_queue_t *nhpc_init_queue(int size) {
-   nhpc_queue_t *q = (nhpc_queue_t *)nhpc_calloc(sizeof(nhpc_queue_t));
-   
+void _nhpc_init_queue(nhpc_queue_t *q, int size) {
    pthread_mutex_init(&q->mutex, NULL);
    pthread_cond_init(&q->cond, NULL);
    
-   q->elements = (nhpc_queue_elem_t *)nhpc_calloc(sizeof(nhpc_queue_elem_t) * size);
    q->head     = NULL;
    q->tail     = NULL;
    q->count    = 0;
-   q->max      = size;
+   q->max      = size;   
+}
+
+nhpc_queue_t *nhpc_init_queue(nhpc_pool_t *p, int size) {
+   nhpc_queue_t *q = (nhpc_queue_t *)nhpc_palloc(p, sizeof(nhpc_queue_t));
+   q->elements     = (nhpc_queue_elem_t *)nhpc_pcalloc(p, sizeof(nhpc_queue_elem_t) * size);
    
+   _nhpc_init_queue(q, size);
+   return q;
+}
+
+nhpc_queue_t *nhpc_init_queue(int size) {
+   nhpc_queue_t *q = (nhpc_queue_t *)nhpc_alloc(sizeof(nhpc_queue_t));
+   q->elements     = (nhpc_queue_elem_t *)nhpc_calloc(sizeof(nhpc_queue_elem_t) * size);
+   
+   _nhpc_init_queue(q, size);
    return q;
 }
 
@@ -107,8 +118,10 @@ void nhpc_insert_queue(nhpc_queue_t *q, void *data) {
       pthread_cond_wait(&q->cond, &q->mutex);
    }
    nhpc_queue_elem_t *qe = _nhpc_get_free_queueelem(q);
-   if(!qe)
+   if(!qe) {
       LOG_ERROR("queue_insert() failed");
+      return;
+   }
 
    qe->data = data;
    if(!q->head) {

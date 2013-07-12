@@ -44,4 +44,7 @@ int nhpc_strfind(const char *s1, const char s2, int old_position);
 
 char *nhpc_substr(char *dst, char *src, int p1, int p2);
 
+#define nhpc_strconcat(...) nhpc_strconcat_va("", ##__VA_ARGS__, NULL)
+char *nhpc_strconcat_va(const char *fmt, ...);
+
 #endif

@@ -34,6 +34,7 @@ struct nhpc_queue_t {
    pthread_cond_t      cond;
 };
 
+nhpc_queue_t *nhpc_init_queue(nhpc_pool_t *p, int size);
 nhpc_queue_t *nhpc_init_queue(int size);
 void         *nhpc_get_queue(nhpc_queue_t *q);
 void          nhpc_insert_queue(nhpc_queue_t *q, void *data);

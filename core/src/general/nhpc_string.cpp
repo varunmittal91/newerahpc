@@ -147,3 +147,39 @@ int nhpc_strfind(const char *s1, const char s2, int old_position)
 char *nhpc_substr(char *dst, char *src, int p1, int p2) {
    
 }
+
+char *nhpc_strconcat_va(const char *fmt, ...)
+{
+   nhpc_size_t len = 0;
+   
+   const char *s;
+   char       *string = NULL;      
+   va_list     ap;
+   
+   va_start(ap, fmt);      
+   while((s = va_arg(ap, const char *)))
+   {
+      len += strlen(s);
+   }
+   va_end(ap);
+   
+   if(len == 0)
+   {
+      return NULL;
+   }
+   string = new char [len + 1];
+   string[len] = '\0';
+   
+   char  *tmp = string;
+   
+   va_start(ap, fmt);
+   while((s = va_arg(ap, const char *)))
+   {
+      len = strlen(s);
+      memcpy((void *)tmp, s, len * sizeof(char));
+      tmp += len;
+   }      
+   va_end(ap);
+   
+   return string;
+}

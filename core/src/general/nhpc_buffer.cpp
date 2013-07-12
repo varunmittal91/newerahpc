@@ -38,36 +38,35 @@ void nhpc_buffer_destroy(nhpc_buffer_t *buffer) {
 
 void nhpc_buffer_add_data(nhpc_buffer_t *buffer, u_char *address, nhpc_size_t data_len, 
 			  nhpc_uint_t buffer_data_type, nhpc_uint_t deallocate) {
-   buffer->address    = address;
-   buffer->deallocate = deallocate;
-   buffer->data_type  = buffer_data_type;
    
-   if(buffer->data_type & NHPC_BUFFER_DATA_MEM_BLOCK) {
-
-      nhpc_chain_t **chain = &(buffer->chain);
-      while((*chain)) {
-	 chain = &((*chain)->next);
-      }
-      (*chain) = (nhpc_chain_t *)nhpc_palloc(buffer->pool, sizeof(nhpc_chain_t));
-      
-      u_char *tmp_address;
-      if(deallocate) {
-	 tmp_address = (u_char *)nhpc_palloc(buffer->pool, data_len);
-	 memcpy(tmp_address, address, data_len);
-	 address = tmp_address;
-	 
-	 buffer->deallocate = 1;
-      }
-      
-      (*chain)->next  = NULL;
-      (*chain)->start = address;
-      (*chain)->end   = address + data_len;
-      
+   if(buffer_data_type & NHPC_BUFFER_DATA_MEM_BLOCK) { 
       if(!buffer->start) {
-	 buffer->start = (*chain)->start;
-	 buffer->end   = (*chain)->end;
+	 buffer->start = address;
+	 buffer->end   = address + data_len;
+	 
+	 buffer->data_type  = buffer_data_type;
+	 buffer->deallocate = deallocate;
+      } else {
+	 nhpc_chain_t **chain = &(buffer->chain);
+	 while((*chain)) {
+	    chain = &((*chain)->next);
+	 }
+	 (*chain) = (nhpc_chain_t *)nhpc_palloc(buffer->pool, sizeof(nhpc_chain_t));
+	 
+	 u_char *tmp_address;
+	 if(deallocate) {
+	    tmp_address = (u_char *)nhpc_palloc(buffer->pool, data_len);
+	    memcpy(tmp_address, address, data_len);
+	    address = tmp_address;
+	    
+	    buffer->deallocate = 1;
+	 }
+	 
+	 (*chain)->next  = NULL;
+	 (*chain)->start = address;
+	 (*chain)->end   = address + data_len;	 
       }
    }
-   
+      
    return;
 }

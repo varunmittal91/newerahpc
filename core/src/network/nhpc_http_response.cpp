@@ -21,25 +21,21 @@
 
 using namespace std;
 
-//const char *NHPC_HTTP_GET_HEADER = "HTTP/1.1 
+const char        *NHPC_HTTP_HEADER    = "HTTP/1.1 ";
+const nhpc_size_t  nhpc_http_headerlen = strlen(NHPC_HTTP_HEADER);
 
 void nhpc_http_prepare_response(nhpc_http_request_t *http_request) {
-   cout << "preparing response data and buffer" << endl;
    
-   //const char *header
+   nhpc_size_t status_strlen = strlen((const char *)http_request->status.status_str);
+   nhpc_size_t header_strlen = status_strlen + nhpc_http_headerlen + 3;
    
-   
-   const char *test_mssg = "THIS IS A TEST hEADER";
-   if(http_request->status.request_type & NHPC_HTTP_INVALID_REQUEST) {
-      cout << "We have an invalid request" << endl;
-   } else if(http_request->status.request_type & NHPC_HTTP_GET_REQUEST) {
-      cout << "We have a get request" << endl;
-   } else if(http_request->status.request_type & NHPC_HTTP_POST_REQUEST) {
-      cout << "We have a post request" << endl;
-   } else {
-      cout << "Method nt implemnted";
-   }
-   
-   
-   nhpc_buffer_add_data(http_request->response_buffer, (u_char *)test_mssg, strlen(test_mssg), NHPC_BUFFER_DATA_MEM_BLOCK, 0);
+   u_char *header_str = (u_char *)nhpc_palloc(http_request->pool, header_strlen);
+   memcpy(header_str, NHPC_HTTP_HEADER, nhpc_http_headerlen);
+   memcpy(header_str + nhpc_http_headerlen, http_request->status.status_str, status_strlen);
+   header_str[header_strlen - 3] = '\r';
+   header_str[header_strlen - 2] = '\n';
+   header_str[header_strlen - 1]     = '\0';
+			
+   nhpc_buffer_add_data(http_request->response_buffer, (u_char *)header_str, header_strlen,
+			NHPC_BUFFER_DATA_MEM_BLOCK, 0);
 }

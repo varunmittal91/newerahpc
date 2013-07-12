@@ -20,6 +20,9 @@
 #ifndef _NHPC_HTTP_REQUEST_H_
 #define _NHPC_HTTP_REQUEST_H_
 
+#define HTTP_ROOT "/www"
+extern nhpc_size_t http_root_strlen;
+
 typedef void (*nhpc_http_handler_ptr)(nhpc_http_request_t *);
 
 #define NHPC_HTTP_GET_REQUEST     0x0001
@@ -38,6 +41,7 @@ extern nhpc_http_request_types http_request_types[];
 struct nhpc_http_status_s {
    unsigned       version;
    nhpc_uint_t    status_code;
+   const u_char  *status_str;
    nhpc_uint_t    request_type;
 };
 

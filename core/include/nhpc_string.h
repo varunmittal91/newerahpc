@@ -23,21 +23,27 @@
 #include "nhpc_general.h"
 
 struct nhpc_str_t {
-   nhpc_size_t  len;
    u_char      *data;
+   nhpc_size_t  len;
 };
+#define nhpc_str_set(str, text)    (str)->data = (u_char *)text; (str)->len = strlen(text)
+#define nhpc_str_init(text)        {(u_char *)text, nhpc_strlen((u_char *)text)}
 
 struct nhpc_key_pair_t {
    char  *key;
    char  *value;
 };
 
+#define nhpc_stralloc(s)     ((u_char *)nhpc_alloc(s))
+#define nhpc_strpalloc(p, s) ((u_char *)nhpc_palloc(p, s))
+
 void nhpc_strcpy(char *dst, const char *src);
 void nhpc_strcpy(char *dst, const char *src, nhpc_size_t len);
 
 nhpc_int_t nhpc_strcmp(const char *s1, const char *s2);
 
-char *nhpc_itoa(char *dst, int i);
+char        *nhpc_itoa(char *dst, int i);
+nhpc_uint_t  nhpc_atoi(const u_char *str);
 
 int nhpc_strfind(const char *s1, const char s2);
 int nhpc_strfind(const char *s1, const char s2, int old_position);
@@ -46,5 +52,7 @@ char *nhpc_substr(char *dst, char *src, int p1, int p2);
 
 #define nhpc_strconcat(...) nhpc_strconcat_va("", ##__VA_ARGS__, NULL)
 char *nhpc_strconcat_va(const char *fmt, ...);
+
+#define nhpc_strlen(s)  strlen((const char *)s)
 
 #endif

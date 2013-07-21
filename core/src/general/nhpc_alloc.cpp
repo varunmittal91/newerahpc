@@ -29,7 +29,7 @@ void *nhpc_alloc(nhpc_size_t size) {
    void *p;
    p = malloc(size);
    if(!p)
-      LOG_ERROR("malloc() failed");
+      nhpc_log_error("ERROR: %s:%h\n", "malloc() failed for size", size);
    
    return p;
 }

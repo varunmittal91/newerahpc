@@ -31,7 +31,7 @@ nhpc_status_t nhpc_init_threads(int n, nhpc_size_t size) {
    if((rv = pthread_attr_setstacksize(&thread_attr, size)) < 0)
       return errno;
    if((rv =  pthread_attr_setdetachstate(&thread_attr, PTHREAD_CREATE_DETACHED)) < 0) {
-      LOG_ERROR("Unable to set thread attribute: PTHREAD_CREATE_DETACHED");
+      nhpc_log_error("ERROR: Unable to set thread attribute: PTHREAD_CREATE_DETACHED\n");
       return errno;
    }
    
@@ -45,7 +45,7 @@ nhpc_status_t nhpc_create_thread(pthread_t *tid, nhpc_thread_value_t func, void 
    int rv;
    
    if(nthreads >= max_threads) {
-      LOG_ERROR("thread_create() failed, reached maximum limit");
+      nhpc_log_error("ERROR: thread_create() failed, reached maximum limit\n");
       return NHPC_FAIL;
    }
    

@@ -39,18 +39,35 @@ nhpc_status_t nhpc_send(nhpc_connection_t *c, char *buffer, nhpc_size_t *len) {
    
    if(rv == 0) {
       c->wev->eof = 1;
+
       return NHPC_EOF;
    }
    
-   if(rv == -1) {
-      perror("write()");
-      
-      cout << errno << endl;
-      
-      return EINTR;
-   }
+   if(rv == -1)
+      return errno;
    
    return NHPC_SUCCESS;
+}
+
+nhpc_status_t nhpc_send_buffer(nhpc_connection_t *c, nhpc_buffer_t *buffer) {
+   
+   if(!buffer->head)
+      return NHPC_EOF;
+   
+   nhpc_size_t size  = buffer->head->end - buffer->head->start;
+   nhpc_status_t nrv;
+   
+   nrv = nhpc_send(c, (char *)buffer->head->start, &size);
+   if((size = (buffer->head->end - buffer->head->start) - size) > 0)
+      buffer->head->start += size;      
+   else {
+      if(buffer->head->next) 
+	 buffer->head = buffer->head->next;
+      else 
+	 return NHPC_EOF;
+   }
+	  
+   return nrv;
 }
 
 nhpc_status_t nhpc_send_file(nhpc_connection_t *c, char *filepath) {

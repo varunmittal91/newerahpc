@@ -27,25 +27,33 @@ struct nhpc_chain_t {
    u_char       *end;
 };
 
-struct nhpc_buffer_t {
-   u_char         *address;
-   nhpc_size_t     data_len;
-   nhpc_uint_t     data_type;
+struct nhpc_buffer_data_t {
+   FILE               *fp;
+   u_char             *address;
+   nhpc_uint_t         readpos;
+   
+   u_char             *start;
+   u_char             *end;
+   
+   nhpc_buffer_data_t *next;
 
-   u_char         *start;
-   u_char         *end;
+   unsigned            deallocate:1;
+   nhpc_uint_t         data_type;
+};
+
+struct nhpc_buffer_t {
+   nhpc_buffer_data_t   d;
+   nhpc_buffer_data_t  *current;
+   nhpc_buffer_data_t  *head;
    
-   unsigned        deallocate:1;            
-   unsigned        file_io:1;
-   
-   FILE           *fp;
-   
-   nhpc_pool_t    *pool;
-   
-   nhpc_chain_t   *chain;
+   nhpc_pool_t         *pool;
 };
 
 nhpc_buffer_t *nhpc_buffer_init(nhpc_pool_t *p);
 void           nhpc_buffer_destroy(nhpc_buffer_t *buffer);
 void           nhpc_buffer_add_data(nhpc_buffer_t *buffer, u_char *address, nhpc_size_t data_len, 
 				    nhpc_uint_t buffer_data_type, nhpc_uint_t deallocate = 0);
+void           nhpc_buffer_add_header_data(nhpc_buffer_t *buffer, u_char *address, nhpc_size_t data_len, 
+					   nhpc_uint_t buffer_data_type, nhpc_uint_t deallocate = 0);
+
+

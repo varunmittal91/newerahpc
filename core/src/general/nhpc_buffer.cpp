@@ -24,10 +24,9 @@ using namespace std;
 nhpc_buffer_t *nhpc_buffer_init(nhpc_pool_t *p) {
    nhpc_buffer_t *buffer = (nhpc_buffer_t *)nhpc_pcalloc(p, sizeof(nhpc_buffer_t));
 
-   buffer->pool  = p;
-   buffer->start = NULL;
-   buffer->end   = NULL;
-   buffer->chain = NULL;
+   buffer->current = NULL;
+   buffer->head    = NULL;
+   buffer->pool    = p;
    
    return buffer;
 }
@@ -39,34 +38,62 @@ void nhpc_buffer_destroy(nhpc_buffer_t *buffer) {
 void nhpc_buffer_add_data(nhpc_buffer_t *buffer, u_char *address, nhpc_size_t data_len, 
 			  nhpc_uint_t buffer_data_type, nhpc_uint_t deallocate) {
    
-   if(buffer_data_type & NHPC_BUFFER_DATA_MEM_BLOCK) { 
-      if(!buffer->start) {
-	 buffer->start = address;
-	 buffer->end   = address + data_len;
+   nhpc_buffer_data_t *buffer_data = buffer->current;
+   if(!buffer->current) {
+      buffer->current = &(buffer->d);
+      buffer->head    = &buffer->d;
+   } else {
+      buffer->current->next = (nhpc_buffer_data_t *)nhpc_palloc(buffer->pool, sizeof(nhpc_buffer_data_t));
+      buffer->current       = buffer->current->next;
+   }
+   buffer_data = buffer->current;
+
+   buffer_data->data_type = buffer_data_type;
+   buffer_data->next      = NULL;
+   
+   if(buffer_data_type & NHPC_BUFFER_DATA_MEM_BLOCK) {
+
+      if(deallocate) {
+	 u_char *_address = (u_char *)nhpc_pcalloc(buffer->pool, data_len);
+	 memcpy(_address, address, data_len);
+	 address = _address;	 
 	 
-	 buffer->data_type  = buffer_data_type;
-	 buffer->deallocate = deallocate;
-      } else {
-	 nhpc_chain_t **chain = &(buffer->chain);
-	 while((*chain)) {
-	    chain = &((*chain)->next);
-	 }
-	 (*chain) = (nhpc_chain_t *)nhpc_palloc(buffer->pool, sizeof(nhpc_chain_t));
-	 
-	 u_char *tmp_address;
-	 if(deallocate) {
-	    tmp_address = (u_char *)nhpc_palloc(buffer->pool, data_len);
-	    memcpy(tmp_address, address, data_len);
-	    address = tmp_address;
-	    
-	    buffer->deallocate = 1;
-	 }
-	 
-	 (*chain)->next  = NULL;
-	 (*chain)->start = address;
-	 (*chain)->end   = address + data_len;	 
+	 buffer_data->deallocate = 1;
       }
+      
+      buffer_data->start = address;
+      buffer_data->end   = address + data_len;
+   } else if(buffer_data_type & NHPC_BUFFER_DATA_FILE) {
+      
+      buffer_data->address = address;
+      buffer_data->readpos = 0;
    }
       
    return;
+}
+
+void nhpc_buffer_add_header_data(nhpc_buffer_t *buffer, u_char *address, nhpc_size_t data_len, 
+				 nhpc_uint_t buffer_data_type, nhpc_uint_t deallocate) {
+   
+   nhpc_buffer_data_t *buffer_head;
+   
+   if(!buffer->head) {
+      buffer->head = &buffer->d;
+      buffer_head = buffer->head;
+   } else {
+      buffer_head = (nhpc_buffer_data_t *)nhpc_palloc(buffer->pool, sizeof(nhpc_buffer_data_t));
+      buffer_head->next = buffer->head;
+      buffer->head = buffer_head;
+   }
+   
+   if(deallocate) {
+      u_char *_address = (u_char *)nhpc_palloc(buffer->pool, data_len);
+      memcpy(_address, address, data_len);
+      address = _address;
+      
+      buffer->d.deallocate = 1;
+   }
+
+   buffer_head->start = address;
+   buffer_head->end   = address + data_len;
 }

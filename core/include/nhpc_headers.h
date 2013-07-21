@@ -17,7 +17,26 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-struct nhpc_headers_s {
-   char          *cmd_string;
-   nhpc_rbtree_t *header_strings;
+struct nhpc_headers_data_t {
+   nhpc_uint_t   count;
+   nhpc_uint_t   max;
+   nhpc_size_t   datasize;
+   u_char      **strings;
 };
+
+struct nhpc_headers_s {
+   nhpc_headers_data_t  d;
+   
+   nhpc_headers_s  *next;
+   nhpc_pool_t     *pool;   
+};
+
+nhpc_headers_t *nhpc_init_headers(nhpc_pool_t *pool, nhpc_uint_t max = 10);
+void            nhpc_destroy_headers(nhpc_headers_t *headers);
+
+#define nhpc_close_headers(headers) (nhpc_headers_add_string(headers, (u_char *)"\r\n"))
+void nhpc_headers_add_string(nhpc_headers_t *headers, u_char *str);
+void nhpc_headers_add_new_string(nhpc_headers_t *headers, u_char *str);
+void nhpc_headers_add_string(nhpc_headers_t *headers, u_char *str1, u_char *str2);
+
+void nhpc_headers_convert_to_buffer(nhpc_headers_t *headers, nhpc_buffer_t *buffer);

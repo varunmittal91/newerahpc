@@ -65,7 +65,7 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libgeneral_la_LIBADD =
 am__objects_1 = nhpc_palloc.lo nhpc_alloc.lo nhpc_string.lo \
 	nhpc_rbtree.lo nhpc_config.lo nhpc_thread.lo nhpc_queue.lo \
-	nhpc_buffer.lo nhpc_file.lo
+	nhpc_buffer.lo nhpc_file.lo nhpc_log.lo
 am_libgeneral_la_OBJECTS = $(am__objects_1)
 libgeneral_la_OBJECTS = $(am_libgeneral_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -226,7 +226,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SOURCES = nhpc_palloc.cpp nhpc_alloc.cpp nhpc_string.cpp nhpc_rbtree.cpp nhpc_config.cpp nhpc_thread.cpp nhpc_queue.cpp \
-nhpc_buffer.cpp nhpc_file.cpp
+nhpc_buffer.cpp nhpc_file.cpp nhpc_log.cpp
 
 noinst_LTLIBRARIES = libgeneral.la 
 libgeneral_la_SOURCES = $(SOURCES)
@@ -286,6 +286,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nhpc_buffer.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nhpc_config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nhpc_file.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nhpc_log.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nhpc_palloc.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nhpc_queue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nhpc_rbtree.Plo@am__quote@

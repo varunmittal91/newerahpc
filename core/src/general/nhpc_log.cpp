@@ -17,26 +17,36 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NHPC_ATOMIC_H_
-#define _NHPC_ATOMIC_H_
+#include <math.h>
+#include <stdarg.h>
+#include <stdio.h>
 
-#include <stdint.h>
-#include <cstddef>
+#include <include/neweraHPC.h>
 
-#define NHPC_SUCCESS  0
-#define NHPC_FAIL    -1
+nhpc_uint_t log_level = 0;
 
-#ifdef __x86_64__
-typedef uint64_t nhpc_uint_t;
-typedef int64_t  nhpc_int_t;
-#else
-typedef uint32_t nhpc_uint_t;
-typedef int32_t  nhpc_int_t;
-#endif
+void nhpc_log_init(const u_char *log_str) {
 
-typedef nhpc_int_t  nhpc_status_t;
-typedef size_t      nhpc_size_t;
+   if(nhpc_strcmp((const char *)log_str, "debug*") == NHPC_SUCCESS)
+      log_str += 5;
+   else if(nhpc_strcmp((const char *)log_str, "info") == NHPC_SUCCESS) 
+      log_str += 4;
+   else 
+      log_str = NULL;
+   
+   if(log_str) {
+      
+      log_level = nhpc_atoi(log_str);
+      if(log_level > LOG_LEVEL_DEBUG_MAX)
+	 log_level = LOG_LEVEL_DEBUG_MAX;
+      
+      log_level = pow(2, log_level + 1) - 1;
+   }
+}
 
-typedef unsigned char u_char;
-
-#endif
+void nhpc_log_debug(const char *fmt, ...) {
+   va_list   ap;
+   va_start(ap, fmt);
+   vprintf(fmt, ap);
+   va_end(ap);
+}

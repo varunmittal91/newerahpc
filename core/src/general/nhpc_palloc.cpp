@@ -26,8 +26,12 @@ nhpc_pool_t *nhpc_create_pool(nhpc_size_t size) {
    size = size * NHPC_DEFAULT_POOL_SIZE;
    nhpc_pool_t *p = (nhpc_pool_t *)nhpc_calloc(size);
    
-   if(!p)
+   if(!p) {
+      nhpc_log_error("ERROR: create_pool() failed, size:%iBytes\n", size);
       return NULL;
+   }
+   
+   nhpc_log_debug1(LOG_LEVEL_DEBUG_5, "DEBUG: created memory pool with size:%i Bytes, address:%p\n", size, p);
    
    p->d.last   = (u_char *)p + sizeof(nhpc_pool_t);
    p->d.end    = (u_char *)p + size;

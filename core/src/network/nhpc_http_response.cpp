@@ -25,7 +25,7 @@ const char        *NHPC_HTTP_HEADER    = "HTTP/1.1 ";
 const nhpc_size_t  nhpc_http_headerlen = strlen(NHPC_HTTP_HEADER);
 
 void nhpc_http_prepare_response(nhpc_http_request_t *http_request) {
-   
+		     
    nhpc_size_t status_strlen = strlen((const char *)http_request->status.status_str);
    nhpc_size_t header_strlen = status_strlen + nhpc_http_headerlen + 3;
    
@@ -34,8 +34,10 @@ void nhpc_http_prepare_response(nhpc_http_request_t *http_request) {
    memcpy(header_str + nhpc_http_headerlen, http_request->status.status_str, status_strlen);
    header_str[header_strlen - 3] = '\r';
    header_str[header_strlen - 2] = '\n';
-   header_str[header_strlen - 1]     = '\0';
+   header_str[header_strlen - 1] = '\0';
 			
-   nhpc_buffer_add_data(http_request->response_buffer, (u_char *)header_str, header_strlen,
-			NHPC_BUFFER_DATA_MEM_BLOCK, 0);
+   nhpc_headers_add_string(http_request->status.headers, header_str);
+   nhpc_close_headers(http_request->status.headers);
+   
+   nhpc_headers_convert_to_buffer(http_request->status.headers, http_request->response_buffer);
 }

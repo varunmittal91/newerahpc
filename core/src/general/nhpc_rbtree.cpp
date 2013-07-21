@@ -94,9 +94,9 @@ nhpc_status_t nhpc_rbtree_insert_node(nhpc_rbtree_t *rbtree, rb_node *new_node)
 	 if(rb_mode_is_hash((*rbtree).rb_mode))
 	    break;
 	 else if(rb_mode_is_str((*rbtree).rb_mode))
-	    LOG_ERROR("RBTREE Insertion Failed, Key Exists KEY:" << new_node->key.str);
+	    nhpc_log_error("ERROR: %s:%s\n", "rbtree_insert() failed, key exists key:", new_node->key.str);
 	 else 
-	    LOG_ERROR("RBTREE Insertion Failed, Key Exists KEY:" << new_node->key.num);	       
+	    nhpc_log_error("ERROR: %s:%i\n", "rbtree_insert() failed, key exists key:", new_node->key.num);
 	 return NHPC_FAIL;
       }
    }
@@ -159,9 +159,9 @@ rb_node *nhpc_rbtree_search_node(nhpc_rbtree_t *rbtree, int *key_num, const char
    if(!node)
    {
       if(key_str)
-	 LOG_DEBUG("RBTREE Search Failed, Key:" << *key_str);
+	 nhpc_log_debug1(LOG_LEVEL_DEBUG_5, "DEBUG: %s:%s\n", "rbtree_search() failed, no key found key", *key_str);
       else 
-	 LOG_DEBUG("RBTREE Search Failed, Key:" << *key_num);	    
+	 nhpc_log_debug1(LOG_LEVEL_DEBUG_5, "DEBUG: %s:%i\n", "rbtree_search() failed, no key found key", *key_num);
    }
    
    return node;
@@ -170,8 +170,7 @@ rb_node *nhpc_rbtree_search_node(nhpc_rbtree_t *rbtree, int *key_num, const char
 rb_node *nhpc_rbtree_search_node(nhpc_rbtree_t *rbtree, int pos)
 {
    rb_node *node = NULL;
-   for(int i = 1; i <= pos; i++)
-   {
+   for(int i = 1; i <= pos; i++) {
       if(!node)
 	 node = nhpc_rbtree_rb_first(rbtree);
       else 
@@ -179,7 +178,7 @@ rb_node *nhpc_rbtree_search_node(nhpc_rbtree_t *rbtree, int pos)
    }
    
    if(!node)
-      LOG_DEBUG("RBTREE Inorder Search Failed, Position:" << pos);
+      nhpc_log_debug1(LOG_LEVEL_DEBUG_5, "DEBUG: %s:%i\n", "rbtree_search_inorder() failed, no key found key", pos);
    
    return node;
 }

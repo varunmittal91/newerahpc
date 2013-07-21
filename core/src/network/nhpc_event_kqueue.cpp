@@ -45,7 +45,7 @@ nhpc_status_t nhpc_event_kqueue_set_event(nhpc_event_t *ev, nhpc_int_t filter, n
    nhpc_connection_t *c;
    
    if(nchanges >= maxevents) {
-      LOG_ERROR("Event list full");
+      //LOG_ERROR("Event list full");
       return NHPC_FAIL;
    }
    
@@ -131,7 +131,7 @@ nhpc_status_t nhpc_event_kqueue_process_changes(nhpc_listening_t *ls) {
    
    if(events == -1) {
       cout << "errno:" << errno << endl;
-      LOG_ERROR("kevent() failed");
+      //LOG_ERROR("kevent() failed");
       return NHPC_FAIL;
    } else if(events > 0) {
       for(int i = 0; i < events; i++) {
@@ -141,7 +141,7 @@ nhpc_status_t nhpc_event_kqueue_process_changes(nhpc_listening_t *ls) {
 	 }
 	 
 	 if(!(ev = (nhpc_event_t *)eventlist[i].udata)) {
-	    LOG_ERROR("kevent() udata empty");
+	    //LOG_ERROR("kevent() udata empty");
 	    continue;
 	 }
 	 
@@ -159,10 +159,9 @@ nhpc_status_t nhpc_event_kqueue_process_changes(nhpc_listening_t *ls) {
 	 //cout << "Event:" << c->socket.fd << endl;
 	 
 	 if(!ev->accept) {
-	    ev->available = 1;
-	    
-	     ev->handler(ev);
-	     ev->available = 0;
+	    ev->available = 1;	    
+	    ev->handler(ev);
+	    ev->available = 0;
 	    
 	    /*
 	    if(worker_pool && !ev->write)

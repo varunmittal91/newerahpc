@@ -17,6 +17,8 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <math.h>
+
 #include <include/neweraHPC.h>
 
 void nhpc_strcpy(char *dst, const char *src, nhpc_size_t len) {
@@ -104,6 +106,27 @@ char *nhpc_itoa(char *dst, int num) {
    dst[count] = '\0';
 
    return dst;
+}
+
+nhpc_uint_t nhpc_atoi(const u_char *str) {
+
+   nhpc_uint_t num = 0;
+   nhpc_uint_t tnum;
+   nhpc_size_t str_len = nhpc_strlen(str);
+   
+   while(*str != '\0') {
+      
+      if((tnum = (nhpc_uint_t)(*str) - 48) > 9) {
+	 num = 0;
+	 return num;
+      }
+      
+      num += (tnum * pow(10, str_len - 1));
+      str_len--;
+      str++;
+   }
+
+   return num;
 }
 
 int nhpc_strfind(const char *s1, const char s2)

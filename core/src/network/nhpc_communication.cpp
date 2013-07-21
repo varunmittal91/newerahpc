@@ -36,7 +36,7 @@ void nhpc_communication_handler(nhpc_event_t *ev) {
    
    nrv = nhpc_recv(c, buffer, &len);
    if(nrv != NHPC_SUCCESS && nrv != NHPC_EOF) {
-      LOG_ERROR("nhpc_recv(), failed");
+      nhpc_log_error("ERROR: %s\n", "nhpc_recv() failed");
       return;
    }      
    
@@ -55,7 +55,7 @@ void nhpc_communication_handler(nhpc_event_t *ev) {
       handler       = nhpc_network_search_addon(communication->command_str);
    
       if(!handler) {
-	 LOG_ERROR("communication_handler() failed, no suitable network addon found");
+	 nhpc_log_error("ERROR: %s\n", "communication_handler() failed, no suitable network addon found");
 	 nhpc_accept_close_connection(c);
       } else {
 	 ev->handler = handler;

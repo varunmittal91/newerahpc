@@ -119,7 +119,7 @@ void nhpc_insert_queue(nhpc_queue_t *q, void *data) {
    }
    nhpc_queue_elem_t *qe = _nhpc_get_free_queueelem(q);
    if(!qe) {
-      LOG_ERROR("queue_insert() failed");
+      nhpc_log_error("ERROR: queue_insert() failed, no free element available");
       return;
    }
 

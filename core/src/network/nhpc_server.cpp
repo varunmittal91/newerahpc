@@ -39,13 +39,13 @@ nhpc_status_t nhpc_create_server(const char *host_addr, const char *host_port)
    
    if((nrv = nhpc_create_socket(&ls->socket, AF_INET, SOCK_STREAM, 0)) != NHPC_SUCCESS)
    {
-      LOG_ERROR("socket() failed");
+      nhpc_log_error("ERROR: %s\n", "socket() failed");
       return nrv;
    }
    
    if((nrv = nhpc_set_socket_opt(&ls->socket, NHPC_NONBLOCK, 1)) != NHPC_SUCCESS)
    {
-      LOG_ERROR("socket_opt() failed");
+      nhpc_log_error("ERROR %s\n", "socket_opt() failed");
       return nrv;
    }
    
@@ -57,13 +57,13 @@ nhpc_status_t nhpc_create_server(const char *host_addr, const char *host_port)
    
    if((nrv = nhpc_bind_socket(&ls->socket, host_addr, host_port)) != NHPC_SUCCESS)
    {
-      LOG_ERROR("socket_bind() failed");
+      nhpc_log_error("ERROR: %s\n", "socket_bind() failed");
       return nrv;
    }
    
    if((nrv = nhpc_listen_socket(&ls->socket, CONNECTION_BACKLOG)) != NHPC_SUCCESS)
    {
-      LOG_ERROR("socket_listen() failed");
+      nhpc_log_error("ERROR: %s\n", "socket_listen() failed");
       return nrv;
    }
    
@@ -71,7 +71,6 @@ nhpc_status_t nhpc_create_server(const char *host_addr, const char *host_port)
    nhpc_init_event(ls);
    nhpc_init_worker_pool(main_pool, 20);
    nhpc_init_posted_events(ls);
-   //nhpc_process_changes(ls);
    
    return NHPC_SUCCESS;
 }

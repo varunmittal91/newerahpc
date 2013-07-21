@@ -23,8 +23,11 @@ using namespace std;
 
 nhpc_size_t http_root_strlen;
 
-const char *temp_error_response = "<html><head><title>Content Not Found</title></head><body><center><h1>404 - Content Not Found</h1></center></body></html>";
-const char *temp_error_invalid  = "<html><head><title>Bad Request</title></head><body><center><h1>400 - Bad Request</h1></center></body></html>";
+nhpc_str_t response_header = nhpc_str_init("<html><head><title>");
+nhpc_str_t response_body   = nhpc_str_init("</title></head><body>");
+nhpc_str_t response_footer = nhpc_str_init("<hr><i>newera Server</i></body></html>\n");
+
+nhpc_str_t response_bad_request = nhpc_str_init("400 BAD REQUEST");
 
 nhpc_http_request_types http_request_types[] = {
    "GET " , NHPC_HTTP_GET_REQUEST,
@@ -32,25 +35,40 @@ nhpc_http_request_types http_request_types[] = {
 };
 
 void nhpc_http_handler(nhpc_event_t *ev) {
+   
    nhpc_connection_t    *c  = (nhpc_connection_t *)ev->data;
    nhpc_communication_t *cm = c->communication;
 
    nhpc_http_request_t  *http_request;
+   
    if(!cm->data) {
+      
       http_request = nhpc_http_init_request_data(c->pool, cm);
+      http_request->status.headers = nhpc_init_headers(http_request->pool);
       cm->data     = http_request;
+      
    } else {
+
       http_request = (nhpc_http_request_t *)cm->data;
+
    }
    
    http_request->response_buffer = nhpc_buffer_init(http_request->pool);
 
    if(http_request->status.request_type & NHPC_HTTP_INVALID_REQUEST) {
+      
       http_request->status.status_code = NHPC_HTTP_STATUS_BAD_REQUEST;
       http_request->status.status_str  = (const u_char *)"400 BAD REQUEST";
+      
+      nhpc_buffer_add_data(http_request->response_buffer, response_header.data, response_header.len, NHPC_BUFFER_DATA_MEM_BLOCK, 0);
+      nhpc_buffer_add_data(http_request->response_buffer, response_body.data,   response_body.len,   NHPC_BUFFER_DATA_MEM_BLOCK, 0);
+      nhpc_buffer_add_data(http_request->response_buffer, response_footer.data, response_footer.len, NHPC_BUFFER_DATA_MEM_BLOCK, 0);
+      
    } else {
+      
       if(0) {
 	 /* the application handler routine  will be placed here */   
+      
       } else {
 	 /* prepare response based on file/dir check routine */
       
@@ -63,11 +81,19 @@ void nhpc_http_handler(nhpc_event_t *ev) {
 	 nhpc_status_t nrv = nhpc_fileordirectory((const char *)request);
       
 	 if(nrv & NHPC_FILE_NOT_FOUND) {
+	 
 	    http_request->status.status_code = NHPC_HTTP_STATUS_NOT_FOUND;
 	    http_request->status.status_str  = (const u_char *)"404 NOT FOUND";
+	    
+	    nhpc_buffer_add_data(http_request->response_buffer, response_header.data, response_header.len, NHPC_BUFFER_DATA_MEM_BLOCK, 0);
+	    nhpc_buffer_add_data(http_request->response_buffer, response_body.data,   response_body.len,   NHPC_BUFFER_DATA_MEM_BLOCK, 0);
+	    nhpc_buffer_add_data(http_request->response_buffer, response_footer.data, response_footer.len, NHPC_BUFFER_DATA_MEM_BLOCK, 0);
+
 	 } else {
+	    
 	    http_request->status.status_code = NHPC_HTTP_STATUS_OK;
 	    http_request->status.status_str  = (const u_char *)"200 OK";
+	    
 	 }
       }
    }
@@ -77,7 +103,6 @@ void nhpc_http_handler(nhpc_event_t *ev) {
    nhpc_shutdown_connection(c, SHUT_RD);
    nhpc_add_event(c->wev, NHPC_WRITE_EVENT, 0);
    c->wev->handler = nhpc_http_write_handler;
-   c->wev->handler(c->wev);
 }
 
 void nhpc_http_write_handler(nhpc_event_t *ev) {
@@ -87,6 +112,12 @@ void nhpc_http_write_handler(nhpc_event_t *ev) {
    nhpc_http_request_t *http_request = (nhpc_http_request_t *) cm->data;
    nhpc_buffer_t *buffer = http_request->response_buffer;
    
+   nhpc_status_t nrv = nhpc_send_buffer(c, buffer);
+   if(nrv == NHPC_EOF) {
+      nhpc_accept_close_connection(c);   
+   }
+   
+   /*
    nhpc_size_t datasent = (buffer->end - buffer->start);
    nhpc_status_t nrv = nhpc_send(c, (char *)buffer->start, &datasent);
    
@@ -107,22 +138,8 @@ void nhpc_http_write_handler(nhpc_event_t *ev) {
 	 }
 	 cout << "Length zero" << endl;
       } 
-      
-      /*
-      else {
-	 if(buffer->chain) {
-	    buffer->start = buffer->chain->start;
-	    buffer->end   = buffer->chain->end;
-	    
-	    buffer->chain = buffer->chain->next;
-	 }
-	 else {
-	    nhpc_accept_close_connection(c);      
-	    return;
-	 }
-      }
-      */
    }
+    */
 }
 
 nhpc_http_request_t *nhpc_http_init_request_data(nhpc_pool_t *p, nhpc_communication_t *cm) {

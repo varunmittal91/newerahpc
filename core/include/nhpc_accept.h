@@ -33,11 +33,10 @@ static inline void nhpc_accept_free_connection(nhpc_connection_t *c) {
    c->wev->active = 0;
    c->socket.fd   = 0;
 }
-static inline void nhpc_accept_close_connection(nhpc_connection_t *c) {
-   if(!c->rev->active) {
-      LOG_ERROR("failed to close connection");
-      exit(0);
-   }
+static inline nhpc_status_t nhpc_accept_close_connection(nhpc_connection_t *c) {
+   if(!c->rev->active)
+      return errno;
+
    nhpc_shutdown_connection(c, SHUT_RDWR);
    nhpc_close_connection(c);
    nhpc_accept_free_connection(c);

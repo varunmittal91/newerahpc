@@ -39,10 +39,13 @@ struct nhpc_http_request_types {
 extern nhpc_http_request_types http_request_types[];
 
 struct nhpc_http_status_s {
-   unsigned       version;
-   nhpc_uint_t    status_code;
-   const u_char  *status_str;
-   nhpc_uint_t    request_type;
+   unsigned         version;
+   nhpc_uint_t      request_type;
+
+   nhpc_uint_t      status_code;
+   const u_char    *status_str;
+
+   nhpc_headers_t  *headers;
 };
 
 struct nhpc_http_request_s {

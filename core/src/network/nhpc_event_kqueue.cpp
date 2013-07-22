@@ -136,45 +136,22 @@ nhpc_status_t nhpc_event_kqueue_process_changes(nhpc_listening_t *ls) {
    } else if(events > 0) {
       for(int i = 0; i < events; i++) {
 	 
-	 if(eventlist[i].data & EV_ERROR) {
-	    cout << "Error in list" << endl;
-	 }
-	 
-	 if(!(ev = (nhpc_event_t *)eventlist[i].udata)) {
-	    //LOG_ERROR("kevent() udata empty");
+	 if(!(ev = (nhpc_event_t *)eventlist[i].udata) || ev->available) {
 	    continue;
 	 }
-	 
-	 c  = (nhpc_connection_t *)ev->data;
-	 if(ev->available) {
-	    cout << "Error connection" << endl;
-	    break;
-	    continue;
-	 } else if(c->socket.fd == 0) {
-	    cout << "Error socket" << endl;
-	    break;
-	    continue;
-	 }
-	 
-	 //cout << "Event:" << c->socket.fd << endl;
 	 
 	 if(!ev->accept) {
+	    
 	    ev->available = 1;	    
 	    ev->handler(ev);
 	    ev->available = 0;
-	    
-	    /*
-	    if(worker_pool && !ev->write)
-	       nhpc_submit_job_worker_pool(ev);
-	    else {
-	       ev->handler(ev);
-	       ev->available = 0;
-	    }
-	     */
+
 	 } else {
+	 
 	    ev->available = eventlist[i].data;
 	    ev->handler(ev);
 	    ev->available = 0;
+
 	 }
       }
    }

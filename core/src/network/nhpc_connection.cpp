@@ -63,9 +63,10 @@ void nhpc_init_listening(nhpc_listening_t *ls) {
    ls->connections  = (nhpc_connection_t *)nhpc_calloc(sizeof(nhpc_connection_t) * ls->nconnections);
    ls->events       = (nhpc_event_t *)nhpc_calloc(sizeof(nhpc_event_t) * (ls->nconnections * 2 + 1));
 
-   ls->connections_queue = nhpc_init_queue(CONNECTION_BACKLOG);
+   //ls->connections_queue = nhpc_init_queue(CONNECTION_BACKLOG);
    
    ls->pool = nhpc_create_pool(1);
+   ls->connections_stack = nhpc_init_stack(CONNECTION_BACKLOG, ls->pool);
    
    nhpc_event_t *rev, *wev;
    
@@ -84,7 +85,8 @@ void nhpc_init_listening(nhpc_listening_t *ls) {
       ls->connections[i].wev = wev;      
       ls->connections[i].ls  = ls;
 
-      nhpc_insert_queue(ls->connections_queue, &ls->connections[i]);
+      nhpc_push_stack(ls->connections_stack, &ls->connections[i]);
+      //nhpc_insert_queue(ls->connections_queue, &ls->connections[i]);
    }
 }
 

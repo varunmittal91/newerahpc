@@ -54,19 +54,45 @@ nhpc_status_t nhpc_send_buffer(nhpc_connection_t *c, nhpc_buffer_t *buffer) {
    if(!buffer->head)
       return NHPC_EOF;
    
-   nhpc_size_t size  = buffer->head->end - buffer->head->start;
+   nhpc_size_t size;
    nhpc_status_t nrv;
    
-   nrv = nhpc_send(c, (char *)buffer->head->start, &size);
-   if((size = (buffer->head->end - buffer->head->start) - size) > 0)
-      buffer->head->start += size;      
-   else {
-      if(buffer->head->next) 
+   u_char  send_buffer[MAX_BUFFER_SIZE];
+   u_char *tmp_send_buffer = send_buffer;
+   
+   u_char *tmp_start;
+   
+   nhpc_size_t send_buffer_len = 0;
+   nhpc_size_t tmp_send_buffer_len;
+   
+   do {
+     
+      size      = buffer->head->end - buffer->head->start;
+      tmp_start = buffer->head->start;
+      
+      if(size <= MAX_BUFFER_SIZE) {
+	 
+	 tmp_send_buffer_len = size;
 	 buffer->head = buffer->head->next;
-      else 
-	 return NHPC_EOF;
+	 
+      } else {
+	 
+	 tmp_send_buffer_len = MAX_BUFFER_SIZE;
+	 
+      }
+      
+      memcpy(tmp_send_buffer, tmp_start, tmp_send_buffer_len);
+      send_buffer_len += tmp_send_buffer_len;
+      tmp_send_buffer += tmp_send_buffer_len;
+      
+   } while(send_buffer_len < MAX_BUFFER_SIZE && buffer->head);
+   
+   nrv = nhpc_send(c, (char *)send_buffer, &send_buffer_len);
+   if(nrv != NHPC_SUCCESS) {
+      nhpc_log_error("ERROR: send() failed, errno:%i\n", nrv);
+      return nrv;
    }
-	  
+
    return nrv;
 }
 

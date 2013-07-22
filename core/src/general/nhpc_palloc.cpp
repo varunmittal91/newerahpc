@@ -24,10 +24,10 @@ using namespace std;
 nhpc_pool_t *nhpc_create_pool(nhpc_size_t size) {
    
    size = size * NHPC_DEFAULT_POOL_SIZE;
-   nhpc_pool_t *p = (nhpc_pool_t *)nhpc_calloc(size);
+   nhpc_pool_t *p = (nhpc_pool_t *)nhpc_alloc(size);
    
    if(!p) {
-      nhpc_log_error("ERROR: create_pool() failed, size:%iBytes\n", size);
+      nhpc_log_error("ERROR: create_pool() failed, size:%iBytes", size);
       return NULL;
    }
    
@@ -69,12 +69,17 @@ void nhpc_reset_pool(nhpc_pool_t *pool)
    nhpc_pool_large_t  *l;
    
    for(l = pool->large; l; l = l->next) {
-      if(l->alloc)
+      if(l->alloc) {
 	 nhpc_free(l->alloc);
+	 nhpc_log_debug0(LOG_LEVEL_DEBUG_5, "DEBUG: Deleting large memory block with address:%p\n", l->alloc);
+      }
    }
    
-   for(p = pool; p; p->d.next)
+   for(p = pool; p; p = p->d.next) {
       p->d.last = (u_char *)p + sizeof(nhpc_pool_t);
+      
+      nhpc_log_debug0(LOG_LEVEL_DEBUG_5, "DEBUG: reset memory pool with address:%p\n", p);
+   }
 }
 
 void *nhpc_palloc(nhpc_pool_t *pool, nhpc_size_t size)
@@ -90,6 +95,8 @@ void *nhpc_palloc(nhpc_pool_t *pool, nhpc_size_t size)
 	 m = p->d.last;
 	 if((nhpc_size_t)(p->d.end - m) >= size) {
 	    p->d.last = m + size;
+	    
+	    nhpc_log_debug1(LOG_LEVEL_DEBUG_5, "DEBUG: Created memory block with address:%p and size:%i \n", m, size);
 	    
 	    return m;
 	 }
@@ -134,6 +141,8 @@ void *nhpc_palloc_block(nhpc_pool_t *pool, nhpc_size_t size)
    
    pool->current = current ? current : newp;
    
+   nhpc_log_debug1(LOG_LEVEL_DEBUG_5, "DEBUG: Created pool memory block with address:%p and size:%i \n", m, size);
+   
    return m;
 }
 
@@ -169,6 +178,8 @@ void *nhpc_palloc_large(nhpc_pool_t *pool, nhpc_size_t size)
    large->alloc = p;
    large->next  = pool->large;
    pool->large  = large;
+   
+   nhpc_log_debug1(LOG_LEVEL_DEBUG_5, "DEBUG: Created large memory block with address:%p and size:%i \n", p, size);
    
    return p;
 }

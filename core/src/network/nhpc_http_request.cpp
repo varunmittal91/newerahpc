@@ -94,6 +94,28 @@ void nhpc_http_handler(nhpc_event_t *ev) {
 	    http_request->status.status_code = NHPC_HTTP_STATUS_OK;
 	    http_request->status.status_str  = (const u_char *)"200 OK";
 	    
+	    if(nrv & NHPC_FILE) {
+	       
+
+	    } else {
+	       
+	       nhpc_str_list_t *dir_list;
+	       nhpc_get_directorylist((const char *)request, &dir_list, http_request->pool);
+
+	       nhpc_buffer_add_data(http_request->response_buffer, response_header.data, response_header.len, NHPC_BUFFER_DATA_MEM_BLOCK, 0);
+	       nhpc_buffer_add_data(http_request->response_buffer, response_body.data,   response_body.len,   NHPC_BUFFER_DATA_MEM_BLOCK, 0);
+	       
+	       nhpc_str_list_data_t *d;
+	       for(d = &dir_list->d; d; d = d->next) {
+
+		  for(int i = 0; i < d->count; i++) 
+		     cout << "Reading dir:" << d->strings[i].data << endl;
+
+	       }
+	       
+	       nhpc_buffer_add_data(http_request->response_buffer, response_footer.data, response_footer.len, NHPC_BUFFER_DATA_MEM_BLOCK, 0);	       
+	       
+	    }
 	 }
       }
    }
@@ -116,30 +138,6 @@ void nhpc_http_write_handler(nhpc_event_t *ev) {
    if(nrv == NHPC_EOF) {
       nhpc_accept_close_connection(c);   
    }
-   
-   /*
-   nhpc_size_t datasent = (buffer->end - buffer->start);
-   nhpc_status_t nrv = nhpc_send(c, (char *)buffer->start, &datasent);
-   
-   if(nrv == NHPC_EOF) {
-      nhpc_accept_close_connection(c);      
-   } else if(nrv == NHPC_SUCCESS) {
-      if((datasent = (buffer->end - buffer->start) - datasent) > 0) {
-	 buffer->start += datasent;
-      } else if(datasent == 0) {
-	 if(buffer->chain) {
-	    buffer->start = buffer->chain->start;
-	    buffer->end   = buffer->chain->end;
-	    
-	    buffer->chain = buffer->chain->next;
-	 } else {
-	    nhpc_accept_close_connection(c);      
-	    return;	    
-	 }
-	 cout << "Length zero" << endl;
-      } 
-   }
-    */
 }
 
 nhpc_http_request_t *nhpc_http_init_request_data(nhpc_pool_t *p, nhpc_communication_t *cm) {

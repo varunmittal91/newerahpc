@@ -18,7 +18,10 @@
  */
 
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
 #include <errno.h>
+
 
 #include <include/nhpc_general.h>
 
@@ -37,12 +40,43 @@ nhpc_status_t nhpc_file_size(const char *file_path, nhpc_size_t *size) {
 }
 
 nhpc_status_t nhpc_fileordirectory(const char *file_path) {
+   
    struct stat buffer; 
+   nhpc_status_t nrv;
    
    if(stat(file_path, &buffer) == -1)
-      return NHPC_FILE_NOT_FOUND;
-   else if(!S_ISDIR(buffer.st_mode))
-      return NHPC_DIRECTORY;
+      nrv = NHPC_FILE_NOT_FOUND;
+   else if(S_ISDIR(buffer.st_mode))
+      nrv = NHPC_DIRECTORY;
    else 
-      return NHPC_FILE;
+      nrv = NHPC_FILE;
+   
+   return nrv;
+}
+
+nhpc_status_t nhpc_get_directorylist(const char *directory_path, nhpc_str_list_t **dir_list, nhpc_pool_t *pool) {
+
+   DIR           *dir;
+   struct dirent *ent;
+
+   dir = opendir(directory_path);
+   if(!dir)
+      return errno;
+   
+   *dir_list = nhpc_init_str_list(10, pool);
+   
+   nhpc_str_t str;
+   
+   while((ent = readdir(dir))) {
+      
+      str.len  = strlen(ent->d_name);
+      str.data = nhpc_strpalloc(pool, str.len + 1);
+      nhpc_strcpy((char *)str.data, ent->d_name, str.len);
+      
+      nhpc_add_str_list(*dir_list, str);
+   }
+
+   closedir(dir);
+   
+   return NHPC_SUCCESS;
 }

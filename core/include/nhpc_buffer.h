@@ -21,6 +21,8 @@
 #define NHPC_BUFFER_DATA_MEM_BLOCK 0x2
 #define NHPC_BUFFER_DEALLOCATE     0x4
 
+#define MAX_BUFFER_SIZE 1000
+
 struct nhpc_chain_t {
    nhpc_chain_t *next;
    u_char       *start;
@@ -34,6 +36,7 @@ struct nhpc_buffer_data_t {
    
    u_char             *start;
    u_char             *end;
+   nhpc_size_t         max;
    
    nhpc_buffer_data_t *next;
 

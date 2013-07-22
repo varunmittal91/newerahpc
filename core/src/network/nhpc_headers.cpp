@@ -22,11 +22,12 @@
 nhpc_headers_t *nhpc_init_headers(nhpc_pool_t *pool, nhpc_uint_t max) {
    nhpc_headers_t *headers = (nhpc_headers_t *)nhpc_palloc(pool, sizeof(nhpc_headers_t));
    
-   headers->d.count   = 0;
-   headers->d.max     = max;
-   headers->d.strings = (u_char **)nhpc_palloc(pool, sizeof(u_char*) * max);
-   headers->pool      = pool;
-   headers->next      = NULL;
+   headers->d.datasize = 0;
+   headers->d.count    = 0;
+   headers->d.max      = max;
+   headers->d.strings  = (u_char **)nhpc_palloc(pool, sizeof(u_char*) * max);
+   headers->pool       = pool;
+   headers->next       = NULL;
    
    return headers;
 }

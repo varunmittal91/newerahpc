@@ -65,6 +65,7 @@ struct nhpc_listening_s {
    
    
    nhpc_queue_t       *connections_queue;
+   nhpc_stack_t       *connections_stack;
    nhpc_connection_t  *connections;
    nhpc_int_t          nconnections;
    nhpc_event_t       *events;

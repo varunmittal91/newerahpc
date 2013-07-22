@@ -30,4 +30,6 @@
 nhpc_status_t nhpc_file_size(const char *file_path, nhpc_size_t *size);
 nhpc_status_t nhpc_fileordirectory(const char *file_path);
 
+nhpc_status_t nhpc_get_directorylist(const char *directory_path, nhpc_str_list_t **dir_list, nhpc_pool_t *pool);
+
 #endif

@@ -29,8 +29,11 @@ void nhpc_accept_event(nhpc_event_t *ev) {
    pthread_t tid;
    
    do {
-      c  = (nhpc_connection_t *)nhpc_get_queue(ls->connections_queue);
-      c->pool	       = nhpc_create_pool(1);
+      c = (nhpc_connection_t *)nhpc_pop_stack(ls->connections_stack);
+      if(!c->pool) {
+	 nhpc_log_debug0(LOG_LEVEL_DEBUG_4, "DEBUG: %s\n", "allocating new c->pool");
+	 c->pool = nhpc_create_pool(1);
+      }
       c->communication = NULL;
       
       new_sockfd = accept(ls->socket.fd, (struct sockaddr *)&c->socket.sa_in, &c->socket.socklen);

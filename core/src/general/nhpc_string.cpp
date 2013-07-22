@@ -206,3 +206,46 @@ char *nhpc_strconcat_va(const char *fmt, ...)
    
    return string;
 }
+
+nhpc_str_list_t *nhpc_init_str_list(nhpc_uint_t size, nhpc_pool_t *pool) {
+   
+   nhpc_str_list_t *list;
+   if(pool) {
+      list            = (nhpc_str_list_t *)nhpc_palloc(pool, sizeof(nhpc_str_list_t));
+      list->d.strings = (nhpc_str_t *)nhpc_palloc(pool, sizeof(nhpc_str_t) * size); 
+   } else {
+      list            = (nhpc_str_list_t *)nhpc_alloc(sizeof(nhpc_str_list_t));
+      list->d.strings = (nhpc_str_t *)nhpc_alloc(sizeof(nhpc_str_t) * size);
+   }
+
+   list->pool    = pool;
+   list->max     = size;
+   list->d.count = 0;
+   list->current = &list->d;
+   
+   return list;
+}
+
+void nhpc_add_str_list(nhpc_str_list_t *list, nhpc_str_t str) {
+   
+   nhpc_str_list_data_t *list_data;
+   if(list->current->count >= list->max) {
+      
+      if(list->pool) {
+	 list_data          = (nhpc_str_list_data_t *)nhpc_palloc(list->pool, sizeof(nhpc_str_list_data_t));
+	 list_data->strings = (nhpc_str_t *)nhpc_palloc(list->pool, sizeof(nhpc_str_t) * list->max);
+      } else {
+	 list_data          = (nhpc_str_list_data_t *)nhpc_alloc(sizeof(nhpc_str_list_data_t));
+	 list_data->strings = (nhpc_str_t *)nhpc_alloc(sizeof(nhpc_str_t) * list->max); 
+      }
+      list_data->count    = 0;
+      list->current->next = list_data;
+      list->current       = list_data;
+
+   } else {
+      list_data = list->current;
+   }
+   
+   memcpy(&list_data->strings[list_data->count], &str, sizeof(nhpc_str_t));
+   list_data->count++;
+}

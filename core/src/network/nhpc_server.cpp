@@ -69,7 +69,7 @@ nhpc_status_t nhpc_create_server(const char *host_addr, const char *host_port)
    
    nhpc_init_listening(ls);
    nhpc_init_event(ls);
-   nhpc_init_worker_pool(main_pool, 20);
+   //nhpc_init_worker_pool(main_pool, 20);
    nhpc_init_posted_events(ls);
    
    return NHPC_SUCCESS;

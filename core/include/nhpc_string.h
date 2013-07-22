@@ -55,4 +55,22 @@ char *nhpc_strconcat_va(const char *fmt, ...);
 
 #define nhpc_strlen(s)  strlen((const char *)s)
 
+struct nhpc_str_list_data_t {
+   nhpc_str_t   *strings;
+   nhpc_uint_t   count;
+   
+   nhpc_str_list_data_t *next;
+};
+
+struct nhpc_str_list_t {
+   nhpc_pool_t           *pool;
+   nhpc_uint_t            max;
+   nhpc_str_list_data_t   d;
+   nhpc_str_list_data_t  *current;
+};
+
+nhpc_str_list_t *nhpc_init_str_list(nhpc_uint_t size, nhpc_pool_t *pool = NULL);
+void             nhpc_destroy_str_list(nhpc_str_list_t *list);
+void nhpc_add_str_list(nhpc_str_list_t *list, nhpc_str_t str);
+
 #endif

@@ -15082,39 +15082,62 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-for ac_func in kqueue
+
+for ac_header in sys/epoll.h
 do :
-  ac_fn_c_check_func "$LINENO" "kqueue" "ac_cv_func_kqueue"
-if test "x$ac_cv_func_kqueue" = xyes; then :
+  ac_fn_c_check_header_mongrel "$LINENO" "sys/epoll.h" "ac_cv_header_sys_epoll_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_epoll_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
-@%:@define HAVE_KQUEUE 1
+@%:@define HAVE_SYS_EPOLL_H 1
 _ACEOF
- 
+ found_epoll=yes;
 fi
+
 done
 
-for ac_func in epoll
+for ac_header in sys/event.h
 do :
-  ac_fn_c_check_func "$LINENO" "epoll" "ac_cv_func_epoll"
-if test "x$ac_cv_func_epoll" = xyes; then :
+  ac_fn_c_check_header_mongrel "$LINENO" "sys/event.h" "ac_cv_header_sys_event_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_event_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
-@%:@define HAVE_EPOLL 1
+@%:@define HAVE_SYS_EVENT_H 1
 _ACEOF
- 
+ found_kqueue=yes;
 fi
+
 done
 
-for ac_func in poll
+for ac_header in poll.h
 do :
-  ac_fn_c_check_func "$LINENO" "poll" "ac_cv_func_poll"
-if test "x$ac_cv_func_poll" = xyes; then :
+  ac_fn_c_check_header_mongrel "$LINENO" "poll.h" "ac_cv_header_poll_h" "$ac_includes_default"
+if test "x$ac_cv_header_poll_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
-@%:@define HAVE_POLL 1
+@%:@define HAVE_POLL_H 1
 _ACEOF
- 
+ found_poll=yes;
 fi
+
 done
 
+
+if test "x$found_epoll" = xyes; then :
+  
+$as_echo "@%:@define HAVE_EPOLL 1" >>confdefs.h
+
+elif test "x$found_kqueue" = xyes; then :
+  
+$as_echo "@%:@define HAVE_KQUEUE 1" >>confdefs.h
+
+elif test "x$found_poll" = xyes; then :
+  
+$as_echo "@%:@define HAVE_POLL 1" >>confdefs.h
+
+fi
+
+
+#AC_CHECK_FUNCS(kqueue)
+#AC_CHECK_FUNCS(epoll_create)
+#AC_CHECK_FUNCS(poll)
 
 for ac_header in pthread.h
 do :

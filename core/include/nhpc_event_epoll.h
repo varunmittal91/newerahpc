@@ -19,5 +19,17 @@
 
 #include <sys/epoll.h>
 
-#define NHPC_EVENT_READ   EPOLLIN
-#define NHPC_EVENT_WRITE  EPOLLOUT
+#define NHPC_READ_EVENT   EPOLLIN
+#define NHPC_WRITE_EVENT  EPOLLOUT
+
+#define NHPC_DELETE_EVENT   EPOLL_CTL_DEL
+#define NHPC_DISABLE_EVENT  NHPC_DELETE_EVENT
+#define NHPC_CLOSE_EVENT    4
+
+nhpc_status_t nhpc_event_epoll_add_event(nhpc_event_t *ev, nhpc_int_t event, nhpc_uint_t flags);
+nhpc_status_t nhpc_event_epoll_del_event(nhpc_event_t *ev, nhpc_int_t event, nhpc_uint_t flags);
+
+nhpc_status_t nhpc_event_epoll_process_changes(nhpc_listening_t *ls);
+
+nhpc_status_t nhpc_event_epoll_init(nhpc_listening_t *ls);
+void          nhpc_event_epoll_done(nhpc_listening_t *ls);

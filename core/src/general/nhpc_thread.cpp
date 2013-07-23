@@ -17,6 +17,8 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
+
 #include <include/neweraHPC.h>
 
 pthread_attr_t thread_attr;

@@ -38,6 +38,9 @@
 #ifndef NHPC_DISABLE_EVENT 
 #define NHPC_DISABLE_EVENT 2
 #endif
+#ifndef NHPC_DELETE_EVENT
+#define NHPC_DELETE_EVENT 4
+#endif
 
 #ifndef NHPC_EOF
 #define NHPC_EOF 0x8000

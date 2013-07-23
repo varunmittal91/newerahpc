@@ -17,6 +17,9 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef __linux__
+#include <malloc.h>
+#endif
 #include <string.h>
 
 #include <include/nhpc_general.h>

@@ -17,6 +17,8 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
+
 #include <include/nhpc_general.h>
 
 using namespace std;

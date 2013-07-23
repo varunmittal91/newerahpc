@@ -17,6 +17,8 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdarg.h>
+#include <string.h>
 #include <math.h>
 
 #include <include/neweraHPC.h>

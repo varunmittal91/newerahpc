@@ -17,6 +17,8 @@
  *	along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
+
 #include <include/neweraHPC.h>
 
 nhpc_headers_t *nhpc_init_headers(nhpc_pool_t *pool, nhpc_uint_t max) {

@@ -1,0 +1,1392 @@
+{
+	"interface": {
+    "object": {
+      "className": "NuiWindow",
+      "id": "window1",
+      "child": {
+        "object": {
+          "className": "NuiTable",
+          "id": "button_panel",
+          "property": [
+            {
+              "-name": "visible",
+              "#text": "True"
+            },
+            {
+              "-name": "n_rows",
+              "#text": "4"
+            },
+            {
+              "-name": "n_columns",
+              "#text": "6"
+            },
+            {
+              "-name": "homogeneous",
+              "#text": "True"
+            }
+          ],
+          "child": [
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_4_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "4"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "False"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "top_attach",
+                    "#text": "1"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_7_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "7"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "False"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_8_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "8"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "False"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "1"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_9_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "9"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "False"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_5_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "5"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "False"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "1"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "top_attach",
+                    "#text": "1"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_6_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "6"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "False"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "top_attach",
+                    "#text": "1"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_divide_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "÷"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "False"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "4"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_1_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "1"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "False"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "top_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_2_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "False"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "1"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "top_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_0_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "0"
+                  },
+                  {
+                    "-name": "width_request",
+                    "#text": "50"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "False"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "top_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "4"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_numeric_point_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "-comments": "Label is set in gtk.c to comply with LC flags",
+                    "#text": "."
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "False"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "1"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "top_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "4"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_percentage_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "%"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "top_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "4"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_3_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "False"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "top_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_multiply_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "×"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "False"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "4"
+                  },
+                  {
+                    "-name": "top_attach",
+                    "#text": "1"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_subtract_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "−"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "False"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "4"
+                  },
+                  {
+                    "-name": "top_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_add_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "+"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "False"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "4"
+                  },
+                  {
+                    "-name": "top_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "4"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_result_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "-translatable": "yes",
+                    "-comments": "Label on the solve button (clicking this solves the displayed calculation)",
+                    "#text": "="
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "False"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "4"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "6"
+                  },
+                  {
+                    "-name": "top_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "4"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_start_group_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "("
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "4"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "5"
+                  },
+                  {
+                    "-name": "top_attach",
+                    "#text": "1"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_end_group_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": ")"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "5"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "6"
+                  },
+                  {
+                    "-name": "top_attach",
+                    "#text": "1"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_clear_button",
+                "property": [
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ],
+                "child": {
+                  "object": {
+                    "className": "NuiImage",
+                    "id": "image2",
+                    "property": [
+                      {
+                        "-name": "visible",
+                        "#text": "True"
+                      },
+                      {
+                        "-name": "icon-name",
+                        "#text": "edit-clear-symbolic"
+                      }
+                    ]
+                  }
+                }
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "5"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "6"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_square_root_button",
+                "property": [
+                  {
+                    "-name": "label",
+                    "#text": "√"
+                  },
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "5"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "6"
+                  },
+                  {
+                    "-name": "top_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_x_squared_button",
+                "property": [
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ],
+                "child": [
+                  {
+                    "-internal-child": "accessible",
+                    "object": {
+                      "className": "AtkObject",
+                      "id": "calc_x_squared_button-atkobject",
+                      "property": {
+                        "-name": "AtkObject::accessible-name",
+                        "-translatable": "yes",
+                        "-comments": "Accessible name for the exponentiation (x to the power of y) button",
+                        "#text": "Exponent"
+                      }
+                    }
+                  },
+                  {
+                    "object": {
+                      "className": "NuiLabel",
+                      "id": "x_squared_label",
+                      "property": [
+                        {
+                          "-name": "visible",
+                          "#text": "True"
+                        },
+                        {
+                          "-name": "label",
+                          "#text": "<i>x</i><sup><i>2</i></sup>"
+                        },
+                        {
+                          "-name": "use_markup",
+                          "#text": "True"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "4"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "5"
+                  },
+                  {
+                    "-name": "top_attach",
+                    "#text": "2"
+                  },
+                  {
+                    "-name": "bottom_attach",
+                    "#text": "3"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            },
+            {
+              "object": {
+                "className": "NuiButton",
+                "id": "calc_undo_button",
+                "property": [
+                  {
+                    "-name": "visible",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "can_focus",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "receives_default",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "use_underline",
+                    "#text": "True"
+                  },
+                  {
+                    "-name": "focus_on_click",
+                    "#text": "False"
+                  }
+                ],
+                "child": {
+                  "object": {
+                    "className": "NuiImage",
+                    "id": "image1",
+                    "property": [
+                      {
+                        "-name": "visible",
+                        "#text": "True"
+                      },
+                      {
+                        "-name": "icon-name",
+                        "#text": "edit-undo-symbolic"
+                      }
+                    ]
+                  }
+                }
+              },
+              "packing": {
+                "property": [
+                  {
+                    "-name": "left_attach",
+                    "#text": "4"
+                  },
+                  {
+                    "-name": "right_attach",
+                    "#text": "5"
+                  },
+                  {
+                    "-name": "x_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  },
+                  {
+                    "-name": "y_options",
+                    "#text": "NUI_EXPAND | NUI_SHRINK | NUI_FILL"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

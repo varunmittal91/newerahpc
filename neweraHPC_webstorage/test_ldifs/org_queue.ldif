@@ -1,0 +1,3 @@
+dn: ou=people_queue,dc=newerahpc,dc=com
+objectclass: organizationalUnit
+ou: people_queue

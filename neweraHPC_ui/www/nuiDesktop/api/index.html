@@ -1,0 +1,106 @@
+<html>
+<head>
+	<title>Nui Interface Parser</title>
+  <script src="../js/jquery.js" type="application/javascript"></script>
+	<script src="../js/jquery.ui.js" type="application/javascript"></script>
+  <script src="nui.parser.js" type="application/javascript"></script>
+  <link rel="stylesheet" href="css/reset.css" />
+	<link rel="stylesheet" href="css/desktop.css" />
+</head>
+<body>
+	<!--
+	<div id="test_window" class="abs window">
+		
+	</div>
+	-->
+
+	<script type="application/javascript">
+		jQuery.ajaxSetup({async:false});
+
+		$.getJSON('calculator.json', function(interface) {
+			var new_dom = NuiInterfaceParser.init(interface);
+			console.log(new_dom);
+
+			//document.getElementsByTagName('body').item.appendChild(dom);
+			document.getElementsByTagName('body').item(0).appendChild(new_dom);
+		});
+	</script>
+
+	<div class="abs" id="wrapper">
+  <div class="abs" id="desktop">
+    <div id="window_computer" class="abs window">
+      <div class="abs window_inner">
+        <div class="window_top">
+          <span class="float_left">
+            <img src="assets/images/icons/icon_16_computer.png" />
+            Computer
+          </span>
+          <span class="float_right">
+            <a href="#" class="window_min"></a>
+            <a href="#" class="window_resize"></a>
+            <a href="#icon_dock_computer" class="window_close"></a>
+          </span>
+        </div>
+        <div class="abs window_content">
+          <div class="window_aside">
+            Hello. You look nice today!
+          </div>
+          <div class="window_main">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th class="shrink">
+                    &nbsp;
+                  </th>
+                  <th>
+                    Name
+                  </th>
+                  <th>
+                    Date Modified
+                  </th>
+                  <th>
+                    Date Created
+                  </th>
+                  <th>
+                    Size
+                  </th>
+                  <th>
+                    Kind
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <img src="assets/images/icons/icon_16_drive.png" />
+                  </td>
+                  <td>
+                    Hard Drive
+                  </td>
+                  <td>
+                    Today
+                  </td>
+                  <td>
+                    &mdash;
+                  </td>
+                  <td>
+                    200 GB
+                  </td>
+                  <td>
+                    Volume
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="abs window_bottom">
+          Build: TK421
+        </div>
+      </div>
+      <span class="abs ui-resizable-handle ui-resizable-se"></span>
+    </div>
+		</div>
+		</div>
+</body>
+</html>

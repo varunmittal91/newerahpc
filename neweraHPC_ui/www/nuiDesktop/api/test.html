@@ -1,0 +1,17 @@
+<html>
+   <head>
+      <title>dom test</title>
+   </head>
+   <body>
+      
+      <script type="application/javascript">
+	 var fragment = document.createDocumentFragment();
+	 var heading = fragment.appendChild(document.createElement('h1'));
+	 heading.appendChild(document.createTextNode('Quotes by Yoda'));
+	 var blockquote = fragment.appendChild(document.createElement('blockquote'));
+	 var p = blockquote.appendChild(document.createElement('p'));
+	 p.appendChild(document.createTextNode('Always two there are'));
+	 document.getElementsByTagName('body').item(0).appendChild(fragment);
+	 </script>      
+   </body>
+</html>

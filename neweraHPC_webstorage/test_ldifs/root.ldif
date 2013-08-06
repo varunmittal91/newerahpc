@@ -1,0 +1,7 @@
+## Build the root node
+dn: dc=newerahpc,dc=com
+objectClass: dcObject
+objectClass: organizationalUnit
+ou: NeweraHPC Cluster
+dc: newerahpc
+

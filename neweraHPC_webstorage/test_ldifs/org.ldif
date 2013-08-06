@@ -1,0 +1,7 @@
+dn: ou=people,dc=newerahpc,dc=com
+objectclass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=newerahpc,dc=com
+objectclass: organizationalUnit
+ou: group

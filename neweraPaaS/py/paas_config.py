@@ -21,7 +21,7 @@
 
 import os
 
-import errors
+import paas_errors
 
 def getPAASRoot(cmd_arguments):
    try:

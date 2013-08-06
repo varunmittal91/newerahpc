@@ -25,13 +25,14 @@ import errno
 import getopt
 import ConfigParser
 
-import containers
+import neweraPaaS
 
 def updateFunctions(function_list):
-   function_list['create']  = containers.createContainer
-   function_list['destroy'] = containers.destroyContainer
-   function_list['start']   = containers.startContainer
-   function_list['stop']    = containers.stopContainer
+   function_list['create']   = neweraPaaS.containers.createContainer
+   function_list['destroy']  = neweraPaaS.containers.destroyContainer
+   function_list['start']    = neweraPaaS.containers.startContainer
+   function_list['stop']     = neweraPaaS.containers.stopContainer
+   function_list['shutdown'] = neweraPaaS.containers.shutdownContainer
 
 def main(argv):
 

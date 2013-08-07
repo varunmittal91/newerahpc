@@ -32,7 +32,24 @@ else:
    exit(2)
 
 def mountContainer(lxc_path, image_path, instance_path):
-   _mount.mountContainer(lxc_path, image_path, instance_path)
+   print "Mounting container file system:"
+   print "\t Target:" + lxc_path
+   print "\t Image:" + image_path
+   print "\t Instance:" + instance_path
+
+   if _mount.mountContainer(lxc_path, image_path, instance_path) != 0:
+      paas_errors.setError(paas_errors.PAAS_EMOUNT)
+      return -1
+   else:
+      return 0
 
 def umountContainer(lxc_path):
-   _mount.umountContainer(lxc_path)   
+   print "Umounting container file system:"
+   print "\t Target:" + lxc_path
+
+   if _mount.umountContainer(lxc_path) != 0:
+      paas_errors.setError(paas_errors.PAAS_EUMOUNT)
+      return -1
+   else:
+      return 0
+

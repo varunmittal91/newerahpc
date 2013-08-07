@@ -19,5 +19,21 @@
 #       along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import os
+
+def start(container_name):
+   cmd = "lxc-start -d -n " + container_name
+   status = os.system(cmd)
+   if status != 0:
+      return -1
+   return status
+
+def stop(container_name):
+   cmd = "lxc-stop -n " + container_name
+   if os.system(cmd) != 0:
+      return -1
+   else:
+      return 0
+
 def shutdown():
    return

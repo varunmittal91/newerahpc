@@ -84,7 +84,7 @@ def createContainer(cmd_arguments):
       config.write(configfile)
 
    lxc_root = paas_config.getLXCRoot(cmd_arguments)
-   rootfs   = lxc_root + "/instance-" + str(i) 
+   rootfs   = lxc_root + "/instance-" + str(i) + "/rootfs"
    rootfs_fstab = lxc_root + "/instance-" + str(i) + "/fstab"
 
    shutil.copy(image_details[1] + "/config", instance_path + "/config")
@@ -127,6 +127,11 @@ def _startContainer(container_config, lxc_root, paas_root):
       paas_errors.paasPerror("mountContainer() failed, _startContainer()")
       os.rmdir(lxc_path)
       return -1
+
+   if paas_lxc_interface.start(container_name) == -1:
+      paas_errors.paasPerror("lxc_interface_start(), _startContainer()")
+      return -1
+
    return 0
 
 def startContainer(cmd_arguments):
@@ -161,7 +166,15 @@ def startContainer(cmd_arguments):
    _startContainer(container_config, lxc_root, paas_root)
 
 def _stopContainer(container_config, lxc_root):
-   return
+   if paas_mount.umountContainer(lxc_root) == -1:
+      paas_errors.paasPerror("_umountContainer() failed, _stopContainer()")
+      return -1
+   if paas_lxc_interface.stop(container_name) == -1:
+      paas_errors.paasPerror("lxc_interface_stop(), _stopContainer()")
+      return -1
+
+   os.rmdir(lxc_root)
+   return 0
 
 def stopContainer(cmd_arguments):
    container_name = ''
@@ -195,7 +208,7 @@ def stopContainer(cmd_arguments):
       return
    
    if paas_mount.umountContainer(lxc_path) == -1:
-      paas_errors.paasPeeror("umountContainer() failed, stopContainer")
+      paas_errors.paasPerror("umountContainer() failed, stopContainer")
       return -1
    os.rmdir(lxc_path)
    return 0

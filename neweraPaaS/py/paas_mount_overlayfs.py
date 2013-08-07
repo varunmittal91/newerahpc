@@ -19,8 +19,33 @@
 #       along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
 #
    
-import paas_errors as errors
-import paas_containers as containers
-import paas_config as config
-import paas_images as images
-import paas_network as network
+import os
+import paas_errors
+
+def mountContainer(lxc_path, image_path, instance_path):
+   print "Mounting container file system:"
+   print "\t Target:" + lxc_path
+   print "\t Image:" + image_path
+   print "\t Instance:" + instance_path
+
+   branch = "lowerdir=" + image_path + ",upperdir=" + instance_path
+   cmd = "mount -t overlayfs overlayfs -o" + branch + " " + lxc_path
+   status = os.system(cmd)
+   if status != 0:
+      paas_errors.setError(paas_errors.PAAS_EMOUNT)
+      return -1
+
+   return status
+
+def umountContainer(lxc_path):
+   print "Umounting container file system:"
+   print "\t Target:" + lxc_path
+
+   cmd = "umount " + lxc_path
+   status = os.system(cmd)
+   if status != 0:
+      paas_errors.setError(paas_errors.PAAS_EUMOUNT)
+      return
+
+   return status
+

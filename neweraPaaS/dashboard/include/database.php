@@ -19,4 +19,10 @@
   */
 ?>
 
+<?php
 
+function init_db() {
+
+}
+
+?>

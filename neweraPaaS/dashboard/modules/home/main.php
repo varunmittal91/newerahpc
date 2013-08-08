@@ -19,4 +19,26 @@
   */
 ?>
 
+<?php
 
+function home_test_enable() {
+   return 1;
+}
+
+function home_load_menu() {
+   return "<a href=?q=home>Home</a>";   
+}
+
+function home_load_content() {
+   $test_value = check_arg('q', 1);
+   if($test_value && $test_value != 'home')
+      return NULL;
+
+   return "<h1>Welcome</h1>";
+}
+
+function home_load_sidebar() {
+
+}
+
+?>

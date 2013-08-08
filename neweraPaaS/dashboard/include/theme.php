@@ -19,4 +19,11 @@
   */
 ?>
 
+<?php 
 
+global $theme_active;
+
+$theme_path = "themes/".$theme_active."/main.php";
+include_once($theme_path);
+
+?>

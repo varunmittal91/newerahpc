@@ -19,4 +19,11 @@
   */
 ?>
 
+<?php 
 
+function check_logged_in() {
+   if(isset($_SESSION['logged_in']))
+      return true;
+   else 
+      return false;
+}

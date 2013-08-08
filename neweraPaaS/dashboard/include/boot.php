@@ -19,4 +19,17 @@
   */
 ?>
 
+<?php
+
+   include('settings.php');  
+   include('database.php');
+   include('modules.php');
+   include('auth.php');
+
+   function boot() {
+      session_start();
+      init_db();
+      load_modules();
+   }
+?>
 

@@ -32,6 +32,10 @@ global PAAS_ENNOENT
 global PAAS_EINOENT
 global PAAS_ENEXISTS    
 global PAAS_EIEXISTS
+global PAAS_EMOUNT
+global PAAS_EUMOUNT
+global PAAS_ESTARTLXC
+global PAAS_ESTOPLXC
 
 PAAS_ENOENT      = errno.ENOENT # No such file or directory
 PAAS_EACCES      = errno.EACCES # Permission denied
@@ -44,6 +48,11 @@ PAAS_ENNOENT     = 108          # No such container
 PAAS_EINOENT     = 109          # No such image
 PAAS_ENACTIVE    = 110          # Container already running
 PAAS_ENNOACTIVE  = 111          # Container not running
+PAAS_EMOUNT      = 112          # Unable to mount image
+PAAS_EUMOUNT     = 113          # Unable to unmount image
+PAAS_ESTARTLXC   = 114          # Unable to start container
+PAAS_ESTOPLXC    = 115          # Unable to stop container
+
 
 PAAS_ERROR_STRINGS = {}
 PAAS_ERROR_STRINGS[PAAS_ENOENT]      = "No such file or directory" 
@@ -57,6 +66,10 @@ PAAS_ERROR_STRINGS[PAAS_ENEXISTS]    = "Container exists"
 PAAS_ERROR_STRINGS[PAAS_EIEXISTS]    = "Image exists"
 PAAS_ERROR_STRINGS[PAAS_ENACTIVE]    = "Container already running"
 PAAS_ERROR_STRINGS[PAAS_ENNOACTIVE]  = "Container not running"
+PAAS_ERROR_STRINGS[PAAS_EMOUNT]      = "Unable to mount image"
+PAAS_ERROR_STRINGS[PAAS_EUMOUNT]     = "Unable to unmount image"
+PAAS_ERROR_STRINGS[PAAS_ESTARTLXC]   = "Unable to start container"
+PAAS_ERROR_STRINGS[PAAS_ESTOPLXC]    = "Unable to stop container"
 
 def setError(error):
    global paas_errno

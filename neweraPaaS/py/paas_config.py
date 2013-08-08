@@ -20,6 +20,7 @@
 #
 
 import os
+import ConfigParser
 
 import paas_errors
 
@@ -27,11 +28,11 @@ def getPAASRoot(cmd_arguments):
    try:
       paas_root = cmd_arguments['paas-root']
    except:
-      errors.setError(errors.PAAS_EINVAL)
+      paas_errors.setError(paas_errors.PAAS_EINVAL)
       return
 
    if not os.path.isdir(paas_root):
-      errors.setError(errors.PAAS_ENOPAASROOT)
+      paas_errors.setError(paas_errors.PAAS_ENOPAASROOT)
       return
 
    return paas_root
@@ -40,21 +41,38 @@ def getLXCRoot(cmd_arguments):
    try:
       lxc_root = cmd_arguments['lxc-root']
    except:
-      errors.setError(errors.PAAS_EINVAL)
+      paas_errors.setError(paas_errors.PAAS_EINVAL)
       return
 
    if not os.path.isdir(lxc_root):
-      errors.setError(errors.PAAS_ENOPAASROOT)
+      paas_errors.setError(paas_errors.PAAS_ENOPAASROOT)
       return
 
    return lxc_root
 
 def getLocalNetPrefix(cmd_arguments):
+
    try:
       network_prefix = cmd_arguments['local-net-prefix']
    except:
-      errors.setError(errors.PAAS_EINVAL)
+      paas_errors.setError(paas_errors.PAAS_EINVAL)
       return
 
    return network_prefix
+
+def getLocalNetConfig(cmd_arguments):
+   config_file = ''
+   net_config  = {}
+   try:
+      config_file = cmd_arguments['config-file']
+      config = ConfigParser.RawConfigParser()
+      config.read(config_file)
+      net_config['net-prefix'] = config.get('NeweraPaaS', 'local-net-prefix')
+      net_config['net-type']   = config.get('NeweraPaaS', 'local-net-type')
+      net_config['net-link']   = config.get('NeweraPaaS', 'local-net-link')
+   except:
+      paas_errors.setError(paas_errors.PAAS_EINVAL)
+      return
+
+   return net_config
 

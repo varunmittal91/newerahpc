@@ -38,7 +38,7 @@ def checkImage(cmd_arguments, paas_root):
    try:
       image_name = cmd_arguments['image-name']
    except:
-      errors.setError(errors.PAAS_EINVAL)
+      paas_errors.setError(paas_errors.PAAS_EINVAL)
       return
 
    image_path = checkImageName(image_name, paas_root)

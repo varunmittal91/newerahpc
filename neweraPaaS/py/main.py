@@ -41,6 +41,7 @@ def main(argv):
    paas_root = ''
    lxc_root  = ''
    local_net_prefix = ''
+   config_file = ''
 
 # evaluating command line arguments
 #    -i image name
@@ -60,6 +61,7 @@ def main(argv):
       elif opt in ('-n'):
          cmd_arguments['container-name'] = arg
       elif opt in ('-c'):
+         cmd_arguments['config-file'] = arg
          config = ConfigParser.RawConfigParser()
          try:
             config.read(arg)

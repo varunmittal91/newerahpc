@@ -21,7 +21,29 @@
 
 <?php
 
+$db_conn = NULL;
+
 function init_db() {
+   global $db_host;
+   global $db_user;
+   global $db_pass;
+   global $db_name;
+   global $db_conn;
+
+   $db_conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
+   if($db_conn->connect_errno) {
+      echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+      exit(0);
+   }
+}
+
+function query_db($query) {
+   global $db_conn;
+   $res = $db_conn->query($query);
+   return $res;
+}
+
+function fetch_result_db($query, $parameters) {
 
 }
 

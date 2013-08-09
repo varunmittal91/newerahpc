@@ -33,30 +33,47 @@ function identity_load_menu() {
 }
 
 function identity_load_action() {
-	 $test_val = check_arg('func', 1);
-	 if($test_val == NULL)
-	    print 0;
-		else if($test_val == 'check_avail_user') {
-		  print 1;
-		} else if($test_val == 'signup') {
-		  $username   = check_arg('username', 0);
-			$userpasswd = check_arg('userpasswd', 0);
-
-      if(!$username || !$userpasswd)
-			   print 0;
-			else {
-			   print 1;
-			}
-		} else {
-		  print 0;
-		}
+   $test_val = check_arg('func', 1);
+   if($test_val == NULL)
+      print 0;
+   else if($test_val == 'register_user') {
+      $username = check_arg('username', 1);
+      $passwd   = check_arg('userpasswd', 1);
+      if(!$username || !$passwd) {
+         print 0;
+         return;
+      }
+      $epasswd = md5($passwd);
+      $query  = "insert into users(uid, user, passwd) values(@, '$username', '$epasswd')";
+      $result = query_db($query);
+      if($result)
+         print 1;
+      else
+         print 0;
+      return; 
+   } else if($test_val == 'check_avail_user') {
+      $username   = check_arg('username', 1);
+      if(!$username) 
+         print 0;
+      else {
+         $query = "select user from users where user='$username'";
+         $res   = query_db($query);
+         if(!$res || $res->num_rows > 0)
+            print 0;
+         else
+            print 1;
+         return;
+      }
+   } else {
+      print 0;
+   }
 }
 
 function identity_load_script() {
    $test_value = check_arg('q', 1);
    if($test_value == 'identity_signup') {
 
-      $script = "<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js'></script>
+      $script = "<script type='text/javascript' src='themes/js/jquery-1.3.2.js'></script>
                  <script type='text/javascript' src='modules/identity/signup.js'></script>
                 ";
       return $script;
@@ -65,65 +82,77 @@ function identity_load_script() {
 
 function identity_load_content() {
    $test_value = check_arg('q', 1);
-   if($test_value && $test_value == 'identity_login') {
-      $form = "<h1>Login</h1><br>
-               <table><tr>
-               <form method='post' action='?q=identity_login_action'>
-               <td>Login:</td><td><input type='text' name='login_name'></td></tr>
-               <tr>
-               <td>Password:</td><td><input type='password' name='login_passwd'></td>
-               </tr>
-               <tr><td><input type='submit' value='Login'></td>
-               </tr></table>
-	       <a href='?q=identity_signup'>Signup</a>
-              ";
-                
+   if($test_value && $test_value == 'identity_login') {  
+      $form = "
+<div class='well'>
+   <form class='form-horizontal' method='POST' action=''>
+      <legend>Login</legend>
+      <div class='control-group'>
+         <label class='control-label'>Username</label>
+         <div class='controls'>
+            <input type='text' class='input-xlarge' id='username' name='username' placeholder='Username' maxlength=16>
+         </div>
+      </div>
+      <div class='control-group'>
+         <label class='control-label'>Password</label>
+         <div class='controls'>
+            <input type='password' class='input-xlarge' id='userpasswd' name='userpasswd' placeholder='Password' maxlength=16>
+         </div>
+      </div>
+      <div class='control-group'>
+         <label class='control-label'></label>
+         <div class='controls'>
+            <button type='submit' class='btn btn-success'>Login</button>  
+         </div>
+      </div>
+      <hr>
+   </form>
+   <div class='control-group'>
+      <a href='?q=identity_signup'>
+         <label class='control-label'>Create New Account</label>
+      </a>
+   </div>
+</div>
+";
       return $form;
    } else if($test_value && $test_value == 'identity_signup') {
 
-      $form = "<h1>Signup</h1><br>
-               Signup in process
-               <form action=''>
-               <table cellpadding='5'>
-               <tr>
-               <td>
-                  Username:
-               </td>
-               <td>
-                  <input type='text' name='login_name' id='login_name' maxlength=16>
-               </td>
-               <td>
-                  <img id='login_tick' src='modules/identity/images/tick.png' width='20' height='20'/>
-                  <img id='login_cross' src='modules/identity/images/cross.png' width='20' height='20'/>
-               </td>
-               <td>
-                  <small><p id='login_name_error_len'>Username length should be minimum 4 and maximum 16</p></small>
-                  <small><p id='login_name_error_navail'>Username not available</p></small>
-               </td>
-               </tr>
-               <tr>
-               <td>
-                  Password:
-               </td>
-               <td>
-                  <input type='text' name='login_passwd' id='login_passwd' maxlength=32>
-               </td>
-               <td>
-                  <img id='passwd_tick' src='modules/identity/images/tick.png' width='20' height='20'/>
-                  <img id='passwd_cross' src='modules/identity/images/cross.png' width='20' height='20'/>
-               </td>
-               <td>
-                  <small><p id='passwd_error_len'>Password length should be minimum 8</p></small>
-               </td>
-               </tr>
-							 <tr>
-							 <td>
-									<input type='button' id='signup_submit' value='Signup'>
-							 </td>
-							 </tr>
-							 </table>
-               </form>
-              ";
+      $form = "
+<div class='well'>
+   <legend>Sign Up</legend>
+   <form class='form-horizontal' id='signup_form'>
+      <div class='control-group'>
+         <label class='control-label'>Username</label>
+         <div class='controls'>
+            <input type='text' class='input-xlarge' id='username' name='username' placeholder='Username' maxlength=16>
+            <small><p class='error' style='display: none' id='username_error_len'>Username length should be atleast 5</p></small>
+            <small><p class='error' style='display: none' id='username_error_exists'>Username not available</p></small>
+         </div>
+      </div>
+      <div class='control-group'>
+         <label class='control-label'>Password</label>
+         <div class='controls'>
+            <input type='password' class='input-xlarge' id='passwd' name='passwd' placeholder='Password' maxlength=16>
+            <small><p class='error' style='display: none' id='passwd_error_nmatch'>Passwords do not match</p></small>
+            <small><p class='error' style='display: none' id='passwd_error_len'>Password length should me minimum 8</p></small>
+         </div>
+      </div>
+      <div class='control-group'>
+         <label class='control-label'>Confirm Password</label>
+         <div class='controls'>
+            <input type='password' class='input-xlarge' id='confirm_passwd' name='confirm-passwd' placeholder='Confirm Password' maxlength=16>
+         </div>
+      </div>
+      <div class='control-group'>
+         <label class='control-label'></label>
+         <div class='controls'>
+            <button type='button' class='btn btn-success' id='signup_submit' name='signup_submit'>Signup</button>
+         </div>
+      </div>
+   </form>
+   <div id='welcome_message' style='display: none'><h1>Welcome to Cloud</h1></div>
+</div>
+";
       return $form;
    }
 }

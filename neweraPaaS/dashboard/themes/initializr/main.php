@@ -60,25 +60,24 @@
         </div>
 
         <div class="container">
-
             <!-- Main hero unit for a primary marketing message or call to action -->
-						<div class="row">
-							<div class="span2">
-							   This is the Sidebar area
-							   <?php print $sidebar ?>
-							</div>
-						  <div class="span9">
-								<div class="hero-unit">
-									<?php print $content ?>
-								</div>
-							</div>
-						</div>
+           <div class="row">
+              <div class="span4">
+              <div class='hero-unit'>
+	         This is the Sidebar area
+		 <?php print $sidebar ?>
+              </div>
+              </div>
+	      <div class="span8">
+	         <?php print $content ?>
+	      </div>
+	   </div>
 
-            <hr>
+           <hr>
 
-            <footer>
-                <p>&copy; <?php print $site_footer ?></p>
-            </footer>
+           <footer>
+              <p>&copy; <?php print $site_footer ?></p>
+           </footer>
 
         </div> <!-- /container -->
 

@@ -1,91 +1,92 @@
-                    var valid_login_name = 0;
-										var valid_login_passwd = 0;
-                    $(document).ready(function() {
-                       $('#login_name').blur(username_check);
-                       $('#login_tick').hide();
-                       $('#login_cross').hide();
-                       $('#login_name_error_len').hide();
-		                   $('#login_name_error_navail').hide();
+var valid_login_name = 0;
+var valid_login_passwd = 0;
 
-                       $('#login_passwd').blur(passwd_check);
-                       $('#passwd_tick').hide();
-                       $('#passwd_cross').hide();
-                       $('#passwd_error_len').hide();
-                       $('#passwd_error_navail').hide();   
-											 
-											 $('#signup_submit').click(function(){
-											    console.log('button pressed');
-													if(!valid_login_name || !valid_login_passwd) {
-													   console.log('invalid username password');
-													} else {
-														 var userpasswd = $('#login_passwd').val();
-												 	   var username   = $('#login_name').val();
-											 
-													   jQuery.ajax({
-														    type: 'POST',
-																url: '?q=action&module=identity&func=signup',
-																data: {'username': username, 'userpasswd': userpasswd},
-																cache: false,
-																success: function(response){
-																   if(response == 1)
-																	    console.log('signup successfull');
-																	 else
-																	    console.log('signup failed');
-																}
-														 })
-													}
-											 })
-                    });
+$(document).ready(function() {
+   $('#username').blur(username_check);
+   $('#passwd').blur(passwd_check);
+   $('#confirm_passwd').blur(match_passwd);
+										 
+   $('#signup_submit').click(function() {
+      console.log('button pressed');
+      if(!valid_login_name || !valid_login_passwd) {
+         console.log('invalid username password');
+      } else {
+         var userpasswd = $('#passwd').val();
+         var username   = $('#username').val();
+         jQuery.ajax({
+            type: 'GET',
+            url: '?q=action&module=identity&func=register_user',
+            data: {'username': username, 'userpasswd': userpasswd},
+            cache: false,
+            success: function(response) {
+               if(response == 1) {
+                  console.log('signup successfull');
+                  $('#signup_form').hide();
+                  $('#welcome_message').fadeIn();
+               }
+               else
+                  console.log('signup failed');
+            }
+         })
+      }
+   })
+});
 
-                    function passwd_check() {
-                       var passwd = $('#login_passwd').val();
-                       if(passwd == '' || passwd.length < 8) {
-                          $('#username').css('border', '3px #CCC solid');
-                          $('#passwd_tick').hide();
-                          $('#passwd_cross').fadeIn();
-                          $('#login_passwd').css('border', '3px #C33 solid');
-                          $('#passwd_error_len').fadeIn();
-                          valid_login_passwd = 0;
-                       } else {
-													$('#passwd_error_len').hide();
-                          $('#login_passwd').css('border', '3px #090 solid');
-                          $('#passwd_tick').fadeIn();
-                          $('#passwd_cross').hide();
-													valid_login_passwd = 1;
-											 }
-                    }
+function passwd_check() {
+   console.log("checking password validity");
+   var passwd = $('#passwd').val();
+   if(passwd == '' || passwd.length < 8) {
+      $('#passwd').css('border', '3px #C33 solid');
+      $('#passwd_error_len').fadeIn();
+      valid_login_passwd = 0;
+   } else {
+      $('#passwd_error_len').hide();
+      $('#passwd').css('border', '3px #090 solid');
+      valid_login_passwd = 1;
+   }
+}
 
-                    function username_check(){	
-                       var username = $('#login_name').val();
-                       if(username == '' || username.length < 4) {
-                          $('#username').css('border', '3px #CCC solid');
-                          $('#login_tick').hide();
-                          $('#login_cross').fadeIn();
-                          $('#login_name').css('border', '3px #C33 solid');
-                          $('#login_name_error_len').fadeIn();
-                          valid_login_name = 0;
-                       } else {
-                          $('#login_name_error_len').hide();
-                          jQuery.ajax({
-                             type: 'POST',
-                             url: '?q=action&module=identity&func=check_avail_user',
-                             data: 'username='+ username,
-                             cache: false,
-                             success: function(response){
-                                if(response == 1){
-       	                           $('#login_name').css('border', '3px #090 solid');	
-	                           $('#login_cross').hide();
-	                           $('#login_tick').fadeIn();
-                                   valid_login_name = 1;
-	                        } else {
-	                           $('#login_name').css('border', '3px #C33 solid');
-              	                   $('#login_tick').hide();
-     	                           $('#login_cross').fadeIn();
-                                   $('#login_name_error_navail').show();
-                                   valid_login_name = 0;
-	                        }
-                             }
-                          });
-                       }
-                    }
+function match_passwd() {
+   var passwd  = $('#passwd').val();
+   var cpasswd = $('#confirm_passwd').val();
+
+   if(valid_login_passwd == 1 && passwd == cpasswd) {
+      $('#passwd').css('border', '3px #090 solid');
+      $('#confirm_passwd').css('border', '3px #090 solid');      
+      valid_login_passwd = 1;
+   } else {
+      $('#passwd').css('border', '3px #C33 solid');
+      $('#confirm_passwd').css('border', '3px #C33 solid');      
+      $('#passwd_error_nmatch').fadeIn();
+      valid_login_passwd = 0;
+   }
+}
+
+function username_check() {	
+   var username = $('#username').val();
+   if(username == '' || username.length < 5) {
+      $('#username').css('border', '3px #C33 solid');
+      $('#username_error_len').fadeIn();
+      valid_login_name = 0;
+   } else {
+      $('#username_error_len').hide();
+      jQuery.ajax({
+         type: 'GET',
+         url: '?q=action&module=identity&func=check_avail_user',
+         data: 'username='+ username,
+         cache: false,
+         success: function(response) {
+            if(response == 1) {
+       	       $('#username').css('border', '3px #090 solid');	
+               $('#username_error_exists').hide();
+               valid_login_name = 1;
+            } else {
+               $('#username').css('border', '3px #C33 solid');
+               $('#username_error_exists').fadeIn();
+               valid_login_name = 0;
+            }
+         }
+      });
+   }
+}
 

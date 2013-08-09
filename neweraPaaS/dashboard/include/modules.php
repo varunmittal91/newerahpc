@@ -33,8 +33,18 @@ function load_modules() {
    $sidebar = "";
    $script  = "";
 
-   foreach($modules as $i => $module) {
+   if(check_arg('q', 1) == 'action') {
+      $module = check_arg('module', 1);
+      if($module == NULL) {
+         $_GET['q'] = 'home';
+      } else {
+         include_once('modules/'.$module.'/main.php');
+         $func_load_action = $module."_load_action";
+         return $func_load_action();
+      }
+   }
 
+   foreach($modules as $i => $module) {
       $module_path = "modules/" . $module . "/main.php";
       include_once($module_path);
 

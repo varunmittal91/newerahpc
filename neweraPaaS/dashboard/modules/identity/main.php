@@ -32,55 +32,32 @@ function identity_load_menu() {
       return "<a href=?q=identity_logout>Logout</a>";
 }
 
+function identity_load_action() {
+	 $test_val = check_arg('func', 1);
+	 if($test_val == NULL)
+	    print 0;
+		else if($test_val == 'check_avail_user') {
+		  print 1;
+		} else if($test_val == 'signup') {
+		  $username   = check_arg('username', 0);
+			$userpasswd = check_arg('userpasswd', 0);
+
+      if(!$username || !$userpasswd)
+			   print 0;
+			else {
+			   print 1;
+			}
+		} else {
+		  print 0;
+		}
+}
+
 function identity_load_script() {
    $test_value = check_arg('q', 1);
-   if($test_value && $test_value == 'identity_signup') {
+   if($test_value == 'identity_signup') {
 
       $script = "<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js'></script>
-                 <script type='text/javascript'>
-                    $(document).ready(function(){
-                       $('#login_name').keyup(username_check);
-                          $('#tick').hide();
-                          $('#cross').hide();
-                          $('#login_name_error_len').hide();
-			  $('#login_name_error_navail').hide();
-                    });
-	
-                    function username_check(){	
-                       console.log('keypressed');
-                       var username = $('#login_name').val();
-                       if(username == '' || username.length < 4 || username.length > 16) {
-                          $('#username').css('border', '3px #CCC solid');
-                          $('#tick').hide();
-                          $('#cross').fadeIn();
-                          $('#login_name').css('border', '3px #C33 solid');
-                          $('#login_name_error_len').fadeIn();
-                       } else {
-                          $('#login_name_error_len').hide();
-                          jQuery.ajax({
-                             type: 'POST',
-                             url: 'modules/identity/check_login_name.php',
-                             data: 'username='+ username,
-                             cache: false,
-                             success: function(response){
-                                console.log(response);
-                                if(response == 1){
-                                   console.log('succss');
-       	                           $('#login_name').css('border', '3px #090 solid');	
-	                           $('#cross').hide();
-	                           $('#tick').fadeIn();
-	                        } else {
-                                   console.log('failure');
-	                           $('#login_name').css('border', '3px #C33 solid');
-              	                   $('#tick').hide();
-     	                           $('#cross').fadeIn();
-                                   $('#login_name_error_navail').show();
-	                        }
-                             }
-                          });
-                       }
-                    }
-                 </script>
+                 <script type='text/javascript' src='modules/identity/signup.js'></script>
                 ";
       return $script;
    }
@@ -94,7 +71,7 @@ function identity_load_content() {
                <form method='post' action='?q=identity_login_action'>
                <td>Login:</td><td><input type='text' name='login_name'></td></tr>
                <tr>
-               <td>Password:</td><td><input type='password' name='login_password'></td>
+               <td>Password:</td><td><input type='password' name='login_passwd'></td>
                </tr>
                <tr><td><input type='submit' value='Login'></td>
                </tr></table>
@@ -106,12 +83,45 @@ function identity_load_content() {
 
       $form = "<h1>Signup</h1><br>
                Signup in process
-               <form method='post' action='?q=identity_signup_action'>
-               Username:<input type='text' name='login_name' id='login_name'>
-               <img id='tick' src='modules/identity/images/tick.png' width='16' height='16'/>
-               <img id='cross' src='modules/identity/images/cross.png' width='16' height='16'/>
-               <small><p id='login_name_error_len'>Username length should be minimum 4 and maximum 16</p></small>
-               <small><p id='login_name_error_navail'>Username not available</p></small>
+               <form action=''>
+               <table cellpadding='5'>
+               <tr>
+               <td>
+                  Username:
+               </td>
+               <td>
+                  <input type='text' name='login_name' id='login_name' maxlength=16>
+               </td>
+               <td>
+                  <img id='login_tick' src='modules/identity/images/tick.png' width='20' height='20'/>
+                  <img id='login_cross' src='modules/identity/images/cross.png' width='20' height='20'/>
+               </td>
+               <td>
+                  <small><p id='login_name_error_len'>Username length should be minimum 4 and maximum 16</p></small>
+                  <small><p id='login_name_error_navail'>Username not available</p></small>
+               </td>
+               </tr>
+               <tr>
+               <td>
+                  Password:
+               </td>
+               <td>
+                  <input type='text' name='login_passwd' id='login_passwd' maxlength=32>
+               </td>
+               <td>
+                  <img id='passwd_tick' src='modules/identity/images/tick.png' width='20' height='20'/>
+                  <img id='passwd_cross' src='modules/identity/images/cross.png' width='20' height='20'/>
+               </td>
+               <td>
+                  <small><p id='passwd_error_len'>Password length should be minimum 8</p></small>
+               </td>
+               </tr>
+							 <tr>
+							 <td>
+									<input type='button' id='signup_submit' value='Signup'>
+							 </td>
+							 </tr>
+							 </table>
                </form>
               ";
       return $form;

@@ -19,4 +19,29 @@
   */
 ?>
 
+<?php
+
+   $site_title  = "NeweraPaaS Cloud";
+   $site_footer = "Varun Mittal";
+
+   $db_agent = "mysql";
+   $db_host  = "localhost";
+   $db_name  = "neweraPaaS";
+   $db_user  = "neweraPaaS";
+   $db_pass  = "test123";
+
+   $theme_active = "initializr";
+
+   $modules = array(
+                     "home",
+                     "identity"
+                   );
+
+   $user_roles = array(
+                        "admin",
+                        "project_admin",
+                        "user"
+                      );
+
+?>
 

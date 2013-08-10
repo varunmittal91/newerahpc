@@ -166,7 +166,8 @@ def startContainer(cmd_arguments):
    _startContainer(container_config, lxc_root, paas_root)
 
 def _stopContainer(container_name, lxc_path):
-   paas_lxc_interface.shutdown(container_name)
+   if paas_lxc_interface.shutdown(container_name) == -1:
+      return -1
 
    if paas_mount.umountContainer(lxc_path) == -1:
       paas_errors.paasPerror("_umountContainer() failed, _stopContainer()")

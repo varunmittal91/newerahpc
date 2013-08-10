@@ -20,11 +20,13 @@
 #
 
 import os
+import paas_errors
 
 def start(container_name):
    cmd = "lxc-start -d -n " + container_name
    status = os.system(cmd)
    if status != 0:
+      paasError.setError(paas_errors.PAAS_ESTARTLXC)
       return -1
    return status
 
@@ -33,6 +35,7 @@ def stop(container_name):
    print cmd
    os.system(cmd) 
    if os.system(cmd) != 0:
+      paasError.setError(paas_errors.PAAS_ESTOPLXC)
       return -1
    else:
       return 0
@@ -40,6 +43,7 @@ def stop(container_name):
 def shutdown(container_name):
    cmd = "lxc-shutdown -n " + container_name
    if os.system(cmd) != 0:
+      paasError.setError(paas_errors.PAAS_ESTOPLXC)
       return -1
    else:
       return 0

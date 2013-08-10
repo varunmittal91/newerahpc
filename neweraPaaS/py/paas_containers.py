@@ -165,16 +165,16 @@ def startContainer(cmd_arguments):
       return
    _startContainer(container_config, lxc_root, paas_root)
 
-def _stopContainer(container_config, lxc_root):
-   if paas_mount.umountContainer(lxc_root) == -1:
+def _stopContainer(container_name, lxc_path):
+   paas_lxc_interface.shutdown(container_name)
+
+   if paas_mount.umountContainer(lxc_path) == -1:
       paas_errors.paasPerror("_umountContainer() failed, _stopContainer()")
       return -1
-   if paas_lxc_interface.stop(container_name) == -1:
-      paas_errors.paasPerror("lxc_interface_stop(), _stopContainer()")
+   try:
+      os.rmdir(lxc_path)
+   except:
       return -1
-
-   os.rmdir(lxc_root)
-   return 0
 
 def stopContainer(cmd_arguments):
    container_name = ''
@@ -207,10 +207,9 @@ def stopContainer(cmd_arguments):
       paas_errors.paasPerror("startContainer()")
       return
    
-   if paas_mount.umountContainer(lxc_path) == -1:
-      paas_errors.paasPerror("umountContainer() failed, stopContainer")
+   if _stopContainer(container_name, lxc_path) == -1:
+      paas_errors.paasPerror("_stopContainer() failed, stopContainer")
       return -1
-   os.rmdir(lxc_path)
    return 0
 
 def checkContainer(cmd_arguments):

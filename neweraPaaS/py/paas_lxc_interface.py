@@ -30,10 +30,16 @@ def start(container_name):
 
 def stop(container_name):
    cmd = "lxc-stop -n " + container_name
+   print cmd
+   os.system(cmd) 
    if os.system(cmd) != 0:
       return -1
    else:
       return 0
 
-def shutdown():
-   return
+def shutdown(container_name):
+   cmd = "lxc-shutdown -n " + container_name
+   if os.system(cmd) != 0:
+      return -1
+   else:
+      return 0

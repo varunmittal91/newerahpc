@@ -33,10 +33,34 @@ function identity_load_menu() {
 }
 
 function identity_load_action() {
+   global $enable_debug;
+
+   if($enable_debug)
+      $arg_type = 1;
+   else
+      $arg_type = 0;
+
    $test_val = check_arg('func', 1);
    if($test_val == NULL)
       print 0;
-   else if($test_val == 'register_user') {
+   else if($test_val == 'login_user') {
+      $username = check_arg('username', $arg_type);
+      $passwd   = check_arg('userpasswd', $arg_type);
+
+      if(!$username || !$passwd) {
+         print 0;
+         return;
+      }
+      $epasswd = md5($passwd);
+      $query  = "select uid,gid,groupname from users where user='$username' and passwd='$epasswd'";
+      $result = query_db($query);
+      if($result && $result->num_rows > 0) {
+         print 1;
+         
+      } else
+         print 0;
+      return;
+   } else if($test_val == 'register_user') {
       $username = check_arg('username', 1);
       $passwd   = check_arg('userpasswd', 1);
       if(!$username || !$passwd) {
@@ -72,37 +96,50 @@ function identity_load_action() {
 function identity_load_script() {
    $test_value = check_arg('q', 1);
    if($test_value == 'identity_signup') {
-
       $script = "<script type='text/javascript' src='themes/js/jquery-1.3.2.js'></script>
                  <script type='text/javascript' src='modules/identity/signup.js'></script>
                 ";
+      return $script;
+   } else if($test_value == 'identity_login') {
+      $script = "
+<script type='text/javascript' src='themes/js/jquery-1.3.2.js'></script>
+<script type='text/javascript' src='modules/identity/signin.js'></script>
+";
       return $script;
    }
 }
 
 function identity_load_content() {
+
+   
+
    $test_value = check_arg('q', 1);
    if($test_value && $test_value == 'identity_login') {  
       $form = "
 <div class='well'>
-   <form class='form-horizontal' method='POST' action=''>
+   <form class='form-horizontal' method='POST' action='' id='signin_form'>
       <legend>Login</legend>
+      <div class='control-group'>
+         <center><label class='error' style='display: none;color:red' color='3px #090 solid' id='login_error_failed'>Login failed</label></center>
+      </div>
       <div class='control-group'>
          <label class='control-label'>Username</label>
          <div class='controls'>
             <input type='text' class='input-xlarge' id='username' name='username' placeholder='Username' maxlength=16>
+            <small><p class='error' style='display: none' id='username_error_required'>Username required</p></small>
          </div>
       </div>
       <div class='control-group'>
          <label class='control-label'>Password</label>
          <div class='controls'>
             <input type='password' class='input-xlarge' id='userpasswd' name='userpasswd' placeholder='Password' maxlength=16>
+            <small><p class='error' style='display: none' id='userpasswd_error_required'>Password required</p></small>
          </div>
       </div>
       <div class='control-group'>
          <label class='control-label'></label>
          <div class='controls'>
-            <button type='submit' class='btn btn-success'>Login</button>  
+            <button type='button' class='btn btn-success' id='login_button'>Login</button>  
          </div>
       </div>
       <hr>

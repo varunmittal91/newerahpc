@@ -45,7 +45,17 @@ function load_modules() {
    }
 
    foreach($modules as $i => $module) {
-      $module_path = "modules/" . $module . "/main.php";
+      $module_path = '';
+      if(($pos = strpos($module, '.'))) {
+         $mainmodule  = substr($module, 0, $pos);
+         $submodule   = substr($module, $pos + 1, strlen($module));
+
+         $module_name = $mainmodule."_".$submodule;
+         $module_path = "modules/" . $mainmodule  . "/" . $submodule . ".php";
+         $module = $module_name;
+      } else {
+         $module_path = "modules/" . $module . "/main.php";
+      }
       include_once($module_path);
 
       $func_test_enable = $module."_test_enable";

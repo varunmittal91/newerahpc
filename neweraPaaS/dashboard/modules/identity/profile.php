@@ -19,15 +19,14 @@
   */
 ?>
 
-<?php 
+<?php
 
-function check_logged_in() {
-   if(isset($_SESSION['logged_in']))
-      return true;
-   else 
-      return false;
+function identity_profile_test_enable() {
+   return 0;
 }
 
-function set_logged_in($user) {
+function identity_profile_load_menu() {
 
 }
+
+?>

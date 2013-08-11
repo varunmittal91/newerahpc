@@ -62,6 +62,8 @@ def createContainer(cmd_arguments):
             paas_errors.paasPerror("createContainer()")
             return
    instance_path = _instance_path
+   os.mkdir(instance_path + "/rootfs")
+   os.mkdir(instance_path + "/rootfs/etc")
 
    hwaddr1 = paas_network.generateHWADDR()
 
@@ -87,9 +89,15 @@ def createContainer(cmd_arguments):
    rootfs   = lxc_root + "/instance-" + str(i) + "/rootfs"
    rootfs_fstab = lxc_root + "/instance-" + str(i) + "/fstab"
 
-   shutil.copy(image_details[1] + "/config", instance_path + "/config")
-   file = open(instance_path + "/config", 'a')
-   file.write("lxc.rootfs = " + rootfs + "\n")
+   container_name = "instance-" + str(i)
+   lxc_path       = lxc_root + "/" + container_name
+
+   file = open(instance_path + "/rootfs/etc/hostname", 'w')
+   file.write(container_name)
+   file.close()
+
+   file = open(instance_path + "/config", 'w')
+   file.write("lxc.rootfs = " + lxc_path + "/rootfs" + "\n")
    file.write("lxc.mount = " + rootfs_fstab + "\n")
 
    file.write("lxc.network.type = " + net_config['net-type'] + "\n")
@@ -121,7 +129,7 @@ def _startContainer(container_config, lxc_root, paas_root):
 
    lxc_path      = lxc_root + "/" + container_name 
    instance_path = paas_root + "/instances/" + container_name
-   image_path    = paas_root + "/images/" + image_name
+   image_path    = paas_root + "/images/" + image_name + "/container"
    os.mkdir(lxc_path)
    if paas_mount.mountContainer(lxc_path, image_path, instance_path) == -1:
       paas_errors.paasPerror("mountContainer() failed, _startContainer()")

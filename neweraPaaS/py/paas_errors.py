@@ -23,6 +23,7 @@ import errno
 
 paas_errno = 0
 
+global PAAS_ENOPT
 global PAAS_ENOENT      
 global PAAS_EACCES
 global PAAS_EINVAL      
@@ -36,7 +37,9 @@ global PAAS_EMOUNT
 global PAAS_EUMOUNT
 global PAAS_ESTARTLXC
 global PAAS_ESTOPLXC
+global PAAS_EINVALUSER
 
+PAAS_ENOPT       = 1            # Operation not permitted
 PAAS_ENOENT      = errno.ENOENT # No such file or directory
 PAAS_EACCES      = errno.EACCES # Permission denied
 PAAS_EINVAL      = errno.EINVAL # Invalid arguments
@@ -52,9 +55,11 @@ PAAS_EMOUNT      = 112          # Unable to mount image
 PAAS_EUMOUNT     = 113          # Unable to unmount image
 PAAS_ESTARTLXC   = 114          # Unable to start container
 PAAS_ESTOPLXC    = 115          # Unable to stop container
+PAAS_EINVALUSER  = 116          # Invalid paas user given
 
 
 PAAS_ERROR_STRINGS = {}
+PAAS_ERROR_STRINGS[PAAS_ENOPT]       = "Operation not permitted"
 PAAS_ERROR_STRINGS[PAAS_ENOENT]      = "No such file or directory" 
 PAAS_ERROR_STRINGS[PAAS_EACCES]      = "Permission denied"
 PAAS_ERROR_STRINGS[PAAS_EINVAL]      = "Invalid arguments"
@@ -70,6 +75,7 @@ PAAS_ERROR_STRINGS[PAAS_EMOUNT]      = "Unable to mount image"
 PAAS_ERROR_STRINGS[PAAS_EUMOUNT]     = "Unable to unmount image"
 PAAS_ERROR_STRINGS[PAAS_ESTARTLXC]   = "Unable to start container"
 PAAS_ERROR_STRINGS[PAAS_ESTOPLXC]    = "Unable to stop container"
+PAAS_ERROR_STRINGS[PAAS_EINVALUSER]  = "Invalid paas user give"
 
 def setError(error):
    global paas_errno

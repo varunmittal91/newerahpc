@@ -21,6 +21,10 @@
 
 <?php
 
+$ARG_TYPE_POST    = 0;
+$ARG_TYPE_GET     = 1;
+$ARG_TYPE_SESSION = 2;
+
 function load_modules() {
    
    global $site_title;
@@ -81,20 +85,41 @@ function load_modules() {
    include_once($theme_path);
 }
 
-function check_arg($argument, $is_get) {
-   if($is_get) {
-      if(isset($_GET[$argument]))
-         return $_GET[$argument];
-      else
-         return NULL;
-   } else {
-      if(isset($_POST[$argument]))
-         return $_POST[$argument];
-      else 
-         return NULL;
-   } 
+//function set_arg($argument, $arg_type
 
-   return NULL;
+function check_arg($argument, $arg_type, &$arg_is_empty = NULL) {
+   global $ARG_TYPE_POST;
+   global $ARG_TYPE_GET;
+   global $ARG_TYPE_SESSION;
+
+   $arg_value = NULL;
+   switch($arg_type) {
+   case $ARG_TYPE_GET:
+      if(isset($_GET[$argument])) {
+         $arg_value = $_GET[$argument]; 
+         if(empty($_GET[$argument]))
+            $arg_is_empty = 1;
+         return $arg_value;
+      }
+      break;
+   case $ARG_TYPE_POST:
+      if(isset($_POST[$argument])) {
+         $arg_value = $_POST[$argument];
+         if($arg_is_empty && empty($arg))
+            $arg_is_empty = 1;
+         return $arg_value;
+      }
+      break;
+   case $ARG_TYPE_SESSION:
+      if(isset($_SESSION[$argument])) {
+         $arg_value = $_SESSION[$argument];
+         if($arg_is_empty && empty($arg))
+            $arg_value = 1;
+      }                             
+      break;
+   }   
+
+   return $arg_value;
 }
 
 ?>

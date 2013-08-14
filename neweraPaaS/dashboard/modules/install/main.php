@@ -20,15 +20,37 @@
 ?>
 
 <?php
-   include('settings.php');  
-   include('database.php');
-   include('modules.php');
-   include('auth.php');
 
-   function boot() {
-      session_start();
-      init_db();
-      load_modules();
+function install_test_enable() {
+   return 1;
+}
+
+function install_load_menu() {
+   return NULL;
+}
+
+function install_load_content() {
+   $data = '
+<div class="well">
+   <legend>NeweraPaaS Installation</legend>
+</div>';
+   
+   global $ARG_TYPE_POST;
+   global $ARG_TYPE_GET;
+   global $ARG_TYPE_SESSION;
+
+   $is_empty;
+   $inst_stage = check_arg("stage", $ARG_TYPE_SESSION, $is_empty);
+   if($inst_stage) {
+      print "$value";
    }
-?>
+   else
+      print "starting installation";
 
+   return $data;
+}
+
+function install_load_sidebar() {
+}
+
+?>

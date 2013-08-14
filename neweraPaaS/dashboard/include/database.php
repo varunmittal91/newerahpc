@@ -32,9 +32,9 @@ function init_db() {
    global $db_name;
    global $db_conn;
 
-   $db_conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
+   $db_conn = @new mysqli($db_host, $db_user, $db_pass, $db_name) or die("Error");
    if($db_conn->connect_errno) {
-      echo "Failed to connect to MySQL: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error;
+      echo "Failed to connect to MySQL: (" . $db_conn->connect_errno . ") " . $db_conn->connect_error . "<br>";
       exit(0);
    }
 }

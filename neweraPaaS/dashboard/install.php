@@ -20,15 +20,22 @@
 ?>
 
 <?php
-   include('settings.php');  
-   include('database.php');
-   include('modules.php');
-   include('auth.php');
 
-   function boot() {
-      session_start();
-      init_db();
-      load_modules();
+   if(file_exists('include/settings.php')) {
+      echo "It appears dashboard is already installed, remove settings.php from include directory to install again.";
+      exit(0);
    }
-?>
 
+   include('include/database.php');
+   include('include/modules.php');
+   include('include/auth.php');
+
+   $site_title  = "NeweraPaaS Cloud Setup";
+   $site_footer = "Varun Mittal";
+
+   $modules = array("install");
+   $theme_active = "initializr";
+
+   session_start();
+   load_modules();
+?>

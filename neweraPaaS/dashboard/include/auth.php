@@ -28,6 +28,8 @@ function check_logged_in() {
       return false;
 }
 
-function set_logged_in($user) {
-
+function set_logged_in($uid, $gid) {
+   $_SESSION['uid'] = $uid;
+   $_SESSION['gid'] = $gid;
+   $_SESSION['logged_in'] = 1;
 }

@@ -56,7 +56,7 @@ function identity_load_action() {
       $result = query_db($query);
       if($result && $result->num_rows > 0) {
          print 1;
-         
+         set_logged_id();
       } else
          print 0;
       return;
@@ -111,7 +111,8 @@ function identity_load_script() {
 
 function identity_load_content() {
 
-   
+   fetch_result_db(array('uid','gid'), 'user', array("'username'" => array("'varun'", DB_PARAMETER_TYPE_COMPARE)));
+   exit(0);
 
    $test_value = check_arg('q', 1);
    if($test_value && $test_value == 'identity_login') {  

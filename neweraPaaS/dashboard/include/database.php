@@ -21,6 +21,8 @@
 
 <?php
 
+define("DB_PARAMETER_TYPE_COMPARE", "compare");
+
 $db_conn = NULL;
 
 function init_db() {
@@ -43,8 +45,40 @@ function query_db($query) {
    return $res;
 }
 
-function fetch_result_db($query, $parameters) {
+function fetch_result_db($fields, $table, $parameters) {
+   $field_list = NULL;
+   $param_list = NULL;
 
+   foreach($fields as $field) {
+      if(!$field_list)
+         $field_list = $field; 
+      else
+         $field_list .= ",$field";
+   }
+   foreach($parameters as $field => $values) {
+      $param = _prepare_param($field, $values);
+      print "$param<br>";
+   }
+   //$query = "select $field_list from $table
+}
+
+function _param_compare($field, $value) {
+   if(!$field || !$value)
+      return NULL; 
+   return "$field = $value";
+}
+
+function _param_and($filed, $value) {
+   
+}
+
+function _prepare_param($field, $values) {
+   $value      = $values[0];
+   $param_type = $values[1];
+   $func = "_param_" . $param_type;
+   if(!function_exists($func))
+      return NULL;
+   return $func($field, $value);
 }
 
 ?>

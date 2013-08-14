@@ -1,5 +1,5 @@
-diff -uNrp linux-3.4.55.orig/Documentation/ABI/testing/debugfs-aufs linux-3.4.55/Documentation/ABI/testing/debugfs-aufs
---- linux-3.4.55.orig/Documentation/ABI/testing/debugfs-aufs	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/Documentation/ABI/testing/debugfs-aufs linux-3.4.55/Documentation/ABI/testing/debugfs-aufs
+--- linux-3.4.55/Documentation/ABI/testing/debugfs-aufs	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/Documentation/ABI/testing/debugfs-aufs	2013-07-29 21:44:19.762000051 +0530
 @@ -0,0 +1,50 @@
 +What:		/debug/aufs/si_<id>/
@@ -52,8 +52,8 @@ diff -uNrp linux-3.4.55.orig/Documentation/ABI/testing/debugfs-aufs linux-3.4.55
 +		be created.
 +		When the aufs mount option 'noxino' is specified, it
 +		will be empty. About XINO files, see the aufs manual.
-diff -uNrp linux-3.4.55.orig/Documentation/ABI/testing/sysfs-aufs linux-3.4.55/Documentation/ABI/testing/sysfs-aufs
---- linux-3.4.55.orig/Documentation/ABI/testing/sysfs-aufs	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/Documentation/ABI/testing/sysfs-aufs linux-3.4.55/Documentation/ABI/testing/sysfs-aufs
+--- linux-3.4.55/Documentation/ABI/testing/sysfs-aufs	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/Documentation/ABI/testing/sysfs-aufs	2013-07-29 21:44:19.762000051 +0530
 @@ -0,0 +1,24 @@
 +What:		/sys/fs/aufs/si_<id>/
@@ -80,8 +80,8 @@ diff -uNrp linux-3.4.55.orig/Documentation/ABI/testing/sysfs-aufs linux-3.4.55/D
 +		even if it is the default path.
 +		When the aufs mount option 'noxino' is specified, it
 +		will be empty. About XINO files, see the aufs manual.
-diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/01intro.txt linux-3.4.55/Documentation/filesystems/aufs/design/01intro.txt
---- linux-3.4.55.orig/Documentation/filesystems/aufs/design/01intro.txt	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/Documentation/filesystems/aufs/design/01intro.txt linux-3.4.55/Documentation/filesystems/aufs/design/01intro.txt
+--- linux-3.4.55/Documentation/filesystems/aufs/design/01intro.txt	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/Documentation/filesystems/aufs/design/01intro.txt	2013-07-29 21:43:53.248001632 +0530
 @@ -0,0 +1,162 @@
 +
@@ -246,8 +246,8 @@ diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/01intro.txt l
 +Some people may think it is better to pass such work to user space
 +helper, instead of doing in kernel space. Actually I am still thinking
 +about it. But currently I have implemented it in kernel space.
-diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/02struct.txt linux-3.4.55/Documentation/filesystems/aufs/design/02struct.txt
---- linux-3.4.55.orig/Documentation/filesystems/aufs/design/02struct.txt	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/Documentation/filesystems/aufs/design/02struct.txt linux-3.4.55/Documentation/filesystems/aufs/design/02struct.txt
+--- linux-3.4.55/Documentation/filesystems/aufs/design/02struct.txt	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/Documentation/filesystems/aufs/design/02struct.txt	2013-07-29 21:43:53.249001579 +0530
 @@ -0,0 +1,226 @@
 +
@@ -476,8 +476,8 @@ diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/02struct.txt 
 +internally and makes change to the new file on the upper writable branch.
 +When the trigger systemcall does not update the timestamps of the parent
 +dir, aufs reverts it after copy-up.
-diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/03lookup.txt linux-3.4.55/Documentation/filesystems/aufs/design/03lookup.txt
---- linux-3.4.55.orig/Documentation/filesystems/aufs/design/03lookup.txt	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/Documentation/filesystems/aufs/design/03lookup.txt linux-3.4.55/Documentation/filesystems/aufs/design/03lookup.txt
+--- linux-3.4.55/Documentation/filesystems/aufs/design/03lookup.txt	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/Documentation/filesystems/aufs/design/03lookup.txt	2013-07-29 21:43:53.248001632 +0530
 @@ -0,0 +1,106 @@
 +
@@ -586,8 +586,8 @@ diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/03lookup.txt 
 +   test, and skip therevalidatin in step 4. It is useful and improves
 +   aufs performance when system surely hide the aufs branches from user,
 +   by over-mounting something (or another method).
-diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/04branch.txt linux-3.4.55/Documentation/filesystems/aufs/design/04branch.txt
---- linux-3.4.55.orig/Documentation/filesystems/aufs/design/04branch.txt	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/Documentation/filesystems/aufs/design/04branch.txt linux-3.4.55/Documentation/filesystems/aufs/design/04branch.txt
+--- linux-3.4.55/Documentation/filesystems/aufs/design/04branch.txt	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/Documentation/filesystems/aufs/design/04branch.txt	2013-07-29 21:43:53.248001632 +0530
 @@ -0,0 +1,76 @@
 +
@@ -666,8 +666,8 @@ diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/04branch.txt 
 +  - a file on the branch is mmap-ed.
 +  - a regular file on the branch is opened for write and there is no
 +    same named entry on the upper branch.
-diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/05wbr_policy.txt linux-3.4.55/Documentation/filesystems/aufs/design/05wbr_policy.txt
---- linux-3.4.55.orig/Documentation/filesystems/aufs/design/05wbr_policy.txt	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/Documentation/filesystems/aufs/design/05wbr_policy.txt linux-3.4.55/Documentation/filesystems/aufs/design/05wbr_policy.txt
+--- linux-3.4.55/Documentation/filesystems/aufs/design/05wbr_policy.txt	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/Documentation/filesystems/aufs/design/05wbr_policy.txt	2013-07-29 21:43:53.249001579 +0530
 @@ -0,0 +1,65 @@
 +
@@ -735,8 +735,8 @@ diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/05wbr_policy.
 +  where the source and the target exists and selects the higher
 +  one. If the selected branch is readonly, then aufs follows the
 +  copyup policy.
-diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/06mmap.txt linux-3.4.55/Documentation/filesystems/aufs/design/06mmap.txt
---- linux-3.4.55.orig/Documentation/filesystems/aufs/design/06mmap.txt	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/Documentation/filesystems/aufs/design/06mmap.txt linux-3.4.55/Documentation/filesystems/aufs/design/06mmap.txt
+--- linux-3.4.55/Documentation/filesystems/aufs/design/06mmap.txt	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/Documentation/filesystems/aufs/design/06mmap.txt	2013-07-29 21:43:53.248001632 +0530
 @@ -0,0 +1,47 @@
 +
@@ -786,14 +786,14 @@ diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/06mmap.txt li
 +generic_file_mmap() and handles struct vm_operations_struct. In this
 +approach, aufs met a hard problem and I could not solve it without
 +switching the approach.
-diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/07export.txt linux-3.4.55/Documentation/filesystems/aufs/design/07export.txt
---- linux-3.4.55.orig/Documentation/filesystems/aufs/design/07export.txt	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/Documentation/filesystems/aufs/design/07export.txt linux-3.4.55/Documentation/filesystems/aufs/design/07export.txt
+--- linux-3.4.55/Documentation/filesystems/aufs/design/07export.txt	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/Documentation/filesystems/aufs/design/07export.txt	2013-07-29 21:43:53.249001579 +0530
 @@ -0,0 +1,59 @@
 +
 +# Copyright (C) 2005-2013 Junjiro R. Okajima
 +# 
-+# This program is free software; you can redistribute it and/or modify
++# This program is free softwaare; you can redistribute it and/or modify
 +# it under the terms of the GNU General Public License as published by
 +# the Free Software Foundation; either version 2 of the License, or
 +# (at your option) any later version.
@@ -849,8 +849,8 @@ diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/07export.txt 
 +  convert it into ESTALE for NFSD.
 +- readdir(): call lockdep_on/off() because filldir in NFSD calls
 +  lookup_one_len(), vfs_getattr(), encode_fh() and others.
-diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/08shwh.txt linux-3.4.55/Documentation/filesystems/aufs/design/08shwh.txt
---- linux-3.4.55.orig/Documentation/filesystems/aufs/design/08shwh.txt	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/Documentation/filesystems/aufs/design/08shwh.txt linux-3.4.55/Documentation/filesystems/aufs/design/08shwh.txt
+--- linux-3.4.55/Documentation/filesystems/aufs/design/08shwh.txt	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/Documentation/filesystems/aufs/design/08shwh.txt	2013-07-29 21:43:53.249001579 +0530
 @@ -0,0 +1,53 @@
 +
@@ -906,8 +906,8 @@ diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/08shwh.txt li
 +
 +This new squashfs archive can be stored on the boot device and the
 +initramfs will use it to replace the old one at the next boot.
-diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/10dynop.txt linux-3.4.55/Documentation/filesystems/aufs/design/10dynop.txt
---- linux-3.4.55.orig/Documentation/filesystems/aufs/design/10dynop.txt	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/Documentation/filesystems/aufs/design/10dynop.txt linux-3.4.55/Documentation/filesystems/aufs/design/10dynop.txt
+--- linux-3.4.55/Documentation/filesystems/aufs/design/10dynop.txt	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/Documentation/filesystems/aufs/design/10dynop.txt	2013-07-29 21:43:53.249001579 +0530
 @@ -0,0 +1,47 @@
 +
@@ -957,8 +957,8 @@ diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/10dynop.txt l
 +XIP mainly.
 +Currently this approach is applied to file_operations and
 +vm_operations_struct for regular files only.
-diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/99plan.txt linux-3.4.55/Documentation/filesystems/aufs/design/99plan.txt
---- linux-3.4.55.orig/Documentation/filesystems/aufs/design/99plan.txt	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/Documentation/filesystems/aufs/design/99plan.txt linux-3.4.55/Documentation/filesystems/aufs/design/99plan.txt
+--- linux-3.4.55/Documentation/filesystems/aufs/design/99plan.txt	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/Documentation/filesystems/aufs/design/99plan.txt	2013-07-29 21:43:53.249001579 +0530
 @@ -0,0 +1,96 @@
 +
@@ -1057,8 +1057,8 @@ diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/design/99plan.txt li
 +Opened File) is specified (by default), aufs returns the filedata from
 +/new.
 +Otherwise from /new.
-diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/README linux-3.4.55/Documentation/filesystems/aufs/README
---- linux-3.4.55.orig/Documentation/filesystems/aufs/README	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/Documentation/filesystems/aufs/README linux-3.4.55/Documentation/filesystems/aufs/README
+--- linux-3.4.55/Documentation/filesystems/aufs/README	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/Documentation/filesystems/aufs/README	2013-07-29 21:43:53.248001632 +0530
 @@ -0,0 +1,340 @@
 +
@@ -1401,8 +1401,8 @@ diff -uNrp linux-3.4.55.orig/Documentation/filesystems/aufs/README linux-3.4.55/
 +# Local variables: ;
 +# mode: text;
 +# End: ;
-diff -uNrp linux-3.4.55.orig/drivers/block/loop.c linux-3.4.55/drivers/block/loop.c
---- linux-3.4.55.orig/drivers/block/loop.c	2013-07-29 21:30:51.318999966 +0530
+diff -uNrp linux-3.4.55/drivers/block/loop.c linux-3.4.55/drivers/block/loop.c
+--- linux-3.4.55/drivers/block/loop.c	2013-07-29 21:30:51.318999966 +0530
 +++ linux-3.4.55/drivers/block/loop.c	2013-07-29 21:48:30.792986899 +0530
 @@ -500,7 +500,7 @@ out:
  }
@@ -1582,8 +1582,8 @@ diff -uNrp linux-3.4.55.orig/drivers/block/loop.c linux-3.4.55/drivers/block/loo
  	return 0;
  }
  
-diff -uNrp linux-3.4.55.orig/drivers/block/loop.c.orig linux-3.4.55/drivers/block/loop.c.orig
---- linux-3.4.55.orig/drivers/block/loop.c.orig	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/drivers/block/loop.c.orig linux-3.4.55/drivers/block/loop.c.orig
+--- linux-3.4.55/drivers/block/loop.c.orig	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/drivers/block/loop.c.orig	2013-07-29 04:57:25.000000000 +0530
 @@ -0,0 +1,1928 @@
 +/*
@@ -3514,8 +3514,8 @@ diff -uNrp linux-3.4.55.orig/drivers/block/loop.c.orig linux-3.4.55/drivers/bloc
 +
 +__setup("max_loop=", max_loop_setup);
 +#endif
-diff -uNrp linux-3.4.55.orig/fs/aufs/aufs.h linux-3.4.55/fs/aufs/aufs.h
---- linux-3.4.55.orig/fs/aufs/aufs.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/aufs.h linux-3.4.55/fs/aufs/aufs.h
+--- linux-3.4.55/fs/aufs/aufs.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/aufs.h	2013-07-29 21:42:21.111993052 +0530
 @@ -0,0 +1,60 @@
 +/*
@@ -3578,8 +3578,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/aufs.h linux-3.4.55/fs/aufs/aufs.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/branch.c linux-3.4.55/fs/aufs/branch.c
---- linux-3.4.55.orig/fs/aufs/branch.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/branch.c linux-3.4.55/fs/aufs/branch.c
+--- linux-3.4.55/fs/aufs/branch.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/branch.c	2013-07-29 21:42:21.106992477 +0530
 @@ -0,0 +1,1207 @@
 +/*
@@ -4789,8 +4789,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/branch.c linux-3.4.55/fs/aufs/branch.c
 +	AuTraceErr(err);
 +	return err;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/branch.h linux-3.4.55/fs/aufs/branch.h
---- linux-3.4.55.orig/fs/aufs/branch.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/branch.h linux-3.4.55/fs/aufs/branch.h
+--- linux-3.4.55/fs/aufs/branch.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/branch.h	2013-07-29 21:42:21.110992941 +0530
 @@ -0,0 +1,249 @@
 +/*
@@ -5042,8 +5042,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/branch.h linux-3.4.55/fs/aufs/branch.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_BRANCH_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/conf.mk linux-3.4.55/fs/aufs/conf.mk
---- linux-3.4.55.orig/fs/aufs/conf.mk	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/conf.mk linux-3.4.55/fs/aufs/conf.mk
+--- linux-3.4.55/fs/aufs/conf.mk	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/conf.mk	2013-07-29 21:42:21.107992596 +0530
 @@ -0,0 +1,38 @@
 +
@@ -5084,8 +5084,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/conf.mk linux-3.4.55/fs/aufs/conf.mk
 +${obj}/sysfs.o: ${AuConfName}
 +
 +-include ${srctree}/${src}/conf_priv.mk
-diff -uNrp linux-3.4.55.orig/fs/aufs/cpup.c linux-3.4.55/fs/aufs/cpup.c
---- linux-3.4.55.orig/fs/aufs/cpup.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/cpup.c linux-3.4.55/fs/aufs/cpup.c
+--- linux-3.4.55/fs/aufs/cpup.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/cpup.c	2013-07-29 21:42:21.111993052 +0530
 @@ -0,0 +1,1247 @@
 +/*
@@ -6335,8 +6335,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/cpup.c linux-3.4.55/fs/aufs/cpup.c
 +	dput(parent);
 +	return err;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/cpup.h linux-3.4.55/fs/aufs/cpup.h
---- linux-3.4.55.orig/fs/aufs/cpup.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/cpup.h linux-3.4.55/fs/aufs/cpup.h
+--- linux-3.4.55/fs/aufs/cpup.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/cpup.h	2013-07-29 21:42:21.111993052 +0530
 @@ -0,0 +1,87 @@
 +/*
@@ -6426,8 +6426,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/cpup.h linux-3.4.55/fs/aufs/cpup.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_CPUP_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/dbgaufs.c linux-3.4.55/fs/aufs/dbgaufs.c
---- linux-3.4.55.orig/fs/aufs/dbgaufs.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/dbgaufs.c linux-3.4.55/fs/aufs/dbgaufs.c
+--- linux-3.4.55/fs/aufs/dbgaufs.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/dbgaufs.c	2013-07-29 21:42:21.106992477 +0530
 @@ -0,0 +1,433 @@
 +/*
@@ -6863,8 +6863,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/dbgaufs.c linux-3.4.55/fs/aufs/dbgaufs.c
 +		err = 0;
 +	return err;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/dbgaufs.h linux-3.4.55/fs/aufs/dbgaufs.h
---- linux-3.4.55.orig/fs/aufs/dbgaufs.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/dbgaufs.h linux-3.4.55/fs/aufs/dbgaufs.h
+--- linux-3.4.55/fs/aufs/dbgaufs.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/dbgaufs.h	2013-07-29 21:42:21.112993162 +0530
 @@ -0,0 +1,49 @@
 +/*
@@ -6916,8 +6916,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/dbgaufs.h linux-3.4.55/fs/aufs/dbgaufs.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __DBGAUFS_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/dcsub.c linux-3.4.55/fs/aufs/dcsub.c
---- linux-3.4.55.orig/fs/aufs/dcsub.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/dcsub.c linux-3.4.55/fs/aufs/dcsub.c
+--- linux-3.4.55/fs/aufs/dcsub.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/dcsub.c	2013-07-29 21:42:21.108992713 +0530
 @@ -0,0 +1,243 @@
 +/*
@@ -7163,8 +7163,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/dcsub.c linux-3.4.55/fs/aufs/dcsub.c
 +
 +	return path_is_under(path + 0, path + 1);
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/dcsub.h linux-3.4.55/fs/aufs/dcsub.h
---- linux-3.4.55.orig/fs/aufs/dcsub.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/dcsub.h linux-3.4.55/fs/aufs/dcsub.h
+--- linux-3.4.55/fs/aufs/dcsub.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/dcsub.h	2013-07-29 21:42:21.108992713 +0530
 @@ -0,0 +1,94 @@
 +/*
@@ -7261,8 +7261,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/dcsub.h linux-3.4.55/fs/aufs/dcsub.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_DCSUB_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/debug.c linux-3.4.55/fs/aufs/debug.c
---- linux-3.4.55.orig/fs/aufs/debug.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/debug.c linux-3.4.55/fs/aufs/debug.c
+--- linux-3.4.55/fs/aufs/debug.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/debug.c	2013-07-29 21:42:21.109992828 +0530
 @@ -0,0 +1,492 @@
 +/*
@@ -7757,8 +7757,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/debug.c linux-3.4.55/fs/aufs/debug.c
 +
 +	return 0;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/debug.h linux-3.4.55/fs/aufs/debug.h
---- linux-3.4.55.orig/fs/aufs/debug.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/debug.h linux-3.4.55/fs/aufs/debug.h
+--- linux-3.4.55/fs/aufs/debug.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/debug.h	2013-07-29 21:42:21.111993052 +0530
 @@ -0,0 +1,242 @@
 +/*
@@ -8003,8 +8003,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/debug.h linux-3.4.55/fs/aufs/debug.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_DEBUG_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/dentry.c linux-3.4.55/fs/aufs/dentry.c
---- linux-3.4.55.orig/fs/aufs/dentry.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/dentry.c linux-3.4.55/fs/aufs/dentry.c
+--- linux-3.4.55/fs/aufs/dentry.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/dentry.c	2013-07-29 21:42:21.111993052 +0530
 @@ -0,0 +1,1144 @@
 +/*
@@ -9151,8 +9151,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/dentry.c linux-3.4.55/fs/aufs/dentry.c
 +	.d_revalidate	= aufs_d_revalidate,
 +	.d_release	= aufs_d_release
 +};
-diff -uNrp linux-3.4.55.orig/fs/aufs/dentry.h linux-3.4.55/fs/aufs/dentry.h
---- linux-3.4.55.orig/fs/aufs/dentry.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/dentry.h linux-3.4.55/fs/aufs/dentry.h
+--- linux-3.4.55/fs/aufs/dentry.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/dentry.h	2013-07-29 21:42:21.108992713 +0530
 @@ -0,0 +1,237 @@
 +/*
@@ -9392,8 +9392,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/dentry.h linux-3.4.55/fs/aufs/dentry.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_DENTRY_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/dinfo.c linux-3.4.55/fs/aufs/dinfo.c
---- linux-3.4.55.orig/fs/aufs/dinfo.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/dinfo.c linux-3.4.55/fs/aufs/dinfo.c
+--- linux-3.4.55/fs/aufs/dinfo.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/dinfo.c	2013-07-29 21:42:21.112993162 +0530
 @@ -0,0 +1,543 @@
 +/*
@@ -9939,8 +9939,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/dinfo.c linux-3.4.55/fs/aufs/dinfo.c
 +			return bindex;
 +	return -1;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/dir.c linux-3.4.55/fs/aufs/dir.c
---- linux-3.4.55.orig/fs/aufs/dir.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/dir.c linux-3.4.55/fs/aufs/dir.c
+--- linux-3.4.55/fs/aufs/dir.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/dir.c	2013-07-29 21:42:21.112993162 +0530
 @@ -0,0 +1,638 @@
 +/*
@@ -10581,8 +10581,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/dir.c linux-3.4.55/fs/aufs/dir.c
 +	.flush		= aufs_flush_dir,
 +	.fsync		= aufs_fsync_dir
 +};
-diff -uNrp linux-3.4.55.orig/fs/aufs/dir.h linux-3.4.55/fs/aufs/dir.h
---- linux-3.4.55.orig/fs/aufs/dir.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/dir.h linux-3.4.55/fs/aufs/dir.h
+--- linux-3.4.55/fs/aufs/dir.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/dir.h	2013-07-29 21:42:21.108992713 +0530
 @@ -0,0 +1,137 @@
 +/*
@@ -10722,8 +10722,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/dir.h linux-3.4.55/fs/aufs/dir.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_DIR_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/dynop.c linux-3.4.55/fs/aufs/dynop.c
---- linux-3.4.55.orig/fs/aufs/dynop.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/dynop.c linux-3.4.55/fs/aufs/dynop.c
+--- linux-3.4.55/fs/aufs/dynop.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/dynop.c	2013-07-29 21:42:21.109992828 +0530
 @@ -0,0 +1,377 @@
 +/*
@@ -11103,8 +11103,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/dynop.c linux-3.4.55/fs/aufs/dynop.c
 +	for (i = 0; i < AuDyLast; i++)
 +		WARN_ON(!list_empty(&dynop[i].head));
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/dynop.h linux-3.4.55/fs/aufs/dynop.h
---- linux-3.4.55.orig/fs/aufs/dynop.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/dynop.h linux-3.4.55/fs/aufs/dynop.h
+--- linux-3.4.55/fs/aufs/dynop.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/dynop.h	2013-07-29 21:42:21.112993162 +0530
 @@ -0,0 +1,76 @@
 +/*
@@ -11183,8 +11183,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/dynop.h linux-3.4.55/fs/aufs/dynop.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_DYNOP_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/export.c linux-3.4.55/fs/aufs/export.c
---- linux-3.4.55.orig/fs/aufs/export.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/export.c linux-3.4.55/fs/aufs/export.c
+--- linux-3.4.55/fs/aufs/export.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/export.c	2013-07-29 21:42:21.106992477 +0530
 @@ -0,0 +1,819 @@
 +/*
@@ -12006,8 +12006,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/export.c linux-3.4.55/fs/aufs/export.c
 +	BUILD_BUG_ON(sizeof(u) != sizeof(int));
 +	atomic_set(&sbinfo->si_xigen_next, u);
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/file.c linux-3.4.55/fs/aufs/file.c
---- linux-3.4.55.orig/fs/aufs/file.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/file.c linux-3.4.55/fs/aufs/file.c
+--- linux-3.4.55/fs/aufs/file.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/file.c	2013-07-29 21:42:21.110992941 +0530
 @@ -0,0 +1,686 @@
 +/*
@@ -12696,8 +12696,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/file.c linux-3.4.55/fs/aufs/file.c
 +	.error_remove_page	= aufs_error_remove_page
 +#endif /* CONFIG_AUFS_DEBUG */
 +};
-diff -uNrp linux-3.4.55.orig/fs/aufs/file.h linux-3.4.55/fs/aufs/file.h
---- linux-3.4.55.orig/fs/aufs/file.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/file.h linux-3.4.55/fs/aufs/file.h
+--- linux-3.4.55/fs/aufs/file.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/file.h	2013-07-29 21:42:21.106992477 +0530
 @@ -0,0 +1,298 @@
 +/*
@@ -12998,8 +12998,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/file.h linux-3.4.55/fs/aufs/file.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_FILE_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/finfo.c linux-3.4.55/fs/aufs/finfo.c
---- linux-3.4.55.orig/fs/aufs/finfo.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/finfo.c linux-3.4.55/fs/aufs/finfo.c
+--- linux-3.4.55/fs/aufs/finfo.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/finfo.c	2013-07-29 21:42:21.107992596 +0530
 @@ -0,0 +1,157 @@
 +/*
@@ -13159,8 +13159,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/finfo.c linux-3.4.55/fs/aufs/finfo.c
 +out:
 +	return err;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/f_op.c linux-3.4.55/fs/aufs/f_op.c
---- linux-3.4.55.orig/fs/aufs/f_op.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/f_op.c linux-3.4.55/fs/aufs/f_op.c
+--- linux-3.4.55/fs/aufs/f_op.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/f_op.c	2013-07-29 21:48:30.792986899 +0530
 @@ -0,0 +1,729 @@
 +/*
@@ -13892,8 +13892,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/f_op.c linux-3.4.55/fs/aufs/f_op.c
 +	.aio_splice_read  = aufs_aio_splice_read
 +#endif
 +};
-diff -uNrp linux-3.4.55.orig/fs/aufs/f_op_sp.c linux-3.4.55/fs/aufs/f_op_sp.c
---- linux-3.4.55.orig/fs/aufs/f_op_sp.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/f_op_sp.c linux-3.4.55/fs/aufs/f_op_sp.c
+--- linux-3.4.55/fs/aufs/f_op_sp.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/f_op_sp.c	2013-07-29 21:42:21.112993162 +0530
 @@ -0,0 +1,298 @@
 +/*
@@ -14194,8 +14194,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/f_op_sp.c linux-3.4.55/fs/aufs/f_op_sp.c
 +
 +	return ret;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/fstype.h linux-3.4.55/fs/aufs/fstype.h
---- linux-3.4.55.orig/fs/aufs/fstype.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/fstype.h linux-3.4.55/fs/aufs/fstype.h
+--- linux-3.4.55/fs/aufs/fstype.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/fstype.h	2013-07-29 21:42:21.107992596 +0530
 @@ -0,0 +1,496 @@
 +/*
@@ -14694,8 +14694,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/fstype.h linux-3.4.55/fs/aufs/fstype.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_FSTYPE_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/hfsnotify.c linux-3.4.55/fs/aufs/hfsnotify.c
---- linux-3.4.55.orig/fs/aufs/hfsnotify.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/hfsnotify.c linux-3.4.55/fs/aufs/hfsnotify.c
+--- linux-3.4.55/fs/aufs/hfsnotify.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/hfsnotify.c	2013-07-29 21:42:21.112993162 +0530
 @@ -0,0 +1,263 @@
 +/*
@@ -14961,8 +14961,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/hfsnotify.c linux-3.4.55/fs/aufs/hfsnotify.
 +	.fin_br		= au_hfsn_fin_br,
 +	.init_br	= au_hfsn_init_br
 +};
-diff -uNrp linux-3.4.55.orig/fs/aufs/hfsplus.c linux-3.4.55/fs/aufs/hfsplus.c
---- linux-3.4.55.orig/fs/aufs/hfsplus.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/hfsplus.c linux-3.4.55/fs/aufs/hfsplus.c
+--- linux-3.4.55/fs/aufs/hfsplus.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/hfsplus.c	2013-07-29 21:42:21.106992477 +0530
 @@ -0,0 +1,56 @@
 +/*
@@ -15021,8 +15021,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/hfsplus.c linux-3.4.55/fs/aufs/hfsplus.c
 +		au_sbr_put(dentry->d_sb, bindex);
 +	}
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/hnotify.c linux-3.4.55/fs/aufs/hnotify.c
---- linux-3.4.55.orig/fs/aufs/hnotify.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/hnotify.c linux-3.4.55/fs/aufs/hnotify.c
+--- linux-3.4.55/fs/aufs/hnotify.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/hnotify.c	2013-07-29 21:42:21.111993052 +0530
 @@ -0,0 +1,712 @@
 +/*
@@ -15737,8 +15737,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/hnotify.c linux-3.4.55/fs/aufs/hnotify.c
 +	if (au_cachep[AuCache_HNOTIFY])
 +		au_hn_destroy_cache();
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/iinfo.c linux-3.4.55/fs/aufs/iinfo.c
---- linux-3.4.55.orig/fs/aufs/iinfo.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/iinfo.c linux-3.4.55/fs/aufs/iinfo.c
+--- linux-3.4.55/fs/aufs/iinfo.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/iinfo.c	2013-07-29 21:42:21.110992941 +0530
 @@ -0,0 +1,276 @@
 +/*
@@ -16017,8 +16017,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/iinfo.c linux-3.4.55/fs/aufs/iinfo.c
 +	iinfo->ii_hinode = NULL;
 +	AuRwDestroy(&iinfo->ii_rwsem);
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/inode.c linux-3.4.55/fs/aufs/inode.c
---- linux-3.4.55.orig/fs/aufs/inode.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/inode.c linux-3.4.55/fs/aufs/inode.c
+--- linux-3.4.55/fs/aufs/inode.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/inode.c	2013-07-29 21:42:21.111993052 +0530
 @@ -0,0 +1,492 @@
 +/*
@@ -16513,8 +16513,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/inode.c linux-3.4.55/fs/aufs/inode.c
 +		mask |= MAY_READ; /* force permission check */
 +	return au_test_h_perm(h_inode, mask);
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/inode.h linux-3.4.55/fs/aufs/inode.h
---- linux-3.4.55.orig/fs/aufs/inode.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/inode.h linux-3.4.55/fs/aufs/inode.h
+--- linux-3.4.55/fs/aufs/inode.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/inode.h	2013-07-29 21:42:21.110992941 +0530
 @@ -0,0 +1,600 @@
 +/*
@@ -17117,8 +17117,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/inode.h linux-3.4.55/fs/aufs/inode.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_INODE_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/ioctl.c linux-3.4.55/fs/aufs/ioctl.c
---- linux-3.4.55.orig/fs/aufs/ioctl.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/ioctl.c linux-3.4.55/fs/aufs/ioctl.c
+--- linux-3.4.55/fs/aufs/ioctl.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/ioctl.c	2013-07-29 21:42:21.109992828 +0530
 @@ -0,0 +1,196 @@
 +/*
@@ -17317,8 +17317,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/ioctl.c linux-3.4.55/fs/aufs/ioctl.c
 +}
 +#endif
 +#endif
-diff -uNrp linux-3.4.55.orig/fs/aufs/i_op_add.c linux-3.4.55/fs/aufs/i_op_add.c
---- linux-3.4.55.orig/fs/aufs/i_op_add.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/i_op_add.c linux-3.4.55/fs/aufs/i_op_add.c
+--- linux-3.4.55/fs/aufs/i_op_add.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/i_op_add.c	2013-07-29 21:42:21.112993162 +0530
 @@ -0,0 +1,715 @@
 +/*
@@ -18036,8 +18036,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/i_op_add.c linux-3.4.55/fs/aufs/i_op_add.c
 +out:
 +	return err;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/i_op.c linux-3.4.55/fs/aufs/i_op.c
---- linux-3.4.55.orig/fs/aufs/i_op.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/i_op.c linux-3.4.55/fs/aufs/i_op.c
+--- linux-3.4.55/fs/aufs/i_op.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/i_op.c	2013-07-29 21:42:21.112993162 +0530
 @@ -0,0 +1,1073 @@
 +/*
@@ -19113,8 +19113,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/i_op.c linux-3.4.55/fs/aufs/i_op.c
 +	.getattr	= aufs_getattr,
 +	.truncate_range	= aufs_truncate_range
 +};
-diff -uNrp linux-3.4.55.orig/fs/aufs/i_op_del.c linux-3.4.55/fs/aufs/i_op_del.c
---- linux-3.4.55.orig/fs/aufs/i_op_del.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/i_op_del.c linux-3.4.55/fs/aufs/i_op_del.c
+--- linux-3.4.55/fs/aufs/i_op_del.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/i_op_del.c	2013-07-29 21:42:21.111993052 +0530
 @@ -0,0 +1,478 @@
 +/*
@@ -19595,8 +19595,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/i_op_del.c linux-3.4.55/fs/aufs/i_op_del.c
 +	AuTraceErr(err);
 +	return err;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/i_op_ren.c linux-3.4.55/fs/aufs/i_op_ren.c
---- linux-3.4.55.orig/fs/aufs/i_op_ren.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/i_op_ren.c linux-3.4.55/fs/aufs/i_op_ren.c
+--- linux-3.4.55/fs/aufs/i_op_ren.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/i_op_ren.c	2013-07-29 21:42:21.106992477 +0530
 @@ -0,0 +1,1049 @@
 +/*
@@ -20648,8 +20648,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/i_op_ren.c linux-3.4.55/fs/aufs/i_op_ren.c
 +	AuTraceErr(err);
 +	return err;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/Kconfig linux-3.4.55/fs/aufs/Kconfig
---- linux-3.4.55.orig/fs/aufs/Kconfig	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/Kconfig linux-3.4.55/fs/aufs/Kconfig
+--- linux-3.4.55/fs/aufs/Kconfig	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/Kconfig	2013-07-29 21:42:21.109992828 +0530
 @@ -0,0 +1,203 @@
 +config AUFS_FS
@@ -20855,8 +20855,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/Kconfig linux-3.4.55/fs/aufs/Kconfig
 +	Automatic configuration for internal use.
 +	When aufs supports Magic SysRq, enabled automatically.
 +endif
-diff -uNrp linux-3.4.55.orig/fs/aufs/loop.c linux-3.4.55/fs/aufs/loop.c
---- linux-3.4.55.orig/fs/aufs/loop.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/loop.c linux-3.4.55/fs/aufs/loop.c
+--- linux-3.4.55/fs/aufs/loop.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/loop.c	2013-07-29 21:48:30.794987311 +0530
 @@ -0,0 +1,151 @@
 +/*
@@ -21010,8 +21010,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/loop.c linux-3.4.55/fs/aufs/loop.c
 +	AuDebugOn(!f);
 +	return f;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/loop.h linux-3.4.55/fs/aufs/loop.h
---- linux-3.4.55.orig/fs/aufs/loop.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/loop.h linux-3.4.55/fs/aufs/loop.h
+--- linux-3.4.55/fs/aufs/loop.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/loop.h	2013-07-29 21:48:30.795987511 +0530
 @@ -0,0 +1,54 @@
 +/*
@@ -21068,8 +21068,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/loop.h linux-3.4.55/fs/aufs/loop.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_LOOP_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/magic.mk linux-3.4.55/fs/aufs/magic.mk
---- linux-3.4.55.orig/fs/aufs/magic.mk	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/magic.mk linux-3.4.55/fs/aufs/magic.mk
+--- linux-3.4.55/fs/aufs/magic.mk	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/magic.mk	2013-07-29 21:42:21.111993052 +0530
 @@ -0,0 +1,54 @@
 +
@@ -21126,8 +21126,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/magic.mk linux-3.4.55/fs/aufs/magic.mk
 +ifdef CONFIG_HFSPLUS_FS
 +ccflags-y += -DHFSPLUS_SUPER_MAGIC=0x482b
 +endif
-diff -uNrp linux-3.4.55.orig/fs/aufs/Makefile linux-3.4.55/fs/aufs/Makefile
---- linux-3.4.55.orig/fs/aufs/Makefile	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/Makefile linux-3.4.55/fs/aufs/Makefile
+--- linux-3.4.55/fs/aufs/Makefile	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/Makefile	2013-07-29 21:42:21.110992941 +0530
 @@ -0,0 +1,42 @@
 +
@@ -21172,8 +21172,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/Makefile linux-3.4.55/fs/aufs/Makefile
 +aufs-$(CONFIG_AUFS_BR_HFSPLUS) += hfsplus.o
 +aufs-$(CONFIG_AUFS_DEBUG) += debug.o
 +aufs-$(CONFIG_AUFS_MAGIC_SYSRQ) += sysrq.o
-diff -uNrp linux-3.4.55.orig/fs/aufs/module.c linux-3.4.55/fs/aufs/module.c
---- linux-3.4.55.orig/fs/aufs/module.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/module.c linux-3.4.55/fs/aufs/module.c
+--- linux-3.4.55/fs/aufs/module.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/module.c	2013-07-29 21:42:21.108992713 +0530
 @@ -0,0 +1,196 @@
 +/*
@@ -21372,8 +21372,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/module.c linux-3.4.55/fs/aufs/module.c
 +
 +module_init(aufs_init);
 +module_exit(aufs_exit);
-diff -uNrp linux-3.4.55.orig/fs/aufs/module.h linux-3.4.55/fs/aufs/module.h
---- linux-3.4.55.orig/fs/aufs/module.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/module.h linux-3.4.55/fs/aufs/module.h
+--- linux-3.4.55/fs/aufs/module.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/module.h	2013-07-29 21:42:21.112993162 +0530
 @@ -0,0 +1,105 @@
 +/*
@@ -21481,8 +21481,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/module.h linux-3.4.55/fs/aufs/module.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_MODULE_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/opts.c linux-3.4.55/fs/aufs/opts.c
---- linux-3.4.55.orig/fs/aufs/opts.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/opts.c linux-3.4.55/fs/aufs/opts.c
+--- linux-3.4.55/fs/aufs/opts.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/opts.c	2013-07-29 21:42:21.108992713 +0530
 @@ -0,0 +1,1697 @@
 +/*
@@ -23182,8 +23182,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/opts.c linux-3.4.55/fs/aufs/opts.c
 +{
 +	return au_mntflags(sb) & AuOptMask_UDBA;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/opts.h linux-3.4.55/fs/aufs/opts.h
---- linux-3.4.55.orig/fs/aufs/opts.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/opts.h linux-3.4.55/fs/aufs/opts.h
+--- linux-3.4.55/fs/aufs/opts.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/opts.h	2013-07-29 21:42:21.105992356 +0530
 @@ -0,0 +1,209 @@
 +/*
@@ -23395,8 +23395,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/opts.h linux-3.4.55/fs/aufs/opts.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_OPTS_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/plink.c linux-3.4.55/fs/aufs/plink.c
---- linux-3.4.55.orig/fs/aufs/plink.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/plink.c linux-3.4.55/fs/aufs/plink.c
+--- linux-3.4.55/fs/aufs/plink.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/plink.c	2013-07-29 21:42:21.111993052 +0530
 @@ -0,0 +1,527 @@
 +/*
@@ -23926,8 +23926,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/plink.c linux-3.4.55/fs/aufs/plink.c
 +		}
 +	}
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/poll.c linux-3.4.55/fs/aufs/poll.c
---- linux-3.4.55.orig/fs/aufs/poll.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/poll.c linux-3.4.55/fs/aufs/poll.c
+--- linux-3.4.55/fs/aufs/poll.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/poll.c	2013-07-29 21:42:21.112993162 +0530
 @@ -0,0 +1,56 @@
 +/*
@@ -23986,8 +23986,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/poll.c linux-3.4.55/fs/aufs/poll.c
 +	AuTraceErr((int)mask);
 +	return mask;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/procfs.c linux-3.4.55/fs/aufs/procfs.c
---- linux-3.4.55.orig/fs/aufs/procfs.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/procfs.c linux-3.4.55/fs/aufs/procfs.c
+--- linux-3.4.55/fs/aufs/procfs.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/procfs.c	2013-07-29 21:42:21.106992477 +0530
 @@ -0,0 +1,170 @@
 +/*
@@ -24160,8 +24160,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/procfs.c linux-3.4.55/fs/aufs/procfs.c
 +out:
 +	return err;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/rdu.c linux-3.4.55/fs/aufs/rdu.c
---- linux-3.4.55.orig/fs/aufs/rdu.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/rdu.c linux-3.4.55/fs/aufs/rdu.c
+--- linux-3.4.55/fs/aufs/rdu.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/rdu.c	2013-07-29 21:42:21.111993052 +0530
 @@ -0,0 +1,384 @@
 +/*
@@ -24548,8 +24548,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/rdu.c linux-3.4.55/fs/aufs/rdu.c
 +	return err;
 +}
 +#endif
-diff -uNrp linux-3.4.55.orig/fs/aufs/rwsem.h linux-3.4.55/fs/aufs/rwsem.h
---- linux-3.4.55.orig/fs/aufs/rwsem.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/rwsem.h linux-3.4.55/fs/aufs/rwsem.h
+--- linux-3.4.55/fs/aufs/rwsem.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/rwsem.h	2013-07-29 21:42:21.109992828 +0530
 @@ -0,0 +1,188 @@
 +/*
@@ -24740,8 +24740,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/rwsem.h linux-3.4.55/fs/aufs/rwsem.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_RWSEM_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/sbinfo.c linux-3.4.55/fs/aufs/sbinfo.c
---- linux-3.4.55.orig/fs/aufs/sbinfo.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/sbinfo.c linux-3.4.55/fs/aufs/sbinfo.c
+--- linux-3.4.55/fs/aufs/sbinfo.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/sbinfo.c	2013-07-29 21:42:21.108992713 +0530
 @@ -0,0 +1,346 @@
 +/*
@@ -25090,8 +25090,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/sbinfo.c linux-3.4.55/fs/aufs/sbinfo.c
 +	p = radix_tree_delete(&sbinfo->au_si_pid.tree, current->pid);
 +	spin_unlock(&sbinfo->au_si_pid.tree_lock);
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/spl.h linux-3.4.55/fs/aufs/spl.h
---- linux-3.4.55.orig/fs/aufs/spl.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/spl.h linux-3.4.55/fs/aufs/spl.h
+--- linux-3.4.55/fs/aufs/spl.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/spl.h	2013-07-29 21:42:21.111993052 +0530
 @@ -0,0 +1,112 @@
 +/*
@@ -25206,8 +25206,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/spl.h linux-3.4.55/fs/aufs/spl.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_SPL_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/super.c linux-3.4.55/fs/aufs/super.c
---- linux-3.4.55.orig/fs/aufs/super.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/super.c linux-3.4.55/fs/aufs/super.c
+--- linux-3.4.55/fs/aufs/super.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/super.c	2013-07-29 21:48:30.797987905 +0530
 @@ -0,0 +1,996 @@
 +/*
@@ -26206,8 +26206,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/super.c linux-3.4.55/fs/aufs/super.c
 +	/* no need to __module_get() and module_put(). */
 +	.owner		= THIS_MODULE,
 +};
-diff -uNrp linux-3.4.55.orig/fs/aufs/super.h linux-3.4.55/fs/aufs/super.h
---- linux-3.4.55.orig/fs/aufs/super.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/super.h linux-3.4.55/fs/aufs/super.h
+--- linux-3.4.55/fs/aufs/super.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/super.h	2013-07-29 21:42:21.111993052 +0530
 @@ -0,0 +1,555 @@
 +/*
@@ -26765,8 +26765,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/super.h linux-3.4.55/fs/aufs/super.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_SUPER_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/sysaufs.c linux-3.4.55/fs/aufs/sysaufs.c
---- linux-3.4.55.orig/fs/aufs/sysaufs.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/sysaufs.c linux-3.4.55/fs/aufs/sysaufs.c
+--- linux-3.4.55/fs/aufs/sysaufs.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/sysaufs.c	2013-07-29 21:42:21.111993052 +0530
 @@ -0,0 +1,105 @@
 +/*
@@ -26874,8 +26874,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/sysaufs.c linux-3.4.55/fs/aufs/sysaufs.c
 +out:
 +	return err;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/sysaufs.h linux-3.4.55/fs/aufs/sysaufs.h
---- linux-3.4.55.orig/fs/aufs/sysaufs.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/sysaufs.h linux-3.4.55/fs/aufs/sysaufs.h
+--- linux-3.4.55/fs/aufs/sysaufs.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/sysaufs.h	2013-07-29 21:42:21.108992713 +0530
 @@ -0,0 +1,104 @@
 +/*
@@ -26982,8 +26982,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/sysaufs.h linux-3.4.55/fs/aufs/sysaufs.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __SYSAUFS_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/sysfs.c linux-3.4.55/fs/aufs/sysfs.c
---- linux-3.4.55.orig/fs/aufs/sysfs.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/sysfs.c linux-3.4.55/fs/aufs/sysfs.c
+--- linux-3.4.55/fs/aufs/sysfs.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/sysfs.c	2013-07-29 21:42:21.107992596 +0530
 @@ -0,0 +1,257 @@
 +/*
@@ -27243,8 +27243,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/sysfs.c linux-3.4.55/fs/aufs/sysfs.c
 +				br->br_name, err);
 +	}
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/sysrq.c linux-3.4.55/fs/aufs/sysrq.c
---- linux-3.4.55.orig/fs/aufs/sysrq.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/sysrq.c linux-3.4.55/fs/aufs/sysrq.c
+--- linux-3.4.55/fs/aufs/sysrq.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/sysrq.c	2013-07-29 21:42:21.111993052 +0530
 @@ -0,0 +1,151 @@
 +/*
@@ -27398,8 +27398,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/sysrq.c linux-3.4.55/fs/aufs/sysrq.c
 +	if (unlikely(err))
 +		pr_err("err %d (ignored)\n", err);
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/vdir.c linux-3.4.55/fs/aufs/vdir.c
---- linux-3.4.55.orig/fs/aufs/vdir.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/vdir.c linux-3.4.55/fs/aufs/vdir.c
+--- linux-3.4.55/fs/aufs/vdir.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/vdir.c	2013-07-29 21:42:21.112993162 +0530
 @@ -0,0 +1,885 @@
 +/*
@@ -28287,8 +28287,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/vdir.c linux-3.4.55/fs/aufs/vdir.c
 +	/* smp_mb(); */
 +	return 0;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/vfsub.c linux-3.4.55/fs/aufs/vfsub.c
---- linux-3.4.55.orig/fs/aufs/vfsub.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/vfsub.c linux-3.4.55/fs/aufs/vfsub.c
+--- linux-3.4.55/fs/aufs/vfsub.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/vfsub.c	2013-07-29 21:42:21.109992828 +0530
 @@ -0,0 +1,832 @@
 +/*
@@ -29123,8 +29123,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/vfsub.c linux-3.4.55/fs/aufs/vfsub.c
 +
 +	return err;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/vfsub.h linux-3.4.55/fs/aufs/vfsub.h
---- linux-3.4.55.orig/fs/aufs/vfsub.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/vfsub.h linux-3.4.55/fs/aufs/vfsub.h
+--- linux-3.4.55/fs/aufs/vfsub.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/vfsub.h	2013-07-29 21:42:21.112993162 +0530
 @@ -0,0 +1,232 @@
 +/*
@@ -29359,8 +29359,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/vfsub.h linux-3.4.55/fs/aufs/vfsub.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_VFSUB_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/wbr_policy.c linux-3.4.55/fs/aufs/wbr_policy.c
---- linux-3.4.55.orig/fs/aufs/wbr_policy.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/wbr_policy.c linux-3.4.55/fs/aufs/wbr_policy.c
+--- linux-3.4.55/fs/aufs/wbr_policy.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/wbr_policy.c	2013-07-29 21:42:21.110992941 +0530
 @@ -0,0 +1,701 @@
 +/*
@@ -30064,8 +30064,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/wbr_policy.c linux-3.4.55/fs/aufs/wbr_polic
 +		.fin	= au_wbr_create_fin_mfs
 +	}
 +};
-diff -uNrp linux-3.4.55.orig/fs/aufs/whout.c linux-3.4.55/fs/aufs/whout.c
---- linux-3.4.55.orig/fs/aufs/whout.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/whout.c linux-3.4.55/fs/aufs/whout.c
+--- linux-3.4.55/fs/aufs/whout.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/whout.c	2013-07-29 21:42:21.112993162 +0530
 @@ -0,0 +1,1050 @@
 +/*
@@ -31118,8 +31118,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/whout.c linux-3.4.55/fs/aufs/whout.c
 +		au_whtmp_rmdir_free(args);
 +	}
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/whout.h linux-3.4.55/fs/aufs/whout.h
---- linux-3.4.55.orig/fs/aufs/whout.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/whout.h linux-3.4.55/fs/aufs/whout.h
+--- linux-3.4.55/fs/aufs/whout.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/whout.h	2013-07-29 21:42:21.111993052 +0530
 @@ -0,0 +1,87 @@
 +/*
@@ -31209,8 +31209,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/whout.h linux-3.4.55/fs/aufs/whout.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_WHOUT_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/wkq.c linux-3.4.55/fs/aufs/wkq.c
---- linux-3.4.55.orig/fs/aufs/wkq.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/wkq.c linux-3.4.55/fs/aufs/wkq.c
+--- linux-3.4.55/fs/aufs/wkq.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/wkq.c	2013-07-29 21:42:21.108992713 +0530
 @@ -0,0 +1,214 @@
 +/*
@@ -31427,8 +31427,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/wkq.c linux-3.4.55/fs/aufs/wkq.c
 +
 +	return err;
 +}
-diff -uNrp linux-3.4.55.orig/fs/aufs/wkq.h linux-3.4.55/fs/aufs/wkq.h
---- linux-3.4.55.orig/fs/aufs/wkq.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/wkq.h linux-3.4.55/fs/aufs/wkq.h
+--- linux-3.4.55/fs/aufs/wkq.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/wkq.h	2013-07-29 21:42:21.112993162 +0530
 @@ -0,0 +1,92 @@
 +/*
@@ -31523,8 +31523,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/wkq.h linux-3.4.55/fs/aufs/wkq.h
 +
 +#endif /* __KERNEL__ */
 +#endif /* __AUFS_WKQ_H__ */
-diff -uNrp linux-3.4.55.orig/fs/aufs/xino.c linux-3.4.55/fs/aufs/xino.c
---- linux-3.4.55.orig/fs/aufs/xino.c	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/aufs/xino.c linux-3.4.55/fs/aufs/xino.c
+--- linux-3.4.55/fs/aufs/xino.c	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/aufs/xino.c	2013-07-29 21:42:21.109992828 +0530
 @@ -0,0 +1,1265 @@
 +/*
@@ -32792,8 +32792,8 @@ diff -uNrp linux-3.4.55.orig/fs/aufs/xino.c linux-3.4.55/fs/aufs/xino.c
 +out:
 +	return err;
 +}
-diff -uNrp linux-3.4.55.orig/fs/file_table.c linux-3.4.55/fs/file_table.c
---- linux-3.4.55.orig/fs/file_table.c	2013-07-29 21:30:49.242999974 +0530
+diff -uNrp linux-3.4.55/fs/file_table.c linux-3.4.55/fs/file_table.c
+--- linux-3.4.55/fs/file_table.c	2013-07-29 21:30:49.242999974 +0530
 +++ linux-3.4.55/fs/file_table.c	2013-07-29 21:39:24.550022953 +0530
 @@ -442,6 +442,8 @@ void file_sb_list_del(struct file *file)
  	}
@@ -32804,8 +32804,8 @@ diff -uNrp linux-3.4.55.orig/fs/file_table.c linux-3.4.55/fs/file_table.c
  #ifdef CONFIG_SMP
  
  /*
-diff -uNrp linux-3.4.55.orig/fs/inode.c linux-3.4.55/fs/inode.c
---- linux-3.4.55.orig/fs/inode.c	2013-07-29 21:30:49.284999966 +0530
+diff -uNrp linux-3.4.55/fs/inode.c linux-3.4.55/fs/inode.c
+--- linux-3.4.55/fs/inode.c	2013-07-29 21:30:49.284999966 +0530
 +++ linux-3.4.55/fs/inode.c	2013-07-29 21:39:24.551022773 +0530
 @@ -56,6 +56,7 @@ static struct hlist_head *inode_hashtabl
  static __cacheline_aligned_in_smp DEFINE_SPINLOCK(inode_hash_lock);
@@ -32815,8 +32815,8 @@ diff -uNrp linux-3.4.55.orig/fs/inode.c linux-3.4.55/fs/inode.c
  
  /*
   * Empty aops. Can be used for the cases where the user does not
-diff -uNrp linux-3.4.55.orig/fs/Kconfig linux-3.4.55/fs/Kconfig
---- linux-3.4.55.orig/fs/Kconfig	2013-07-29 21:30:49.207001025 +0530
+diff -uNrp linux-3.4.55/fs/Kconfig linux-3.4.55/fs/Kconfig
+--- linux-3.4.55/fs/Kconfig	2013-07-29 21:30:49.207001025 +0530
 +++ linux-3.4.55/fs/Kconfig	2013-07-29 21:39:28.964995410 +0530
 @@ -220,6 +220,7 @@ source "fs/pstore/Kconfig"
  source "fs/sysv/Kconfig"
@@ -32826,16 +32826,16 @@ diff -uNrp linux-3.4.55.orig/fs/Kconfig linux-3.4.55/fs/Kconfig
  
  endif # MISC_FILESYSTEMS
  
-diff -uNrp linux-3.4.55.orig/fs/Makefile linux-3.4.55/fs/Makefile
---- linux-3.4.55.orig/fs/Makefile	2013-07-29 21:30:49.219000471 +0530
+diff -uNrp linux-3.4.55/fs/Makefile linux-3.4.55/fs/Makefile
+--- linux-3.4.55/fs/Makefile	2013-07-29 21:30:49.219000471 +0530
 +++ linux-3.4.55/fs/Makefile	2013-07-29 21:39:28.965995482 +0530
 @@ -125,3 +125,4 @@ obj-$(CONFIG_GFS2_FS)           += gfs2/
  obj-y				+= exofs/ # Multiple modules
  obj-$(CONFIG_CEPH_FS)		+= ceph/
  obj-$(CONFIG_PSTORE)		+= pstore/
 +obj-$(CONFIG_AUFS_FS)           += aufs/
-diff -uNrp linux-3.4.55.orig/fs/namei.c linux-3.4.55/fs/namei.c
---- linux-3.4.55.orig/fs/namei.c	2013-07-29 21:30:49.238000039 +0530
+diff -uNrp linux-3.4.55/fs/namei.c linux-3.4.55/fs/namei.c
+--- linux-3.4.55/fs/namei.c	2013-07-29 21:30:49.238000039 +0530
 +++ linux-3.4.55/fs/namei.c	2013-07-29 21:39:24.555022067 +0530
 @@ -1831,10 +1831,11 @@ int vfs_path_lookup(struct dentry *dentr
   * needs parent already locked. Doesn't follow mounts.
@@ -32850,8 +32850,8 @@ diff -uNrp linux-3.4.55.orig/fs/namei.c linux-3.4.55/fs/namei.c
  
  /**
   * lookup_one_len - filesystem helper to lookup single pathname component
-diff -uNrp linux-3.4.55.orig/fs/namespace.c linux-3.4.55/fs/namespace.c
---- linux-3.4.55.orig/fs/namespace.c	2013-07-29 21:30:49.207001025 +0530
+diff -uNrp linux-3.4.55/fs/namespace.c linux-3.4.55/fs/namespace.c
+--- linux-3.4.55/fs/namespace.c	2013-07-29 21:30:49.207001025 +0530
 +++ linux-3.4.55/fs/namespace.c	2013-07-29 21:39:24.561021046 +0530
 @@ -1340,6 +1340,7 @@ int iterate_mounts(int (*f)(struct vfsmo
  	}
@@ -32861,8 +32861,8 @@ diff -uNrp linux-3.4.55.orig/fs/namespace.c linux-3.4.55/fs/namespace.c
  
  static void cleanup_group_ids(struct mount *mnt, struct mount *end)
  {
-diff -uNrp linux-3.4.55.orig/fs/namespace.c.orig linux-3.4.55/fs/namespace.c.orig
---- linux-3.4.55.orig/fs/namespace.c.orig	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/namespace.c.orig linux-3.4.55/fs/namespace.c.orig
+--- linux-3.4.55/fs/namespace.c.orig	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/namespace.c.orig	2013-07-29 04:57:25.000000000 +0530
 @@ -0,0 +1,2636 @@
 +/*
@@ -35501,8 +35501,8 @@ diff -uNrp linux-3.4.55.orig/fs/namespace.c.orig linux-3.4.55/fs/namespace.c.ori
 +{
 +	return check_mnt(real_mount(mnt));
 +}
-diff -uNrp linux-3.4.55.orig/fs/notify/group.c linux-3.4.55/fs/notify/group.c
---- linux-3.4.55.orig/fs/notify/group.c	2013-07-29 21:30:49.205001096 +0530
+diff -uNrp linux-3.4.55/fs/notify/group.c linux-3.4.55/fs/notify/group.c
+--- linux-3.4.55/fs/notify/group.c	2013-07-29 21:30:49.205001096 +0530
 +++ linux-3.4.55/fs/notify/group.c	2013-07-29 21:39:24.568019914 +0530
 @@ -22,6 +22,7 @@
  #include <linux/srcu.h>
@@ -35525,8 +35525,8 @@ diff -uNrp linux-3.4.55.orig/fs/notify/group.c linux-3.4.55/fs/notify/group.c
  	return group;
  }
 +EXPORT_SYMBOL(fsnotify_alloc_group);
-diff -uNrp linux-3.4.55.orig/fs/notify/mark.c linux-3.4.55/fs/notify/mark.c
---- linux-3.4.55.orig/fs/notify/mark.c	2013-07-29 21:30:49.205001096 +0530
+diff -uNrp linux-3.4.55/fs/notify/mark.c linux-3.4.55/fs/notify/mark.c
+--- linux-3.4.55/fs/notify/mark.c	2013-07-29 21:30:49.205001096 +0530
 +++ linux-3.4.55/fs/notify/mark.c	2013-07-29 21:39:24.576018692 +0530
 @@ -112,6 +112,7 @@ void fsnotify_put_mark(struct fsnotify_m
  	if (atomic_dec_and_test(&mark->refcnt))
@@ -35560,8 +35560,8 @@ diff -uNrp linux-3.4.55.orig/fs/notify/mark.c linux-3.4.55/fs/notify/mark.c
  
  static int fsnotify_mark_destroy(void *ignored)
  {
-diff -uNrp linux-3.4.55.orig/fs/open.c linux-3.4.55/fs/open.c
---- linux-3.4.55.orig/fs/open.c	2013-07-29 21:30:49.226000280 +0530
+diff -uNrp linux-3.4.55/fs/open.c linux-3.4.55/fs/open.c
+--- linux-3.4.55/fs/open.c	2013-07-29 21:30:49.226000280 +0530
 +++ linux-3.4.55/fs/open.c	2013-07-29 21:39:24.584017546 +0530
 @@ -60,6 +60,7 @@ int do_truncate(struct dentry *dentry, l
  	mutex_unlock(&dentry->d_inode->i_mutex);
@@ -35571,8 +35571,8 @@ diff -uNrp linux-3.4.55.orig/fs/open.c linux-3.4.55/fs/open.c
  
  static long do_sys_truncate(const char __user *pathname, loff_t length)
  {
-diff -uNrp linux-3.4.55.orig/fs/proc/nommu.c linux-3.4.55/fs/proc/nommu.c
---- linux-3.4.55.orig/fs/proc/nommu.c	2013-07-29 21:30:49.290999966 +0530
+diff -uNrp linux-3.4.55/fs/proc/nommu.c linux-3.4.55/fs/proc/nommu.c
+--- linux-3.4.55/fs/proc/nommu.c	2013-07-29 21:30:49.290999966 +0530
 +++ linux-3.4.55/fs/proc/nommu.c	2013-07-29 21:48:37.534994361 +0530
 @@ -46,6 +46,10 @@ static int nommu_region_show(struct seq_
  
@@ -35585,8 +35585,8 @@ diff -uNrp linux-3.4.55.orig/fs/proc/nommu.c linux-3.4.55/fs/proc/nommu.c
  		dev = inode->i_sb->s_dev;
  		ino = inode->i_ino;
  	}
-diff -uNrp linux-3.4.55.orig/fs/proc/task_mmu.c linux-3.4.55/fs/proc/task_mmu.c
---- linux-3.4.55.orig/fs/proc/task_mmu.c	2013-07-29 21:30:49.290999966 +0530
+diff -uNrp linux-3.4.55/fs/proc/task_mmu.c linux-3.4.55/fs/proc/task_mmu.c
+--- linux-3.4.55/fs/proc/task_mmu.c	2013-07-29 21:30:49.290999966 +0530
 +++ linux-3.4.55/fs/proc/task_mmu.c	2013-07-29 21:48:37.535994450 +0530
 @@ -226,6 +226,10 @@ show_map_vma(struct seq_file *m, struct 
  
@@ -35608,8 +35608,8 @@ diff -uNrp linux-3.4.55.orig/fs/proc/task_mmu.c linux-3.4.55/fs/proc/task_mmu.c
  		seq_path(m, &file->f_path, "\n\t= ");
  	} else if (vma->vm_start <= mm->brk && vma->vm_end >= mm->start_brk) {
  		seq_printf(m, " heap");
-diff -uNrp linux-3.4.55.orig/fs/proc/task_nommu.c linux-3.4.55/fs/proc/task_nommu.c
---- linux-3.4.55.orig/fs/proc/task_nommu.c	2013-07-29 21:30:49.291999966 +0530
+diff -uNrp linux-3.4.55/fs/proc/task_nommu.c linux-3.4.55/fs/proc/task_nommu.c
+--- linux-3.4.55/fs/proc/task_nommu.c	2013-07-29 21:30:49.291999966 +0530
 +++ linux-3.4.55/fs/proc/task_nommu.c	2013-07-29 21:48:37.538994710 +0530
 @@ -150,6 +150,10 @@ static int nommu_vma_show(struct seq_fil
  
@@ -35622,8 +35622,8 @@ diff -uNrp linux-3.4.55.orig/fs/proc/task_nommu.c linux-3.4.55/fs/proc/task_nomm
  		dev = inode->i_sb->s_dev;
  		ino = inode->i_ino;
  		pgoff = (loff_t)vma->vm_pgoff << PAGE_SHIFT;
-diff -uNrp linux-3.4.55.orig/fs/splice.c linux-3.4.55/fs/splice.c
---- linux-3.4.55.orig/fs/splice.c	2013-07-29 21:30:49.165004128 +0530
+diff -uNrp linux-3.4.55/fs/splice.c linux-3.4.55/fs/splice.c
+--- linux-3.4.55/fs/splice.c	2013-07-29 21:30:49.165004128 +0530
 +++ linux-3.4.55/fs/splice.c	2013-07-29 21:39:24.586017269 +0530
 @@ -1090,8 +1090,8 @@ EXPORT_SYMBOL(generic_splice_sendpage);
  /*
@@ -35662,8 +35662,8 @@ diff -uNrp linux-3.4.55.orig/fs/splice.c linux-3.4.55/fs/splice.c
  
  /**
   * splice_direct_to_actor - splices data directly between two non-pipes
-diff -uNrp linux-3.4.55.orig/fs/splice.c.orig linux-3.4.55/fs/splice.c.orig
---- linux-3.4.55.orig/fs/splice.c.orig	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/fs/splice.c.orig linux-3.4.55/fs/splice.c.orig
+--- linux-3.4.55/fs/splice.c.orig	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/fs/splice.c.orig	2013-07-29 21:39:17.399001893 +0530
 @@ -0,0 +1,2050 @@
 +/*
@@ -37716,8 +37716,8 @@ diff -uNrp linux-3.4.55.orig/fs/splice.c.orig linux-3.4.55/fs/splice.c.orig
 +
 +	return error;
 +}
-diff -uNrp linux-3.4.55.orig/include/linux/aufs_type.h linux-3.4.55/include/linux/aufs_type.h
---- linux-3.4.55.orig/include/linux/aufs_type.h	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/include/linux/aufs_type.h linux-3.4.55/include/linux/aufs_type.h
+--- linux-3.4.55/include/linux/aufs_type.h	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/include/linux/aufs_type.h	2013-07-29 21:42:49.687996716 +0530
 @@ -0,0 +1,235 @@
 +/*
@@ -37955,8 +37955,8 @@ diff -uNrp linux-3.4.55.orig/include/linux/aufs_type.h linux-3.4.55/include/linu
 +#define AUFS_CTL_IBUSY		_IOWR(AuCtlType, AuCtl_IBUSY, struct aufs_ibusy)
 +
 +#endif /* __AUFS_TYPE_H__ */
-diff -uNrp linux-3.4.55.orig/include/linux/fs.h linux-3.4.55/include/linux/fs.h
---- linux-3.4.55.orig/include/linux/fs.h	2013-07-29 21:30:50.481999966 +0530
+diff -uNrp linux-3.4.55/include/linux/fs.h linux-3.4.55/include/linux/fs.h
+--- linux-3.4.55/include/linux/fs.h	2013-07-29 21:30:50.481999966 +0530
 +++ linux-3.4.55/include/linux/fs.h	2013-07-29 21:48:30.798988095 +0530
 @@ -1709,6 +1709,10 @@ struct super_operations {
  	int (*bdev_try_to_free_page)(struct super_block*, struct page*, gfp_t);
@@ -37969,8 +37969,8 @@ diff -uNrp linux-3.4.55.orig/include/linux/fs.h linux-3.4.55/include/linux/fs.h
  };
  
  /*
-diff -uNrp linux-3.4.55.orig/include/linux/Kbuild linux-3.4.55/include/linux/Kbuild
---- linux-3.4.55.orig/include/linux/Kbuild	2013-07-29 21:30:50.416999966 +0530
+diff -uNrp linux-3.4.55/include/linux/Kbuild linux-3.4.55/include/linux/Kbuild
+--- linux-3.4.55/include/linux/Kbuild	2013-07-29 21:30:50.416999966 +0530
 +++ linux-3.4.55/include/linux/Kbuild	2013-07-29 21:39:28.967995623 +0530
 @@ -66,6 +66,7 @@ header-y += atmppp.h
  header-y += atmsap.h
@@ -37980,8 +37980,8 @@ diff -uNrp linux-3.4.55.orig/include/linux/Kbuild linux-3.4.55/include/linux/Kbu
  header-y += auto_fs.h
  header-y += auto_fs4.h
  header-y += auxvec.h
-diff -uNrp linux-3.4.55.orig/include/linux/loop.h linux-3.4.55/include/linux/loop.h
---- linux-3.4.55.orig/include/linux/loop.h	2013-07-29 21:30:50.418999966 +0530
+diff -uNrp linux-3.4.55/include/linux/loop.h linux-3.4.55/include/linux/loop.h
+--- linux-3.4.55/include/linux/loop.h	2013-07-29 21:30:50.418999966 +0530
 +++ linux-3.4.55/include/linux/loop.h	2013-07-29 21:48:30.800988468 +0530
 @@ -48,7 +48,7 @@ struct loop_device {
  	int		(*ioctl)(struct loop_device *, int cmd, 
@@ -37992,8 +37992,8 @@ diff -uNrp linux-3.4.55.orig/include/linux/loop.h linux-3.4.55/include/linux/loo
  	struct block_device *lo_device;
  	unsigned	lo_blocksize;
  	void		*key_data; 
-diff -uNrp linux-3.4.55.orig/include/linux/mm_types.h linux-3.4.55/include/linux/mm_types.h
---- linux-3.4.55.orig/include/linux/mm_types.h	2013-07-29 21:30:50.387999966 +0530
+diff -uNrp linux-3.4.55/include/linux/mm_types.h linux-3.4.55/include/linux/mm_types.h
+--- linux-3.4.55/include/linux/mm_types.h	2013-07-29 21:30:50.387999966 +0530
 +++ linux-3.4.55/include/linux/mm_types.h	2013-07-29 21:48:37.547995416 +0530
 @@ -195,6 +195,7 @@ struct vm_region {
  	unsigned long	vm_top;		/* region allocated to here */
@@ -38011,8 +38011,8 @@ diff -uNrp linux-3.4.55.orig/include/linux/mm_types.h linux-3.4.55/include/linux
  	void * vm_private_data;		/* was vm_pte (shared mem) */
  
  #ifndef CONFIG_MMU
-diff -uNrp linux-3.4.55.orig/include/linux/mm_types.h.orig linux-3.4.55/include/linux/mm_types.h.orig
---- linux-3.4.55.orig/include/linux/mm_types.h.orig	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/include/linux/mm_types.h.orig linux-3.4.55/include/linux/mm_types.h.orig
+--- linux-3.4.55/include/linux/mm_types.h.orig	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/include/linux/mm_types.h.orig	2013-07-29 04:57:25.000000000 +0530
 @@ -0,0 +1,416 @@
 +#ifndef _LINUX_MM_TYPES_H
@@ -38431,8 +38431,8 @@ diff -uNrp linux-3.4.55.orig/include/linux/mm_types.h.orig linux-3.4.55/include/
 +}
 +
 +#endif /* _LINUX_MM_TYPES_H */
-diff -uNrp linux-3.4.55.orig/include/linux/namei.h linux-3.4.55/include/linux/namei.h
---- linux-3.4.55.orig/include/linux/namei.h	2013-07-29 21:30:50.477999966 +0530
+diff -uNrp linux-3.4.55/include/linux/namei.h linux-3.4.55/include/linux/namei.h
+--- linux-3.4.55/include/linux/namei.h	2013-07-29 21:30:50.477999966 +0530
 +++ linux-3.4.55/include/linux/namei.h	2013-07-29 21:39:17.400001831 +0530
 @@ -85,6 +85,7 @@ extern int vfs_path_lookup(struct dentry
  extern struct file *lookup_instantiate_filp(struct nameidata *nd, struct dentry *dentry,
@@ -38442,8 +38442,8 @@ diff -uNrp linux-3.4.55.orig/include/linux/namei.h linux-3.4.55/include/linux/na
  extern struct dentry *lookup_one_len(const char *, struct dentry *, int);
  
  extern int follow_down_one(struct path *);
-diff -uNrp linux-3.4.55.orig/include/linux/splice.h linux-3.4.55/include/linux/splice.h
---- linux-3.4.55.orig/include/linux/splice.h	2013-07-29 21:30:50.389999966 +0530
+diff -uNrp linux-3.4.55/include/linux/splice.h linux-3.4.55/include/linux/splice.h
+--- linux-3.4.55/include/linux/splice.h	2013-07-29 21:30:50.389999966 +0530
 +++ linux-3.4.55/include/linux/splice.h	2013-07-29 21:39:17.402001713 +0530
 @@ -91,4 +91,10 @@ extern void splice_shrink_spd(struct spl
  extern void spd_release_page(struct splice_pipe_desc *, unsigned int);
@@ -38456,8 +38456,8 @@ diff -uNrp linux-3.4.55.orig/include/linux/splice.h linux-3.4.55/include/linux/s
 +			 struct pipe_inode_info *pipe, size_t len,
 +			 unsigned int flags);
  #endif
-diff -uNrp linux-3.4.55.orig/kernel/fork.c linux-3.4.55/kernel/fork.c
---- linux-3.4.55.orig/kernel/fork.c	2013-07-29 21:30:52.176999966 +0530
+diff -uNrp linux-3.4.55/kernel/fork.c linux-3.4.55/kernel/fork.c
+--- linux-3.4.55/kernel/fork.c	2013-07-29 21:30:52.176999966 +0530
 +++ linux-3.4.55/kernel/fork.c	2013-07-29 21:48:37.554995944 +0530
 @@ -383,6 +383,8 @@ static int dup_mmap(struct mm_struct *mm
  			struct address_space *mapping = file->f_mapping;
@@ -38468,8 +38468,8 @@ diff -uNrp linux-3.4.55.orig/kernel/fork.c linux-3.4.55/kernel/fork.c
  			if (tmp->vm_flags & VM_DENYWRITE)
  				atomic_dec(&inode->i_writecount);
  			mutex_lock(&mapping->i_mmap_mutex);
-diff -uNrp linux-3.4.55.orig/kernel/fork.c.orig linux-3.4.55/kernel/fork.c.orig
---- linux-3.4.55.orig/kernel/fork.c.orig	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/kernel/fork.c.orig linux-3.4.55/kernel/fork.c.orig
+--- linux-3.4.55/kernel/fork.c.orig	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/kernel/fork.c.orig	2013-07-29 04:57:25.000000000 +0530
 @@ -0,0 +1,1845 @@
 +/*
@@ -40317,8 +40317,8 @@ diff -uNrp linux-3.4.55.orig/kernel/fork.c.orig linux-3.4.55/kernel/fork.c.orig
 +	task_unlock(task);
 +	return 0;
 +}
-diff -uNrp linux-3.4.55.orig/mm/memory.c linux-3.4.55/mm/memory.c
---- linux-3.4.55.orig/mm/memory.c	2013-07-29 21:30:50.558999966 +0530
+diff -uNrp linux-3.4.55/mm/memory.c linux-3.4.55/mm/memory.c
+--- linux-3.4.55/mm/memory.c	2013-07-29 21:30:50.558999966 +0530
 +++ linux-3.4.55/mm/memory.c	2013-07-29 21:48:37.563996971 +0530
 @@ -2705,6 +2705,8 @@ reuse:
  		/* file_update_time outside page_lock */
@@ -40338,8 +40338,8 @@ diff -uNrp linux-3.4.55.orig/mm/memory.c linux-3.4.55/mm/memory.c
  	} else {
  		unlock_page(vmf.page);
  		if (anon)
-diff -uNrp linux-3.4.55.orig/mm/memory.c.orig linux-3.4.55/mm/memory.c.orig
---- linux-3.4.55.orig/mm/memory.c.orig	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/mm/memory.c.orig linux-3.4.55/mm/memory.c.orig
+--- linux-3.4.55/mm/memory.c.orig	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/mm/memory.c.orig	2013-07-29 04:57:25.000000000 +0530
 @@ -0,0 +1,4075 @@
 +/*
@@ -44417,8 +44417,8 @@ diff -uNrp linux-3.4.55.orig/mm/memory.c.orig linux-3.4.55/mm/memory.c.orig
 +	}
 +}
 +#endif /* CONFIG_TRANSPARENT_HUGEPAGE || CONFIG_HUGETLBFS */
-diff -uNrp linux-3.4.55.orig/mm/mmap.c linux-3.4.55/mm/mmap.c
---- linux-3.4.55.orig/mm/mmap.c	2013-07-29 21:30:50.561999966 +0530
+diff -uNrp linux-3.4.55/mm/mmap.c linux-3.4.55/mm/mmap.c
+--- linux-3.4.55/mm/mmap.c	2013-07-29 21:30:50.561999966 +0530
 +++ linux-3.4.55/mm/mmap.c	2013-07-29 21:48:37.571997666 +0530
 @@ -232,6 +232,8 @@ static struct vm_area_struct *remove_vma
  		vma->vm_ops->close(vma);
@@ -44465,8 +44465,8 @@ diff -uNrp linux-3.4.55.orig/mm/mmap.c linux-3.4.55/mm/mmap.c
  				if (vma->vm_flags & VM_EXECUTABLE)
  					added_exe_file_vma(mm);
  			}
-diff -uNrp linux-3.4.55.orig/mm/mmap.c.orig linux-3.4.55/mm/mmap.c.orig
---- linux-3.4.55.orig/mm/mmap.c.orig	1970-01-01 05:30:00.000000000 +0530
+diff -uNrp linux-3.4.55/mm/mmap.c.orig linux-3.4.55/mm/mmap.c.orig
+--- linux-3.4.55/mm/mmap.c.orig	1970-01-01 05:30:00.000000000 +0530
 +++ linux-3.4.55/mm/mmap.c.orig	2013-07-29 04:57:25.000000000 +0530
 @@ -0,0 +1,2725 @@
 +/*
@@ -47194,8 +47194,8 @@ diff -uNrp linux-3.4.55.orig/mm/mmap.c.orig linux-3.4.55/mm/mmap.c.orig
 +	ret = percpu_counter_init(&vm_committed_as, 0);
 +	VM_BUG_ON(ret);
 +}
-diff -uNrp linux-3.4.55.orig/mm/nommu.c linux-3.4.55/mm/nommu.c
---- linux-3.4.55.orig/mm/nommu.c	2013-07-29 21:30:50.556999966 +0530
+diff -uNrp linux-3.4.55/mm/nommu.c linux-3.4.55/mm/nommu.c
+--- linux-3.4.55/mm/nommu.c	2013-07-29 21:30:50.556999966 +0530
 +++ linux-3.4.55/mm/nommu.c	2013-07-29 21:48:37.578998144 +0530
 @@ -633,6 +633,8 @@ static void __put_nommu_region(struct vm
  
@@ -47238,16 +47238,16 @@ diff -uNrp linux-3.4.55.orig/mm/nommu.c linux-3.4.55/mm/nommu.c
  	if (vma->vm_flags & VM_EXECUTABLE)
  		removed_exe_file_vma(vma->vm_mm);
  	kmem_cache_free(vm_area_cachep, vma);
-diff -uNrp linux-3.4.55.orig/security/commoncap.c linux-3.4.55/security/commoncap.c
---- linux-3.4.55.orig/security/commoncap.c	2013-07-29 21:30:52.189999966 +0530
+diff -uNrp linux-3.4.55/security/commoncap.c linux-3.4.55/security/commoncap.c
+--- linux-3.4.55/security/commoncap.c	2013-07-29 21:30:52.189999966 +0530
 +++ linux-3.4.55/security/commoncap.c	2013-07-29 21:39:24.587017133 +0530
 @@ -972,3 +972,4 @@ int cap_file_mmap(struct file *file, uns
  	}
  	return ret;
  }
 +EXPORT_SYMBOL(cap_file_mmap);
-diff -uNrp linux-3.4.55.orig/security/device_cgroup.c linux-3.4.55/security/device_cgroup.c
---- linux-3.4.55.orig/security/device_cgroup.c	2013-07-29 21:30:52.192999966 +0530
+diff -uNrp linux-3.4.55/security/device_cgroup.c linux-3.4.55/security/device_cgroup.c
+--- linux-3.4.55/security/device_cgroup.c	2013-07-29 21:30:52.192999966 +0530
 +++ linux-3.4.55/security/device_cgroup.c	2013-07-29 21:39:24.589016864 +0530
 @@ -7,6 +7,7 @@
  #include <linux/device_cgroup.h>
@@ -47265,8 +47265,8 @@ diff -uNrp linux-3.4.55.orig/security/device_cgroup.c linux-3.4.55/security/devi
  
  int devcgroup_inode_mknod(int mode, dev_t dev)
  {
-diff -uNrp linux-3.4.55.orig/security/security.c linux-3.4.55/security/security.c
---- linux-3.4.55.orig/security/security.c	2013-07-29 21:30:52.182999966 +0530
+diff -uNrp linux-3.4.55/security/security.c linux-3.4.55/security/security.c
+--- linux-3.4.55/security/security.c	2013-07-29 21:30:52.182999966 +0530
 +++ linux-3.4.55/security/security.c	2013-07-29 21:39:24.591016601 +0530
 @@ -380,6 +380,7 @@ int security_path_rmdir(struct path *dir
  		return 0;

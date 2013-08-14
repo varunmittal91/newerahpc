@@ -27,7 +27,7 @@ import paas_config
 def checkImageName(image_name, paas_root):
    image_path = paas_root + "/images/" + image_name
    if not os.path.isdir(image_path):
-      errors.setError(errors.PAAS_EINOENT)
+      paas_errors.setError(paas_errors.PAAS_EINOENT)
       return
    return image_path
 

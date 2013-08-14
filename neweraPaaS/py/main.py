@@ -38,10 +38,11 @@ def main(argv):
 
    cmd_arguments = {}
 
-   paas_root = ''
-   lxc_root  = ''
+   paas_root        = ''
+   lxc_root         = ''
+   config_file      = ''
+   paas_user        = ''
    local_net_prefix = ''
-   config_file = ''
 
 # evaluating command line arguments
 #    -i image name
@@ -68,6 +69,7 @@ def main(argv):
             lxc_root         = config.get('NeweraPaaS', 'lxc-root')
             paas_root        = config.get('NeweraPaaS', 'paas-root')
             local_net_prefix = config.get('NeweraPaaS', 'local-net-prefix')
+            paas_user        = config.get('NeweraPaaS', 'paas-user')
          except:
             print "config file could not be read"
             sys.exit(2)
@@ -91,17 +93,28 @@ def main(argv):
    if local_net_prefix:
       cmd_arguments['local-net-prefix'] = local_net_prefix
 
+   if paas_user:
+      from pwd import getpwnam  
+      try: 
+         uid = getpwnam(paas_user).pw_uid
+         os.setuid(uid)
+      except os.error as error:
+         if error.errno == neweraPaaS.errors.PAAS_ENOPT:
+       	    neweraPaaS.errors.setError(neweraPaaS.errors.PAAS_ENOPT)
+         else:
+            neweraPaaS.errors.setError(neweraPaaS.errors.PAAS_EINVALUSER)
+         return -1
+
    function_list = {}
    updateFunctions(function_list)
 
    try:
       func = function_list[cmd]
    except:
-      print cmd
-      print "PaaS function not recognized"
       sys.exit(2)
 
-   func(cmd_arguments)
+   return func(cmd_arguments)
 
 if __name__ == "__main__":
-   main(sys.argv[1:])
+   if main(sys.argv[1:]) == -1:
+      neweraPaaS.errors.paasPerror("main() failed")

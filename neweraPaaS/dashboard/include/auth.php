@@ -17,9 +17,6 @@
   *     You should have received a copy of the GNU General Public License
   *     along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
   */
-?>
-
-<?php 
 
 function check_logged_in() {
    if(isset($_SESSION['logged_in']))
@@ -33,3 +30,5 @@ function set_logged_in($uid, $gid) {
    $_SESSION['gid'] = $gid;
    $_SESSION['logged_in'] = 1;
 }
+
+?>

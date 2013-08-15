@@ -96,15 +96,10 @@ function identity_load_action() {
 function identity_load_script() {
    $test_value = check_arg('q', 1);
    if($test_value == 'identity_signup') {
-      $script = "<script type='text/javascript' src='themes/js/jquery-1.3.2.js'></script>
-                 <script type='text/javascript' src='modules/identity/signup.js'></script>
-                ";
+      $script = "<script type='text/javascript' src='modules/identity/signup.js'></script>";
       return $script;
    } else if($test_value == 'identity_login') {
-      $script = "
-<script type='text/javascript' src='themes/js/jquery-1.3.2.js'></script>
-<script type='text/javascript' src='modules/identity/signin.js'></script>
-";
+      $script = "<script type='text/javascript' src='modules/identity/signin.js'></script>";
       return $script;
    }
 }

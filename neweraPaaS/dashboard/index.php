@@ -21,5 +21,15 @@
 
 <?php
    include_once('include/boot.php');
+   if(!check_installed()) {
+      print "Dashboard is not installed, use manual to install and configure";
+      exit(0);
+   }
+
+   include_once('include/settings.php');
+   include_once('include/database.php');
+   include_once('include/modules.php');
+   include_once('include/auth.php');
+
    boot();
 ?>

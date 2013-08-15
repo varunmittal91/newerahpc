@@ -17,13 +17,10 @@
   *     You should have received a copy of the GNU General Public License
   *     along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
   */
-?>
 
-<?php
-
-$ARG_TYPE_POST    = 0;
-$ARG_TYPE_GET     = 1;
-$ARG_TYPE_SESSION = 2;
+define("ARG_TYPE_POST", 0);
+define("ARG_TYPE_GET", 1);
+define("ARG_TYPE_SESSION", 2);
 
 function load_modules() {
    
@@ -85,16 +82,30 @@ function load_modules() {
    include_once($theme_path);
 }
 
-//function set_arg($argument, $arg_type
+function set_arg($argument, $arg_type, &$arg_value = NULL) {
+   $target = NULL;
+
+   switch($arg_type) {
+   case ARG_TYPE_GET:
+      $target = $_GET;
+      break;
+   case ARG_TYPE_POST: 
+		$target = $_POST;
+   	break;
+   case $ARG_TYPE_SESSION:
+   	$target = $_SESSION;
+   	break;
+   }
+   
+   if($target)
+   	$target[$argument] = $arg_value;
+}
 
 function check_arg($argument, $arg_type, &$arg_is_empty = NULL) {
-   global $ARG_TYPE_POST;
-   global $ARG_TYPE_GET;
-   global $ARG_TYPE_SESSION;
-
    $arg_value = NULL;
+   
    switch($arg_type) {
-   case $ARG_TYPE_GET:
+   case ARG_TYPE_GET:
       if(isset($_GET[$argument])) {
          $arg_value = $_GET[$argument]; 
          if(empty($_GET[$argument]))
@@ -102,7 +113,7 @@ function check_arg($argument, $arg_type, &$arg_is_empty = NULL) {
          return $arg_value;
       }
       break;
-   case $ARG_TYPE_POST:
+   case ARG_TYPE_POST:
       if(isset($_POST[$argument])) {
          $arg_value = $_POST[$argument];
          if($arg_is_empty && empty($arg))
@@ -110,7 +121,7 @@ function check_arg($argument, $arg_type, &$arg_is_empty = NULL) {
          return $arg_value;
       }
       break;
-   case $ARG_TYPE_SESSION:
+   case ARG_TYPE_SESSION:
       if(isset($_SESSION[$argument])) {
          $arg_value = $_SESSION[$argument];
          if($arg_is_empty && empty($arg))

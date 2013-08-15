@@ -17,13 +17,10 @@
   *     You should have received a copy of the GNU General Public License
   *     along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
   */
-?>
 
-<?php
-   include('settings.php');  
-   include('database.php');
-   include('modules.php');
-   include('auth.php');
+   function check_installed() {
+      return file_exists('settings.php');
+   }
 
    function boot() {
       session_start();

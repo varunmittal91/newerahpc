@@ -17,9 +17,6 @@
   *     You should have received a copy of the GNU General Public License
   *     along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
   */
-?>
-
-<?php
 
    if(file_exists('include/settings.php')) {
       echo "It appears dashboard is already installed, remove settings.php from include directory to install again.";

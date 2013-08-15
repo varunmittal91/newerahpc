@@ -22,6 +22,43 @@ define("ARG_TYPE_POST", 0);
 define("ARG_TYPE_GET", 1);
 define("ARG_TYPE_SESSION", 2);
 
+function get_default_module() {
+	global $modules;
+	return $modules[0];
+}
+
+function _get_module_path($module) {
+	$module_path = "modules/$module/main.php";
+	if(file_exists($module_path))
+		return $module_path;	
+}
+
+function _get_menu_module() {
+	global $modules;
+	$menu = "";
+	$module_path;
+	$func_ptr;
+	foreach($modules as $module) {
+		if(!($module_path = _get_module_path($module))) {
+			print "module not found";
+			exit(0);
+		}
+		$func_ptr = $module."_load_menu";
+		$menu .= $func_ptr();
+	} 	
+
+	print $menu;
+}
+
+function _get_script_module($module) {
+	$module_path;
+	if(!($module_path = _get_module_path($module)))
+		return;
+	include_once($module_path);
+	$func_ptr = $module."_load_script";
+	print $func_ptr();
+}
+
 function load_modules() {
    
    global $site_title;
@@ -34,16 +71,55 @@ function load_modules() {
    $sidebar = "";
    $script  = "";
 
-   if(check_arg('q', 1) == 'action') {
-      $module = check_arg('module', 1);
-      if($module == NULL) {
-         $_GET['q'] = 'home';
-      } else {
-         include_once('modules/'.$module.'/main.php');
-         $func_load_action = $module."_load_action";
-         return $func_load_action();
-      }
-   }
+	$check_arg_var;
+	$module;
+	if(($check_arg_var = check_arg('q', 1))) {
+		if(!($module = check_arg('module', 1))) {
+			if($check_arg_var == 'action' || $check_arg_var == 'script') {
+				print 0;
+				return;	
+			} else {
+				if(!($module = get_default_module())) {
+					print "404";
+					return;	
+				}
+			}
+		}		
+		
+		$module_path = "modules/$module/main.php";
+		if(!file_exists($module_path)) {
+			print "404";
+			return;
+		}
+		include_once($module_path);
+
+		$func_ptr = $module;
+		if($check_arg_var == 'action') {
+			$func_ptr .= '_load_action';
+		} else if($check_arg_var == 'get_current_module') {
+			print $module;
+			return;
+		} else if($check_arg_var == 'content') {
+			$func_ptr .= '_load_content';
+		} else if($check_arg_var == 'sidebar') {
+		} else if($check_arg_var == 'menu') {
+			return _get_menu_module();		
+		} else if($check_arg_var == 'script') {
+			$func_ptr .= '_load_script';	
+		} else {
+			print "Invalid request";
+			return;	
+		}
+		print $func_ptr();
+		return;
+	}	else {
+	   global $theme_active;
+   	$theme_path = "themes/".$theme_active."/main.php";
+   	include_once($theme_path);
+		return;
+	}
+	
+	return;
 
    foreach($modules as $i => $module) {
       $module_path = '';

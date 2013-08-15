@@ -26,7 +26,8 @@
       <script type="text/javascript" src="include/js/core.js"></script>
       <?php print $script ?>
 	</head>
-   <body>
+   <body>   
+   	<div id="script-area"></div>
    	<div class="navbar navbar-inverse navbar-fixed-top">
       	<div class="navbar-inner">
          	<div class="container">
@@ -34,6 +35,7 @@
                <div class="nav-collapse collapse">
 	               <ul class="nav">
 	               	<?php echo $menu ?>
+	               	<div id="menu-area"></div>
                      <li class="dropdown">
                      	<a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
                         <ul class="dropdown-menu">
@@ -62,6 +64,7 @@
               	</div>
           	</div>
 	    		<div class="span8">
+	    			<div id="content-area"></div>
 	      		<?php print $content ?>
 	      	</div>
 	 		</div>

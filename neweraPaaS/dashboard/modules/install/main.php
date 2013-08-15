@@ -52,46 +52,45 @@ function install_load_script() {
 }
 
 function install_load_content() {
-   $data = "
-<div class='well'>
-   <legend><h1>NeweraPaaS Installation</h1></legend>
-   <!-- Checking mysql connectivity in first stage -->
-   <form class='form-horizontal' method='POST' id='stage_1' style='display: none;'>
-   	<legend>Verify mysql connectivity</legend>
-   	<div class='control-group'>
-			<center><label class='error' style='display: none;color:red' color='3px #090 solid' id='check_mysql_error'>Mysql connectivity failed</label></center>
-   	</div>
-   	<div class='control-group'>
-   		<label class='control-label'>Host Address</label>
-   		<div class='controls'>
-   			<input type='text' class='input-xlarge' id='mysql_addr' name='mysql_addr' placeholder='Server address' maxlength=24>
-   		</div>
-   	</div>
-   	<div class='control-group'>
-   		<label class='control-label'>Host Port</label>
-   		<div class='controls'>
-   			<input type='text' class='input-xlarge' id='mysql_port' name='mysql_port' placeholder='Server port' value=3306 maxlength=5>
-   		</div> 
-   	</div>
-   	<div class='control-group'>
-   		<label class='control-label'>Username</label>
-   		<div class='controls'>
-   			<input type='text' class='input-xlarge' id='mysql_user' name='mysql_user' placeholder='Username'>
-   		</div>
-   	</div>
-   	<div class='control-group'>
-   		<label class='control-label'>Password</label>
-   		<div class='controls'>
-   			<input type='text' class='input-xlarge' id='mysql_passwd' name='mysql_passwd' placeholder='Password'>
-   		</div>
-   	</div>
-   	<div class='control-group'>
-   		<div class='controls'>
-   			<button class='btn btn-success' id='submit_stage_1'>Check Mysql</button>
-   		</div>
-   	</div>
-   </form>
-</div>";
+   $data = "<div class='well'>
+   				<legend><h1>NeweraPaaS Installation</h1></legend>
+   				<!-- Checking mysql connectivity in first stage -->
+   				<form class='form-horizontal' method='POST' id='stage_1' style='display: none;'>
+   					<legend>Verify mysql connectivity</legend>
+   						<div class='control-group'>
+								<center><label class='error' style='display: none;color:red' color='3px #090 solid' id='check_mysql_error'>Mysql connectivity failed</label></center>
+   						</div>
+   						<div class='control-group'>
+   							<label class='control-label'>Host Address</label>
+   							<div class='controls'>
+   								<input type='text' class='input-xlarge' id='mysql_addr' name='mysql_addr' placeholder='Server address' maxlength=24>
+   							</div>
+   						</div>
+   						<div class='control-group'>
+   							<label class='control-label'>Host Port</label>
+   							<div class='controls'>
+   								<input type='text' class='input-xlarge' id='mysql_port' name='mysql_port' placeholder='Server port' value=3306 maxlength=5>
+   							</div> 
+   						</div>
+   						<div class='control-group'>
+   							<label class='control-label'>Username</label>
+   							<div class='controls'>
+   								<input type='text' class='input-xlarge' id='mysql_user' name='mysql_user' placeholder='Username'>
+   							</div>
+   						</div>
+   						<div class='control-group'>
+   							<label class='control-label'>Password</label>
+   							<div class='controls'>
+   								<input type='text' class='input-xlarge' id='mysql_passwd' name='mysql_passwd' placeholder='Password'>
+   							</div>
+   						</div>
+   						<div class='control-group'>
+   							<div class='controls'>
+   								<button class='btn btn-success' id='submit_stage_1'>Check Mysql</button>
+   							</div>
+   						</div>
+   					</form>
+					</div>";
    
    return $data;
 }
@@ -102,7 +101,7 @@ function install_load_sidebar() {
 						<li>Mysql Connection</li>
 						<li>Mysql Database initialization</l1>
 						<li>Configuring Steps</li>
-						<l1>Complete</li>
+						<li>Complete</li>
 					</ul>";
 	
 	return $content;

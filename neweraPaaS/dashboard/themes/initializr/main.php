@@ -59,8 +59,7 @@
       	<div class="row">
          	<div class="span4">
             	<div class='hero-unit'>
-	         		This is the Sidebar area
-		 				<?php print $sidebar ?>
+            		<div id='content-sidebar'></div>
               	</div>
           	</div>
 	    		<div class="span8">
@@ -74,7 +73,7 @@
         		</footer>
    	</div> <!-- /container -->
 
-      <script>window.jQuery || document.write('<script src="themes/initializr/js/vendor/jquery-1.10.1.js"><\/script>')</script>
+
       <script src="themes/initializr/js/vendor/bootstrap.min.js"></script>
       <script src="themes/initializr/js/main.js"></script>
 	</body>

@@ -58,24 +58,46 @@ function _get_current_module() {
 	return _get_core_action(url);
 }
 
-function load_content(module, func) {
+function _load_content(module, func) {
 	var url = "?q=content&module=" + module;
-	$("#content-area").load(url);
+	$("#content-area").empty();
+	$("#content-area").append(_get_core_action(url));
 }
 
-function load_script(module) {
+function _load_sidebar() {
+	var url = "?q=sidebar";
+	$("#content-sidebar").empty();
+	$("#content-sidebar").append(_get_core_action(url));
+}
+
+function _load_script(module) {
 	var url = "?q=script&" + "module=" + module;
-	$("#script-area").load(url);
+	var scripts = _get_core_action(url);
+	console.log(scripts);
+	$("body").append(scripts);
 }
 
-function load_menu() {
+function _load_menu() {
 	var url = "?q=menu";
 	$("#menu-area").load(url);
 }
 
+function paas_core_refresh_content(module) {
+	if(!module)
+		module = _get_current_module();
+	
+	_load_content(module);
+	_load_menu();
+	_load_sidebar();
+	_load_script(module);
+}
+
 $(document).ready(function() {
-	var module = _get_current_module();
-	load_content(module);
-	load_menu();
-	load_script(module);
+	paas_core_refresh_content();
+	
+	try {
+		custom_script_function();
+	} catch(err) {
+		console.log("custom script function could not be loaded or failed");
+	}
 });

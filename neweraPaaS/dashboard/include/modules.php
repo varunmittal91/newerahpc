@@ -50,6 +50,22 @@ function _get_menu_module() {
 	print $menu;
 }
 
+function _get_sidebar_module() {
+	global $modules;
+	$sidebar = "";
+	$module_path;
+	$func_ptr;
+	foreach($modules as $module) {
+		if(!($module_path = _get_module_path($module))) {
+			exit(0);	
+		}	
+		$func_ptr = $module."_load_sidebar";
+		$sidebar .= $func_ptr();
+	}	
+	
+	print $sidebar;
+}
+
 function _get_script_module($module) {
 	$module_path;
 	if(!($module_path = _get_module_path($module)))
@@ -102,6 +118,7 @@ function load_modules() {
 		} else if($check_arg_var == 'content') {
 			$func_ptr .= '_load_content';
 		} else if($check_arg_var == 'sidebar') {
+			return _get_sidebar_module();
 		} else if($check_arg_var == 'menu') {
 			return _get_menu_module();		
 		} else if($check_arg_var == 'script') {
@@ -163,18 +180,15 @@ function set_arg($argument, $arg_type, &$arg_value = NULL) {
 
    switch($arg_type) {
    case ARG_TYPE_GET:
-      $target = $_GET;
+		$_GET[$argument] = $arg_value;
       break;
    case ARG_TYPE_POST: 
-		$target = $_POST;
+		$_POST[$argument] = $arg_value;
    	break;
-   case $ARG_TYPE_SESSION:
-   	$target = $_SESSION;
+   case ARG_TYPE_SESSION:
+		$_SESSION[$argument] = $arg_value;
    	break;
    }
-   
-   if($target)
-   	$target[$argument] = $arg_value;
 }
 
 function check_arg($argument, $arg_type, &$arg_is_empty = NULL) {
@@ -186,7 +200,6 @@ function check_arg($argument, $arg_type, &$arg_is_empty = NULL) {
          $arg_value = $_GET[$argument]; 
          if(empty($_GET[$argument]))
             $arg_is_empty = 1;
-         return $arg_value;
       }
       break;
    case ARG_TYPE_POST:
@@ -194,14 +207,13 @@ function check_arg($argument, $arg_type, &$arg_is_empty = NULL) {
          $arg_value = $_POST[$argument];
          if($arg_is_empty && empty($arg))
             $arg_is_empty = 1;
-         return $arg_value;
       }
       break;
    case ARG_TYPE_SESSION:
       if(isset($_SESSION[$argument])) {
          $arg_value = $_SESSION[$argument];
          if($arg_is_empty && empty($arg))
-            $arg_value = 1;
+            $arg_is_empty = 1;
       }                             
       break;
    }   

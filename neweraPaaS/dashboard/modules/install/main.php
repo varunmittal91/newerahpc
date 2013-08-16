@@ -27,11 +27,11 @@ function install_load_menu() {
 }
 
 function check_install_stage() {
-   $is_empty;
-   $inst_stage = check_arg("stage", ARG_TYPE_SESSION, $is_empty);
+   $inst_stage = check_arg("stage", ARG_TYPE_SESSION);
    if($inst_stage)
-      return $value;
-   else {
+   {
+      return $inst_stage;
+   } else {
    	return 1;
    }
 }
@@ -39,10 +39,15 @@ function check_install_stage() {
 function install_load_action() {
 	$enable_debug = 1;
 	$test_val = check_arg('func', ARG_TYPE_GET);
-	if($test_val == 'install_stage')	
-		print check_install_stage();
-	else 	
-		print 0;
+	if($test_val == 'install_stage') {	
+		return check_install_stage();
+	}
+	if($test_val == 'check_mysql') {
+		$arg_value = 2;
+		set_arg("stage", ARG_TYPE_SESSION, $arg_value);
+		return 1;
+	} else 	
+		return 0;
 }
 
 function install_load_script() {
@@ -52,50 +57,79 @@ function install_load_script() {
 }
 
 function install_load_content() {
-   $data = "<div class='well'>
-   				<legend><h1>NeweraPaaS Installation</h1></legend>
-   				<!-- Checking mysql connectivity in first stage -->
-   				<form class='form-horizontal' method='POST' id='stage_1' style='display: none;'>
-   					<legend>Verify mysql connectivity</legend>
-   						<div class='control-group'>
-								<center><label class='error' style='display: none;color:red' color='3px #090 solid' id='check_mysql_error'>Mysql connectivity failed</label></center>
-   						</div>
-   						<div class='control-group'>
-   							<label class='control-label'>Host Address</label>
-   							<div class='controls'>
-   								<input type='text' class='input-xlarge' id='mysql_addr' name='mysql_addr' placeholder='Server address' maxlength=24>
+	$inst_stage = check_install_stage();
+	if($inst_stage == 1) {
+   	$data = "<div class='well'>
+   					<legend><h1>NeweraPaaS Installation</h1></legend>
+   					<!-- Checking mysql connectivity in first stage -->
+   					<form class='form-horizontal' method='POST' id='stage_1' name='stage_1'>
+   						<legend>Verify mysql connectivity</legend>
+   							<div class='control-group'>
+									<center><label class='error' style='display: none;color:red' color='3px #090 solid' id='check_mysql_error'>Mysql connectivity failed</label></center>
    							</div>
-   						</div>
-   						<div class='control-group'>
-   							<label class='control-label'>Host Port</label>
-   							<div class='controls'>
-   								<input type='text' class='input-xlarge' id='mysql_port' name='mysql_port' placeholder='Server port' value=3306 maxlength=5>
-   							</div> 
-   						</div>
-   						<div class='control-group'>
-   							<label class='control-label'>Username</label>
-   							<div class='controls'>
-   								<input type='text' class='input-xlarge' id='mysql_user' name='mysql_user' placeholder='Username'>
+   							<div class='control-group'>
+   								<label class='control-label'>Host Address</label>
+   								<div class='controls'>
+   									<input type='text' class='input-xlarge' id='mysql_addr' name='mysql_addr' placeholder='Server address' maxlength=24>
+   								</div>
+	   						</div>
+   							<div class='control-group'>
+   								<label class='control-label'>Host Port</label>
+   								<div class='controls'>
+   									<input type='text' class='input-xlarge' id='mysql_port' name='mysql_port' placeholder='Server port' value=3306 maxlength=5>
+   								</div> 
    							</div>
-   						</div>
-   						<div class='control-group'>
-   							<label class='control-label'>Password</label>
-   							<div class='controls'>
-   								<input type='text' class='input-xlarge' id='mysql_passwd' name='mysql_passwd' placeholder='Password'>
+   							<div class='control-group'>
+   								<label class='control-label'>Username</label>
+	   							<div class='controls'>
+   									<input type='text' class='input-xlarge' id='mysql_user' name='mysql_user' placeholder='Username'>
+   								</div>
    							</div>
-   						</div>
-   						<div class='control-group'>
-   							<div class='controls'>
-   								<button class='btn btn-success' id='submit_stage_1'>Check Mysql</button>
+   							<div class='control-group'>
+   								<label class='control-label'>Password</label>
+   								<div class='controls'>
+   									<input type='text' class='input-xlarge' id='mysql_passwd' name='mysql_passwd' placeholder='Password'>
+   								</div>
+	   						</div>
+   							<div class='control-group'>
+   								<div class='controls'>
+   									<button class='btn btn-success' id='submit_stage_1'>Check Mysql</button>
+   								</div>
    							</div>
-   						</div>
-   					</form>
+   						</form>";
+   	return $data;
+   } else if($inst_stage == 2) {
+   	
+		return "<h1>Mysql checked</h1>";   	
+   }
+   						
+/*   						
+   						
+   				<form class='form-horizontal' method='POST' id='stage_2' style='display: none;'>
+   					<legend>Mysql verified</legend>
+   				</form>
 					</div>";
-   
-   return $data;
+					*/
 }
 
 function install_load_sidebar() {
+	
+	$stages = array("Checking write permission", "Mysql Connection", "Mysql Database Initialization",
+						 "Configuring Steps", "Complete");
+	
+	$inst_stage = check_install_stage();	
+	
+	$content = "<ul>";
+	foreach($stages as $i => $stage) {
+		if($inst_stage == ($i + 1)) {
+			$content .= "<li><b>$stage</b></li>";
+		} else {
+			$content .= "<li>$stage</li>";	
+		}
+	}	
+	$content .= "</ul>";
+	
+	/*
 	$content = "<ul>
 						<li>Checking write permission</li>
 						<li>Mysql Connection</li>
@@ -103,7 +137,7 @@ function install_load_sidebar() {
 						<li>Configuring Steps</li>
 						<li>Complete</li>
 					</ul>";
-	
+	*/
 	return $content;
 }
 

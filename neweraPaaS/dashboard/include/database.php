@@ -36,6 +36,13 @@ function init_db() {
    }
 }
 
+function test_connection_db($db_host, $db_port, $db_user, $db_passwd, $db_name = "") {
+	if(new mysqli($db_host, $db_user, $db_passwd, $db_name, $db_port))
+		return 1;
+	else 
+		return;
+}
+
 function query_db($query) {
    global $db_conn;
    $res = $db_conn->query($query);

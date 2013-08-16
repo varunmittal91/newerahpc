@@ -58,8 +58,10 @@
       <!-- Main hero unit for a primary marketing message or call to action -->
       	<div class="row">
          	<div class="span4">
-            	<div class='hero-unit'>
-            		<div id='content-sidebar'></div>
+            	<div class='sidebar-nav'>
+            		<div class="well">
+	            		<div id='content-sidebar'></div>
+	            	</div>
               	</div>
           	</div>
 	    		<div class="span8">

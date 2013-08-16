@@ -50,7 +50,22 @@ function install_load_action() {
 			return 1;
 		}
 	} else if($test_val == 'check_stage_2') {
-		
+		$db_host   = "";
+		$db_port   = "";
+		$db_user   = ""; 
+		$db_passwd = "";
+		if(($db_host = check_arg("mysql_addr", 1)) && ($db_port = check_arg("mysql_port", 1)) && ($db_user = check_arg("mysql_user", 1))) {
+			if(!($db_passwd = check_arg("mysql_passwd", 1)))
+				$db_passwd = "";
+			if(!test_connection_db($db_host, $db_port, $db_user, $db_passwd))
+				return 0;
+			$arg_value = 3;
+			set_arg("stage", ARG_TYPE_SESSION, $arg_value);
+			return 1;
+		}
+		else {
+			return 0;
+		}
 	} else if($test_val == 'check_mysql') {
 		$arg_value = 2;
 		set_arg("stage", ARG_TYPE_SESSION, $arg_value);
@@ -88,10 +103,10 @@ function install_load_content() {
    	$data = "<div class='well'>
    					<legend><h1>NeweraPaaS Installation</h1></legend>
    					<!-- Checking mysql connectivity in first stage -->
-   					<form class='form-horizontal' method='POST' id='stage_1' name='stage_1'>
+   					<form class='form-horizontal' method='POST' id='stage_2'>
    						<legend>Verify mysql connectivity</legend>
    							<div class='control-group'>
-									<center><label class='error' style='display: none;color:red' color='3px #090 solid' id='check_mysql_error'>Mysql connectivity failed</label></center>
+									<label class='error' style='display: none;color:red' color='3px #090 solid' id='error_stage_2'>Mysql connectivity failed</label>
    							</div>
    							<div class='control-group'>
    								<label class='control-label'>Host Address</label>
@@ -119,23 +134,14 @@ function install_load_content() {
 	   						</div>
    							<div class='control-group'>
    								<div class='controls'>
-   									<button class='btn btn-success' id='submit_stage_1'>Check Mysql</button>
+   									<button class='btn btn-success' id='submit_stage_2'>Check Mysql</button>
    								</div>
    							</div>
    						</form>";
    	return $data;
-   } else if($inst_stage == 3) {
-   	
+   } else if($inst_stage == 3) {   	
 		return "<h1>Mysql checked</h1>";   	
    }
-   						
-/*   						
-   						
-   				<form class='form-horizontal' method='POST' id='stage_2' style='display: none;'>
-   					<legend>Mysql verified</legend>
-   				</form>
-					</div>";
-					*/
 }
 
 function install_load_sidebar() {
@@ -145,25 +151,15 @@ function install_load_sidebar() {
 	
 	$inst_stage = check_install_stage();	
 	
-	$content = "<ul>";
+	$content = "<ul class='nav nav-list'><li class='nav-header'>Installation steps</li>";
 	foreach($stages as $i => $stage) {
 		if($inst_stage == ($i + 1)) {
-			$content .= "<li><b>$stage</b></li>";
+			$content .= "<b><big><li class='active'>$stage</li></big></b>";
 		} else {
 			$content .= "<li>$stage</li>";	
 		}
 	}	
 	$content .= "</ul>";
-	
-	/*
-	$content = "<ul>
-						<li>Checking write permission</li>
-						<li>Mysql Connection</li>
-						<li>Mysql Database initialization</l1>
-						<li>Configuring Steps</li>
-						<li>Complete</li>
-					</ul>";
-	*/
 	return $content;
 }
 

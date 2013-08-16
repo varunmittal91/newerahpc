@@ -25,25 +25,42 @@ function custom_script_function() {
 	
 	$("#stage_1").submit(false);
 	$("#submit_stage_1").click(function(){
-		var validator = $("#stage_1").validate({
+		value = core_perform_action("install", "check_stage_2");
+		if(value != 1) {
+			$("#error_stage_1").fadeIn();
+   		console.log(value);
+   	} else {
+   		console.log("mysql_update_result:" + value);
+  			console.log("submit1 stage presed");
+  			paas_core_refresh_content("install");
+  		}
+  	})   	
+	
+   $("#stage_2").submit(false);
+	$("#submit_stage_2").click(function(){
+		var validator = $("#stage_2").validate({
    	rules: {
    		mysql_addr: "required",
    		mysql_port: "required",
-   		mysql_user: "required",
-   		mysql_passwd: "required",
+   		mysql_user: "required"
    	},
    	errorElement: "span",
    	messages: {
    		mysql_addr: "Please enter server address",
    		mysql_port: "Please enter server port",
    		mysql_user: "Please enter admin username",
-   		mysql_passwd: "Please enter admin password"
    	}
    	});
-   	if($("#stage_1").valid()){
-   		value = core_perform_action("install", "check_stage_1");
+   	if($("#stage_2").valid()){
+			var mysql_addr   = $("#mysql_addr").val();
+			var mysql_port   = $("#mysql_port").val();
+			var mysql_user   = $("#mysql_user").val();
+			var mysql_passwd = $("#mysql_passwd").val();   		
+   		var action_data = {'mysql_addr': mysql_addr, 'mysql_port': mysql_port, 'mysql_user': mysql_user, 'mysql_passwd': mysql_passwd}; 
+   		console.log(action_data);
+   		value = core_perform_action("install", "check_stage_2", action_data);
    		if(value != 1) {
-   			$("#error_stage_1").fadeIn();
+   			$("#error_stage_2").fadeIn();
    			console.log(value);
    		} else {
    			console.log("mysql_update_result:" + value);
@@ -52,40 +69,9 @@ function custom_script_function() {
    		}   	
    	}
 	});	
-	
+
 	console.log('#stage_' + inst_stage);
 }
-/*
-$(document).ready(function() {
-	console.log("script loaded");	
-   inst_stage = core_perform_action('install', 'install_stage');
-   if(!inst_stage)
-   	return;
-
-  	$('#stage_1').submit(false);
-   $("#submit_stage_1").click(function(){
-   	$("#stage_1").validate({
-   	rules: {
-   		mysql_addr: "required",
-   		mysql_port: "required",
-   		mysql_user: "required",
-   		mysql_passwd: "required",
-   	},
-   	errorElement: "span",
-   	messages: {
-   		mysql_addr: "Please enter server address",
-   		mysql_port: "Please enter server port",
-   		mysql_user: "Please enter admin username",
-   		mysql_passwd: "Please enter admin password"
-   	}
-   	});   	
-   	console.log("submit1 stage presed");
-   });
-   	
-   console.log('#stage_' + inst_stage);
-   $('#stage_' + inst_stage).fadeIn();
-});
-*/
 
 function check_install_stage() {
 }

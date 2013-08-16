@@ -25,7 +25,7 @@ function custom_script_function() {
 	
 	$("#stage_1").submit(false);
 	$("#submit_stage_1").click(function(){
-		value = core_perform_action("install", "check_stage_2");
+		value = core_perform_action("install", "check_stage_1");
 		if(value != 1) {
 			$("#error_stage_1").fadeIn();
    		console.log(value);

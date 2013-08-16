@@ -19,8 +19,6 @@
   */
 
    if(file_exists('include/settings.php')) {
-      echo "It appears dashboard is already installed, remove settings.php from include directory to install again.";
-      exit(0);
    }
 
    include('include/database.php');

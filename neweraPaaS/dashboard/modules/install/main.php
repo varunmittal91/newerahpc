@@ -41,8 +41,17 @@ function install_load_action() {
 	$test_val = check_arg('func', ARG_TYPE_GET);
 	if($test_val == 'install_stage') {	
 		return check_install_stage();
-	}
-	if($test_val == 'check_mysql') {
+	} else if($test_val == 'check_stage_1') {
+		if(!(fopen("include/settings.php", "w")))
+			return 0;
+		else {
+			$arg_value = 2;
+			set_arg("stage", ARG_TYPE_SESSION, $arg_value);
+			return 1;
+		}
+	} else if($test_val == 'check_stage_2') {
+		
+	} else if($test_val == 'check_mysql') {
 		$arg_value = 2;
 		set_arg("stage", ARG_TYPE_SESSION, $arg_value);
 		return 1;
@@ -59,6 +68,23 @@ function install_load_script() {
 function install_load_content() {
 	$inst_stage = check_install_stage();
 	if($inst_stage == 1) {
+		$data = "<div class='well'>
+						<legend><h1>NeweraPaaS Installation</h1></legend>
+						<!-- Checking write permissions in first stage -->
+						<form class='form-horizontal' method='POST' id='stage_1'>
+							<legend>Verifiy write permission</legend>
+							<div class='control-group'>
+         					<label class='error' style='display: none;color:red' color='3px #090 solid' id='error_stage_1'>No write access available in folder 'include'</label>
+							</div>
+							<div class='control-group'>
+								<div class='controls'>
+   								<button class='btn btn-success' id='submit_stage_1'>Check Permissions</button>
+   							</div>
+							</div>
+						</form>
+					</div>";
+		return $data;
+	} 	else if($inst_stage == 2) {
    	$data = "<div class='well'>
    					<legend><h1>NeweraPaaS Installation</h1></legend>
    					<!-- Checking mysql connectivity in first stage -->
@@ -98,7 +124,7 @@ function install_load_content() {
    							</div>
    						</form>";
    	return $data;
-   } else if($inst_stage == 2) {
+   } else if($inst_stage == 3) {
    	
 		return "<h1>Mysql checked</h1>";   	
    }
@@ -114,7 +140,7 @@ function install_load_content() {
 
 function install_load_sidebar() {
 	
-	$stages = array("Checking write permission", "Mysql Connection", "Mysql Database Initialization",
+	$stages = array("Check write permission", "Check Mysql Connection", "Initialize MysqlData",
 						 "Configuring Steps", "Complete");
 	
 	$inst_stage = check_install_stage();	

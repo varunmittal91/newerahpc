@@ -41,10 +41,15 @@ function custom_script_function() {
    	}
    	});
    	if($("#stage_1").valid()){
-   		value = core_perform_action("install", "check_mysql");
-   		console.log("mysql_update_result:" + value);
-   		console.log("submit1 stage presed");
-   		paas_core_refresh_content("install");   	
+   		value = core_perform_action("install", "check_stage_1");
+   		if(value != 1) {
+   			$("#error_stage_1").fadeIn();
+   			console.log(value);
+   		} else {
+   			console.log("mysql_update_result:" + value);
+   			console.log("submit1 stage presed");
+   			paas_core_refresh_content("install");
+   		}   	
    	}
 	});	
 	

@@ -140,7 +140,24 @@ function install_load_content() {
    						</form>";
    	return $data;
    } else if($inst_stage == 3) {   	
-		return "<h1>Mysql checked</h1>";   	
+		$form_params['class']  = "form-horizontal";
+		$form_params['id']     = "stage_3";
+		$form_params['legend'] = "Initialize MysqlData";
+		$form_params['error']  = "Cannot create database";
+		
+		$form_params['elements'][0]['type'] = 'text';
+		$form_params['elements'][0]['label'] = 'test field';
+		$form_params['elements'][0]['class'] = 'input-xlarge';	
+		$form_params['elements'][0]['placeholder'] = 'Username';
+		$form_params['elements'][0]['maxlength'] = '24';	
+		
+		$form_params['elements'][1]['type'] = 'button';	
+		$form_params['elements'][1]['class'] = 'btn btn-success';
+		$form_params['elements'][1]['label'] = 'Proceed';	
+
+		include_once("include/forms.php");
+		$form = core_generate_form($form_params);
+		return "<div class='well'><legend><h1>NeweraPaaS Installation</h1></legend>$form</div>";
    }
 }
 

@@ -57,7 +57,6 @@ function custom_script_function() {
 			var mysql_user   = $("#mysql_user").val();
 			var mysql_passwd = $("#mysql_passwd").val();   		
    		var action_data = {'mysql_addr': mysql_addr, 'mysql_port': mysql_port, 'mysql_user': mysql_user, 'mysql_passwd': mysql_passwd}; 
-   		console.log(action_data);
    		value = core_perform_action("install", "check_stage_2", action_data);
    		if(value != 1) {
    			$("#error_stage_2").fadeIn();
@@ -69,8 +68,34 @@ function custom_script_function() {
    		}   	
    	}
 	});	
-
-	console.log('#stage_' + inst_stage);
+	
+	$("#stage_3").submit(false);
+	$("#submit_stage_3").click(function(){
+		var validator = $("#stage_3").validate({
+			rules: {
+				dash_user:   "required",
+				dash_passwd: "required"
+			},
+			errorElement: "span",
+			messages: {
+				dash_user:   "Admin username required",
+				dash_passwd: "Admin password required"	
+			}
+		});
+		if($("#stage_3").valid()){
+			var dash_user   = $("#dash_user").val(); 
+			var dash_passwd = $("#dash_passwd").val();
+			var dash_db     = $("#dash_db").val();
+			var action_data = {'dash_user': dash_user, 'dash_passwd': dash_passwd, 'dash_db': dash_db};
+			value = core_perform_action("install", "check_stage_3", "action_data");
+			if(value != 1) {
+				$("#error_stage_3").text("hi");
+				$("#error_stage_3").fadeIn();
+			} else {
+				paas_core_refresh_content("install");	
+			}
+		};
+	});
 }
 
 function check_install_stage() {

@@ -59,9 +59,12 @@ function _get_current_module() {
 }
 
 function _load_content(module, func) {
+	var content_area = $("#content-area");
 	var url = "?q=content&module=" + module;
-	$("#content-area").empty();
-	$("#content-area").append(_get_core_action(url));
+	content_area.hide();
+	content_area.empty();
+	content_area.append(_get_core_action(url));
+	content_area.fadeIn();
 }
 
 function _load_sidebar() {

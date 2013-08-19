@@ -32,31 +32,31 @@ function _core_generate_form_elements($form, $elements) {
 			break;
 		case "text":
 		case "password":
-			$elem_tag = "<input type='$element_type' class='' id='' name='' placeholder=''>";
+			$elem_tag = "<input type='$element_type' class='' id='' name='' placeholder='' maxlength='' value=''>";
 			break;
 		default:
 			continue;
 		}
 		
-		$replacements;
-		$targets;
+		$replacements = array();
+		$targets = array();
 		$i = 0;
 		foreach($element as $param => $value) {
 			if($param == 'type')
 				continue;			
 			switch($param) {
 			case 'label':
-
-				if($element_type == 'button') {
-					$targets[$i]      = "><";
-					$replacements[$i] = ">$value<";
-					$i++;	
-				}
+				if($element_type != 'button')
+					continue;
+				$targets[$i]      = "><";
+				$replacements[$i] = ">$value<";
+				$i++;	
 				break;
 			case 'placeholder':
 			case 'maxlength':
-				if($param != 'text')
-					continue;
+			case 'value':
+				if($element_type == 'button')
+					break;
 			case 'class':
 			case 'id':
 			case 'name':
@@ -66,7 +66,8 @@ function _core_generate_form_elements($form, $elements) {
 			}			
 		} 
 
-		$elem_tag = str_replace($targets, $replacements, $elem_tag);
+		if(count($targets) && count($replacements))
+			$elem_tag = str_replace($targets, $replacements, $elem_tag);
 		$elem_tag = "<div class='controls'>$elem_tag</div>";
 		if(isset($element['label']) && $element_type != "button")
 			$elem_tag = "<label class='control-label'>$element[label]</label>$elem_tag";
@@ -77,42 +78,42 @@ function _core_generate_form_elements($form, $elements) {
 }
 
 function core_generate_form(&$form_params=NULL) {
-	$targets;
-	$replacements;
+	$targets      = array();
+	$replacements = array();
 	$i = 0;	
 	$form = "<form class='' id='' name='' action='' method=''>";
 	
-	if(isset($form_params["name"])) {
-		$targets[$i]      = "name=''";
-		$replacements[$i] = "name='$form_params[name]'";
-		$i++;
+	$form_id = '';	
+	
+	foreach($form_params as $param => $value) {
+		if($param == "elements")
+			continue;
+		switch($param) {
+		case "name":
+		case "id":
+			$form_id = $value;
+		case "method":
+		case "action":
+		case "class":
+			$targets[$i]      = "$param=''";
+			$replacements[$i] = "$param='$value'";
+			$i++;
+			break;
+		default:
+			break;
+		}	
 	}
-	if(isset($form_params["id"]))	{
-		$targets[$i]      = "id=''";
-		$replacements[$i] = "id='$form_params[id]'";
-		$i++;
-	}
-	if(isset($form_params["method"])) {
-		$targets[$i]      = "method=''";
-		$replacements[$i] = "methods='$form_params[method]'";
-		$i++;
-	}
-	if(isset($form_params["action"])) {
-		$targets[$i]      = "action=''";
-		$replacements[$i] = "action='$form_params[action]'";
-		$i++;
-	}
-	if(isset($form_params["class"])) {
-		$targets[$i]      = "class=''";
-		$replacements[$i] = "class='$form_params[class]'";
-		$i++;
-	}
-	$form = str_replace($targets, $replacements, $form);
+
+	if(count($targets) > 0)
+		$form = str_replace($targets, $replacements, $form);
 	if(isset($form_params["legend"])) {	
 		$form .= "<legend>$form_params[legend]</legend>";
 	}
 	if(isset($form_params["error"])) {
-   	$form .= "<div class='control-group'><label class='error' style='display: none;color: red;'>$form_params[error]</label></div>";
+		$error_id = "error";
+		if($form_id)
+			$error_id = $error_id."_".$form_id;
+   	$form .= "<div class='control-group'><label class='error' id='$error_id' style='display: none;color: red;'>$form_params[error]</label></div>";
 	}
 		
 	if(isset($form_params["elements"])) {

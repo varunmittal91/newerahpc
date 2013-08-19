@@ -57,8 +57,9 @@ function install_load_action() {
 		if(($db_host = check_arg("mysql_addr", 1)) && ($db_port = check_arg("mysql_port", 1)) && ($db_user = check_arg("mysql_user", 1))) {
 			if(!($db_passwd = check_arg("mysql_passwd", 1)))
 				$db_passwd = "";
-			if(!test_connection_db($db_host, $db_port, $db_user, $db_passwd))
-				return 0;
+			if(($test_action = test_connection_db($db_host, $db_port, $db_user, $db_passwd)) != 1)  {
+				return $test_action;
+			}
 			$arg_value = 3;
 			set_arg("stage", ARG_TYPE_SESSION, $arg_value);
 			return 1;
@@ -66,10 +67,6 @@ function install_load_action() {
 		else {
 			return 0;
 		}
-	} else if($test_val == 'check_mysql') {
-		$arg_value = 2;
-		set_arg("stage", ARG_TYPE_SESSION, $arg_value);
-		return 1;
 	} else 	
 		return 0;
 }
@@ -82,78 +79,99 @@ function install_load_script() {
 
 function install_load_content() {
 	$inst_stage = check_install_stage();
+	include_once("include/forms.php");
+
 	if($inst_stage == 1) {
-		$data = "<div class='well'>
-						<legend><h1>NeweraPaaS Installation</h1></legend>
-						<!-- Checking write permissions in first stage -->
-						<form class='form-horizontal' method='POST' id='stage_1'>
-							<legend>Verifiy write permission</legend>
-							<div class='control-group'>
-         					<label class='error' style='display: none;color:red' color='3px #090 solid' id='error_stage_1'>No write access available in folder 'include'</label>
-							</div>
-							<div class='control-group'>
-								<div class='controls'>
-   								<button class='btn btn-success' id='submit_stage_1'>Check Permissions</button>
-   							</div>
-							</div>
-						</form>
-					</div>";
-		return $data;
+		$form_params['class']  = "form-horizontal";
+		$form_params['id']     = "stage_1";
+		$form_params['legend'] = "Verify write permissions";
+		$form_params['error']  = "No write access available in folder 'include'";
+		$form_params['method'] = "Post";
+		
+		$form_params['elements'][0]['type']  = 'button';	
+		$form_params['elements'][0]['class'] = 'btn btn-success';
+		$form_params['elements'][0]['label'] = 'Check Permissions';
+		$form_params['elements'][0]['id']    = 'submit_stage_1';	
+
+		$form = core_generate_form($form_params);
+		return "<div class='well'><legend><h1>NeweraPaaS Installation</h1></legend>$form</div>";
 	} 	else if($inst_stage == 2) {
-   	$data = "<div class='well'>
-   					<legend><h1>NeweraPaaS Installation</h1></legend>
-   					<!-- Checking mysql connectivity in first stage -->
-   					<form class='form-horizontal' method='POST' id='stage_2'>
-   						<legend>Verify mysql connectivity</legend>
-   							<div class='control-group'>
-									<label class='error' style='display: none;color:red' color='3px #090 solid' id='error_stage_2'>Mysql connectivity failed</label>
-   							</div>
-   							<div class='control-group'>
-   								<label class='control-label'>Host Address</label>
-   								<div class='controls'>
-   									<input type='text' class='input-xlarge' id='mysql_addr' name='mysql_addr' placeholder='Server address' maxlength=24>
-   								</div>
-	   						</div>
-   							<div class='control-group'>
-   								<label class='control-label'>Host Port</label>
-   								<div class='controls'>
-   									<input type='text' class='input-xlarge' id='mysql_port' name='mysql_port' placeholder='Server port' value=3306 maxlength=5>
-   								</div> 
-   							</div>
-   							<div class='control-group'>
-   								<label class='control-label'>Username</label>
-	   							<div class='controls'>
-   									<input type='text' class='input-xlarge' id='mysql_user' name='mysql_user' placeholder='Username'>
-   								</div>
-   							</div>
-   							<div class='control-group'>
-   								<label class='control-label'>Password</label>
-   								<div class='controls'>
-   									<input type='text' class='input-xlarge' id='mysql_passwd' name='mysql_passwd' placeholder='Password'>
-   								</div>
-	   						</div>
-   							<div class='control-group'>
-   								<div class='controls'>
-   									<button class='btn btn-success' id='submit_stage_2'>Check Mysql</button>
-   								</div>
-   							</div>
-   						</form>";
-   	return $data;
+		$form_params['class']  = "form-horizontal";
+		$form_params['id']     = "stage_2";
+		$form_params['legend'] = "Verify mysql connectivity";
+		$form_params['error']  = "Mysql Connectivity failed";
+		$form_params['method'] = "Post";
+		
+		$form_params['elements'][0]['type']        = 'text';
+		$form_params['elements'][0]['label']       = 'Host address';
+		$form_params['elements'][0]['maxlength']   = '24';
+		$form_params['elements'][0]['placeholder'] = 'Server address';
+		$form_params['elements'][0]['id']          = 'mysql_addr';
+		$form_params['elements'][0]['name']        = 'mysql_addr';
+		
+		$form_params['elements'][1]['type']        = 'text';
+		$form_params['elements'][1]['label']       = 'Host port';
+		$form_params['elements'][1]['maxlength']   = '5';
+		$form_params['elements'][1]['placeholder'] = 'Server port';
+		$form_params['elements'][1]['id']          = 'mysql_port';
+		$form_params['elements'][1]['name']        = 'mysql_port';
+		$form_params['elements'][1]['value']       = '3306';
+		
+		$form_params['elements'][2]['type']        = 'text';
+		$form_params['elements'][2]['label']       = 'Username';
+		$form_params['elements'][2]['maxlength']   = '16';
+		$form_params['elements'][2]['placeholder'] = 'Database username';
+		$form_params['elements'][2]['id']          = 'mysql_user';
+		$form_params['elements'][2]['name']        = 'mysql_user';
+		
+		$form_params['elements'][3]['type']        = 'password';
+		$form_params['elements'][3]['label']       = 'Password';
+		$form_params['elements'][3]['maxlength']   = '16';
+		$form_params['elements'][3]['placeholder'] = 'Database password';
+		$form_params['elements'][3]['id']          = 'mysql_passwd';
+		$form_params['elements'][3]['name']        = 'mysql_passwd';
+		
+		$form_params['elements'][4]['type']  = 'button';	
+		$form_params['elements'][4]['class'] = 'btn btn-success';
+		$form_params['elements'][4]['label'] = 'Check Permissions';
+		$form_params['elements'][4]['id']    = 'submit_stage_2';	
+		
+		$form = core_generate_form($form_params);
+		return "<div class='well'><legend><h1>NeweraPaaS Installation</h1></legend>$form</div>";
    } else if($inst_stage == 3) {   	
 		$form_params['class']  = "form-horizontal";
 		$form_params['id']     = "stage_3";
 		$form_params['legend'] = "Initialize MysqlData";
 		$form_params['error']  = "Cannot create database";
 		
-		$form_params['elements'][0]['type'] = 'text';
-		$form_params['elements'][0]['label'] = 'test field';
-		$form_params['elements'][0]['class'] = 'input-xlarge';	
-		$form_params['elements'][0]['placeholder'] = 'Username';
-		$form_params['elements'][0]['maxlength'] = '24';	
+		$form_params['elements'][0]['type']        = 'text';
+		$form_params['elements'][0]['label']       = 'Admin Username';
+		$form_params['elements'][0]['class']       = 'input-xlarge';	
+		$form_params['elements'][0]['placeholder'] = 'Dashboard admin username';
+		$form_params['elements'][0]['maxlength']   = '16';	
+		$form_params['elements'][0]['id']          = 'dash_user';
+		$form_params['elements'][0]['name']        = 'dash_user';
+				
+		$form_params['elements'][1]['type']        = 'password';
+		$form_params['elements'][1]['label']       = 'Admin Password';
+		$form_params['elements'][1]['class']       = 'input-xlarge';
+		$form_params['elements'][1]['placeholder'] = 'Dashboard admin password';
+		$form_params['elements'][1]['maxlength']   = '16';
+		$form_params['elements'][1]['id']          = 'dash_passwd';
+		$form_params['elements'][1]['name']        = 'dash_passwd';
 		
-		$form_params['elements'][1]['type'] = 'button';	
-		$form_params['elements'][1]['class'] = 'btn btn-success';
-		$form_params['elements'][1]['label'] = 'Proceed';	
+		$form_params['elements'][2]['type']        = 'text';
+		$form_params['elements'][2]['label']       = 'Database Name';
+		$form_params['elements'][2]['class']       = 'input-xlarge';
+		$form_params['elements'][2]['palceholder'] = 'Deffault paas_dashboard';
+		$form_params['elements'][2]['maxlength']   = '16';
+		$form_params['elements'][2]['id']          = 'dash_db';
+		$form_params['elements'][2]['name']        = 'dash_db';
+		
+		$form_params['elements'][3]['type']  = 'button';	
+		$form_params['elements'][3]['class'] = 'btn btn-success';
+		$form_params['elements'][3]['label'] = 'Create Database';
+		$form_params['elements'][3]['id']    = 'submit_stage_3';	
 
 		include_once("include/forms.php");
 		$form = core_generate_form($form_params);

@@ -37,10 +37,11 @@ function init_db() {
 }
 
 function test_connection_db($db_host, $db_port, $db_user, $db_passwd, $db_name = "") {
-	if(new mysqli($db_host, $db_user, $db_passwd, $db_name, $db_port))
+	global $db_conn; 
+	$db_conn = @new mysqli($db_host, $db_user, $db_passwd, $db_name, $db_port);
+	if($db_conn && !$db_conn->connect_errno)
 		return 1;
-	else 
-		return;
+	return 0;
 }
 
 function query_db($query) {

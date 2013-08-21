@@ -19,7 +19,7 @@
   */
 
    function check_installed() {
-      return file_exists('settings.php');
+      return file_exists('include/settings.php');
    }
 
    function boot() {

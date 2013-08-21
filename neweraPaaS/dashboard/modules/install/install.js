@@ -87,8 +87,7 @@ function custom_script_function() {
 		if($("#stage_3").valid()){
 			var dash_user   = $("#dash_user").val(); 
 			var dash_passwd = $("#dash_passwd").val();
-			var dash_db     = $("#dash_db").val();
-			var action_data = {'dash_user': dash_user, 'dash_passwd': dash_passwd, 'dash_db': dash_db};
+			var action_data = {'dash_user': dash_user, 'dash_passwd': dash_passwd};
 			value = core_perform_action("install", "check_stage_3", action_data);
 			if(value != 1) {
 				console.log(value);

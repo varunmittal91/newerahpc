@@ -22,18 +22,18 @@ define("DB_PARAMETER_TYPE_COMPARE", "compare");
 
 $db_conn = NULL;
 
-function setup_parameters_db($_db_host, $_db_port, $_db_user, $_db_pass, $_db_name) {
+function setup_parameters_db($_db_host, $_db_port, $_db_user, $_db_passwd, $_db_name) {
 	global $db_host;
 	global $db_port;
 	global $db_user;
-	global $db_pass;
+	global $db_passwd;
 	global $db_name;
 	
-	$db_host = $_db_host;
-	$db_port = $_db_port;
-	$db_user = $_db_user;
-	$db_pass = $_db_pass;
-	$db_name = $_db_name;
+	$db_host   = $_db_host;
+	$db_port   = $_db_port;
+	$db_user   = $_db_user;
+	$db_passwd = $_db_passwd;
+	$db_name   = $_db_name;
 	
 	return 1; 
 }
@@ -41,11 +41,11 @@ function setup_parameters_db($_db_host, $_db_port, $_db_user, $_db_pass, $_db_na
 function init_db() {
    global $db_host;
    global $db_user;
-   global $db_pass;
+   global $db_passwd;
    global $db_name;
    global $db_conn;
 
-   $db_conn = @new mysqli($db_host, $db_user, $db_pass, $db_name) or die("Error");
+   $db_conn = @new mysqli($db_host, $db_user, $db_passwd, $db_name) or die("Error");
    if($db_conn->connect_errno) {
       echo "Failed to connect to MySQL: (" . $db_conn->connect_errno . ") " . $db_conn->connect_error . "<br>";
       exit(0);
@@ -60,6 +60,11 @@ function test_connection_db($db_host, $db_port, $db_user, $db_passwd, $db_name =
 	if($db_conn && !$db_conn->connect_errno)
 		return 1;
 	return 0;
+}
+
+function insert_db($query) {
+	global $db_conn;	
+	return $db_conn->real_query($query);
 }
 
 function query_db($query) {

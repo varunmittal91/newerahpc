@@ -127,7 +127,10 @@ function load_modules() {
 			print "Invalid request";
 			return;	
 		}
-		print $func_ptr();
+		if(($result_data = $func_ptr()))
+			print $result_data;
+		else 
+			print "404";
 		return;
 	}	else {
 	   global $theme_active;

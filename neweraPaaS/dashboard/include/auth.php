@@ -31,4 +31,16 @@ function set_logged_in($uid, $gid) {
    $_SESSION['logged_in'] = 1;
 }
 
+function add_user($dash_user, $dash_passwd, $rsa_key = NULL) {
+	if($rsa_key)
+		$fileds = "(_uid, _user, _passwd, _rsa_pub_key) values(@, '$dash_user', '$dash_passwd', '$rsa_key')";
+	else 
+		$fileds = "(_uid, _user, _passwd) values(@, '$dash_user', '$dash_passwd')";
+	   
+	$query = "insert into $user $fileds";
+	if(query_db($query))
+		return 1;
+	else return 0;	
+} 
+
 ?>

@@ -57,16 +57,34 @@ function install_load_action() {
 		if(($db_host = check_arg("mysql_addr", 1)) && ($db_port = check_arg("mysql_port", 1)) && ($db_user = check_arg("mysql_user", 1))) {
 			if(!($db_passwd = check_arg("mysql_passwd", 1)))
 				$db_passwd = "";
-			if(($test_action = test_connection_db($db_host, $db_port, $db_user, $db_passwd)) != 1)  {
-				return $test_action;
-			}
+			if(!($db_name = check_arg("mysql_db", 1)))
+				$db_name = "neweraPaaS";
+			include_once('install_utils.php');
+			if(!_create_database($db_host, $db_port, $db_user, $db_passwd, $db_name))
+				return 0;			
+			
 			$arg_value = 3;
+			set_arg("db_host", ARG_TYPE_SESSION, $db_host);
+			set_arg("db_port", ARG_TYPE_SESSION, $db_port);
+			set_arg("db_user", ARG_TYPE_SESSION, $db_user);
+			set_arg("db_passwd", ARG_TYPE_SESSION, $db_passwd);
+			set_arg("db_name", ARG_TYPE_SESSION, $db_name);
+			
 			set_arg("stage", ARG_TYPE_SESSION, $arg_value);
 			return 1;
 		}
 		else {
 			return 0;
 		}
+	} else if($test_val == 'check_stage_3') {
+		if(!($dash_user = check_arg("dash_user", ARG_TYPE_GET)) || !($dash_passwd = check_arg("dash_passwd", ARG_TYPE_GET))) {
+			return 0;
+		}
+
+		if(!init_db())
+			return 0;
+
+		return 1;  		
 	} else 	
 		return 0;
 }
@@ -131,10 +149,17 @@ function install_load_content() {
 		$form_params['elements'][3]['id']          = 'mysql_passwd';
 		$form_params['elements'][3]['name']        = 'mysql_passwd';
 		
-		$form_params['elements'][4]['type']  = 'button';	
-		$form_params['elements'][4]['class'] = 'btn btn-success';
-		$form_params['elements'][4]['label'] = 'Check Permissions';
-		$form_params['elements'][4]['id']    = 'submit_stage_2';	
+		$form_params['elements'][4]['type']        = 'text';
+		$form_params['elements'][4]['label']       = 'Database name';
+		$form_params['elements'][4]['maxlength']   = '16';
+		$form_params['elements'][4]['placeholder'] = 'Default neweraPaaS';
+		$form_params['elements'][4]['id']          = 'mysql_db';
+		$form_params['elements'][4]['name']        = 'mysql_db';
+		
+		$form_params['elements'][5]['type']  = 'button';	
+		$form_params['elements'][5]['class'] = 'btn btn-success';
+		$form_params['elements'][5]['label'] = 'Check Permissions';
+		$form_params['elements'][5]['id']    = 'submit_stage_2';	
 		
 		$form = core_generate_form($form_params);
 		return "<div class='well'><legend><h1>NeweraPaaS Installation</h1></legend>$form</div>";

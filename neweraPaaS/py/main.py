@@ -96,8 +96,9 @@ def main(argv):
    if paas_user:
       from pwd import getpwnam  
       try: 
-         uid = getpwnam(paas_user).pw_uid
-         os.setuid(uid)
+         #uid = getpwnam(paas_user).pw_uid
+         #os.setuid(uid)
+         print "not syncing user yet"
       except os.error as error:
          if error.errno == neweraPaaS.errors.PAAS_ENOPT:
        	    neweraPaaS.errors.setError(neweraPaaS.errors.PAAS_ENOPT)

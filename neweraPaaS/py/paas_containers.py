@@ -52,7 +52,6 @@ def createContainer(cmd_arguments):
    while 1:
       i += 1
       _instance_path = instance_path + "instance-" + str(i)
-      
       try:
          os.mkdir(_instance_path)
          break
@@ -60,6 +59,7 @@ def createContainer(cmd_arguments):
          if exception.errno != errno.EEXIST:
             paas_errors.setError(paas_errors.PAAS_EACCES)
             paas_errors.paasPerror("createContainer()")
+            raise
             return
    instance_path = _instance_path
    os.mkdir(instance_path + "/rootfs")

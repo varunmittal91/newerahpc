@@ -24,3 +24,5 @@ import paas_containers as containers
 import paas_config as config
 import paas_images as images
 import paas_network as network
+import paas_platform as platform
+import paas_mysql as mysql

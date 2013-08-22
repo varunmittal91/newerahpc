@@ -51,7 +51,6 @@ def getLXCRoot(cmd_arguments):
    return lxc_root
 
 def getLocalNetPrefix(cmd_arguments):
-
    try:
       network_prefix = cmd_arguments['local-net-prefix']
    except:
@@ -76,3 +75,22 @@ def getLocalNetConfig(cmd_arguments):
 
    return net_config
 
+def getMysqlConfig(cmd_arguments):
+   config_file  = ''
+   mysql_config = {}
+   try:
+      config_file = cmd_arguments['config-file']
+      config      = ConfigParser.RawConfigParser()
+      config.read(config_file)
+      mysql_config['sql_host']   = config.get('NeweraPaaS', 'mysql-host')
+      mysql_config['sql_port']   = config.get('NeweraPaaS', 'mysql-port')
+      mysql_config['sql_user']   = config.get('NeweraPaaS', 'mysql-user')
+      mysql_config['sql_passwd'] = config.get('NeweraPaaS', 'msqyl-passwd')
+      mysql_config['sql_db']     = config.get('NeweraPaaS', 'mysql-db')
+   except:
+      paas_errors.setError(paas_errors.PAAS_EINVAL)
+      return
+   return mysql_config
+
+
+      

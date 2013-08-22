@@ -35,6 +35,10 @@ def updateFunctions(function_list):
    function_list['shutdown'] = neweraPaaS.containers.shutdownContainer
 
 def main(argv):
+   if not neweraPaaS.platform.checkPlatform():
+      print "test"
+      #neweraPaaS.errors.paasPerror("checkPlatform() failed, main()")
+      #exit(1)
 
    cmd_arguments = {}
 
@@ -79,6 +83,9 @@ def main(argv):
          lxc_root = arg
       elif opt in ('-p'):
          paas_root = arg
+
+   if not neweraPaaS.mysql.connectMysql(cmd_arguments):
+      neweraPaaS.errors.paasPerror("aa")
 
    try:
       cmd = cmd_arguments['cmd']

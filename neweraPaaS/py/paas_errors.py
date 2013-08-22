@@ -19,9 +19,12 @@
 #       along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import sys
 import errno
+import traceback
 
-paas_errno = 0
+paas_errno     = 0
+paas_traceback = 0
 
 global PAAS_ENOPT
 global PAAS_ENOENT      
@@ -38,6 +41,9 @@ global PAAS_EUMOUNT
 global PAAS_ESTARTLXC
 global PAAS_ESTOPLXC
 global PAAS_EINVALUSER
+global PAAS_ENOUMOUNT
+global PAAS_ENOPLATFRM
+global PAAS_ENOMYSQL
 
 PAAS_ENOPT       = 1            # Operation not permitted
 PAAS_ENOENT      = errno.ENOENT # No such file or directory
@@ -56,6 +62,9 @@ PAAS_EUMOUNT     = 113          # Unable to unmount image
 PAAS_ESTARTLXC   = 114          # Unable to start container
 PAAS_ESTOPLXC    = 115          # Unable to stop container
 PAAS_EINVALUSER  = 116          # Invalid paas user given
+PAAS_ENOUMOUNT   = 117          # No union mount support available
+PAAS_ENOPLATFRM  = 118          # Platform not supported
+PAAS_ENOMYSQL    = 119          # Error connecting mysql
 
 
 PAAS_ERROR_STRINGS = {}
@@ -76,10 +85,15 @@ PAAS_ERROR_STRINGS[PAAS_EUMOUNT]     = "Unable to unmount image"
 PAAS_ERROR_STRINGS[PAAS_ESTARTLXC]   = "Unable to start container"
 PAAS_ERROR_STRINGS[PAAS_ESTOPLXC]    = "Unable to stop container"
 PAAS_ERROR_STRINGS[PAAS_EINVALUSER]  = "Invalid paas user give"
+PAAS_ERROR_STRINGS[PAAS_ENOUMOUNT]   = "No union mount support available"
+PAAS_ERROR_STRINGS[PAAS_ENOPLATFRM]  = "Platform not supported"
+PAAS_ERROR_STRINGS[PAAS_ENOMYSQL]    = "Error connecting mysql"
 
 def setError(error):
    global paas_errno
-   paas_errno = error
+   global paas_traceback
+   paas_errno     = error
+   paas_traceback = traceback.extract_stack()
 
 def paasPerror(string):
    error_str  = ''
@@ -94,3 +108,4 @@ def paasPerror(string):
    
    error_str += perror_str
    print error_str
+   print paas_traceback

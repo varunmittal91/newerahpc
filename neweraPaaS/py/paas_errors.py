@@ -44,6 +44,7 @@ global PAAS_EINVALUSER
 global PAAS_ENOUMOUNT
 global PAAS_ENOPLATFRM
 global PAAS_ENOMYSQL
+global PAAS_ENOHOST
 
 PAAS_ENOPT       = 1            # Operation not permitted
 PAAS_ENOENT      = errno.ENOENT # No such file or directory
@@ -65,6 +66,7 @@ PAAS_EINVALUSER  = 116          # Invalid paas user given
 PAAS_ENOUMOUNT   = 117          # No union mount support available
 PAAS_ENOPLATFRM  = 118          # Platform not supported
 PAAS_ENOMYSQL    = 119          # Error connecting mysql
+PAAS_ENOHOST     = 120          # Error host not found or down
 
 
 PAAS_ERROR_STRINGS = {}
@@ -88,19 +90,25 @@ PAAS_ERROR_STRINGS[PAAS_EINVALUSER]  = "Invalid paas user give"
 PAAS_ERROR_STRINGS[PAAS_ENOUMOUNT]   = "No union mount support available"
 PAAS_ERROR_STRINGS[PAAS_ENOPLATFRM]  = "Platform not supported"
 PAAS_ERROR_STRINGS[PAAS_ENOMYSQL]    = "Error connecting mysql"
+PAAS_ERROR_STRINGS[PAAS_ENOHOST]     = "Error host not found or down"
 
-def setError(error):
+def setError(error, identifier = ''):
    global paas_errno
+   global paas_errno_identifier
    global paas_traceback
-   paas_errno     = error
-   paas_traceback = traceback.extract_stack()
+   paas_errno            = error
+   paas_traceback        = traceback.extract_stack()
+   paas_errno_identifier = identifier
 
 def paasPerror(string):
    error_str  = ''
    perror_str = ''
 
    if string:
-      error_str = string + ": "
+      if paas_errno_identifier:
+         error_str = string + ",identifier: " + paas_errno_identifier + " : "
+      else:
+         error_str = string + ": "
    try:
       perror_str = PAAS_ERROR_STRINGS[paas_errno] 
    except:

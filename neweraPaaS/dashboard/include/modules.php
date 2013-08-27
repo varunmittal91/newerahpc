@@ -43,8 +43,10 @@ function _get_menu_module() {
 			print "module not found";
 			exit(0);
 		}
+		include_once($module_path);
 		$func_ptr = $module."_load_menu";
-		$menu .= $func_ptr();
+		$_menu = $func_ptr();
+		$menu .= "<li>$_menu</li>";
 	} 	
 
 	print $menu;
@@ -59,6 +61,7 @@ function _get_sidebar_module() {
 		if(!($module_path = _get_module_path($module))) {
 			exit(0);	
 		}	
+		include_once($module_path);
 		$func_ptr = $module."_load_sidebar";
 		$sidebar .= $func_ptr();
 	}	
@@ -96,12 +99,10 @@ function load_modules() {
 				return;	
 			} else {
 				if(!($module = get_default_module())) {
-					print "404";
 					return;	
 				}
 			}
 		}		
-		
 		$module_path = "modules/$module/main.php";
 		if(!file_exists($module_path)) {
 			print "404";
@@ -122,7 +123,11 @@ function load_modules() {
 		} else if($check_arg_var == 'menu') {
 			return _get_menu_module();		
 		} else if($check_arg_var == 'script') {
-			$func_ptr .= '_load_script';	
+			$func_ptr .= '_load_script';
+			if(function_exists($func_ptr))
+				print $func_ptr();
+			else 
+				return 0;
 		} else {
 			print "Invalid request";
 			return;	
@@ -130,7 +135,7 @@ function load_modules() {
 		if(($result_data = $func_ptr()))
 			print $result_data;
 		else 
-			print "404";
+			print "0";
 		return;
 	}	else {
 	   global $theme_active;

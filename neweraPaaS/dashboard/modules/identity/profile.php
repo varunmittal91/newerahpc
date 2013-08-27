@@ -17,9 +17,6 @@
   *     You should have received a copy of the GNU General Public License
   *     along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
   */
-?>
-
-<?php
 
 function identity_profile_test_enable() {
    return 0;

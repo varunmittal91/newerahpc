@@ -24,6 +24,18 @@ import ConfigParser
 
 import paas_errors
 
+class Config:
+   def __init__(self, config_file):
+      config = ConfigParser.RawConfigParser()
+      config.read(config_file)
+      self.config = config
+   def getValue(self, key):
+      try:
+         value = self.config.get('NeweraPaaS', key)
+         return value
+      except:
+         return
+
 def getPAASRoot(cmd_arguments):
    try:
       paas_root = cmd_arguments['paas-root']
@@ -80,12 +92,11 @@ def getMysqlConfig(cmd_arguments):
    mysql_config = {}
    try:
       config_file = cmd_arguments['config-file']
-      config      = ConfigParser.RawConfigParser()
+      config = ConfigParser.RawConfigParser()
       config.read(config_file)
       mysql_config['sql_host']   = config.get('NeweraPaaS', 'mysql-host')
-      mysql_config['sql_port']   = config.get('NeweraPaaS', 'mysql-port')
       mysql_config['sql_user']   = config.get('NeweraPaaS', 'mysql-user')
-      mysql_config['sql_passwd'] = config.get('NeweraPaaS', 'msqyl-passwd')
+      mysql_config['sql_passwd'] = config.get('NeweraPaaS', 'mysql-passwd')
       mysql_config['sql_db']     = config.get('NeweraPaaS', 'mysql-db')
    except:
       paas_errors.setError(paas_errors.PAAS_EINVAL)

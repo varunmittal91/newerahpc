@@ -36,7 +36,7 @@ def updateFunctions(function_list):
 
 def main(argv):
    if not neweraPaaS.platform.checkPlatform():
-      print "test"
+      print "aa"
       #neweraPaaS.errors.paasPerror("checkPlatform() failed, main()")
       #exit(1)
 
@@ -66,6 +66,7 @@ def main(argv):
       elif opt in ('-n'):
          cmd_arguments['container-name'] = arg
       elif opt in ('-c'):
+         config_file = arg
          cmd_arguments['config-file'] = arg
          config = ConfigParser.RawConfigParser()
          try:
@@ -84,8 +85,13 @@ def main(argv):
       elif opt in ('-p'):
          paas_root = arg
 
-   if not neweraPaaS.mysql.connectMysql(cmd_arguments):
-      neweraPaaS.errors.paasPerror("aa")
+   if not config_file:
+      print "config file must"
+      exit(1)
+
+   if not neweraPaaS.server.serverInit(cmd_arguments):
+      neweraPaaS.errors.paasPerror("initServer failed, main()")      
+      exit(1)
 
    try:
       cmd = cmd_arguments['cmd']

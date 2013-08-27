@@ -31,6 +31,39 @@ import paas_network
 import paas_mount
 import paas_lxc_interface
 
+RESOURCE_TINY   = {'cpu':1, 'mem':'256MB', 'hdd':'10GB'}
+RESOURCE_MEDIUM = {'cpu':2, 'mem':'512MB', 'hdd':'10GB'}
+def customResource(_cpu, _mem, _hdd):
+   return {cpu:_cpu, mem:_mem, hdd:_hdd}
+
+class Containers:
+   def configure(self, Config, Database):
+      self.lxc_root = Config.getValue('lxc-root')
+      self.paas_root = Config.getValue('paas-root')
+      if not self.lxc_root:
+         paas_errors.setError(paas_errors.PAAS_EINVAL, "lxc-root")
+         return
+      if not self.paas_root:
+         paas_errors.setError(paas_errors.PAAS_EINVAL, "paas-root")
+         return    
+      return 1
+
+   def create(self, Images, name, image, resource=RESOURCE_TINY):
+      print "Create container"
+
+   def start(self, name):
+      print "Starting container"
+
+   def stop(self, name):
+      print "Stoping continer"
+
+   def reconfigure(self, name, resource):
+      print "Reconfiguring container"
+
+   def migrate(self, name, target):
+      print "Initiating migrate"
+
+
 def createContainer(cmd_arguments):
    paas_root = paas_config.getPAASRoot(cmd_arguments)
    if not paas_root:

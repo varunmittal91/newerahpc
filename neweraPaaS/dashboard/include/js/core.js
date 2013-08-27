@@ -75,6 +75,7 @@ function _load_sidebar() {
 
 function _load_script(module) {
 	var url = "?q=script&" + "module=" + module;
+	console.log(url);
 	var scripts = _get_core_action(url);
 	console.log(scripts);
 	$("body").append(scripts);

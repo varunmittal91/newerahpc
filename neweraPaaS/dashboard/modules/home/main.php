@@ -17,9 +17,6 @@
   *     You should have received a copy of the GNU General Public License
   *     along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
   */
-?>
-
-<?php
 
 function home_test_enable() {
    return 1;
@@ -30,15 +27,11 @@ function home_load_menu() {
 }
 
 function home_load_content() {
-   $test_value = check_arg('q', 1);
-   if($test_value && $test_value != 'home')
-      return NULL;
-
    return "<h1>Welcome</h1>";
 }
 
 function home_load_sidebar() {
-
+	return "hi";
 }
 
 ?>

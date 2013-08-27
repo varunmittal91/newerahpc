@@ -17,9 +17,6 @@
   *     You should have received a copy of the GNU General Public License
   *     along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
   */
-?>
-
-<?php
 
 function identity_test_enable() {
    return 1;
@@ -105,9 +102,11 @@ function identity_load_script() {
 }
 
 function identity_load_content() {
+	return "<h1>Return content</h1>";
 
-   fetch_result_db(array('uid','gid'), 'user', array("'username'" => array("'varun'", DB_PARAMETER_TYPE_COMPARE)));
-   exit(0);
+
+   //fetch_result_db(array('uid','gid'), 'user', array("'username'" => array("'varun'", DB_PARAMETER_TYPE_COMPARE)));
+   //exit(0);
 
    $test_value = check_arg('q', 1);
    if($test_value && $test_value == 'identity_login') {  
@@ -191,6 +190,7 @@ function identity_load_content() {
 }
 
 function identity_load_sidebar() {
+	return "< test >";
 }
 
 ?>

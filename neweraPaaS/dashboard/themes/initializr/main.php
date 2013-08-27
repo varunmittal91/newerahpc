@@ -34,8 +34,7 @@
                <a class="brand" href="#"><?php print $site_title ?></a>
                <div class="nav-collapse collapse">
 	               <ul class="nav">
-	               	<?php echo $menu ?>
-	               	<div id="menu-area"></div>
+	               	<ul class="nav" id="menu-area"></ul>
                      <li class="dropdown">
                      	<a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
                         <ul class="dropdown-menu">

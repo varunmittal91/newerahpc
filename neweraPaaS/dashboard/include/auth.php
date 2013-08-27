@@ -31,13 +31,21 @@ function set_logged_in($uid, $gid) {
    $_SESSION['logged_in'] = 1;
 }
 
+function core_uid_generator() {
+    $characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    $randstring = "";
+    for ($i = 0; $i < 10; $i++) {
+        $randstring = $characters[rand(0, strlen($characters) - 1)];
+    }
+    return md5($randstring);
+}
+
 function core_add_user($dash_user, $dash_passwd, $rsa_key = NULL) {
+	$uuid = core_uid_generator();
 	if($rsa_key)
-		$fileds = "(_uid, _user, _passwd, _rsa_pub_key) values(@, '$dash_user', '$dash_passwd', '$rsa_key')";
+		$fileds = "(_uid, _user, _passwd, _rsa_pub_key, _uuid) values(@, '$dash_user', '$dash_passwd', '$rsa_key', '$uuid')";
 	else 
-		$fileds = "(_uid, _user, _passwd) values(@, '$dash_user', '$dash_passwd')";
-	   
-	global $db_name;
+		$fileds = "(_uid, _user, _passwd, _uuid) values(@, '$dash_user', '$dash_passwd', '$uuid')";
 	   
 	$query = "insert into users $fileds";
 	return insert_db($query);

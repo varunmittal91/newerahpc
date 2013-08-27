@@ -26,3 +26,4 @@ import paas_images as images
 import paas_network as network
 import paas_platform as platform
 import paas_mysql as mysql
+import paas_server as server

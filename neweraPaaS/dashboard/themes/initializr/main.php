@@ -33,8 +33,25 @@
          	<div class="container">
                <a class="brand" href="#"><?php print $site_title ?></a>
                <div class="nav-collapse collapse">
-	               <ul class="nav">
-	               	<ul class="nav" id="menu-area"></ul>
+	               <ul class="nav" id="menu-area">
+	               	<!--
+	               	<li class="dropdown">
+	               	<a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown<b class="caret"></b></a>
+	                  <ul class="dropdown-menu">
+   	                 	<li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li class="divider"></li>
+                        <li class="nav-header">Nav header</li>
+                        <li><a href="#">Separated link</a></li>
+                        <li><a href="#">One more separated link</a></li>
+                   	</ul>
+                   	</li>
+							-->
+
+
+	               	<!-- </ul> -->
+	               	<!--
                      <li class="dropdown">
                      	<a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
                         <ul class="dropdown-menu">
@@ -47,6 +64,7 @@
                            <li><a href="#">One more separated link</a></li>
                       	</ul>
                  		</li>
+                 		-->
                 	</ul>
               	</div><!--/.nav-collapse -->
           	</div>
@@ -57,11 +75,7 @@
       <!-- Main hero unit for a primary marketing message or call to action -->
       	<div class="row">
          	<div class="span4">
-            	<div class='sidebar-nav'>
-            		<div class="well">
-	            		<div id='content-sidebar'></div>
-	            	</div>
-              	</div>
+            	<div class="well" id='content-sidebar'></div>
           	</div>
 	    		<div class="span8">
 	    			<div id="content-area"></div>

@@ -17,64 +17,47 @@
   *     along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
   */
 
-var valid_login_name = 0;
-var valid_login_passwd = 0;
-
-$(document).ready(function() {
-   $('#username').blur(username_check);
-   $('#userpasswd').blur(passwd_check);
-
-   $('#login_button').click(function() {
-      console.log('button pressed');
-      if(!valid_login_name && !valid_login_passwd) {
-         username_check();
-         passwd_check();
-      } else if(!valid_login_passwd)
-         passwd_check();
-      else {
-         console.log("sending login");
-         var userpasswd = $('#userpasswd').val();
-         var username   = $('#username').val();
-         jQuery.ajax({
-            type: 'GET',
-            url: '?q=action&module=identity&func=login_user',
-            data: {'username': username, 'userpasswd': userpasswd},
-            cache: false,
-            success: function(response) {
-               console.log(response);
-               if(response == 1) {
-                  window.location = location.pathname;
-               }
-               else {
-                  $('#login_error_failed').fadeIn();
-               }
-            }
-         })
-      }
-   })
-});
-
-function passwd_check() {
-   var passwd = $('#userpasswd').val();
-   console.log(passwd);
-   if(passwd == '') {
-      valid_login_passwd = 0;
-      $('#userpasswd_error_required').fadeIn();
-      $('#userpasswd').css('border', '3px #C33 solid');
-   } else {
-      valid_login_passwd = 1;
-      $('#userpasswd').css('border', '3px #090 solid');
-   }
-}
-
-function username_check() {
-   var username = $('#username').val();
-   if(username == '') {
-      valid_login_name = 0;
-      $('#username_error_required').fadeIn();
-      $('#username').css('border', '3px #C33 solid');
-   } else {
-      valid_login_name = 1;
-      $('#username').css('border', '3px #090 solid');
-   }
+function custom_script_function() {
+	$('#signin_form').submit(false);
+	$('#submit_signin').click(function(){
+		var validator = $('#signin_form').validate({
+ 		rules: {
+			dash_user: {
+				required : 1,
+				minlength: 5,
+				maxlength: 16
+			},
+			dash_passwd: {
+				required:  1,
+				minlength: 5,
+				maxlength: 16
+			}
+		},
+		errorElement: 'span',
+		messages: {
+			dash_user: {
+				required:  ' Username required',
+				minlength: ' Minimum length should be 5'
+			},
+			dash_passwd: {
+				required:  ' Password required', 
+				minlength: ' Minimum length should be 5'
+			}
+		}
+		});
+		if($('#signin_form').valid()){
+			var dash_user   = $("#dash_user").val();
+			var dash_passwd = $("#dash_passwd").val();
+			var action_data = {'dash_user': dash_user, 'dash_passwd': dash_passwd};
+			value = core_perform_action("identity", "check_signin", action_data);
+			if(value == 1) {
+				$("#error_signin_form").fadeIn();
+				console.log("login successful");
+				paas_core_refresh_content("home");
+			} else {
+				$("#error_signin_form").fadeIn();
+				console.log(value);				
+			}
+		}
+	});
 }

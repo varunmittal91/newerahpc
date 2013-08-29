@@ -61,6 +61,9 @@ function _get_current_module() {
 function _load_content(module, func) {
 	var content_area = $("#content-area");
 	var url = "?q=content&module=" + module;
+	if(func)
+		url += ("&func=" + func);
+	console.log(url);
 	content_area.hide();
 	content_area.empty();
 	content_area.append(_get_core_action(url));
@@ -73,11 +76,12 @@ function _load_sidebar() {
 	$("#content-sidebar").append(_get_core_action(url));
 }
 
-function _load_script(module) {
+function _load_script(module, func) {
 	var url = "?q=script&" + "module=" + module;
+	if(func)
+		url += ("&func=" + func);
 	console.log(url);
 	var scripts = _get_core_action(url);
-	console.log(scripts);
 	$("body").append(scripts);
 }
 
@@ -86,18 +90,23 @@ function _load_menu() {
 	$("#menu-area").load(url);
 }
 
-function paas_core_refresh_content(module) {
+function paas_core_refresh_content(module, func) {
 	if(!module)
 		module = _get_current_module();
 	
-	_load_content(module);
+	_load_content(module, func);
 	_load_menu();
 	_load_sidebar();
-	_load_script(module);
+	_load_script(module, func);
 }
 
 $(document).ready(function() {
-	paas_core_refresh_content();
+	var $_GET=[];
+   window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,function(a,name,value){$_GET[name]=value;});
+	var module = $_GET["module"];
+	var func   = $_GET["func"];
+	console.log("func:" + func);
+	paas_core_refresh_content(module, func);
 	
 	try {
 		custom_script_function();

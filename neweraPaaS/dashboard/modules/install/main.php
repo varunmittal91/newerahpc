@@ -217,10 +217,18 @@ function install_load_content() {
 		$form_params['elements'][1]['id']          = 'dash_passwd';
 		$form_params['elements'][1]['name']        = 'dash_passwd';
 		
-		$form_params['elements'][2]['type']  = 'button';	
-		$form_params['elements'][2]['class'] = 'btn btn-success';
-		$form_params['elements'][2]['label'] = 'Init Database';
-		$form_params['elements'][2]['id']    = 'submit_stage_3';	
+		$form_params['elements'][2]['type']        = 'password';
+		$form_params['elements'][2]['label']       = 'Confirm Admin Password';
+		$form_params['elements'][2]['class']       = 'input-xlarge';
+		$form_params['elements'][2]['placeholder'] = 'Dashboard admin password';
+		$form_params['elements'][2]['maxlength']   = '16';
+		$form_params['elements'][2]['id']          = 'dash_cpasswd';
+		$form_params['elements'][2]['name']        = 'dash_cpasswd';
+
+		$form_params['elements'][3]['type']  = 'button';	
+		$form_params['elements'][3]['class'] = 'btn btn-success';
+		$form_params['elements'][3]['label'] = 'Init Database';
+		$form_params['elements'][3]['id']    = 'submit_stage_3';	
 
 		include_once("include/forms.php");
 		$form = core_generate_form($form_params);

@@ -20,14 +20,14 @@
 
 function check_logged_in() {
    if(isset($_SESSION['logged_in']))
-      return true;
+   	return check_arg('uid', ARG_TYPE_SESSION);
    else 
-      return false;
+      return;
 }
 
-function set_logged_in($uid, $gid) {
-   $_SESSION['uid'] = $uid;
-   $_SESSION['gid'] = $gid;
+function set_logged_in($_uuid, $_uid) {
+   $_SESSION['uuid'] = $_uuid;
+   $_SESSION['uid'] = $_uid;
    $_SESSION['logged_in'] = 1;
 }
 
@@ -42,6 +42,7 @@ function core_uid_generator() {
 
 function core_add_user($dash_user, $dash_passwd, $rsa_key = NULL) {
 	$uuid = core_uid_generator();
+	$dash_passwd = md5($dash_passwd);
 	if($rsa_key)
 		$fileds = "(_uid, _user, _passwd, _rsa_pub_key, _uuid) values(@, '$dash_user', '$dash_passwd', '$rsa_key', '$uuid')";
 	else 

@@ -55,7 +55,7 @@ function custom_script_function() {
 			var mysql_addr   = $("#mysql_addr").val();
 			var mysql_port   = $("#mysql_port").val();
 			var mysql_user   = $("#mysql_user").val();
-			var mysql_passwd = $("#mysql_passwd").val();   		
+			var mysql_passwd = $("#mysql_passwd").val();
 			var mysql_db     = $("#mysql_db").val();
    		var action_data = {'mysql_addr': mysql_addr, 'mysql_port': mysql_port, 'mysql_user': mysql_user, 
    								 'mysql_passwd': mysql_passwd, 'mysql_db': mysql_db}; 
@@ -75,13 +75,33 @@ function custom_script_function() {
 	$("#submit_stage_3").click(function(){
 		var validator = $("#stage_3").validate({
 			rules: {
-				dash_user:   "required",
-				dash_passwd: "required"
+				dash_user: {
+					required: 1,
+					minlength: 5
+				},
+				dash_passwd: {
+					required: 1,
+					minlength: 5
+				},
+				dash_cpasswd: {
+					required: 1,
+					equalTo:  '#dash_passwd'
+				}
 			},
 			errorElement: "span",
 			messages: {
-				dash_user:   "Admin username required",
-				dash_passwd: "Admin password required"	
+				dash_user: {
+					required: " Admin username required",
+					minlength: " Minimum length should be 5"
+				},
+				dash_passwd: {
+					required: " Admin password required",
+					minlength: " Minimum length should be 5"
+				},
+				dash_cpasswd: {
+					required: " Confirm password is required", 
+					equalTo:  " Passwords do not match"
+				}	
 			}
 		});
 		if($("#stage_3").valid()){

@@ -23,15 +23,16 @@ function home_test_enable() {
 }
 
 function home_load_menu() {
-   return "<a href=?q=home>Home</a>";   
+   return "<a href=?module=home>Home</a>";   
 }
 
 function home_load_content() {
-   return "<h1>Welcome</h1>";
+   return "<h1>Welcome To NeweraPaaS Dashboard</h1>
+   		 Signin to start working on the cloud :)";
 }
 
 function home_load_sidebar() {
-	return "hi";
+
 }
 
 ?>

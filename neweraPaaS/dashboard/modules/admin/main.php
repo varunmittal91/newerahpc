@@ -1,3 +1,4 @@
+<?php
  /*
   *     (C) 2013 Varun Mittal <varunmittal91@gmail.com>
   *     NeweraHPC_webstorage program is distributed under the terms of the GNU General Public License v3
@@ -17,7 +18,30 @@
   *     along with NeweraHPC.  If not, see <http://www.gnu.org/licenses/>.
   */
 
-function custom_script_function() {
+function admin_test_enable() {
+	include_once('include/auth.php');
+	if(($_uid = check_logged_in()) && $_uid == 1)
+		return 1;
+	else 
+		return 0;
+}
+
+function admin_load_menu() {
+	return "<a href='?module=admin'>Admin</a>";
+}
+
+function admin_load_content() {
 	
 }
 
+function admin_load_sidebar() {
+	$links[0] = "<a href='?module=admin&func=loadGroups'>Active Groups</a>";
+	$links[1] = "<a href='?module=admin&func=loadUsers'>Active Users</a>";
+	return $links;
+}
+
+function admin_load_action() {
+	
+}
+
+?>

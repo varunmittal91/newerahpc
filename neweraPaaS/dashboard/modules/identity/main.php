@@ -23,40 +23,39 @@ function identity_test_enable() {
 }
 
 function identity_load_menu() {
-   if(!check_logged_in())
-      return "<a href=?q=identity_login>Login</a>";
-   else 
-      return "<a href=?q=identity_logout>Logout</a>";
+   if(!check_logged_in()) {
+   	$links[0] = "Signin";
+   	$links[1] = "<a href=?module=identity&func=signin>SignIn</a>";
+   	$links[2] = "<a href=?module=identity&func=signup>SignUp</a>";  
+   	$links[3] = "";
+   	$links[4] = "<a href=?module=identity&func=forgot_password>Forgot Password</a>";
+      return $links;
+   } else {
+   	$link = "<a href=?module=identity&func=signout>SignOut</a>";
+   	return $link;	
+   }
 }
 
 function identity_load_action() {
-   global $enable_debug;
-
-   if($enable_debug)
-      $arg_type = 1;
-   else
-      $arg_type = 0;
-
    $test_val = check_arg('func', 1);
-   if($test_val == NULL)
-      print 0;
-   else if($test_val == 'login_user') {
-      $username = check_arg('username', $arg_type);
-      $passwd   = check_arg('userpasswd', $arg_type);
+   if($test_val == 'check_signin') {
+      $username = check_arg('dash_user', ARG_TYPE_GET);
+      $passwd   = check_arg('dash_passwd', ARG_TYPE_GET);
 
       if(!$username || !$passwd) {
          print 0;
          return;
       }
       $epasswd = md5($passwd);
-      $query  = "select uid,gid,groupname from users where user='$username' and passwd='$epasswd'";
+      $query  = "select _uuid,_uid from users where _user='$username' and _passwd='$epasswd'";
       $result = query_db($query);
       if($result && $result->num_rows > 0) {
-         print 1;
-         set_logged_id();
-      } else
-         print 0;
-      return;
+      	include_once('include/auth.php');
+      	$obj = $result->fetch_object();
+      	set_logged_in($obj->_uuid, $obj->_uid);
+         return 1;
+      }
+      return 0;
    } else if($test_val == 'register_user') {
       $username = check_arg('username', 1);
       $passwd   = check_arg('userpasswd', 1);
@@ -91,106 +90,98 @@ function identity_load_action() {
 }
 
 function identity_load_script() {
-   $test_value = check_arg('q', 1);
-   if($test_value == 'identity_signup') {
-      $script = "<script type='text/javascript' src='modules/identity/signup.js'></script>";
-      return $script;
-   } else if($test_value == 'identity_login') {
-      $script = "<script type='text/javascript' src='modules/identity/signin.js'></script>";
-      return $script;
+   $test_value = check_arg('func', 1);
+   $script = "<script type='text/javascript' src='include/js/jquery.validate.js'></script>";
+   if($test_value == 'signup' || !$test_value) {
+      $script .= "<script type='text/javascript' src='modules/identity/signup.js'></script>";
+   } else if($test_value == 'signin') {
+      $script .= "<script type='text/javascript' src='modules/identity/signin.js'></script>";
+   } else if($test_value == 'signout') {
+   	$script .= "<script type='text/javascript'>paas_core_refresh_content()</script>";	
    }
+	return $script;
 }
 
 function identity_load_content() {
-	return "<h1>Return content</h1>";
+	$test_value = check_arg('func', ARG_TYPE_GET);
+	if(!$test_value || $test_value == 'signin') {
+		$form_params['class']  = "form-horizontal";
+		$form_params['id']     = "signin_form";
+		$form_params['name']   = "signin_form";
+		$form_params['legend'] = "Signin";
+		$form_params['error']  = "Cannot verify username or password";
+		
+		$form_params['elements'][0]['type']        = 'text';
+		$form_params['elements'][0]['label']       = 'Username';
+		$form_params['elements'][0]['class']       = 'input-xlarge';	
+		$form_params['elements'][0]['placeholder'] = 'Username';
+		$form_params['elements'][0]['maxlength']   = '16';	
+		$form_params['elements'][0]['id']          = 'dash_user';
+		$form_params['elements'][0]['name']        = 'dash_user';
+		
+		$form_params['elements'][1]['type']        = 'password';
+		$form_params['elements'][1]['label']       = 'Password';
+		$form_params['elements'][1]['class']       = 'input-xlarge';	
+		$form_params['elements'][1]['placeholder'] = 'Password';
+		$form_params['elements'][1]['maxlength']   = '16';	
+		$form_params['elements'][1]['id']          = 'dash_passwd';
+		$form_params['elements'][1]['name']        = 'dash_passwd';
+		
+		$form_params['elements'][2]['class']  = 'btn btn-success';
+		$form_params['elements'][2]['label']  = 'Signin';
+		$form_params['elements'][2]['type']   = 'button';
+		$form_params['elements'][2]['id']     = 'submit_signin';
+		$form_params['elements'][2]['name']   = 'submit_signin';
+		
+		include_once('include/forms.php');
+		$form = core_generate_form($form_params);
+  	   return "<div class='well'><legend><h1>NeweraPaaS</h1></legend>$form</div>";
+	} else if($test_value == 'signup') {
+		$form_params['class']  = 'form-horizontal';
+		$form_params['id']     = 'signup_form';
+		$form_params['legend'] = 'Signup';
+		$form_params['error']  = 'Signup failed';
+		
+		$form_params['elements'][0]['type']        = 'text';
+		$form_params['elements'][0]['label']       = 'Username';
+		$form_params['elements'][0]['class']       = 'input-xlarge';
+		$form_params['elements'][0]['placeholder'] = 'Desired username';
+		$form_params['elements'][0]['maxlength']   = '16';
+		$form_params['elements'][0]['id']          = 'dash_user';
+		$form_params['elements'][0]['name']        = 'dash_user';	
 
-
-   //fetch_result_db(array('uid','gid'), 'user', array("'username'" => array("'varun'", DB_PARAMETER_TYPE_COMPARE)));
-   //exit(0);
-
-   $test_value = check_arg('q', 1);
-   if($test_value && $test_value == 'identity_login') {  
-      $form = "
-<div class='well'>
-   <form class='form-horizontal' method='POST' action='' id='signin_form'>
-      <legend>Login</legend>
-      <div class='control-group'>
-         <center><label class='error' style='display: none;color:red' color='3px #090 solid' id='login_error_failed'>Login failed</label></center>
-      </div>
-      <div class='control-group'>
-         <label class='control-label'>Username</label>
-         <div class='controls'>
-            <input type='text' class='input-xlarge' id='username' name='username' placeholder='Username' maxlength=16>
-            <small><p class='error' style='display: none' id='username_error_required'>Username required</p></small>
-         </div>
-      </div>
-      <div class='control-group'>
-         <label class='control-label'>Password</label>
-         <div class='controls'>
-            <input type='password' class='input-xlarge' id='userpasswd' name='userpasswd' placeholder='Password' maxlength=16>
-            <small><p class='error' style='display: none' id='userpasswd_error_required'>Password required</p></small>
-         </div>
-      </div>
-      <div class='control-group'>
-         <label class='control-label'></label>
-         <div class='controls'>
-            <button type='button' class='btn btn-success' id='login_button'>Login</button>  
-         </div>
-      </div>
-      <hr>
-   </form>
-   <div class='control-group'>
-      <a href='?q=identity_signup'>
-         <label class='control-label'>Create New Account</label>
-      </a>
-   </div>
-</div>
-";
-      return $form;
-   } else if($test_value && $test_value == 'identity_signup') {
-
-      $form = "
-<div class='well'>
-   <legend>Sign Up</legend>
-   <form class='form-horizontal' id='signup_form'>
-      <div class='control-group'>
-         <label class='control-label'>Username</label>
-         <div class='controls'>
-            <input type='text' class='input-xlarge' id='username' name='username' placeholder='Username' maxlength=16>
-            <small><p class='error' style='display: none' id='username_error_len'>Username length should be atleast 5</p></small>
-            <small><p class='error' style='display: none' id='username_error_exists'>Username not available</p></small>
-         </div>
-      </div>
-      <div class='control-group'>
-         <label class='control-label'>Password</label>
-         <div class='controls'>
-            <input type='password' class='input-xlarge' id='passwd' name='passwd' placeholder='Password' maxlength=16>
-            <small><p class='error' style='display: none' id='passwd_error_nmatch'>Passwords do not match</p></small>
-            <small><p class='error' style='display: none' id='passwd_error_len'>Password length should me minimum 8</p></small>
-         </div>
-      </div>
-      <div class='control-group'>
-         <label class='control-label'>Confirm Password</label>
-         <div class='controls'>
-            <input type='password' class='input-xlarge' id='confirm_passwd' name='confirm-passwd' placeholder='Confirm Password' maxlength=16>
-         </div>
-      </div>
-      <div class='control-group'>
-         <label class='control-label'></label>
-         <div class='controls'>
-            <button type='button' class='btn btn-success' id='signup_submit' name='signup_submit'>Signup</button>
-         </div>
-      </div>
-   </form>
-   <div id='welcome_message' style='display: none'><h1>Welcome to Cloud</h1></div>
-</div>
-";
-      return $form;
+		$form_params['elements'][1]['type']        = 'text';
+		$form_params['elements'][1]['label']       = 'Password';
+		$form_params['elements'][1]['class']       = 'input-xlarge';
+		$form_params['elements'][1]['placeholder'] = 'Desired password';
+		$form_params['elements'][1]['maxlength']   = '16';
+		$form_params['elements'][1]['id']          = 'dash_passwd';
+		$form_params['elements'][1]['name']        = 'dash_passwd';
+		
+		$form_params['elements'][2]['type']        = 'text';
+		$form_params['elements'][2]['label']       = 'Confirm Password';
+		$form_params['elements'][2]['class']       = 'input-xlarge';
+		$form_params['elements'][2]['placeholder'] = 'Desired password';
+		$form_params['elements'][2]['maxlength']   = '16';
+		$form_params['elements'][2]['id']          = 'dash_cpasswd';
+		$form_params['elements'][2]['name']        = 'dash_cpasswd';	
+			
+		$form_params['elements'][3]['class']  = 'btn btn-success';
+		$form_params['elements'][3]['label']  = 'Signup';
+		$form_params['elements'][3]['type']   = 'button';
+		$form_params['elements'][3]['id']     = 'signup_button';
+		$form_params['elements'][3]['name']   = 'signup_button';
+		
+		include_once('include/forms.php');
+		$form = core_generate_form($form_params);
+  	   return "<div class='well'><legend><h1>NeweraPaaS</h1></legend>$form</div>";
+   } else if($test_value == 'signout') {
+   	session_destroy();	
    }
 }
 
 function identity_load_sidebar() {
-	return "< test >";
+
 }
 
 ?>

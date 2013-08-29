@@ -44,9 +44,26 @@ function _get_menu_module() {
 			exit(0);
 		}
 		include_once($module_path);
+		$check_func_ptr = $module."_test_enable";
+		if(!$check_func_ptr()) {
+			continue;
+		}
 		$func_ptr = $module."_load_menu";
 		$_menu = $func_ptr();
-		$menu .= "<li>$_menu</li>";
+		if(is_array($_menu)) {
+			$menu .= "<li class='dropdown'><a href='#' class='dropdown-toggle' data-toggle='dropdown'>$_menu[0]<b class='caret'></b></a>
+	               <ul class='dropdown-menu'>";
+			foreach($_menu as $i => $_menu_item) {
+				if($i == 0)
+					continue;
+				if($_menu_item == '')
+					$menu .= "<li class='divider'></li>";
+				else 
+					$menu .= "<li>$_menu_item</li>"; 
+			}
+			$menu .= "</ul></li>";
+		} else 
+			$menu .= "<li>$_menu</li>";
 	} 	
 
 	print $menu;
@@ -54,7 +71,7 @@ function _get_menu_module() {
 
 function _get_sidebar_module() {
 	global $modules;
-	$sidebar = "";
+	$sidebar = "<ul>";
 	$module_path;
 	$func_ptr;
 	foreach($modules as $module) {
@@ -62,9 +79,19 @@ function _get_sidebar_module() {
 			exit(0);	
 		}	
 		include_once($module_path);
+		$check_func_ptr = $module."_test_enable";
+		if(!$check_func_ptr()) {
+			continue;
+		}
 		$func_ptr = $module."_load_sidebar";
-		$sidebar .= $func_ptr();
+		$_sidebar = $func_ptr();
+		if(is_array($_sidebar)) {
+			foreach($_sidebar as $_sidebar_item)
+				$sidebar .= "<li>$_sidebar_item</li>";	
+		} else if(strlen($_sidebar) > 0)
+			$sidebar .= "<li>$_sidebar</li>";
 	}	
+	$sidebar .= "</ul>";
 	
 	print $sidebar;
 }
@@ -79,7 +106,6 @@ function _get_script_module($module) {
 }
 
 function load_modules() {
-   
    global $site_title;
    global $site_footer;
 
@@ -94,9 +120,11 @@ function load_modules() {
 	$module;
 	if(($check_arg_var = check_arg('q', 1))) {
 		if(!($module = check_arg('module', 1))) {
-			if($check_arg_var == 'action' || $check_arg_var == 'script') {
+			if($check_arg_var == 'action') {
 				print 0;
 				return;	
+			} else if($check_arg_var == 'script') {
+				return;
 			} else {
 				if(!($module = get_default_module())) {
 					return;	
@@ -126,8 +154,7 @@ function load_modules() {
 			$func_ptr .= '_load_script';
 			if(function_exists($func_ptr))
 				print $func_ptr();
-			else 
-				return 0;
+			return;
 		} else {
 			print "Invalid request";
 			return;	
